@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/statuscard.tsx","./src/hooks/usehealthcheck.ts","./src/pages/dashboard.tsx","./src/services/api.ts","./src/types/index.ts","./src/utils/constants.ts"],"version":"5.6.3"}
