@@ -1,0 +1,53 @@
+# Canonical Class Schema for RAKSHYA VISION Object Detection
+version: 1.0.0
+
+canonical_classes:
+  0: person
+  1: helmet
+  2: safety_vest
+  3: gloves
+  4: safety_footwear
+  5: fire
+  6: smoke
+
+mappings:
+  person:
+    - person
+    - worker
+    - human
+  helmet:
+    - helmet
+    - hard-hat
+    - hard_hat
+    - hard hat
+  safety_vest:
+    - vest
+    - safety-vest
+    - safety_vest
+  gloves:
+    - glove
+    - gloves
+  safety_footwear:
+    - boot
+    - boots
+    - safety-boot
+    - safety-boots
+    - safety-shoe
+    - safety-shoes
+    - Safety Boot
+  fire:
+    - fire
+  smoke:
+    - smoke
+
+# Classes deliberately preserved in RAW but filtered out of Stage 1 positive object detector
+ignored_in_detector:
+  - NO-Helmet
+  - NO-Vest
+  - NO-Gloves
+  - NO-Boots
+  - no gloves
+  - no boots
+  - no hat
+  - no vest
+  - head

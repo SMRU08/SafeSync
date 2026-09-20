@@ -1,0 +1,58 @@
+{
+  "person": {
+    "class_name": "person",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  },
+  "helmet": {
+    "class_name": "helmet",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  },
+  "safety_vest": {
+    "class_name": "safety_vest",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  },
+  "gloves": {
+    "class_name": "gloves",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  },
+  "safety_footwear": {
+    "class_name": "safety_footwear",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  },
+  "fire": {
+    "class_name": "fire",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  },
+  "smoke": {
+    "class_name": "smoke",
+    "train": 0,
+    "validation": 0,
+    "test": 0,
+    "total": 0,
+    "percentage": 0.0
+  }
+}

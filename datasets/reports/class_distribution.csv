@@ -1,0 +1,8 @@
+class_name,train,validation,test,total,percentage
+person,0,0,0,0,0.0
+helmet,0,0,0,0,0.0
+safety_vest,0,0,0,0,0.0
+gloves,0,0,0,0,0.0
+safety_footwear,0,0,0,0,0.0
+fire,0,0,0,0,0.0
+smoke,0,0,0,0,0.0

@@ -1,0 +1,4 @@
+﻿# SHA-256 Checksums for Downloaded Raw Archives & Datasets
+# Format: <hash>  <relative_filepath>
+b6713b4a8e065210b9c1f0d96f6e262fd67987d9fabbf190d17592c48b0bd68d  datasets/raw/d_fire/repo/LICENSE
+105f34f17fcac5303ead6255a24b1dc269286547a3a4e9aa0545e8790fd94862  datasets/raw/d_fire/repo/README.md

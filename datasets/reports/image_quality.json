@@ -1,0 +1,10 @@
+{
+  "scanned_images": 0,
+  "valid_images": 0,
+  "corrupted_images_count": 0,
+  "corrupted_images": [],
+  "zero_byte_count": 0,
+  "zero_byte_images": [],
+  "extremely_small_images_count": 0,
+  "extremely_small_images": []
+}

@@ -1,0 +1,78 @@
+version: 1.0.0
+generated_at: "2026-09-20T13:40:00Z"
+
+datasets:
+  - name: "PPE Detection & Compliance"
+    source: "Roboflow Universe"
+    url: "https://universe.roboflow.com/izanagi/ppe-detection-and-compliance"
+    source_version: "Not verified"
+    processing_version: "v1"
+    license: "CC BY 4.0 (Roboflow Community)"
+    original_classes:
+      - person
+      - helmet
+      - NO-Helmet
+      - vest
+      - NO-Vest
+      - gloves
+      - NO-Gloves
+      - boots
+      - NO-Boots
+    canonical_classes:
+      - person
+      - helmet
+      - safety_vest
+      - gloves
+      - safety_footwear
+    notes: "Primary multi-class PPE compliance source. Requires Roboflow API key for direct export."
+
+  - name: "Construction PPE"
+    source: "Roboflow Universe"
+    url: "https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo"
+    source_version: "Not verified"
+    processing_version: "v1"
+    license: "CC BY 4.0 (Roboflow Community)"
+    original_classes:
+      - helmet
+      - vest
+      - gloves
+      - Safety Boot
+      - no gloves
+      - no boots
+      - no hat
+      - no vest
+    canonical_classes:
+      - helmet
+      - safety_vest
+      - gloves
+      - safety_footwear
+    notes: "High diversity construction environment dataset."
+
+  - name: "Hard Hat Workers"
+    source: "Roboflow Public Dataset"
+    url: "https://public.roboflow.com/object-detection/hard-hat-workers"
+    source_version: "v2 (raw) / v10"
+    processing_version: "v1"
+    license: "CC0: Public Domain"
+    original_classes:
+      - helmet
+      - head
+      - person
+    canonical_classes:
+      - person
+      - helmet
+    notes: "Curated by Northeastern University China. CC0 public domain license."
+
+  - name: "D-Fire"
+    source: "GitHub"
+    url: "https://github.com/gaia-solutions-on-demand/DFireDataset"
+    source_version: "v1.0"
+    processing_version: "v1"
+    license: "GPL-3.0"
+    original_classes:
+      - fire
+      - smoke
+    canonical_classes:
+      - fire
+      - smoke
+    notes: "21,000+ images with fire, smoke, and negative non-fire background frames."

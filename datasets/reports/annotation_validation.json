@@ -1,0 +1,12 @@
+{
+  "total_images": 0,
+  "valid_images": 0,
+  "invalid_images": 0,
+  "total_labels": 0,
+  "valid_labels": 0,
+  "invalid_labels": 0,
+  "missing_labels": 0,
+  "invalid_class_ids": 0,
+  "invalid_boxes": 0,
+  "unknown_classes": 0
+}
