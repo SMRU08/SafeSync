@@ -2,106 +2,121 @@
   "project": "RAKSHYA VISION",
   "phase": "Phase 2 — Dataset Collection & Preparation",
   "schema_version": "1.0.0",
-  "created_at": "2026-09-20T13:45:00Z",
+  "created_at": "2026-09-20T17:45:00Z",
   "datasets": [
-    {
-      "name": "PPE Detection & Compliance",
-      "source_url": "https://universe.roboflow.com/izanagi/ppe-detection-and-compliance",
-      "license": "CC BY 4.0",
-      "version": "Not verified",
-      "download_date": "Not verified",
-      "original_classes": [
-        "person",
-        "helmet",
-        "NO-Helmet",
-        "vest",
-        "NO-Vest",
-        "gloves",
-        "NO-Gloves",
-        "boots",
-        "NO-Boots"
-      ],
-      "canonical_classes": [
-        "person",
-        "helmet",
-        "safety_vest",
-        "gloves",
-        "safety_footwear"
-      ],
-      "image_count": 0,
-      "annotation_count": 0,
-      "processing_version": "v1",
-      "checksums": null,
-      "validation_status": "PENDING_DOWNLOAD"
-    },
     {
       "name": "Construction PPE",
       "source_url": "https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo",
       "license": "CC BY 4.0",
-      "version": "Not verified",
-      "download_date": "Not verified",
+      "version": "1",
+      "download_date": "2026-09-20",
       "original_classes": [
-        "helmet",
-        "vest",
-        "gloves",
-        "Safety Boot",
-        "no gloves",
-        "no boots",
+        "hat",
         "no hat",
-        "no vest"
+        "no vest",
+        "vest"
       ],
       "canonical_classes": [
         "helmet",
-        "safety_vest",
-        "gloves",
-        "safety_footwear"
+        "safety_vest"
       ],
-      "image_count": 0,
-      "annotation_count": 0,
+      "image_count": 1124,
+      "annotation_count": 5325,
       "processing_version": "v1",
       "checksums": null,
-      "validation_status": "PENDING_DOWNLOAD"
+      "validation_status": "VERIFIED"
     },
     {
       "name": "Hard Hat Workers",
       "source_url": "https://public.roboflow.com/object-detection/hard-hat-workers",
-      "license": "CC0: Public Domain",
-      "version": "v2",
-      "download_date": "Not verified",
+      "license": "Public Domain (CC0)",
+      "version": "10",
+      "download_date": "2026-09-20",
       "original_classes": [
-        "helmet",
         "head",
+        "helmet",
         "person"
       ],
       "canonical_classes": [
-        "person",
-        "helmet"
+        "helmet",
+        "person"
       ],
       "image_count": 7035,
-      "annotation_count": 0,
+      "annotation_count": 27039,
       "processing_version": "v1",
-      "checksums": null,
-      "validation_status": "PENDING_DOWNLOAD"
+      "checksums": "131b731c7391b71d9b0ece1798b1143a717fcef07f8d3e511008cc6dcfe3c5b1",
+      "validation_status": "VERIFIED"
     },
     {
-      "name": "D-Fire",
-      "source_url": "https://github.com/gaia-solutions-on-demand/DFireDataset",
-      "license": "GPL-3.0",
-      "version": "1.0",
-      "download_date": "Not verified",
+      "name": "PPE Detection & Compliance",
+      "source_url": "https://universe.roboflow.com/izanagi/ppe-detection-and-compliance",
+      "license": "CC BY 4.0",
+      "version": "2",
+      "download_date": "2026-09-20",
       "original_classes": [
-        "fire",
-        "smoke"
+        "Boots",
+        "Gloves",
+        "Goggles",
+        "Helmet",
+        "Mask",
+        "NO-Boots",
+        "NO-Gloves",
+        "NO-Goggles",
+        "NO-Helmet",
+        "NO-Mask",
+        "NO-Vest",
+        "Person",
+        "Vest"
+      ],
+      "canonical_classes": [
+        "safety_footwear",
+        "gloves",
+        "helmet",
+        "person",
+        "safety_vest"
+      ],
+      "image_count": 9663,
+      "annotation_count": 38945,
+      "processing_version": "v1",
+      "checksums": "806cda2009852f3f7736b14f01e689158fa7053b0a6782728ce057c765b45855",
+      "validation_status": "VERIFIED"
+    },
+    {
+      "name": "D-Fire (Fire & Smoke)",
+      "source_url": "https://github.com/gaia-solutions-on-demand/DFireDataset",
+      "license": "CC BY 4.0 / GPL-3.0",
+      "version": "1",
+      "download_date": "2026-09-20",
+      "original_classes": [
+        "Fire",
+        "Smoke"
       ],
       "canonical_classes": [
         "fire",
         "smoke"
       ],
-      "image_count": 21527,
-      "annotation_count": 26557,
+      "image_count": 4631,
+      "annotation_count": 10706,
       "processing_version": "v1",
-      "checksums": null,
-      "validation_status": "PENDING_DOWNLOAD"
+      "checksums": "0ed3b4011469870ff8401445efccae9b4c3de3bef8c1a2c4898ee3e1379319ca",
+      "validation_status": "VERIFIED"
     }
-  ]
+  ],
+  "totals": {
+    "total_raw_images": 22453,
+    "total_processed_images": 22453,
+    "total_train_images": 15717,
+    "total_val_images": 4490,
+    "total_test_images": 2246,
+    "total_bounding_boxes": 51195,
+    "class_counts": {
+      "person": 5545,
+      "helmet": 24531,
+      "safety_vest": 6272,
+      "gloves": 2634,
+      "safety_footwear": 1507,
+      "fire": 5333,
+      "smoke": 5373
+    }
+  }
 }

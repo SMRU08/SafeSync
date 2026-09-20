@@ -1,8 +1,8 @@
 class_name,train,validation,test,total,percentage
-person,0,0,0,0,0.0
-helmet,0,0,0,0,0.0
-safety_vest,0,0,0,0,0.0
-gloves,0,0,0,0,0.0
-safety_footwear,0,0,0,0,0.0
-fire,0,0,0,0,0.0
-smoke,0,0,0,0,0.0
+person,3884,1059,602,5545,10.83
+helmet,17041,5005,2485,24531,47.92
+safety_vest,4505,1199,568,6272,12.25
+gloves,1886,500,248,2634,5.15
+safety_footwear,1010,257,240,1507,2.94
+fire,3637,1131,565,5333,10.42
+smoke,3765,1106,502,5373,10.5

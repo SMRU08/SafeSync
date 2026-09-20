@@ -1,4 +1,3 @@
-# Canonical Class Schema for RAKSHYA VISION Object Detection
 version: 1.0.0
 
 canonical_classes:
@@ -17,6 +16,7 @@ mappings:
     - human
   helmet:
     - helmet
+    - hat
     - hard-hat
     - hard_hat
     - hard hat
@@ -40,7 +40,6 @@ mappings:
   smoke:
     - smoke
 
-# Classes deliberately preserved in RAW but filtered out of Stage 1 positive object detector
 ignored_in_detector:
   - NO-Helmet
   - NO-Vest
@@ -51,3 +50,9 @@ ignored_in_detector:
   - no hat
   - no vest
   - head
+  - goggles
+  - no-goggles
+  - NO-Goggles
+  - mask
+  - no-mask
+  - NO-Mask

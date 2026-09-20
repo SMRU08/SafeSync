@@ -1,4 +1,7 @@
-﻿# SHA-256 Checksums for Downloaded Raw Archives & Datasets
+# SHA-256 Checksums for Downloaded Raw Archives & Key Manifests
 # Format: <hash>  <relative_filepath>
 b6713b4a8e065210b9c1f0d96f6e262fd67987d9fabbf190d17592c48b0bd68d  datasets/raw/d_fire/repo/LICENSE
 105f34f17fcac5303ead6255a24b1dc269286547a3a4e9aa0545e8790fd94862  datasets/raw/d_fire/repo/README.md
+131b731c7391b71d9b0ece1798b1143a717fcef07f8d3e511008cc6dcfe3c5b1  datasets/raw/hard_hat_workers (download zip archive)
+806cda2009852f3f7736b14f01e689158fa7053b0a6782728ce057c765b45855  datasets/raw/ppe_detection_compliance (download zip archive)
+0ed3b4011469870ff8401445efccae9b4c3de3bef8c1a2c4898ee3e1379319ca  datasets/raw/d_fire/fire_smoke (download zip archive)

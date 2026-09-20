@@ -31,9 +31,12 @@ yarn-error.log*
 *.sqlite
 *.sqlite3
 
-# Datasets & Large files
+# Datasets (Raw and processed binary images/labels)
 datasets/raw/*
 !datasets/raw/.gitkeep
+datasets/processed/images/
+datasets/processed/labels/
+datasets/staging/
 
 # Models & Weights
 models/**/*.pt

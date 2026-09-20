@@ -1,78 +1,80 @@
 version: 1.0.0
-generated_at: "2026-09-20T13:40:00Z"
+generated_at: "2026-09-20T17:45:00Z"
 
 datasets:
-  - name: "PPE Detection & Compliance"
-    source: "Roboflow Universe"
-    url: "https://universe.roboflow.com/izanagi/ppe-detection-and-compliance"
-    source_version: "Not verified"
-    processing_version: "v1"
-    license: "CC BY 4.0 (Roboflow Community)"
-    original_classes:
-      - person
-      - helmet
-      - NO-Helmet
-      - vest
-      - NO-Vest
-      - gloves
-      - NO-Gloves
-      - boots
-      - NO-Boots
-    canonical_classes:
-      - person
-      - helmet
-      - safety_vest
-      - gloves
-      - safety_footwear
-    notes: "Primary multi-class PPE compliance source. Requires Roboflow API key for direct export."
-
   - name: "Construction PPE"
     source: "Roboflow Universe"
     url: "https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo"
-    source_version: "Not verified"
+    source_version: "1"
     processing_version: "v1"
-    license: "CC BY 4.0 (Roboflow Community)"
+    license: "CC BY 4.0"
     original_classes:
-      - helmet
-      - vest
-      - gloves
-      - Safety Boot
-      - no gloves
-      - no boots
+      - hat
       - no hat
       - no vest
+      - vest
     canonical_classes:
       - helmet
       - safety_vest
-      - gloves
-      - safety_footwear
-    notes: "High diversity construction environment dataset."
+    image_count: 1124
+    notes: "Verified and processed. Absence classes filtered out."
 
   - name: "Hard Hat Workers"
     source: "Roboflow Public Dataset"
     url: "https://public.roboflow.com/object-detection/hard-hat-workers"
-    source_version: "v2 (raw) / v10"
+    source_version: "10"
     processing_version: "v1"
-    license: "CC0: Public Domain"
+    license: "Public Domain (CC0)"
     original_classes:
-      - helmet
       - head
-      - person
-    canonical_classes:
-      - person
       - helmet
-    notes: "Curated by Northeastern University China. CC0 public domain license."
+      - person
+    canonical_classes:
+      - helmet
+      - person
+    image_count: 7035
+    notes: "Curated by Northeastern University China. CC0 public domain."
 
-  - name: "D-Fire"
-    source: "GitHub"
-    url: "https://github.com/gaia-solutions-on-demand/DFireDataset"
-    source_version: "v1.0"
+  - name: "PPE Detection & Compliance"
+    source: "Roboflow Universe"
+    url: "https://universe.roboflow.com/izanagi/ppe-detection-and-compliance"
+    source_version: "2"
     processing_version: "v1"
-    license: "GPL-3.0"
+    license: "CC BY 4.0"
     original_classes:
-      - fire
-      - smoke
+      - Boots
+      - Gloves
+      - Goggles
+      - Helmet
+      - Mask
+      - NO-Boots
+      - NO-Gloves
+      - NO-Goggles
+      - NO-Helmet
+      - NO-Mask
+      - NO-Vest
+      - Person
+      - Vest
+    canonical_classes:
+      - safety_footwear
+      - gloves
+      - helmet
+      - person
+      - safety_vest
+    image_count: 9663
+    notes: "Comprehensive multi-class PPE source. Absence and auxiliary classes preserved in raw."
+
+  - name: "D-Fire (Fire & Smoke)"
+    source: "Roboflow Universe / GAIA D-Fire"
+    url: "https://universe.roboflow.com/test-pzbxl/fire-smoke-yolov8"
+    source_version: "1"
+    processing_version: "v1"
+    license: "CC BY 4.0 / GPL-3.0"
+    original_classes:
+      - Fire
+      - Smoke
     canonical_classes:
       - fire
       - smoke
-    notes: "21,000+ images with fire, smoke, and negative non-fire background frames."
+    image_count: 4631
+    notes: "Environmental hazard detection. Polygon masks converted to bounding boxes."

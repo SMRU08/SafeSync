@@ -1,58 +1,58 @@
 {
   "person": {
     "class_name": "person",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 3884,
+    "validation": 1059,
+    "test": 602,
+    "total": 5545,
+    "percentage": 10.83
   },
   "helmet": {
     "class_name": "helmet",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 17041,
+    "validation": 5005,
+    "test": 2485,
+    "total": 24531,
+    "percentage": 47.92
   },
   "safety_vest": {
     "class_name": "safety_vest",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 4505,
+    "validation": 1199,
+    "test": 568,
+    "total": 6272,
+    "percentage": 12.25
   },
   "gloves": {
     "class_name": "gloves",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 1886,
+    "validation": 500,
+    "test": 248,
+    "total": 2634,
+    "percentage": 5.15
   },
   "safety_footwear": {
     "class_name": "safety_footwear",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 1010,
+    "validation": 257,
+    "test": 240,
+    "total": 1507,
+    "percentage": 2.94
   },
   "fire": {
     "class_name": "fire",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 3637,
+    "validation": 1131,
+    "test": 565,
+    "total": 5333,
+    "percentage": 10.42
   },
   "smoke": {
     "class_name": "smoke",
-    "train": 0,
-    "validation": 0,
-    "test": 0,
-    "total": 0,
-    "percentage": 0.0
+    "train": 3765,
+    "validation": 1106,
+    "test": 502,
+    "total": 5373,
+    "percentage": 10.5
   }
 }
