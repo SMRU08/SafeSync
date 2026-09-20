@@ -1,0 +1,150 @@
+{
+  "experiment": "ppe_fire_smoke_v2",
+  "evaluated_utc": "2026-09-20T16:59:43.616256",
+  "metrics": [
+    {
+      "split": "val",
+      "class": "person",
+      "class_id": 0,
+      "precision": 0.2777,
+      "recall": 0.5071,
+      "mAP50": 0.2038,
+      "mAP50_95": 0.1147
+    },
+    {
+      "split": "val",
+      "class": "helmet",
+      "class_id": 1,
+      "precision": 0.6049,
+      "recall": 0.8186,
+      "mAP50": 0.7257,
+      "mAP50_95": 0.3846
+    },
+    {
+      "split": "val",
+      "class": "safety_vest",
+      "class_id": 2,
+      "precision": 0.3286,
+      "recall": 0.5196,
+      "mAP50": 0.2926,
+      "mAP50_95": 0.1179
+    },
+    {
+      "split": "val",
+      "class": "gloves",
+      "class_id": 3,
+      "precision": 0.3974,
+      "recall": 0.182,
+      "mAP50": 0.0866,
+      "mAP50_95": 0.0341
+    },
+    {
+      "split": "val",
+      "class": "safety_footwear",
+      "class_id": 4,
+      "precision": 0.0957,
+      "recall": 0.0778,
+      "mAP50": 0.0478,
+      "mAP50_95": 0.0191
+    },
+    {
+      "split": "val",
+      "class": "fire",
+      "class_id": 5,
+      "precision": 0.4502,
+      "recall": 0.2679,
+      "mAP50": 0.1796,
+      "mAP50_95": 0.0716
+    },
+    {
+      "split": "val",
+      "class": "smoke",
+      "class_id": 6,
+      "precision": 0.5262,
+      "recall": 0.2902,
+      "mAP50": 0.2227,
+      "mAP50_95": 0.0892
+    },
+    {
+      "split": "val",
+      "class": "ALL",
+      "class_id": -1,
+      "precision": 0.383,
+      "recall": 0.3805,
+      "mAP50": 0.2512,
+      "mAP50_95": 0.1187
+    },
+    {
+      "split": "test",
+      "class": "person",
+      "class_id": 0,
+      "precision": 0.3028,
+      "recall": 0.5,
+      "mAP50": 0.2264,
+      "mAP50_95": 0.13
+    },
+    {
+      "split": "test",
+      "class": "helmet",
+      "class_id": 1,
+      "precision": 0.6075,
+      "recall": 0.8109,
+      "mAP50": 0.7284,
+      "mAP50_95": 0.3808
+    },
+    {
+      "split": "test",
+      "class": "safety_vest",
+      "class_id": 2,
+      "precision": 0.3145,
+      "recall": 0.5088,
+      "mAP50": 0.2889,
+      "mAP50_95": 0.1158
+    },
+    {
+      "split": "test",
+      "class": "gloves",
+      "class_id": 3,
+      "precision": 0.3478,
+      "recall": 0.1613,
+      "mAP50": 0.0915,
+      "mAP50_95": 0.0383
+    },
+    {
+      "split": "test",
+      "class": "safety_footwear",
+      "class_id": 4,
+      "precision": 0.0619,
+      "recall": 0.0292,
+      "mAP50": 0.0034,
+      "mAP50_95": 0.0017
+    },
+    {
+      "split": "test",
+      "class": "fire",
+      "class_id": 5,
+      "precision": 0.4199,
+      "recall": 0.3062,
+      "mAP50": 0.2015,
+      "mAP50_95": 0.0902
+    },
+    {
+      "split": "test",
+      "class": "smoke",
+      "class_id": 6,
+      "precision": 0.5774,
+      "recall": 0.3048,
+      "mAP50": 0.2262,
+      "mAP50_95": 0.0856
+    },
+    {
+      "split": "test",
+      "class": "ALL",
+      "class_id": -1,
+      "precision": 0.376,
+      "recall": 0.3744,
+      "mAP50": 0.2523,
+      "mAP50_95": 0.1203
+    }
+  ]
+}

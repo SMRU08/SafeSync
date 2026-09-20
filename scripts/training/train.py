@@ -17,6 +17,8 @@ import datetime
 import subprocess
 import logging
 
+import argparse
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -25,17 +27,22 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-EXPERIMENT = "ppe_fire_smoke_v1"
-MODEL_DIR = os.path.join(ROOT, "models", "detection", EXPERIMENT)
-DATA_YAML = os.path.join(ROOT, "datasets", "processed", "data.yaml")
-TRAINING_CONFIG = os.path.join(ROOT, "configs", "training.yaml")
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Model Training Engine")
+    parser.add_argument("--config", type=str, default=os.path.join(ROOT, "configs", "training.yaml"), help="Path to training config YAML")
+    parser.add_argument("--experiment", type=str, default=None, help="Experiment name override")
+    parser.add_argument("--data", type=str, default=None, help="Path to data YAML override")
+    parser.add_argument("--skip-preflight", action="store_true", help="Skip pre-flight verification")
+    return parser.parse_args()
 
 
-def load_training_config():
-    if not os.path.isfile(TRAINING_CONFIG):
-        raise FileNotFoundError(f"Training config not found: {TRAINING_CONFIG}")
-    with open(TRAINING_CONFIG) as f:
+def load_training_config(config_path):
+    if not os.path.isfile(config_path):
+        raise FileNotFoundError(f"Training config not found: {config_path}")
+    with open(config_path) as f:
         return yaml.safe_load(f)
+
 
 
 def detect_hardware():
@@ -87,12 +94,18 @@ def run_preflight():
     log.info("Pre-flight check PASSED.")
 
 
-def train():
+def train(args=None):
     from ultralytics import YOLO
 
-    os.makedirs(MODEL_DIR, exist_ok=True)
+    if args is None:
+        args = parse_args()
 
-    cfg = load_training_config()
+    cfg = load_training_config(args.config)
+    experiment = args.experiment or cfg.get("experiment", "ppe_fire_smoke_v1")
+    model_dir = os.path.join(ROOT, "models", "detection", experiment)
+    data_yaml = args.data or cfg.get("data", os.path.join(ROOT, "datasets", "processed", "data.yaml"))
+
+    os.makedirs(model_dir, exist_ok=True)
     hw = detect_hardware()
 
     log.info(f"Hardware: {hw['gpu_name']}  |  VRAM: {hw['vram_gb']:.2f} GB  |  CUDA: {hw['cuda']}")
@@ -110,12 +123,14 @@ def train():
     patience = cfg.get("patience", 15)
     project_dir = os.path.join(ROOT, "models", "detection")
 
+    log.info(f"Experiment : {experiment}")
+    log.info(f"Data YAML  : {data_yaml}")
     log.info(f"Model      : {model_size}")
     log.info(f"Epochs     : {epochs}")
     log.info(f"Batch size : {batch}")
     log.info(f"Image size : {imgsz}")
     log.info(f"Device     : {device}")
-    log.info(f"Output     : {MODEL_DIR}")
+    log.info(f"Output     : {model_dir}")
 
     import torch
     if not hw["cuda"]:
@@ -127,7 +142,7 @@ def train():
     start_time = time.time()
     try:
         results = model.train(
-            data=DATA_YAML,
+            data=data_yaml,
             epochs=epochs,
             imgsz=imgsz,
             batch=batch,
@@ -139,7 +154,7 @@ def train():
             fraction=cfg.get("fraction", 1.0),
             patience=patience,
             project=project_dir,
-            name=EXPERIMENT,
+            name=experiment,
             exist_ok=True,
             save=True,
             save_period=1,
@@ -170,11 +185,11 @@ def train():
                 "timestamp": datetime.datetime.utcnow().isoformat(),
                 "error": str(e)[:500],
             }
-            oom_path = os.path.join(MODEL_DIR, "oom_recovery.json")
+            oom_path = os.path.join(model_dir, "oom_recovery.json")
             with open(oom_path, "w") as f:
                 json.dump(oom_note, f, indent=2)
             results = model.train(
-                data=DATA_YAML,
+                data=data_yaml,
                 epochs=epochs,
                 imgsz=imgsz,
                 batch=reduced_batch,
@@ -184,7 +199,7 @@ def train():
                 lrf=lrf,
                 patience=patience,
                 project=project_dir,
-                name=EXPERIMENT,
+                name=experiment,
                 exist_ok=True,
                 save=True,
                 plots=True,
@@ -199,23 +214,23 @@ def train():
             raise
 
     # Compute SHA-256 of best.pt
-    best_pt = os.path.join(MODEL_DIR, "weights", "best.pt")
+    best_pt = os.path.join(model_dir, "weights", "best.pt")
     if not os.path.isfile(best_pt):
         # YOLO sometimes nests under experiment name
-        alt = os.path.join(project_dir, EXPERIMENT, "weights", "best.pt")
+        alt = os.path.join(project_dir, experiment, "weights", "best.pt")
         if os.path.isfile(alt):
             best_pt = alt
 
     sha = sha256_file(best_pt) if os.path.isfile(best_pt) else "NOT_FOUND"
 
-    sha_path = os.path.join(MODEL_DIR, "model.sha256")
+    sha_path = os.path.join(model_dir, "model.sha256")
     with open(sha_path, "w") as f:
         f.write(f"{sha}  best.pt\n")
     log.info(f"SHA-256: {sha}")
 
     # Write model_metadata.json
     metadata = {
-        "experiment": EXPERIMENT,
+        "experiment": experiment,
         "model_architecture": model_size,
         "framework": "Ultralytics YOLOv8",
         "training_completed_utc": datetime.datetime.utcnow().isoformat(),
@@ -233,7 +248,7 @@ def train():
             "device": device,
         },
         "dataset": {
-            "path": DATA_YAML,
+            "path": data_yaml,
             "train_images": 15717,
             "val_images": 4490,
             "test_images": 2246,
@@ -244,19 +259,25 @@ def train():
             "best_pt": best_pt,
             "sha256": sha,
         },
-        "phase": "Phase 3 — Model Training & Validation",
+        "phase": cfg.get("phase", "Phase 3.1 — Model Diagnosis, Correction & Retraining"),
         "project": "RAKSHYA VISION",
     }
 
-    meta_path = os.path.join(MODEL_DIR, "model_metadata.json")
+    meta_path = os.path.join(model_dir, "model_metadata.json")
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
     log.info(f"Metadata written: {meta_path}")
 
+    # Also copy training config to model directory
+    shutil.copy2(args.config, os.path.join(model_dir, "training_config.yaml"))
+
     log.info("Training script complete. Run evaluate.py next.")
-    return MODEL_DIR
+    return model_dir
 
 
 if __name__ == "__main__":
-    run_preflight()
-    train()
+    args = parse_args()
+    if not args.skip_preflight:
+        run_preflight()
+    train(args)
+

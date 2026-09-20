@@ -1,0 +1,23 @@
+{
+  "experiment": "ppe_fire_smoke_v2",
+  "model": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\models\\detection\\ppe_fire_smoke_v2\\weights\\best.pt",
+  "benchmarked_utc": "2026-09-20T17:29:56.037246",
+  "image_size": 384,
+  "devices": [
+    {
+      "device": "GPU",
+      "error": "CUDA not available"
+    },
+    {
+      "device": "cpu",
+      "n_runs": 50,
+      "image_size": 384,
+      "mean_ms": 52.04,
+      "median_ms": 40.36,
+      "min_ms": 29.53,
+      "max_ms": 170.78,
+      "stdev_ms": 36.07,
+      "fps": 19.2
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+# configs/training_v2.yaml — RAKSHYA VISION Phase 3.1
+# Controlled experiment v2: Balanced training manifest, multi-epoch convergence, higher cls loss weight
+# Architecture: YOLOv8n (same as v1 for controlled comparison)
+# Resolution: 384x384 (same as v1 for controlled comparison)
+# Dataset: data_v2.yaml (train_balanced.txt with all 7 classes represented, val & test identical to v1)
+
+# ─── Model ───────────────────────────────────────────────────────────────────
+model: yolov8n.pt
+
+# ─── Training Duration ───────────────────────────────────────────────────────
+epochs: 2              # 2 full epochs on balanced data (~676 batches)
+patience: 10
+fraction: 1.0          # 100% of the 5,418 balanced images (no truncation!)
+
+# ─── Image & Batch ───────────────────────────────────────────────────────────
+imgsz: 384             # 384x384 resolution
+batch: 16
+workers: 0             # 0 workers avoids Windows multiprocessing IPC overhead
+
+# ─── Learning Rate & Warmup ─────────────────────────────────────────────────
+lr0: 0.01              # Initial learning rate
+lrf: 0.01              # Final learning rate factor
+warmup_epochs: 0.5     # Finishes warmup early in epoch 1 (~169 batches)
+warmup_momentum: 0.8
+momentum: 0.937
+weight_decay: 0.0005
+
+# ─── Loss Weights ────────────────────────────────────────────────────────────
+box: 7.5               # Bounding box regression loss weight
+cls: 1.0               # Increased from 0.5 in v1 to 1.0 for better classification convergence
+dfl: 1.5               # Distribution focal loss weight
+
+# ─── Augmentation ────────────────────────────────────────────────────────────
+mosaic: 0.5
+mixup: 0.0
+copy_paste: 0.0
+degrees: 0.0
+translate: 0.1
+scale: 0.2
+shear: 0.0
+perspective: 0.0
+flipud: 0.0
+fliplr: 0.5
+hsv_h: 0.015
+hsv_s: 0.5
+hsv_v: 0.3
+erasing: 0.0
+
+# ─── Experiment Metadata ─────────────────────────────────────────────────────
+experiment: ppe_fire_smoke_v2
+phase: "Phase 3.1 — Model Diagnosis, Correction & Retraining"
+project: "RAKSHYA VISION"
+notes: >
+  Controlled experiment v2. Resolves root causes RC-01 (dataset prefix slicing via fraction=0.25)
+  and RC-02 (under-convergence). Uses balanced training manifest with 100% representation for
+  minority classes (footwear, gloves, person, vest) alongside fire, smoke, and helmets.
+  Increased cls loss weight to 1.0 and trained for 2 full epochs with proper warmup completion.

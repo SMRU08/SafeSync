@@ -1,0 +1,23 @@
+{
+  "total_images": {
+    "train": 15717,
+    "val": 4490,
+    "test": 2246
+  },
+  "empty_label_files": {
+    "train": 2947,
+    "val": 856,
+    "test": 422
+  },
+  "missing_label_files": {
+    "train": 0,
+    "val": 0,
+    "test": 0
+  },
+  "split_exact_name_overlaps": {
+    "train_val": 0,
+    "train_test": 0,
+    "val_test": 0
+  },
+  "leakage_detected": false
+}

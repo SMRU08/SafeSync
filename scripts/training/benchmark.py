@@ -12,6 +12,8 @@ import logging
 import datetime
 import statistics
 
+import argparse
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -20,23 +22,30 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-EXPERIMENT = "ppe_fire_smoke_v1"
-MODEL_DIR = os.path.join(ROOT, "models", "detection", EXPERIMENT)
 N_WARMUP = 5
 N_RUNS = 50
 IMGSZ = 384
 
 
-def find_best_pt():
+def parse_args():
+    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Latency Benchmark")
+    parser.add_argument("--experiment", "-e", type=str, default="ppe_fire_smoke_v1", help="Experiment name")
+    parser.add_argument("--model", "-m", type=str, default=None, help="Explicit weights path override")
+    return parser.parse_args()
+
+
+def find_best_pt(model_dir, experiment):
     candidates = [
-        os.path.join(MODEL_DIR, "weights", "best.pt"),
+        os.path.join(model_dir, "weights", "best.pt"),
+        os.path.join(ROOT, "models", "detection", experiment, "weights", "best.pt"),
     ]
     for c in candidates:
         if os.path.isfile(c):
             return c
     raise FileNotFoundError(
-        f"best.pt not found at {candidates[0]}. Run train.py first."
+        f"best.pt not found. Checked: {candidates}. Run train.py first."
     )
+
 
 
 def benchmark_device(model_path, device, n_warmup=N_WARMUP, n_runs=N_RUNS):
@@ -89,10 +98,13 @@ def benchmark_device(model_path, device, n_warmup=N_WARMUP, n_runs=N_RUNS):
 
 def main():
     import torch
-    best_pt = find_best_pt()
+    args = parse_args()
+    experiment = args.experiment
+    model_dir = os.path.join(ROOT, "models", "detection", experiment)
+    best_pt = args.model or find_best_pt(model_dir, experiment)
 
     results = {
-        "experiment": EXPERIMENT,
+        "experiment": experiment,
         "model": best_pt,
         "benchmarked_utc": datetime.datetime.utcnow().isoformat(),
         "image_size": IMGSZ,
@@ -123,7 +135,7 @@ def main():
         results["devices"].append({"device": "cpu", "error": str(e)})
 
     # Save results
-    out_path = os.path.join(MODEL_DIR, "benchmark_results.json")
+    out_path = os.path.join(model_dir, "benchmark_results.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
     log.info(f"Benchmark results saved: {out_path}")
@@ -138,6 +150,7 @@ def main():
         else:
             print(f"  {d['device']:8s} : {d['mean_ms']} ms  ({d['fps']} FPS)")
     print("=" * 50)
+
 
 
 if __name__ == "__main__":

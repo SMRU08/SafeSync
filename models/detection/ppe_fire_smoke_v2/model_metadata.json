@@ -1,0 +1,45 @@
+{
+  "experiment": "ppe_fire_smoke_v2",
+  "model_architecture": "yolov8n.pt",
+  "framework": "Ultralytics YOLOv8",
+  "training_completed_utc": "2026-09-20T16:55:25.371168",
+  "training_duration_seconds": 2998,
+  "hardware": {
+    "cuda": false,
+    "gpu_name": "CPU",
+    "vram_gb": 0.0,
+    "recommended_batch": 4
+  },
+  "hyperparameters": {
+    "epochs": 2,
+    "batch_size": 16,
+    "imgsz": 384,
+    "lr0": 0.01,
+    "lrf": 0.01,
+    "patience": 10,
+    "mosaic": 0.5,
+    "mixup": 0.0,
+    "device": "cpu"
+  },
+  "dataset": {
+    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\processed\\data_v2.yaml",
+    "train_images": 15717,
+    "val_images": 4490,
+    "test_images": 2246,
+    "classes": [
+      "person",
+      "helmet",
+      "safety_vest",
+      "gloves",
+      "safety_footwear",
+      "fire",
+      "smoke"
+    ]
+  },
+  "output": {
+    "best_pt": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\models\\detection\\ppe_fire_smoke_v2\\weights\\best.pt",
+    "sha256": "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3"
+  },
+  "phase": "Phase 3.1 \u00e2\u20ac\u201d Model Diagnosis, Correction & Retraining",
+  "project": "RAKSHYA VISION"
+}

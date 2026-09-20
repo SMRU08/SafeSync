@@ -1,0 +1,8 @@
+class_id,class_name,train_instances,val_instances,test_instances,total_instances,percentage_of_total,train_images,val_images,test_images,total_images_containing
+0,person,3884,1059,602,5545,10.83,2430,663,357,3450
+1,helmet,17041,5005,2485,24531,47.92,6501,1833,907,9241
+2,safety_vest,4505,1199,568,6272,12.25,2143,585,273,3001
+3,gloves,1886,500,248,2634,5.15,985,275,134,1394
+4,safety_footwear,1010,257,240,1507,2.94,302,88,55,445
+5,fire,3637,1131,565,5333,10.42,1441,403,219,2063
+6,smoke,3765,1106,502,5373,10.5,2435,731,349,3515

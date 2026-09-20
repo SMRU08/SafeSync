@@ -13,6 +13,8 @@ import csv
 import datetime
 import logging
 
+import argparse
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -21,18 +23,24 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-EXPERIMENT = "ppe_fire_smoke_v1"
-MODEL_DIR = os.path.join(ROOT, "models", "detection", EXPERIMENT)
-DATA_YAML = os.path.join(ROOT, "datasets", "processed", "data.yaml")
 CLASS_NAMES = ["person", "helmet", "safety_vest", "gloves",
                "safety_footwear", "fire", "smoke"]
 CONFIDENCE_THRESHOLDS = [0.25, 0.35, 0.50, 0.60, 0.70]
 
 
-def find_best_pt():
+def parse_args():
+    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Model Evaluation Suite")
+    parser.add_argument("--experiment", "-e", type=str, default="ppe_fire_smoke_v1", help="Experiment name")
+    parser.add_argument("--data", "-d", type=str, default=None, help="Data YAML path override")
+    parser.add_argument("--model", "-m", type=str, default=None, help="Model weights path override")
+    parser.add_argument("--fraction", type=float, default=1.0, help="Evaluation fraction")
+    return parser.parse_args()
+
+
+def find_best_pt(model_dir, experiment):
     candidates = [
-        os.path.join(MODEL_DIR, "weights", "best.pt"),
-        os.path.join(ROOT, "models", "detection", EXPERIMENT, "weights", "best.pt"),
+        os.path.join(model_dir, "weights", "best.pt"),
+        os.path.join(ROOT, "models", "detection", experiment, "weights", "best.pt"),
     ]
     for c in candidates:
         if os.path.isfile(c):
@@ -41,6 +49,7 @@ def find_best_pt():
         f"best.pt not found. Expected at: {candidates[0]}\n"
         "Run train.py first."
     )
+
 
 
 def evaluate_split(model, split_name, data_yaml, conf=0.25):
@@ -128,13 +137,12 @@ def extract_per_class_metrics(metrics, split_name):
     return results
 
 
-def generate_validation_samples(model, n_samples=20):
+def generate_validation_samples(model, model_dir, data_yaml, n_samples=20):
     """Run inference on sample val images and save annotated outputs."""
     import glob
     import random
-    import cv2
 
-    sample_dir = os.path.join(MODEL_DIR, "validation_samples")
+    sample_dir = os.path.join(model_dir, "validation_samples")
     os.makedirs(sample_dir, exist_ok=True)
 
     val_img_dir = os.path.join(ROOT, "datasets", "processed", "images", "val")
@@ -157,7 +165,7 @@ def generate_validation_samples(model, n_samples=20):
     log.info(f"Saved {len(sampled)} validation samples to: {sample_dir}")
 
 
-def confidence_analysis(model):
+def confidence_analysis(model, model_dir, data_yaml, fraction=1.0):
     """Evaluate model at multiple confidence thresholds and export CSV."""
     log.info("Running confidence threshold analysis ...")
     rows = []
@@ -165,14 +173,14 @@ def confidence_analysis(model):
         log.info(f"  threshold={thresh}")
         try:
             metrics = model.val(
-                data=DATA_YAML,
+                data=data_yaml,
                 split="val",
                 conf=thresh,
                 iou=0.5,
                 imgsz=384,
                 batch=16,
                 workers=0,
-                fraction=0.25,
+                fraction=fraction,
                 plots=False,
                 verbose=False,
             )
@@ -192,7 +200,7 @@ def confidence_analysis(model):
                 "mAP50": None, "mAP50_95": None, "error": str(e)
             })
 
-    csv_path = os.path.join(MODEL_DIR, "confidence_analysis.csv")
+    csv_path = os.path.join(model_dir, "confidence_analysis.csv")
     if rows:
         with open(csv_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
@@ -202,11 +210,11 @@ def confidence_analysis(model):
     return rows
 
 
-def write_error_analysis(val_metrics, test_metrics):
+def write_error_analysis(val_metrics, test_metrics, model_dir, experiment):
     """Write error_analysis.md summarizing findings."""
-    path = os.path.join(MODEL_DIR, "error_analysis.md")
+    path = os.path.join(model_dir, "error_analysis.md")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(f"# Error Analysis — {EXPERIMENT}\n\n")
+        f.write(f"# Error Analysis — {experiment}\n\n")
         f.write(f"**Generated:** {datetime.datetime.utcnow().isoformat()} UTC\n\n")
         f.write("## Known Dataset Biases\n\n")
         f.write("| Class | Boxes | % of Total | Risk |\n")
@@ -219,21 +227,15 @@ def write_error_analysis(val_metrics, test_metrics):
         f.write("| gloves | 2,634 | 5.15% | Underrepresented — may underperform |\n")
         f.write("| safety_footwear | 1,507 | 2.94% | Most underrepresented — highest recall risk |\n\n")
         f.write("## Validation Metrics\n\n")
-        f.write("See `MODEL_EVALUATION_REPORT.md` for full per-class results.\n\n")
-        f.write("## Recommendations\n\n")
-        f.write("- If `safety_footwear` recall < 0.5: consider weighted sampling or synthetic augmentation in Phase 4.\n")
-        f.write("- If `gloves` precision < 0.5: collect more diverse glove images.\n")
-        f.write("- Monitor confusion between `helmet` / `head` (absent from ground truth but common visual false positive).\n")
-        f.write("- Fire/smoke domain shift: d_fire dataset images may differ from industrial CCTV.\n")
-        f.write("  Consider site-specific fine-tuning in Phase 4.\n")
+        f.write("See `MODEL_EVALUATION_REPORT.md` for full per-class results.\n")
     log.info(f"Error analysis written: {path}")
 
 
-def write_evaluation_report(all_metrics, conf_rows):
+def write_evaluation_report(all_metrics, conf_rows, model_dir, experiment):
     """Write MODEL_EVALUATION_REPORT.md."""
-    path = os.path.join(MODEL_DIR, "MODEL_EVALUATION_REPORT.md")
+    path = os.path.join(model_dir, "MODEL_EVALUATION_REPORT.md")
     with open(path, "w", encoding="utf-8") as f:
-        f.write(f"# Model Evaluation Report — {EXPERIMENT}\n\n")
+        f.write(f"# Model Evaluation Report — {experiment}\n\n")
         f.write(f"**Date:** {datetime.datetime.utcnow().isoformat()} UTC\n\n")
         f.write("## Per-Class Metrics\n\n")
         f.write("| Split | Class | Precision | Recall | mAP50 | mAP50-95 |\n")
@@ -266,42 +268,48 @@ def write_evaluation_report(all_metrics, conf_rows):
 def main():
     from ultralytics import YOLO
 
-    best_pt = find_best_pt()
+    args = parse_args()
+    experiment = args.experiment
+    model_dir = os.path.join(ROOT, "models", "detection", experiment)
+    data_yaml = args.data or os.path.join(ROOT, "datasets", "processed", "data.yaml")
+
+    best_pt = args.model or find_best_pt(model_dir, experiment)
     log.info(f"Loading model: {best_pt}")
     model = YOLO(best_pt)
 
     all_metrics = []
 
     # Evaluate on val
-    val_metrics = evaluate_split(model, "val", DATA_YAML, conf=0.25)
+    val_metrics = evaluate_split(model, "val", data_yaml, conf=0.25)
     all_metrics.extend(extract_per_class_metrics(val_metrics, "val"))
 
     # Evaluate on test (held-out — no hyperparameter influence)
-    test_metrics = evaluate_split(model, "test", DATA_YAML, conf=0.25)
+    test_metrics = evaluate_split(model, "test", data_yaml, conf=0.25)
     all_metrics.extend(extract_per_class_metrics(test_metrics, "test"))
 
     # Save full metrics JSON
-    metrics_path = os.path.join(MODEL_DIR, "evaluation_metrics.json")
+    metrics_path = os.path.join(model_dir, "evaluation_metrics.json")
     with open(metrics_path, "w", encoding="utf-8") as f:
         json.dump({
-            "experiment": EXPERIMENT,
+            "experiment": experiment,
             "evaluated_utc": datetime.datetime.utcnow().isoformat(),
             "metrics": all_metrics,
         }, f, indent=2)
     log.info(f"Evaluation metrics saved: {metrics_path}")
 
     # Generate validation sample images
-    generate_validation_samples(model)
+    generate_validation_samples(model, model_dir, data_yaml)
 
     # Confidence threshold analysis
-    conf_rows = confidence_analysis(model)
+    conf_rows = confidence_analysis(model, model_dir, data_yaml, fraction=args.fraction)
 
     # Write reports
-    write_error_analysis(val_metrics, test_metrics)
-    write_evaluation_report(all_metrics, conf_rows)
+    write_error_analysis(val_metrics, test_metrics, model_dir, experiment)
+    write_evaluation_report(all_metrics, conf_rows, model_dir, experiment)
 
     log.info("Evaluation complete. Run benchmark.py next.")
 
 
 if __name__ == "__main__":
     main()
+

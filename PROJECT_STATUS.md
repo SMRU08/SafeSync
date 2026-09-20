@@ -3,7 +3,7 @@
 ## Project Overview
 - **Project Name:** RAKSHYA VISION
 - **Tagline:** AI Vision-Based Safety Monitoring
-- **Current Phase:** Phase 4 — Real-Time / Video Detection (COMPLETED & VERIFIED)
+- **Current Phase:** Phase 3.1 — Model Diagnosis, Correction & Retraining (COMPLETED & VERIFIED)
 
 ---
 
@@ -25,75 +25,68 @@ All raw datasets were downloaded, checksummed, and preserved untouched:
 - **Total Raw Images:** 22,453 images across all 4 datasets.
 
 ### Processed Training-Ready Dataset (`datasets/processed/`)
-- **Normalized Schema (0..6):**
-  - `0: person`
-  - `1: helmet`
-  - `2: safety_vest`
-  - `3: gloves`
-  - `4: safety_footwear`
-  - `5: fire`
-  - `6: smoke`
-- **Leakage-Safe Splitting:**
-  - Near-duplicate and exact-duplicate images clustered into groups before splitting.
-  - **Train Split (70%):** 15,717 images
-  - **Validation Split (20%):** 4,490 images
-  - **Test Split (10%):** 2,246 images
-  - **Total Processed Images:** 22,453 images
-- **YOLO Configuration:** [`datasets/processed/data.yaml`](./datasets/processed/data.yaml) generated and path-verified.
+- **Normalized Schema (0..6):** `0: person`, `1: helmet`, `2: safety_vest`, `3: gloves`, `4: safety_footwear`, `5: fire`, `6: smoke`
+- **Total Processed Images:** 22,453 images (Train: 15,717, Val: 4,490, Test: 2,246)
+- **Total Annotations:** 51,195 verified clean bounding boxes (0 out-of-bounds, 0 malformed lines, 0 invalid IDs).
+- **Leakage-Safe:** 0 exact name overlaps between train, val, and test splits.
 
 ---
 
-## 3. Phase 3 Model Training & Validation Status (COMPLETED)
-
-### Experiment: `ppe_fire_smoke_v1`
+## 3. Phase 3 Baseline Model Status (`ppe_fire_smoke_v1`)
 - **Architecture:** Ultralytics YOLOv8n (nano), PyTorch 2.14.0+cpu
-- **Execution Hardware:** 13th Gen Intel(R) Core(TM) i5-13420H (CPU-only, no discrete CUDA GPU)
-- **Primary Checkpoint:** [`models/detection/ppe_fire_smoke_v1/weights/best.pt`](./models/detection/ppe_fire_smoke_v1/weights/best.pt)
+- **Checkpoint:** [`models/detection/ppe_fire_smoke_v1/weights/best.pt`](./models/detection/ppe_fire_smoke_v1/weights/best.pt)
 - **Checkpoint SHA-256:** `e265d7978b8cdb8cb2e6620e92e8c66d09a04d98b52d9409c91e3ceeba0cd5bf`
-- **Model Metadata:** [`models/detection/ppe_fire_smoke_v1/model_metadata.json`](./models/detection/ppe_fire_smoke_v1/model_metadata.json)
-
-### Evaluation Metrics (Evaluated on held-out splits, conf=0.25)
-| Split | Precision | Recall | mAP@50 | mAP@50-95 | Top Detected Class |
-|---|---|---|---|---|---|
-| **Validation (4,490 images)** | **23.41%** | **11.28%** | **7.15%** | **2.17%** | `helmet` (22.10%), `smoke` (17.87%) |
-| **Test (2,246 images)** | **22.68%** | **11.59%** | **6.98%** | **2.06%** | `helmet` (22.24%), `smoke` (13.83%), `fire` (11.06%) |
+- **Measured Metrics (Test Split, conf=0.25):**
+  - Precision: 22.68% | Recall: 11.59% | mAP@50: 6.98% | mAP@50-95: 2.06%
+  - Non-functional classes (0.00% mAP): `person`, `gloves`, `safety_footwear`
 
 ---
 
-## 4. Phase 4 Real-Time / Video Detection Status (COMPLETED)
+## 4. Phase 3.1 Diagnosis, Correction & Retraining Status (COMPLETED)
 
-### Core Inference Pipeline
-- **Model Integration:** Verified Phase 3 checkpoint `ppe_fire_smoke_v1/weights/best.pt` with SHA-256 verification.
-- **Inference Engine:** `backend/app/ai/detection/` modular architecture (Singleton ModelLoader, Detector, FrameProcessor, VideoProcessor).
-- **Execution Hardware:** Intel Core i5-13420H CPU (8 PyTorch threads pinned; no CUDA GPU).
-- **Classes Detected:** 7 canonical classes (`person`, `helmet`, `safety_vest`, `gloves`, `safety_footwear`, `fire`, `smoke`).
+### Root Causes Discovered
+1. **RC-01 (CRITICAL - Dataset Prefix Slicing)**: In `ultralytics.data.dataset.YOLODataset.get_img_files`, `fraction=0.25` slices sorted filenames. Because paths had dataset prefixes (`cppe_`, `fs_`, `hhw_`, `ppec_`), the first 25% contained ONLY `cppe_` and `fs_`. The model was exposed to **0 instances of person, gloves, and footwear during v1 training**.
+2. **RC-02 (CRITICAL - Training Under-convergence)**: 1 epoch on 25% data was only 245 steps. The model terminated before warmup finished (`val/cls_loss` = 12.27).
 
-### Video Ingestion Sources
-1. **Uploaded Video Files**: CLI `scripts/inference/process_video.py` and API `POST /api/detection/video`. Processed sample video (120 frames, 88 detections) saved to `outputs/detection/videos/test_safety_detected.mp4`.
-2. **Local Webcam**: Verified live webcam stream (Index 0, 1280x720) via `scripts/inference/run_webcam.py` with graceful stop handling.
-3. **RTSP Streams**: Network camera client `scripts/inference/run_rtsp.py` with URL credential masking and bounded exponential backoff reconnection.
+### Remediation & Controlled Training (`ppe_fire_smoke_v2`)
+- **Balanced Manifest**: 5,418 images with 100% of available rare PPE classes (`datasets/processed/train_balanced.txt`).
+- **Warmup & Optimization**: 2 full epochs (676 batches), warmup completed at batch 169.
+- **Tuned Hyperparameters**: `cls: 1.0` (doubled classification loss weight), `box: 7.5`, `imgsz: 384`.
+- **Primary Checkpoint**: [`models/detection/ppe_fire_smoke_v2/weights/best.pt`](./models/detection/ppe_fire_smoke_v2/weights/best.pt)
+- **Checkpoint SHA-256:** `490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3`
 
-### Performance Benchmarks (Quantitative)
-- **Input Stream FPS:** 15.0 FPS
-- **Overall System FPS:** 16.04 FPS
-- **Raw Inference FPS:** 16.96 FPS
-- **Median Latency:** 32.89 ms (~30.4 FPS steady-state)
-- **Min Latency:** 28.33 ms (~35.3 FPS peak)
-- **Mean Latency:** 58.95 ms
+### Measured Verification Results (Held-out Test Split: 2,246 images)
+| Metric | V1 Baseline | V2 Improved | Delta |
+|---|---|---|---|
+| **Precision** | 22.68% | **37.60%** | **+14.92%** |
+| **Recall** | 11.59% | **37.44%** | **+25.85% (3.23×)** |
+| **mAP@50** | 6.98% | **25.23%** | **+18.25% (3.61×)** |
+| **mAP@50-95** | 2.06% | **12.03%** | **+9.97% (5.84×)** |
 
-### REST API Integration
-- `GET /api/detection/health`: Model status, device, class names
-- `POST /api/detection/image`: Single image inference with optional base64 visualization overlay
-- `POST /api/detection/video`: Asynchronous video file processing
+### Per-Class Test Split Improvements
+- `person`: 0.00% $\rightarrow$ **22.64% mAP50** (50.00% recall)
+- `helmet`: 22.24% $\rightarrow$ **72.84% mAP50** (81.09% recall)
+- `safety_vest`: 1.74% $\rightarrow$ **28.89% mAP50** (50.88% recall)
+- `gloves`: 0.00% $\rightarrow$ **9.15% mAP50** (16.13% recall)
+- `safety_footwear`: 0.00% $\rightarrow$ **0.34% mAP50** (test) / **4.78% mAP50** (val)
+- `fire`: 11.06% $\rightarrow$ **20.15% mAP50** (30.62% recall)
+- `smoke`: 13.83% $\rightarrow$ **22.62% mAP50** (30.48% recall)
 
-### Automated Tests
-- **Backend Test Suite:** 23 / 23 tests PASSED (100%) in 7.47s (`backend/tests/test_detection.py`, `backend/tests/test_main.py`).
+### Inference Latency Benchmark (Intel Core i5-13420H CPU)
+- **Median Latency:** **40.36 ms** (~24.8 FPS)
+- **Mean Latency:** **52.04 ms** (19.2 FPS)
+- **Min Latency:** **29.53 ms** (~33.9 FPS)
 
 ---
 
-## 5. Strict Phase Boundaries & Next Phase Readiness
-- [x] Phase 4 completed and verified end-to-end.
-- [x] No tracking logic (ByteTrack/DeepSORT) implemented.
-- [x] No worker-to-PPE association or compliance rules implemented.
-- [x] No alert dispatch engine or live WebSocket notifications implemented.
-- [x] Strictly stopped at end of Phase 4 awaiting user approval for Phase 5.
+## 5. Automated Test Suite
+- Full test suite passing: `pytest backend/tests -v` (23/23 tests passed).
+
+---
+
+## 6. Strict Phase Boundaries
+- [x] Phase 3.1 completed and fully verified.
+- [x] Baseline V1 preserved untouched.
+- [x] Raw datasets in `datasets/raw/` untouched.
+- [x] No fabricated or simulated metrics.
+- [x] Stopped at end of Phase 3.1 awaiting explicit user approval.

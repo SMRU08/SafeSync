@@ -1,0 +1,421 @@
+{
+  "total_images": 22453,
+  "total_annotations": 51195,
+  "empty_label_files_count": 4225,
+  "missing_label_files_count": 0,
+  "invalid_class_id_count": 0,
+  "invalid_class_ids_sample": [],
+  "out_of_bounds_count": 0,
+  "out_of_bounds_sample": [],
+  "non_positive_wh_count": 0,
+  "non_positive_wh_sample": [],
+  "extremely_tiny_boxes_count": 100,
+  "extremely_tiny_sample": [
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_fire_0200_jpg.rf.9b58fa5df12e89ecd69f8927e2d128e1.txt",
+      "box": [
+        0.438281,
+        0.663281,
+        0.00625,
+        0.0125
+      ],
+      "area": 7.812500000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_fire_0200_jpg.rf.c72583c44cd06d753e8a0f3d58a833d0.txt",
+      "box": [
+        0.561719,
+        0.663281,
+        0.00625,
+        0.0125
+      ],
+      "area": 7.812500000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_16_jpg.rf.739dda72ae21593d84f59ccebe5e02a2.txt",
+      "box": [
+        0.360938,
+        0.567187,
+        0.007812,
+        0.010937
+      ],
+      "area": 8.543984400000001e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_192_jpg.rf.3671fdc3cae20655874d0f068895e2ad.txt",
+      "box": [
+        0.269531,
+        0.421875,
+        0.007812,
+        0.0125
+      ],
+      "area": 9.765000000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_192_jpg.rf.87c958c106a45f1cd125cce2009a96be.txt",
+      "box": [
+        0.730469,
+        0.421875,
+        0.007812,
+        0.0125
+      ],
+      "area": 9.765000000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_269_jpg.rf.0cb242b032acd028f08aa387a5fe05ed.txt",
+      "box": [
+        0.325,
+        0.567187,
+        0.007812,
+        0.00625
+      ],
+      "area": 4.882500000000001e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_269_jpg.rf.1f3b6b0f80a4ac66107db2364d22bff0.txt",
+      "box": [
+        0.675,
+        0.567187,
+        0.007812,
+        0.00625
+      ],
+      "area": 4.882500000000001e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_523_jpg.rf.2bdb6bde463023d88e1a081c58005598.txt",
+      "box": [
+        0.375,
+        0.617969,
+        0.00625,
+        0.007812
+      ],
+      "area": 4.882500000000001e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_533_jpg.rf.bb9f48a08e6f2946ebf2c8cb05060584.txt",
+      "box": [
+        0.347656,
+        0.491406,
+        0.010937,
+        0.007812
+      ],
+      "area": 8.543984400000001e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_533_jpg.rf.bb9f48a08e6f2946ebf2c8cb05060584.txt",
+      "box": [
+        0.419531,
+        0.517188,
+        0.007812,
+        0.007812
+      ],
+      "area": 6.1027344000000005e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_538_jpg.rf.5dca728b443881b205e5fdee7e9d677d.txt",
+      "box": [
+        0.522656,
+        0.6,
+        0.014063,
+        0.00625
+      ],
+      "area": 8.789375e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_538_jpg.rf.c1e70a510bddfc206f5a803c3ee2cd4b.txt",
+      "box": [
+        0.477344,
+        0.6,
+        0.014063,
+        0.00625
+      ],
+      "area": 8.789375e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_548_jpg.rf.10cdda97e4cf31eb764ade661e24b81a.txt",
+      "box": [
+        0.625781,
+        0.577344,
+        0.007812,
+        0.0125
+      ],
+      "area": 9.765000000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_548_jpg.rf.4579bc2cae84e09becab4370555d4299.txt",
+      "box": [
+        0.374219,
+        0.577344,
+        0.007812,
+        0.0125
+      ],
+      "area": 9.765000000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_56_jpg.rf.2ae937195dd8a2662f0a80eae3fe319f.txt",
+      "box": [
+        0.507812,
+        0.511719,
+        0.0125,
+        0.007812
+      ],
+      "area": 9.765000000000002e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_56_jpg.rf.2ae937195dd8a2662f0a80eae3fe319f.txt",
+      "box": [
+        0.53125,
+        0.513281,
+        0.010937,
+        0.007812
+      ],
+      "area": 8.543984400000001e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_56_jpg.rf.2ae937195dd8a2662f0a80eae3fe319f.txt",
+      "box": [
+        0.436719,
+        0.517188,
+        0.009375,
+        0.009375
+      ],
+      "area": 8.7890625e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_640_jpg.rf.70f954ac16145f2f7926ae8144caf0c2.txt",
+      "box": [
+        0.602344,
+        0.551562,
+        0.009375,
+        0.007812
+      ],
+      "area": 7.32375e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_651_jpg.rf.eb878eda0264c5e0066701bfbaa8561c.txt",
+      "box": [
+        0.489844,
+        0.4625,
+        0.009375,
+        0.009375
+      ],
+      "area": 8.7890625e-05
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\fs_image_651_jpg.rf.eb878eda0264c5e0066701bfbaa8561c.txt",
+      "box": [
+        0.501563,
+        0.464062,
+        0.007812,
+        0.010937
+      ],
+      "area": 8.543984400000001e-05
+    }
+  ],
+  "extremely_large_boxes_count": 43,
+  "extremely_large_sample": [
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_0280a6c0cc_jpg.rf.fc65e0aa50cfde6fcc5561f52de05221.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_0bb0084be9_jpg.rf.b70569396d644dd22bc38aa55188dd1b.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_171c822727_jpg.rf.a5bed37d296d65673883c0e60e88fe4b.txt",
+      "box": [
+        0.5,
+        0.499219,
+        1.0,
+        0.998437
+      ],
+      "area": 0.998437
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_171c822727_jpg.rf.c1bea782e350e8c6dd63f02d37bcf3df.txt",
+      "box": [
+        0.5,
+        0.499219,
+        1.0,
+        0.998437
+      ],
+      "area": 0.998437
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_18da5c6fa3_jpg.rf.c7eeed338f278ba109104eab5e1a3617.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_1dcefdbbea_jpg.rf.783456ee37b7c7929679f55373e31f1c.txt",
+      "box": [
+        0.508594,
+        0.5,
+        0.982812,
+        1.0
+      ],
+      "area": 0.982812
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_1ee0766fd4_jpg.rf.6fdeda8568805859273392e1b845ed08.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_261bec4062_jpg.rf.8f2556d83f947ca37e2564cfae0b0d4a.txt",
+      "box": [
+        0.500781,
+        0.5,
+        0.998437,
+        1.0
+      ],
+      "area": 0.998437
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_261bec4062_jpg.rf.b597f5ced7167fa57a67d6919d033dc9.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_278a8fdec6_jpg.rf.7202be90d3b372180f62fa2569c4586f.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_3181d33e90_jpg.rf.4eaec5d0952a2308bd085e9cd3805777.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_32e6ba5a29_jpg.rf.ac3b5fc77f4245cffe109309a51d342e.txt",
+      "box": [
+        0.5,
+        0.501563,
+        1.0,
+        0.996875
+      ],
+      "area": 0.996875
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_32e6ba5a29_jpg.rf.db854785f85b09e0dc9b58fba84db554.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_354a516c63_jpg.rf.b485cde014d7b88d1ce9b806a152f594.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_3faf2eef6d_jpg.rf.1c35970c3a667689caabd170cf51e057.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_3faf2eef6d_jpg.rf.d737892a814f3e8945346386838a41b1.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_50124affa1_jpg.rf.ae53994eb32d5a0545dc4e2ea9356381.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_77fbebc1f1_jpg.rf.2279a6454049eea3f36fb9771077394b.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_77fbebc1f1_jpg.rf.6f0b33a38fc85510ca6b51a9395dddfd.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    },
+    {
+      "file": "datasets\\processed\\labels\\train\\ppec_9b94cf3094_jpg.rf.727c5f25dc337be6c7bbc467792332f3.txt",
+      "box": [
+        0.5,
+        0.5,
+        1.0,
+        1.0
+      ],
+      "area": 1.0
+    }
+  ],
+  "malformed_lines_count": 0,
+  "malformed_lines_sample": [],
+  "duplicate_boxes_count": 0
+}
