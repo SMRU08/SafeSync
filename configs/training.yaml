@@ -1,0 +1,57 @@
+# configs/training.yaml — RAKSHYA VISION Phase 3
+# Hardware: CPU-only (torch 2.14.0+cpu, Intel(R) Core(TM) i5-13420H, 15.6 GB RAM)
+# GPU: None detected (Intel UHD Integrated Graphics only, no CUDA)
+#
+# Model choice: YOLOv8n (nano) — optimized for CPU execution
+# Baseline configuration: imgsz 384, fraction 0.25, 1 full epoch, batch 16, workers 0
+
+# ─── Model ───────────────────────────────────────────────────────────────────
+model: yolov8n.pt      # nano — fastest CPU training, smallest memory footprint
+
+# ─── Training Duration ───────────────────────────────────────────────────────
+epochs: 1              # Baseline checkpoint generation
+patience: 10           # Early stopping patience
+fraction: 0.25         # 25% subsampling (~3,930 train images) for hardware-appropriate CPU training (~8 min)
+
+# ─── Image & Batch ───────────────────────────────────────────────────────────
+imgsz: 384             # 384x384 resolution — optimized for CPU edge deployment
+batch: 16              # Batch size 16 balances CPU memory and vectorization throughput
+workers: 0             # 0 workers avoids Windows multiprocessing IPC/spawn overhead
+
+# ─── Learning Rate ───────────────────────────────────────────────────────────
+lr0: 0.01              # Initial learning rate
+lrf: 0.01              # Final learning rate factor
+warmup_epochs: 0.2     # Warmup fraction
+warmup_momentum: 0.8
+momentum: 0.937
+weight_decay: 0.0005
+
+# ─── Loss Weights ────────────────────────────────────────────────────────────
+box: 7.5               # Bounding box regression loss weight
+cls: 0.5               # Classification loss weight
+dfl: 1.5               # Distribution focal loss weight
+
+# ─── Augmentation ────────────────────────────────────────────────────────────
+mosaic: 0.5            # Lightweight mosaic
+mixup: 0.0             # Disabled on CPU to eliminate high CPU blending overhead
+copy_paste: 0.0        # Disabled on CPU to eliminate polygon extraction overhead
+degrees: 0.0
+translate: 0.1
+scale: 0.2
+shear: 0.0
+perspective: 0.0
+flipud: 0.0
+fliplr: 0.5            # Horizontal flip
+hsv_h: 0.015
+hsv_s: 0.5
+hsv_v: 0.3
+erasing: 0.0
+
+# ─── Experiment Metadata ─────────────────────────────────────────────────────
+experiment: ppe_fire_smoke_v1
+phase: "Phase 3 — Model Training & Validation"
+project: "RAKSHYA VISION"
+notes: >
+  Baseline training run on CPU hardware (Intel Core i5-13420H, no CUDA GPU).
+  YOLOv8n-384 with fraction=0.25 selected as the hardware-appropriate CPU baseline.
+  Generates real checkpoint, metrics, PR curve, confusion matrix, and evaluation report.

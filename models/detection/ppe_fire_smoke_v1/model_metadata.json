@@ -1,0 +1,45 @@
+{
+  "experiment": "ppe_fire_smoke_v1",
+  "model_architecture": "yolov8n.pt",
+  "framework": "Ultralytics YOLOv8",
+  "training_completed_utc": "2026-09-20T15:02:06.078006",
+  "training_duration_seconds": 887,
+  "hardware": {
+    "cuda": false,
+    "gpu_name": "CPU",
+    "vram_gb": 0.0,
+    "recommended_batch": 4
+  },
+  "hyperparameters": {
+    "epochs": 1,
+    "batch_size": 16,
+    "imgsz": 384,
+    "lr0": 0.01,
+    "lrf": 0.01,
+    "patience": 10,
+    "mosaic": 0.5,
+    "mixup": 0.0,
+    "device": "cpu"
+  },
+  "dataset": {
+    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\processed\\data.yaml",
+    "train_images": 15717,
+    "val_images": 4490,
+    "test_images": 2246,
+    "classes": [
+      "person",
+      "helmet",
+      "safety_vest",
+      "gloves",
+      "safety_footwear",
+      "fire",
+      "smoke"
+    ]
+  },
+  "output": {
+    "best_pt": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\models\\detection\\ppe_fire_smoke_v1\\weights\\best.pt",
+    "sha256": "e265d7978b8cdb8cb2e6620e92e8c66d09a04d98b52d9409c91e3ceeba0cd5bf"
+  },
+  "phase": "Phase 3 \u2014 Model Training & Validation",
+  "project": "RAKSHYA VISION"
+}
