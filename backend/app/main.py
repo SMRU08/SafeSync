@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -43,6 +43,12 @@ app.add_middleware(
 )
 
 
+from app.api.detection import router as detection_router
+from app.ai.detection.model_loader import ModelLoader
+
+app.include_router(detection_router)
+
+
 @app.get("/", response_model=RootResponse, status_code=status.HTTP_200_OK)
 def read_root():
     return {
@@ -54,8 +60,15 @@ def read_root():
 @app.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
 def health_check():
     db_ok = check_database_connection()
+    try:
+        loader = ModelLoader.get_instance()
+        ai_status = "Connected" if loader.is_loaded() else "Ready"
+    except Exception:
+        ai_status = "Unavailable"
+
     return {
         "status": "healthy",
         "database": "connected" if db_ok else "disconnected",
-        "ai_engine": "Not Connected"
+        "ai_engine": ai_status
     }
+

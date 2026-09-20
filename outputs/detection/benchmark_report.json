@@ -1,0 +1,15 @@
+{
+  "video": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\test_safety_video.mp4",
+  "resolution": "640x480",
+  "frames_tested": 120,
+  "input_fps": 15.0,
+  "processing_fps": 16.04,
+  "inference_fps": 16.96,
+  "mean_latency_ms": 58.95,
+  "median_latency_ms": 32.89,
+  "min_latency_ms": 28.33,
+  "max_latency_ms": 3020.37,
+  "stdev_latency_ms": 272.73,
+  "total_runtime_s": 7.48,
+  "device": "cpu"
+}

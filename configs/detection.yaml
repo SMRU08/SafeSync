@@ -1,0 +1,56 @@
+# configs/detection.yaml — RAKSHYA VISION Phase 4
+# Real-Time & Video Detection Configuration
+
+model:
+  path: "models/detection/ppe_fire_smoke_v1/weights/best.pt"
+  name: "ppe_fire_smoke_v1"
+  architecture: "yolov8n"
+  expected_classes: 7
+
+inference:
+  confidence_threshold: 0.25
+  iou_threshold: 0.45
+  image_size: 384
+  device: "auto"        # "auto" | "cpu" | "cuda" | "0"
+  max_detections: 300
+  half: false           # FP16 (requires GPU)
+
+classes:
+  all:
+    0: person
+    1: helmet
+    2: safety_vest
+    3: gloves
+    4: safety_footwear
+    5: fire
+    6: smoke
+  # Optional filter: list of class names to output (empty list = all 7 classes)
+  filter: []
+
+video:
+  target_fps: 0         # 0 = keep native source FPS
+  skip_frames: 0        # 0 = process every frame; 1 = process every 2nd; 2 = every 3rd
+  display_fps: true
+  display_timestamp: true
+  codec: "mp4v"         # Fallback codec: "XVID" for .avi
+  output_format: "mp4"
+
+webcam:
+  camera_index: 0
+  width: 1280
+  height: 720
+  fps: 30
+
+rtsp:
+  reconnect_delay_seconds: 3.0
+  max_reconnect_attempts: 5
+  timeout_seconds: 10.0
+  buffer_size: 1
+
+output:
+  save_video: true
+  save_frames: false
+  output_directory: "outputs/detection"
+  video_subfolder: "videos"
+  frame_subfolder: "frames"
+  log_subfolder: "logs"

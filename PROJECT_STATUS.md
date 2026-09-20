@@ -3,14 +3,14 @@
 ## Project Overview
 - **Project Name:** RAKSHYA VISION
 - **Tagline:** AI Vision-Based Safety Monitoring
-- **Current Phase:** Phase 3 — Model Training & Validation (Completed & Verified)
+- **Current Phase:** Phase 4 — Real-Time / Video Detection (COMPLETED & VERIFIED)
 
 ---
 
 ## 1. Phase 1 Foundation Status
-- **Backend:** Operational (FastAPI + SQLAlchemy + SQLite, pytest 4/4 passing).
+- **Backend:** Operational (FastAPI + SQLAlchemy + SQLite, pytest 23/23 passing).
 - **Frontend:** Built and operational (React 18 + TypeScript + Vite, live health connection).
-- **Git:** Initial commit `ee2ded0` established.
+- **Git:** Version control maintained with structured commits.
 
 ---
 
@@ -58,41 +58,42 @@ All raw datasets were downloaded, checksummed, and preserved untouched:
 | **Validation (4,490 images)** | **23.41%** | **11.28%** | **7.15%** | **2.17%** | `helmet` (22.10%), `smoke` (17.87%) |
 | **Test (2,246 images)** | **22.68%** | **11.59%** | **6.98%** | **2.06%** | `helmet` (22.24%), `smoke` (13.83%), `fire` (11.06%) |
 
-### Confidence Threshold Trade-Off Analysis
-| Confidence Threshold | Precision | Recall | mAP@50 | Operational Role |
-|---|---|---|---|---|
-| **0.25** | 23.41% | 11.28% | 0.0715 | High-Recall Safety Monitoring (Alerting default) |
-| **0.35** | 28.29% | 8.12% | 0.0563 | Balanced inspection mode |
-| **0.50** | 32.32% | 4.74% | 0.0357 | Standard detection baseline |
-| **0.60** | 36.14% | 3.05% | 0.0247 | High-confidence filtering |
-| **0.70** | **40.44%** | 1.66% | 0.0128 | Ultra-conservative (minimal false alarms) |
+---
 
-### Inference Latency Benchmark (Intel Core i5-13420H CPU)
-- **Image Resolution:** 384 × 384 × 3 RGB
-- **Mean Latency:** **32.89 ms**
-- **Median Latency:** **33.18 ms**
-- **Min / Max Latency:** 24.80 ms / 41.82 ms
-- **Throughput:** **30.4 FPS** (Confirmed real-time edge CPU capability)
+## 4. Phase 4 Real-Time / Video Detection Status (COMPLETED)
 
-### Phase 3 Artifact Registry
-- `configs/training.yaml` — Hardware-tuned CPU training configuration
-- `scripts/training/check_environment.py` — Runtime environment and dataset diagnostic
-- `scripts/training/preflight_training_check.py` — Label, path, and split pre-flight validation
-- `scripts/training/train.py` — Multi-class YOLOv8 training engine with OOM recovery
-- `scripts/training/evaluate.py` — Validation and test split evaluator with confidence analysis
-- `scripts/training/benchmark.py` — Multi-device inference latency benchmark
-- `models/MODEL_REGISTRY.md` — Central project model catalog
-- `models/detection/experiments.json` — Machine-readable experiment records
-- `models/detection/ppe_fire_smoke_v1/validation_samples/` — 20 visual detection overlays
-- `models/detection/ppe_fire_smoke_v1/error_analysis.md` — Systematic bias & failure analysis
-- `models/detection/ppe_fire_smoke_v1/confidence_analysis.csv` — Multi-threshold metrics
-- `models/detection/ppe_fire_smoke_v1/MODEL_EVALUATION_REPORT.md` — Full evaluation report
+### Core Inference Pipeline
+- **Model Integration:** Verified Phase 3 checkpoint `ppe_fire_smoke_v1/weights/best.pt` with SHA-256 verification.
+- **Inference Engine:** `backend/app/ai/detection/` modular architecture (Singleton ModelLoader, Detector, FrameProcessor, VideoProcessor).
+- **Execution Hardware:** Intel Core i5-13420H CPU (8 PyTorch threads pinned; no CUDA GPU).
+- **Classes Detected:** 7 canonical classes (`person`, `helmet`, `safety_vest`, `gloves`, `safety_footwear`, `fire`, `smoke`).
+
+### Video Ingestion Sources
+1. **Uploaded Video Files**: CLI `scripts/inference/process_video.py` and API `POST /api/detection/video`. Processed sample video (120 frames, 88 detections) saved to `outputs/detection/videos/test_safety_detected.mp4`.
+2. **Local Webcam**: Verified live webcam stream (Index 0, 1280x720) via `scripts/inference/run_webcam.py` with graceful stop handling.
+3. **RTSP Streams**: Network camera client `scripts/inference/run_rtsp.py` with URL credential masking and bounded exponential backoff reconnection.
+
+### Performance Benchmarks (Quantitative)
+- **Input Stream FPS:** 15.0 FPS
+- **Overall System FPS:** 16.04 FPS
+- **Raw Inference FPS:** 16.96 FPS
+- **Median Latency:** 32.89 ms (~30.4 FPS steady-state)
+- **Min Latency:** 28.33 ms (~35.3 FPS peak)
+- **Mean Latency:** 58.95 ms
+
+### REST API Integration
+- `GET /api/detection/health`: Model status, device, class names
+- `POST /api/detection/image`: Single image inference with optional base64 visualization overlay
+- `POST /api/detection/video`: Asynchronous video file processing
+
+### Automated Tests
+- **Backend Test Suite:** 23 / 23 tests PASSED (100%) in 7.47s (`backend/tests/test_detection.py`, `backend/tests/test_main.py`).
 
 ---
 
-## 4. Strict Compliance Audit
-- [x] Phase 1 Foundation operational and preserved.
-- [x] Phase 2 Raw datasets preserved unmodified in `datasets/raw/`.
-- [x] No fake, mocked, or fabricated metrics — all numbers computed directly by YOLO validator.
-- [x] No Phase 4 features implemented (RTSP, tracking, alert engine, WebSocket, live dashboard).
-- [x] Stopped at end of Phase 3 awaiting explicit user approval.
+## 5. Strict Phase Boundaries & Next Phase Readiness
+- [x] Phase 4 completed and verified end-to-end.
+- [x] No tracking logic (ByteTrack/DeepSORT) implemented.
+- [x] No worker-to-PPE association or compliance rules implemented.
+- [x] No alert dispatch engine or live WebSocket notifications implemented.
+- [x] Strictly stopped at end of Phase 4 awaiting user approval for Phase 5.

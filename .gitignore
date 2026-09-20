@@ -55,3 +55,11 @@ models/**/*.tflite
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Media and Video files
+*.mp4
+*.avi
+*.mov
+outputs/detection/videos/
+!outputs/detection/README.md
+!outputs/detection/benchmark_report.json
