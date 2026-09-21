@@ -1,0 +1,70 @@
+# configs/risk_policy.yaml — RAKSHYA VISION Phase 7
+# Safety Risk Analysis Policy Configuration
+# Defines transparent score ranges, base event severities, zone multipliers, and persistence weights.
+
+risk_levels:
+  LOW:
+    score_min: 0
+    score_max: 29
+    description: "Minor safety deviation or non-critical PPE advisory"
+
+  MEDIUM:
+    score_min: 30
+    score_max: 59
+    description: "Moderate safety concern requiring supervisor attention"
+
+  HIGH:
+    score_min: 60
+    score_max: 84
+    description: "Serious safety violation or active environmental hazard"
+
+  CRITICAL:
+    score_min: 85
+    score_max: 100
+    description: "Imminent danger, major combustion event, or multi-hazard emergency"
+
+events:
+  missing_helmet:
+    base_severity: 50
+    description: "Head protection absence in operational area"
+
+  missing_safety_vest:
+    base_severity: 45
+    description: "High-visibility torso protection absence"
+
+  missing_gloves:
+    base_severity: 25
+    description: "Hand protection absence in manual handling area"
+
+  missing_safety_footwear:
+    base_severity: 25
+    description: "Protective footwear absence in industrial zone"
+
+  smoke:
+    base_severity: 60
+    description: "Confirmed smoke plume detection"
+
+  fire:
+    base_severity: 85
+    description: "Confirmed active flame combustion"
+
+  multiple_hazards_bonus: 20
+  camera_failure:
+    base_severity: 40
+  system_failure:
+    base_severity: 45
+
+zone_multipliers:
+  electrical_room: 1.30       # High-risk transformer and switchgear enclosure
+  production_floor: 1.15      # Active machinery and moving forklift traffic
+  storage_area: 1.00          # Racked storage warehouse
+  loading_dock: 1.10          # Heavy vehicle docking bay
+  UNKNOWN: 1.00               # Default fallback
+
+scoring_weights:
+  persistence_points_per_second: 1.0
+  max_persistence_points: 25.0
+  points_per_affected_worker: 5.0
+  max_worker_points: 20.0
+  repetition_points_per_event: 4.0
+  max_repetition_points: 15.0

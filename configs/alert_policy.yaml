@@ -1,0 +1,30 @@
+# configs/alert_policy.yaml — RAKSHYA VISION Phase 7
+# Smart Alert Management & Cooldown Configuration
+
+cooldown_seconds:
+  missing_helmet: 60           # Suppress duplicate alerts for same worker missing helmet for 60s
+  missing_safety_vest: 60      # Suppress duplicate alerts for same worker missing vest for 60s
+  missing_gloves: 90           # Suppress duplicate alerts for gloves for 90s
+  missing_safety_footwear: 90  # Suppress duplicate alerts for footwear for 90s
+  smoke: 45                    # Suppress duplicate smoke alerts for same track for 45s
+  fire: 30                     # Suppress duplicate fire alerts for same track for 30s
+  multiple_hazards: 30         # Suppress duplicate multi-hazard alerts for 30s
+  camera_failure: 120
+  system_failure: 120
+  default: 60
+
+escalation:
+  enabled: true
+  persistence_threshold_seconds: 30.0   # If event persists over 30s unresolved, consider escalation
+  escalation_rules:
+    LOW_TO_MEDIUM_SECONDS: 25.0
+    MEDIUM_TO_HIGH_SECONDS: 35.0
+    HIGH_TO_CRITICAL_SECONDS: 45.0
+
+deduplication:
+  enabled: true
+  match_fields:
+    - "event_type"
+    - "camera_id"
+    - "zone_id"
+    - "target_id"              # track_id for workers or hazard event_id for fire/smoke

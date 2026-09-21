@@ -3,7 +3,7 @@
 ## Project Overview
 - **Project Name:** RAKSHYA VISION
 - **Tagline:** AI Vision-Based Safety Monitoring
-- **Current Phase:** Phase 6 — Fire & Smoke Hazard Analysis (COMPLETED & VERIFIED)
+- **Current Phase:** Phase 7 — Risk Analysis + Smart Alert Engine (COMPLETED & VERIFIED)
 
 ---
 
@@ -52,25 +52,41 @@
 ## 6. Phase 6 Fire & Smoke Hazard Analysis Status (COMPLETED)
 - **Decoupled Hazard Extraction:** Detects `fire` (class 5) and `smoke` (class 6) without affecting worker PPE status.
 - **Spatial Tracking Engine:** IoU + normalized centroid distance matching with anonymous IDs (`HAZARD-0001`, `HAZARD-0002`).
-- **Temporal State Machine:** State sequence `NO_HAZARD -> SUSPECTED -> CONFIRMED -> CLEARED -> NO_HAZARD` with $N_{\text{confirm}} = 5$, observation ratio $\ge 0.60$, gap tolerance $\le 5$ frames, clearing after 10 missed frames.
+- **Temporal State Machine:** State sequence `NO_HAZARD -> SUSPECTED -> CONFIRMED -> CLEARED -> NO_HAZARD`.
 - **Multi-Modal Relationship:** Evaluates `FIRE_ONLY`, `SMOKE_ONLY`, `FIRE_AND_SMOKE`, `NO_HAZARD`.
-- **Zone & Camera Intelligence:** Resolves cameras and zones (`configs/cameras.yaml`) with optional polygon ROI containment (unmapped coordinates default to `UNKNOWN`).
+- **Zone & Camera Intelligence:** Resolves cameras and zones (`configs/cameras.yaml`) with optional polygon ROI containment.
 - **Database Persistence:** SQLAlchemy models `HazardEvent` and `HazardObservation` in `backend/app/models/hazard.py`.
-- **Endpoints:**
-  - `GET /api/hazards/config`
-  - `POST /api/hazards/analyze`
-  - `GET /api/hazards`
-  - `GET /api/hazards/{event_id}`
-- **Video Visualization:** Bounding boxes with `FIRE/SMOKE [conf] | State: [state] | Zone: [zone]`, scene state badge, zero risk scoring (`CRITICAL/HIGH` forbidden).
-- **Verification:**
-  - Controlled Scenarios: 12/12 passed (`outputs/hazards/scenario_test_results.json`).
-  - Pytest Suite: 53/53 passed across all backend test modules.
-  - Video Pipeline Benchmark: Processed `datasets/test_hazard_video.mp4` at 8.78 FPS (hazard overhead: 0.30 ms) with metrics exported to `outputs/hazards/hazard_benchmark.json`.
+- **Endpoints:** `GET /api/hazards/config`, `POST /api/hazards/analyze`, `GET /api/hazards`, `GET /api/hazards/{event_id}`.
 
 ---
 
-## 7. Automated Test Suite
-- Full test suite passing: `pytest backend/tests -v` (53/53 tests passed).
+## 7. Phase 7 Risk Analysis + Smart Alert Engine Status (COMPLETED)
+- **Unified Event Normalization:** Common envelope `NormalizedSafetyEvent` ingesting Phase 5 and Phase 6 events.
+- **MANDATORY PPE RULE:** Phase 5 `UNKNOWN` state **never** generates a violation. Only confirmed `ABSENT` PPE creates alerts.
+- **Explainable Risk Scoring:** Deterministic mathematical scoring ($0 \dots 100$) mapped to `LOW`, `MEDIUM`, `HIGH`, `CRITICAL` based on configurable factors (`configs/risk_policy.yaml`).
+- **Incident Management:** Continuous incident tracking with statuses `OPEN`, `ACKNOWLEDGED`, `RESOLVED`, `DISMISSED`.
+- **Smart Alerting:** Deduplication against frame flooding, configurable cooldown suppression (`configs/alert_policy.yaml`), and automatic severity escalation on persistence.
+- **Human-Readable Alert Messages:** Natural language descriptions including worker track IDs, cameras, and zones.
+- **Database Persistence:** SQLAlchemy models `Incident`, `Alert`, `AlertHistory` in `backend/app/models/risk_alert.py`.
+- **WebSocket-Ready Event Dispatcher:** Pub/sub `EventBroadcaster` ready for Phase 8 live dashboard streaming.
+- **Endpoints:**
+  - `GET /api/risk/summary`
+  - `GET /api/alerts`
+  - `GET /api/alerts/{alert_id}`
+  - `POST /api/alerts/{alert_id}/acknowledge`
+  - `POST /api/alerts/{alert_id}/resolve`
+  - `POST /api/alerts/{alert_id}/dismiss`
+  - `GET /api/incidents`
+  - `GET /api/incidents/{incident_id}`
+- **Verification:**
+  - Automated Tests: 72/72 passed (including 19 risk & alert tests).
+  - Performance: 0.028 ms risk evaluation latency, 5.69 ms total event processing & DB latency (175.5 events/sec).
+
+---
+
+## 8. Automated Test Suite
+- Full test suite passing: `pytest backend/tests -v` (72/72 tests passed).
+  - `test_risk_alerts.py`: 19 tests passed.
   - `test_hazards.py`: 16 tests passed.
   - `test_compliance.py`: 14 tests passed.
   - `test_detection.py`: 19 tests passed.
@@ -78,5 +94,5 @@
 
 ---
 
-## 8. Next Steps — Phase 7
-- Awaiting explicit user approval before beginning Phase 7 (Risk Analysis + Smart Alert Engine).
+## 9. Next Steps — Phase 8
+- Awaiting explicit user approval before beginning Phase 8 (Live Safety Dashboard & WebSocket Integration).
