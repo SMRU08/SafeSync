@@ -26,6 +26,11 @@ async def lifespan(app: FastAPI):
         logger.warning("Database connectivity check failed.")
     yield
     logger.info("Shutting down %s...", settings.APP_NAME)
+    try:
+        from app.camera.manager import CameraManager
+        CameraManager.get_instance().stop_all()
+    except Exception as e:
+        logger.error("Error shutting down CameraManager: %s", e)
 
 
 app = FastAPI(
@@ -50,13 +55,24 @@ from app.api.compliance import router as compliance_router
 from app.api.hazards import router as hazards_router
 from app.api.alerts import router as alerts_router
 from app.api.websocket import router as websocket_router
+from app.api.cameras import router as cameras_router
+from app.api.auth import router as auth_router
+from app.api.evidence import router as evidence_router
+from app.api.monitoring import router as monitoring_router
 from app.ai.detection.model_loader import ModelLoader
+from app.config import setup_production_logging
+
+setup_production_logging()
 
 app.include_router(detection_router)
 app.include_router(compliance_router)
 app.include_router(hazards_router)
 app.include_router(alerts_router)
 app.include_router(websocket_router)
+app.include_router(cameras_router)
+app.include_router(auth_router)
+app.include_router(evidence_router)
+app.include_router(monitoring_router)
 
 
 @app.get("/", response_model=RootResponse, status_code=status.HTTP_200_OK)
@@ -81,4 +97,10 @@ def health_check():
         "database": "connected" if db_ok else "disconnected",
         "ai_engine": ai_status
     }
+
+
+@app.get("/health/database", status_code=status.HTTP_200_OK)
+def database_health_check():
+    """Returns detailed database health, connectivity, tables, and SQLite PRAGMA status."""
+    return check_database_health()
 

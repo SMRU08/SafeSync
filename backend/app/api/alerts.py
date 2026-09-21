@@ -23,6 +23,7 @@ try:
         EventType,
     )
     from app.services.alert_engine import AlertEngine
+    from app.security.auth import require_role
 except ImportError:
     from backend.app.database.session import get_db
     from backend.app.models.risk_alert import Incident, Alert, AlertHistory
@@ -159,9 +160,11 @@ def acknowledge_alert(
     alert_id: str = Path(..., description="Alert UUID"),
     db: Session = Depends(get_db),
     engine: AlertEngine = Depends(get_alert_engine),
+    current_user=Depends(require_role(["ADMIN", "OPERATOR"])),
 ):
     """
     Acknowledges an active alert, updating both the alert and its linked incident.
+    Requires ADMIN or OPERATOR role.
     """
     try:
         return engine.acknowledge_alert(alert_id, db)
@@ -174,9 +177,11 @@ def resolve_alert(
     alert_id: str = Path(..., description="Alert UUID"),
     db: Session = Depends(get_db),
     engine: AlertEngine = Depends(get_alert_engine),
+    current_user=Depends(require_role(["ADMIN", "OPERATOR"])),
 ):
     """
     Resolves an alert and marks its parent incident as RESOLVED.
+    Requires ADMIN or OPERATOR role.
     """
     try:
         return engine.resolve_alert(alert_id, db)
@@ -189,9 +194,11 @@ def dismiss_alert(
     alert_id: str = Path(..., description="Alert UUID"),
     db: Session = Depends(get_db),
     engine: AlertEngine = Depends(get_alert_engine),
+    current_user=Depends(require_role(["ADMIN", "OPERATOR"])),
 ):
     """
     Dismisses an alert as false alarm or non-actionable advisory.
+    Requires ADMIN or OPERATOR role.
     """
     try:
         return engine.dismiss_alert(alert_id, db)
@@ -268,3 +275,13 @@ def get_incident_detail(
             for a in db_incident.alerts
         ],
     }
+
+
+@router.get("/alerts/providers/status")
+def get_alert_providers_status():
+    """
+    Returns authentic operational statuses for all external notification channels (Webhook, Email, SMS).
+    Never reports false success: shows ENABLED, DISABLED, NOT_CONFIGURED, or ERROR.
+    """
+    from app.services.alert_providers.registry import ProviderRegistry
+    return ProviderRegistry.get_instance().get_all_statuses()

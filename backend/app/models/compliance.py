@@ -24,7 +24,7 @@ class WorkerTracking(Base):
     track_id = Column(Integer, index=True, nullable=False, doc="Temporary anonymous worker track ID")
     session_id = Column(String(64), index=True, nullable=True, doc="Session or stream identifier")
     first_seen = Column(DateTime, default=datetime.utcnow, nullable=False)
-    last_seen = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_seen = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
     total_frames = Column(Integer, default=1, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
 
@@ -44,7 +44,7 @@ class PPEObservation(Base):
     state = Column(String(16), nullable=False, doc="PRESENT, ABSENT, UNKNOWN")
     confidence = Column(Float, nullable=True)
     is_occluded = Column(Boolean, default=False, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
 
 
 class ComplianceObservation(Base):

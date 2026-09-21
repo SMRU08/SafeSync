@@ -13,6 +13,7 @@ try:
         Alert,
         AlertHistory,
     )
+    from app.models.evidence import EvidenceItem
 except ImportError:
     from backend.app.models.compliance import (
         WorkerTracking,
@@ -28,6 +29,7 @@ except ImportError:
         Alert,
         AlertHistory,
     )
+    from backend.app.models.evidence import EvidenceItem
 
 __all__ = [
     "WorkerTracking",
@@ -38,4 +40,5 @@ __all__ = [
     "Incident",
     "Alert",
     "AlertHistory",
+    "EvidenceItem",
 ]

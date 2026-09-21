@@ -11,6 +11,7 @@ import {
   Alert,
   Incident,
   HazardEventDetail,
+  EvidenceItem,
 } from '../types';
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -131,4 +132,28 @@ export async function fetchHazards(): Promise<HazardEventDetail[]> {
 
 export async function fetchHazardDetail(eventId: string): Promise<any> {
   return request<any>(`/api/hazards/${eventId}`);
+}
+
+// ─── Production Multi-Camera Manager ────────────────────────────────────────
+
+export async function fetchCameras(): Promise<any[]> {
+  return request<any[]>('/api/cameras');
+}
+
+export async function startCamera(cameraId: string): Promise<any> {
+  return request<any>(`/api/cameras/${cameraId}/start`, { method: 'POST' });
+}
+
+export async function stopCamera(cameraId: string): Promise<any> {
+  return request<any>(`/api/cameras/${cameraId}/stop`, { method: 'POST' });
+}
+
+// ─── Evidence Archival ──────────────────────────────────────────────────────
+
+export async function fetchIncidentEvidence(incidentId: string): Promise<EvidenceItem[]> {
+  return request<EvidenceItem[]>(`/api/incidents/${incidentId}/evidence`);
+}
+
+export async function fetchEvidenceDetail(evidenceId: string): Promise<EvidenceItem> {
+  return request<EvidenceItem>(`/api/evidence/${evidenceId}`);
 }

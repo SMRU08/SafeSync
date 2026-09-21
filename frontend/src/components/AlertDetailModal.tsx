@@ -15,9 +15,12 @@ import {
   History,
   Check,
   AlertOctagon,
+  ShieldCheck,
+  Download,
+  Image as ImageIcon,
 } from 'lucide-react';
-import { Alert } from '../types';
-import { fetchAlertDetail } from '../services/api';
+import { Alert, EvidenceItem } from '../types';
+import { fetchAlertDetail, fetchIncidentEvidence } from '../services/api';
 
 interface AlertDetailModalProps {
   alert: Alert | null;
@@ -35,6 +38,7 @@ export const AlertDetailModal: React.FC<AlertDetailModalProps> = ({
   onDismiss,
 }) => {
   const [fullAlert, setFullAlert] = useState<Alert | null>(alert);
+  const [evidenceList, setEvidenceList] = useState<EvidenceItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
@@ -46,6 +50,10 @@ export const AlertDetailModal: React.FC<AlertDetailModalProps> = ({
         .then((data) => setFullAlert(data))
         .catch(() => {})
         .finally(() => setLoading(false));
+
+      fetchIncidentEvidence(alert.incident_id)
+        .then((items) => setEvidenceList(items || []))
+        .catch(() => setEvidenceList([]));
     }
   }, [alert]);
 
@@ -165,6 +173,90 @@ export const AlertDetailModal: React.FC<AlertDetailModalProps> = ({
                   : 'Pending'}
               </span>
             </div>
+          </div>
+
+          {/* Evidence Archival Section */}
+          <div className="modal-section">
+            <h4 className="section-subtitle">
+              <ImageIcon size={16} /> Incident Visual Evidence & Tamper Verification
+            </h4>
+
+            {evidenceList && evidenceList.length > 0 ? (
+              <div className="evidence-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '12px' }}>
+                {evidenceList.map((ev) => (
+                  <div
+                    key={ev.evidence_id}
+                    className="evidence-card"
+                    style={{
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      background: 'rgba(15, 23, 42, 0.6)',
+                    }}
+                  >
+                    <div style={{ position: 'relative', width: '100%', maxHeight: '200px', overflow: 'hidden', background: '#000' }}>
+                      <img
+                        src={ev.download_url}
+                        alt="Incident Evidence"
+                        style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div style={{ padding: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                          Camera: <strong style={{ color: '#f1f5f9' }}>{ev.camera_id}</strong>
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                          {(ev.file_size_bytes / 1024).toFixed(1)} KB
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontSize: '0.75rem',
+                          background: 'rgba(16, 185, 129, 0.1)',
+                          color: '#34d399',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          marginBottom: '10px',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        <ShieldCheck size={14} />
+                        <span>SHA-256: {ev.sha256_checksum.slice(0, 16)}...</span>
+                      </div>
+
+                      <a
+                        href={ev.download_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn btn-secondary"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontSize: '0.8rem',
+                          padding: '6px 12px',
+                          textDecoration: 'none',
+                          color: '#e2e8f0',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <Download size={14} /> Download Evidence
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-text" style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic', margin: '8px 0' }}>
+                No visual snapshot archived for this incident (feed offline or inactive during detection).
+              </p>
+            )}
           </div>
 
           {/* Audit Trail / History */}

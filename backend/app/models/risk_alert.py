@@ -34,11 +34,12 @@ class Incident(Base):
     risk_score = Column(Integer, nullable=False, default=0, doc="Calculated score 0-100")
     risk_level = Column(String(16), nullable=False, default="LOW", index=True, doc="LOW, MEDIUM, HIGH, CRITICAL")
     factors_json = Column(Text, nullable=True, doc="JSON string of explainable risk factors")
-    created_at = Column(DateTime, default=_utc_now, nullable=False)
+    created_at = Column(DateTime, default=_utc_now, nullable=False, index=True)
     updated_at = Column(DateTime, default=_utc_now, nullable=False)
     resolved_at = Column(DateTime, nullable=True)
 
     alerts = relationship("Alert", back_populates="incident", cascade="all, delete-orphan")
+    evidence_items = relationship("EvidenceItem", back_populates="incident", cascade="all, delete-orphan")
 
 
 class Alert(Base):
@@ -57,7 +58,7 @@ class Alert(Base):
     zone_id = Column(String(64), index=True, nullable=False, default="UNKNOWN")
     event_type = Column(String(64), nullable=False, index=True)
     status = Column(String(16), nullable=False, default="ACTIVE", index=True, doc="ACTIVE, ACKNOWLEDGED, RESOLVED, DISMISSED")
-    created_at = Column(DateTime, default=_utc_now, nullable=False)
+    created_at = Column(DateTime, default=_utc_now, nullable=False, index=True)
     acknowledged_at = Column(DateTime, nullable=True)
     resolved_at = Column(DateTime, nullable=True)
 
@@ -77,4 +78,4 @@ class AlertHistory(Base):
     previous_level = Column(String(16), nullable=True)
     new_level = Column(String(16), nullable=True)
     reason = Column(String(256), nullable=False)
-    timestamp = Column(DateTime, default=_utc_now, nullable=False)
+    timestamp = Column(DateTime, default=_utc_now, nullable=False, index=True)

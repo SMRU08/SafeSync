@@ -1,27 +1,64 @@
-# configs/cameras.yaml — RAKSHYA VISION Phase 6
+# configs/cameras.yaml — RAKSHYA VISION Phase 10 Step 5
 # Camera and Zone Metadata Configuration
-# Supports optional polygon ROI regions. If no zone matches, zone defaults to UNKNOWN.
+# Supports RTSP, USB webcams, recorded video files, and synthetic streams.
+# Passwords must be referenced via environment variables, never hardcoded in plaintext.
 
 cameras:
   - id: "camera_01"
     name: "CCTV - Production Floor South"
     zone_id: "production_floor"
-    source: "configured_elsewhere"
+    source: "0"  # USB or integrated webcam index 0, or rtsp:// stream
+    source_type: "usb"  # "rtsp", "usb", "file", "synthetic"
+    enabled: true
+    fps_target: 30
+    resolution: "1280x720"
+    timeout_seconds: 5.0
+    reconnect_policy:
+      max_retries: 5
+      initial_delay_seconds: 1.0
+      max_delay_seconds: 15.0
 
   - id: "camera_02"
     name: "CCTV - Raw Material Storage"
     zone_id: "storage_area"
-    source: "configured_elsewhere"
+    source: "tests/fixtures/sample_storage.mp4"
+    source_type: "file"
+    enabled: false
+    fps_target: 25
+    resolution: "1280x720"
+    timeout_seconds: 5.0
+    reconnect_policy:
+      max_retries: 3
+      initial_delay_seconds: 2.0
+      max_delay_seconds: 10.0
 
   - id: "camera_03"
     name: "CCTV - High Voltage Electrical Room"
     zone_id: "electrical_room"
-    source: "configured_elsewhere"
+    source: "synthetic://electrical_room"
+    source_type: "synthetic"
+    enabled: false
+    fps_target: 20
+    resolution: "640x480"
+    timeout_seconds: 3.0
+    reconnect_policy:
+      max_retries: 5
+      initial_delay_seconds: 1.0
+      max_delay_seconds: 10.0
 
   - id: "camera_04"
     name: "CCTV - Loading Dock Outer"
     zone_id: "loading_dock"
-    source: "configured_elsewhere"
+    source: "rtsp://${CAMERA_USERNAME}:${CAMERA_PASSWORD}@192.168.1.104:554/stream1"
+    source_type: "rtsp"
+    enabled: false
+    fps_target: 25
+    resolution: "1920x1080"
+    timeout_seconds: 5.0
+    reconnect_policy:
+      max_retries: 10
+      initial_delay_seconds: 2.0
+      max_delay_seconds: 30.0
 
 zones:
   - id: "production_floor"

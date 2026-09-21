@@ -21,6 +21,7 @@ import {
   fetchHazards,
   fetchHazardConfig,
   fetchComplianceConfig,
+  fetchCameras,
   acknowledgeAlert,
   resolveAlert,
   dismissAlert,
@@ -107,21 +108,54 @@ export function useSafetyData() {
       setHazards([]);
     }
 
-    // 6. Hazard & Camera Config
+    // 6. Hazard & Camera Manager
     try {
       const hConfig = await fetchHazardConfig();
       setHazardConfig(hConfig);
-      if (hConfig && hConfig.cameras) {
-        const mappedCameras: CameraConfig[] = hConfig.cameras.map((c: any) => ({
-          camera_id: c.camera_id,
-          name: c.name || `Camera ${c.camera_id}`,
-          zone_id: c.zone_id,
-          status: 'ACTIVE',
-          resolution: '1280x720',
-          fps: 30,
-          rtsp_url: c.rtsp_url,
-        }));
-        setCameras(mappedCameras);
+
+      // Fetch real multi-camera statuses from /api/cameras
+      try {
+        const realCameras = await fetchCameras();
+        if (Array.isArray(realCameras) && realCameras.length > 0) {
+          const mappedCameras: CameraConfig[] = realCameras.map((c: any) => ({
+            camera_id: c.camera_id,
+            name: c.name || `Camera ${c.camera_id}`,
+            zone_id: c.zone_id,
+            status: c.state === 'CONNECTED' ? 'ACTIVE' : c.state === 'DISABLED' ? 'STANDBY' : 'OFFLINE',
+            state: c.state,
+            source_type: c.source_type,
+            enabled: c.enabled,
+            resolution: '1280x720',
+            fps: c.metrics?.fps || 0,
+            safe_source: c.safe_source,
+            metrics: c.metrics,
+          }));
+          setCameras(mappedCameras);
+        } else if (hConfig && hConfig.cameras) {
+          const fallbackCameras: CameraConfig[] = hConfig.cameras.map((c: any) => ({
+            camera_id: c.camera_id,
+            name: c.name || `Camera ${c.camera_id}`,
+            zone_id: c.zone_id,
+            status: 'ACTIVE',
+            resolution: '1280x720',
+            fps: 30,
+            rtsp_url: c.rtsp_url,
+          }));
+          setCameras(fallbackCameras);
+        }
+      } catch {
+        if (hConfig && hConfig.cameras) {
+          const fallbackCameras: CameraConfig[] = hConfig.cameras.map((c: any) => ({
+            camera_id: c.camera_id,
+            name: c.name || `Camera ${c.camera_id}`,
+            zone_id: c.zone_id,
+            status: 'ACTIVE',
+            resolution: '1280x720',
+            fps: 30,
+            rtsp_url: c.rtsp_url,
+          }));
+          setCameras(fallbackCameras);
+        }
       }
     } catch {
       setHazardConfig(null);

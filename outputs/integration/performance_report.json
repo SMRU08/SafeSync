@@ -1,0 +1,20 @@
+{
+  "iterations": 25,
+  "overall_pipeline_latency_ms": {
+    "mean": 40.4,
+    "median": 39.57,
+    "min": 33.32,
+    "max": 70.33,
+    "fps": 24.8
+  },
+  "subsystem_mean_latencies_ms": {
+    "detection": 40.31,
+    "tracking": 0.01,
+    "association": 0.0
+  },
+  "memory_usage_mb": {
+    "initial": 429.11,
+    "final": 438.99,
+    "delta": 9.89
+  }
+}

@@ -8,7 +8,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Set, Any
+from typing import Dict, Set, Any, Optional
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 try:
@@ -103,11 +103,27 @@ manager = WebSocketManager()
 
 @router.websocket("/ws/alerts")
 @router.websocket("/ws/events")
-async def websocket_alerts_endpoint(websocket: WebSocket):
+async def websocket_alerts_endpoint(
+    websocket: WebSocket,
+    token: Optional[str] = None,
+):
     """
     Live WebSocket channel streaming safety alerts, incident changes, and system notifications.
     Supports bi-directional heartbeat ping/pong.
+    Requires valid token when AUTH_ENABLED=True.
     """
+    from app.config import settings
+    if settings.AUTH_ENABLED:
+        if not token:
+            await websocket.close(code=4001, reason="Authentication token required")
+            return
+        try:
+            from app.security.auth import decode_access_token
+            decode_access_token(token)
+        except Exception:
+            await websocket.close(code=4003, reason="Invalid or expired token")
+            return
+
     queue = await manager.connect(websocket)
 
     async def send_loop():

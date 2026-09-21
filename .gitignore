@@ -23,11 +23,15 @@ yarn-error.log*
 
 # Environment and secrets
 .env
+.env.*
+!.env.example
 .env.local
 .env.*.local
 
 # Databases
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
 
@@ -63,3 +67,7 @@ Desktop.ini
 outputs/detection/videos/
 !outputs/detection/README.md
 !outputs/detection/benchmark_report.json
+outputs/evidence/*
+!outputs/evidence/.gitkeep
+outputs/logs/*
+!outputs/logs/.gitkeep

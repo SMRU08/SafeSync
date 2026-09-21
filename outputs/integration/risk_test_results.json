@@ -1,0 +1,50 @@
+[
+  {
+    "risk_score": 25,
+    "risk_level": "LOW",
+    "factors": {
+      "base_severity": 25.0,
+      "persistence_factor": 0.0,
+      "affected_workers_factor": 0.0,
+      "repetition_factor": 0.0,
+      "multi_hazard_factor": 0.0,
+      "zone_multiplier": 1.0
+    }
+  },
+  {
+    "risk_score": 50,
+    "risk_level": "MEDIUM",
+    "factors": {
+      "base_severity": 50.0,
+      "persistence_factor": 0.0,
+      "affected_workers_factor": 0.0,
+      "repetition_factor": 0.0,
+      "multi_hazard_factor": 0.0,
+      "zone_multiplier": 1.0
+    }
+  },
+  {
+    "risk_score": 70,
+    "risk_level": "HIGH",
+    "factors": {
+      "base_severity": 60.0,
+      "persistence_factor": 10.0,
+      "affected_workers_factor": 0.0,
+      "repetition_factor": 0.0,
+      "multi_hazard_factor": 0.0,
+      "zone_multiplier": 1.0
+    }
+  },
+  {
+    "risk_score": 100,
+    "risk_level": "CRITICAL",
+    "factors": {
+      "base_severity": 85.0,
+      "persistence_factor": 15.0,
+      "affected_workers_factor": 5.0,
+      "repetition_factor": 0.0,
+      "multi_hazard_factor": 0.0,
+      "zone_multiplier": 1.3
+    }
+  }
+]

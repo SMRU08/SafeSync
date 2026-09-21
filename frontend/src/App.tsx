@@ -99,7 +99,7 @@ export const App: React.FC = () => {
         )}
 
         {currentTab === 'cameras' && (
-          <CamerasView cameras={cameras} hazardConfig={hazardConfig} />
+          <CamerasView cameras={cameras} hazardConfig={hazardConfig} onRefreshCameras={refreshAll} />
         )}
 
         {currentTab === 'workers' && (

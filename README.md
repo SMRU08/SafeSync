@@ -1,81 +1,873 @@
 # RAKSHYA VISION
 
-> **AI Vision-Based Safety Monitoring System**
+> **AI Vision-Based Safety Monitoring System**  
+> Real-Time PPE Compliance Analysis, Multi-Worker Tracking, Fire & Smoke Detection, Risk Assessment, and Incident Awareness.
 
-**Current Phase:** Phase 1 — Foundation (Completed)
+**BPUT Hackathon 2026**  
+**Problem Statement:** PS06 — Build a prototype AI system that detects safety gear compliance  
+**Organization:** Software Technology Parks of India (STPI) & EmTek  
+**Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)  
+**System Status:** Complete & Verified (Phases 1–10 Tested: 154/154 Unit Tests, 39/39 Integration Scenarios)
 
-RAKSHYA VISION is an intelligent workplace and industrial safety monitoring platform engineered to detect compliance with Personal Protective Equipment (PPE) and environmental hazards:
-- **Person**
-- **Helmet** / Non-compliance
-- **Safety Vest** / Non-compliance
-- **Gloves** / Non-compliance
-- **Safety Footwear** / Non-compliance
-- **Fire**
-- **Smoke**
+---
+
+## 1. Problem Statement
+
+Industrial workplaces, construction sites, manufacturing floors, and hazardous infrastructure require continuous adherence to Personal Protective Equipment (PPE) standards to prevent severe injury and loss of life. Standard regulatory requirements stipulate mandatory protective gear including:
+
+- **Safety Helmets:** Head protection from falling objects, collisions, and overhead hazards.
+- **High-Visibility Safety Vests:** Torso visibility for heavy machinery operators and vehicular traffic.
+- **Protective Gloves:** Hand safety against chemical, thermal, and mechanical hazards.
+- **Safety Footwear:** Toe and puncture protection against crush risks and sharp floor objects.
+
+Simultaneously, unexpected environmental emergencies such as **combustion (fire)** and **atmospheric emissions (smoke)** pose catastrophic threats if not detected in their earliest developmental seconds.
+
+### Operational Challenges in Traditional Monitoring:
+- **Continuous Human Observation Fatigue:** Safety officers cannot simultaneously maintain vigilance across dozens of CCTV feeds for hours without perceptual lapses.
+- **Inconsistent Enforcement:** Manual spot-checks capture isolated moments rather than continuous operational compliance.
+- **Delayed Emergency Response:** Traditional localized smoke alarms or manual call points often activate only after combustion has propagated significantly.
+- **Lack of Actionable Evidence:** Incident investigations frequently suffer from missing visual context, ambiguous timestamps, or unverified logs.
+
+### Intended Objectives:
+RAKSHYA VISION addresses Problem Statement **PS06** by delivering an automated, edge-ready artificial intelligence vision system capable of ingesting video feeds (recorded video, USB webcams, IP cameras, and network streams), performing multi-task object detection, tracking individual workers anonymously, verifying anatomical PPE compliance, confirming fire and smoke signatures, calculating explainable risk scores, and alerting human operators in real time.
+
+---
+
+## 2. The RAKSHYA VISION Approach
+
+RAKSHYA VISION is engineered as a deterministic, decoupled multi-stage computer vision and safety operations pipeline. Rather than treating safety monitoring as a monolithic neural network classifier, the system decouples spatial detection from temporal state machines and risk governance:
+
+```
+Camera Observations → Detected Objects → Worker Tracks → PPE Associations → Compliance States → Hazard States → Risk Information → Incidents → Operator Alerts
+```
+
+### Core Engineering Principles:
+1. **Canonical Class Object Detection:** A single-stage, multi-task convolutional detector predicts physical objects (`person`, `helmet`, `safety_vest`, `gloves`, `safety_footwear`, `fire`, `smoke`).
+2. **Absence Derived Through Anatomical Association:** The model does not attempt to learn noisy negative classes such as `no_helmet` or `no_vest`. Non-compliance is derived deterministically by checking whether a detected PPE item spatially belongs to a specific worker's anatomical zone (head, torso, hands, feet).
+3. **Strict Policy on Ambiguity (`UNKNOWN != VIOLATION`):** Temporary occlusion, poor camera angles, or boundary clipping place a PPE item in an `UNKNOWN` state. The system **never** marks an unknown state as a violation. Only persistent, confirmed `ABSENT` observations generate safety violations.
+4. **Temporal State Confirmation:** Single-frame flickers or detection dropouts never trigger alarms. Violations require $N_{\text{confirm}} = 3$ consecutive frames; hazards require $N_{\text{confirm}} = 5$ frames.
+5. **Deterministic, Explainable Risk Scoring:** Safety risks are scored on a scale from $0$ to $100$ using clear, mathematically transparent factors rather than opaque neural predictions.
+6. **Fault-Isolated Architecture:** A failure in video capture, disk quota, or external notification never halts the core monitoring pipeline or incident recording.
+
+---
+
+## 3. System Architecture
+
+```mermaid
+flowchart TD
+    subgraph INGESTION["1. Ingestion Layer"]
+        C1["RTSP / IP Camera"] --> CM["Multi-Camera Manager"]
+        C2["USB Webcam"] --> CM
+        C3["Recorded Video / File"] --> CM
+        C4["Network Stream / Phone"] --> CM
+    end
+
+    subgraph VISION["2. AI Vision & Inference"]
+        CM --> PRE["Frame Acquisition & Preprocessing (384x384)"]
+        PRE --> YOLO["YOLOv8 Multi-Task Detector (best.pt)"]
+        YOLO --> DET["Detections: person, helmet, vest, gloves, footwear, fire, smoke"]
+    end
+
+    subgraph TRACKING["3. Tracking & Association"]
+        DET --> BT["ByteTrack (Kalman Filter + Hungarian)"]
+        BT --> ANAT["Anatomical Spatial Associator (Head, Torso, Hands, Feet)"]
+        ANAT --> TEMP_PPE["Temporal Compliance Tracker (N_confirm=3)"]
+        DET --> TEMP_HAZ["Hazard Tracker & State Machine (N_confirm=5)"]
+    end
+
+    subgraph RISK_ALERT["4. Risk, Incident & Alert Governance"]
+        TEMP_PPE --> NORM["Event Normalizer (Enforces UNKNOWN != VIOLATION)"]
+        TEMP_HAZ --> NORM
+        NORM --> RISK["Risk Engine (0-100 Score, Severity, Zone Multipliers)"]
+        RISK --> INC["Incident Lifecycle Engine (OPEN, ACK, RESOLVED, DISMISSED)"]
+        INC --> ALERT["Alert Engine (Deduplication, Cooldown, Escalation)"]
+    end
+
+    subgraph EVIDENCE["5. Tamper-Evident Storage & DB"]
+        INC --> EV_MGR["Evidence Manager (SHA-256 Checksum + Quota)"]
+        EV_MGR --> EV_DISK["outputs/evidence/ (Encrypted/Hashed JPEG)"]
+        INC --> DB[("SQLite WAL Database (rakshya_vision.db)")]
+        ALERT --> DB
+    end
+
+    subgraph PRESENTATION["6. Distribution & Human Dashboard"]
+        ALERT --> EXT["External Dispatcher (Webhook, Email SMTP, SMS Gateway)"]
+        ALERT --> WS["WebSocket Broadcaster (/ws/alerts)"]
+        ALERT --> REST["FastAPI REST Endpoints (/api/...)"]
+        WS --> SOC["React 18 / Vite Security Operations Center (SOC) Dashboard"]
+        REST --> SOC
+    end
+```
+
+---
+
+## 4. End-to-End Processing Pipeline
+
+### 4.1 Camera & Video Ingestion
+The system supports multiple input formats managed by `backend/app/camera/worker.py` and `backend/app/camera/manager.py`:
+- **Local USB Webcam:** Ingested via OpenCV device indexing (`0`, `1`). Tested and verified.
+- **Recorded Video Files:** Supports `.mp4`, `.avi`, `.mkv` for offline audits and verification. Tested and verified.
+- **RTSP / IP Cameras:** Ingests network video streams with credentials securely masked (`rtsp://admin:***@192.168.1.50:554/stream1`). Architecturally implemented with bounded exponential backoff reconnection. Physical industrial CCTV pilot is marked *Not Tested* due to local hardware unavailability.
+- **Android / Mobile Network Stream:** Ingests IP webcam streams from mobile devices over local Wi-Fi. Tested and verified.
+
+### 4.2 Frame Preprocessing
+Incoming frames are scaled to $384 \times 384$ pixels matching the trained neural network resolution, normalized to $[0, 1]$, and converted to RGB tensor representations.
+
+### 4.3 Object Detection
+Frames pass through the production YOLOv8n checkpoint (`models/detection/ppe_fire_smoke_v2/weights/best.pt`). Checksum integrity is strictly verified on load via SHA-256 against `models/registry/model_registry.yaml`.
+
+### 4.4 Worker Tracking (ByteTrack)
+The system tracks individual workers using a two-stage Hungarian assignment algorithm coupled with an 8-state Kalman Filter (`KalmanBoxTracker`):
+- Assigns stable, anonymous integer IDs (`Worker #1`, `Worker #2`).
+- Recovers lost tracks across brief occlusions using low-confidence detection matching ($0.1 \le \text{conf} \le 0.5$).
+- Does not collect or store biometric data or Personally Identifiable Information (PII).
+
+### 4.5 Anatomical Spatial Association
+Detected PPE items are mapped to individual worker bounding boxes based on relative human anatomical proportions:
+- **Helmet:** Must lie in the upper $25\%$ of the person bounding box with horizontal centering.
+- **Safety Vest:** Must overlap the central torso region ($15\%$ to $65\%$ vertical height).
+- **Gloves:** Must reside in the lower lateral regions or wrist zones.
+- **Footwear:** Must reside in the bottom $20\%$ of the bounding box.
+
+### 4.6 Temporal Validation
+Single-frame detections are treated as unconfirmed observations:
+- **PPE State Confirmation:** Requires $3$ consecutive matching frames before transitioning a worker's PPE state from `UNKNOWN` to `PRESENT` or `ABSENT`.
+- **Dropout Tolerance:** A worker who briefly looks away or walks behind a post retains their compliance state for up to $5$ frames without triggering a false alarm.
+
+### 4.7 Fire & Smoke Hazard Analysis
+Thermal and atmospheric combustion signatures are processed in parallel:
+- Fire and smoke are tracked as spatial hazard objects with independent bounding boxes.
+- Categorized into relationships: `ISOLATED_FIRE`, `ISOLATED_SMOKE`, `FIRE_WITH_SMOKE_PLUME`, `SMOKE_PRECEDING_FIRE`.
+- Requires $5$ consecutive confirmation frames before escalating to `CONFIRMED`.
+
+### 4.8 Risk Engine
+Scores events on an explainable scale from $0$ to $100$, accounting for hazard category, duration of persistence, number of exposed workers, and facility zone risk multipliers.
+
+### 4.9 Incident & Alert Engines
+Groups events into persistent incidents. Applies deduplication, cooldown suppression, and automated severity escalation if an emergency persists beyond $30$ seconds.
+
+### 4.10 Operator Dashboard
+Broadcasting occurs via WebSockets directly into the React 18 Security Operations Center (SOC) dashboard, providing live visual telemetry, checklist HUDs, and human-in-the-loop action buttons.
+
+---
+
+## 5. PPE Compliance Governance
+
+### Canonical Classes & The Absence Philosophy
+The object detector is trained on 7 canonical classes:
+
+| ID | Class Name | Category | Function |
+|:---|:---|:---|:---|
+| `0` | `person` | Worker | Primary tracking anchor |
+| `1` | `helmet` | PPE Item | Hard hat head protection |
+| `2` | `safety_vest` | PPE Item | High-visibility vest |
+| `3` | `gloves` | PPE Item | Hand safety |
+| `4` | `safety_footwear` | PPE Item | Safety boots / shoes |
+| `5` | `fire` | Hazard | Open combustion / flames |
+| `6` | `smoke` | Hazard | Plumes / airborne particulate |
+
+The model does not use artificial negative classes like `no_helmet`. Detecting "nothing" on a head is inherently noisy in computer vision. Instead, RAKSHYA VISION verifies the presence of the required item within the anatomical sub-region. If absent across multiple confirmed frames, a violation is declared.
+
+### Worker States
+Workers are assigned one of four definitive states:
+- **`SAFE`:** All required PPE items for the current zone are confirmed `PRESENT`.
+- **`ATTENTION`:** Minor or secondary PPE items (e.g. gloves in low-risk zones) are pending or missing.
+- **`VIOLATION`:** One or more mandatory PPE items (e.g. helmet or safety vest in high-risk zones) are confirmed `ABSENT` after temporal validation.
+- **`UNKNOWN`:** The worker is occluded, partially outside the camera frame, or undergoing initial tracking acquisition.
 
 > [!IMPORTANT]
-> **AI model training has NOT started yet.** Phase 1 establishes the architectural foundation, environment isolation, database infrastructure, communication endpoints, and testing framework.
+> **Mandatory Safety Rule:** An `UNKNOWN` state **strictly never** triggers an alert or violation. Violations are only generated when temporal evidence proves confirmed absence.
 
 ---
 
-## Technology Stack
+## 6. Fire & Smoke Monitoring
 
-- **Backend:** Python 3.13, FastAPI, Uvicorn, Pydantic v2, SQLAlchemy, OpenCV, NumPy
-- **Frontend:** React 18, TypeScript, Vite
-- **Database:** SQLite (`rakshya_vision.db`)
-- **Testing:** Pytest, HTTPX
+Fire and smoke hazards are decoupled from worker compliance logic:
+
+```
+[No Hazard] ──(Detections >= 1)──> [SUSPECTED] ──(5 Consecutive Frames)──> [CONFIRMED]
+    ▲                                    │                                     │
+    └────────(10 Absent Frames)──────────┴─────────────────────────────────────┘
+```
+
+### Operational Behavior:
+- **`SUSPECTED` State:** When flames or smoke are first detected, the hazard enters `SUSPECTED`. No siren or external emergency dispatch is triggered yet, eliminating false alarms from camera sensor artifacts or transient reflections.
+- **`CONFIRMED` State:** If detection persists for $5$ consecutive frames, the hazard transitions to `CONFIRMED`. An emergency incident is generated immediately, rated `HIGH` or `CRITICAL`.
+- **`CLEARED` State:** If the hazard disappears for $10$ consecutive frames, the event is marked `CLEARED` and the incident is marked for resolution.
+
+### Known Environmental Limitations:
+- Very small, distant smoke plumes in low-resolution cameras ($< 15 \times 15$ pixels) may fall below confidence thresholds.
+- Optical smoke detection can encounter visual confusion in environments with dense steam, dust storms, or welding vapor. RAKSHYA VISION complements physical ionization/optical smoke detectors; it does not replace certified fire alarms.
 
 ---
 
-## Directory Layout
+## 7. Explainable Risk Engine
+
+The `RiskEngine` calculates a deterministic score from $0$ to $100$ according to configurable weights defined in `configs/risk_policy.yaml`:
+
+$$\text{Risk Score} = \min\left(100, \; (\text{Base Severity} + \text{Persistence Factor} + \text{Worker Density Factor}) \times \text{Zone Multiplier}\right)$$
+
+### Factor Breakdown:
+- **Base Severity:**
+  - Fire Detected: $+60$
+  - Smoke Detected: $+40$
+  - Missing Helmet: $+35$
+  - Missing Safety Vest: $+25$
+  - Missing Footwear / Gloves: $+15$
+- **Persistence Factor:** Adds $+1$ point per elapsed second of unmitigated hazard (capped at $+20$).
+- **Worker Density:** Adds $+10$ points per additional worker exposed in the hazard boundary.
+- **Zone Risk Multiplier:**
+  - `LOADING_BAY` / `ELECTRICAL_ROOM` (High Risk): $\times 1.3$
+  - `GENERAL_WORKSHOP` (Standard): $\times 1.0$
+  - `BREAK_ROOM` (Low Risk): $\times 0.7$
+
+### Risk Tiers:
+| Score Range | Risk Level | Action Protocol |
+|:---|:---|:---|
+| `0 – 29` | `LOW` | Logged for compliance metrics; no intrusive sirens. |
+| `30 – 59` | `MEDIUM` | Visual alert banner on dashboard; standard cooldown. |
+| `60 – 79` | `HIGH` | Immediate visual warning; audio chime; operator acknowledgement requested. |
+| `80 – 100` | `CRITICAL` | High-priority modal takeover; persistent alert banner; automated external dispatch. |
+
+---
+
+## 8. Incident Lifecycle
+
+Incidents represent persistent, multi-event safety situations over time.
+
+```mermaid
+stateDiagram-v2
+    [*] --> OPEN: Confirmed Event / Hazard
+    OPEN --> ACKNOWLEDGED: Operator Acknowledges Alert
+    OPEN --> ESCALATED: Persistence > 30s without resolution
+    ACKNOWLEDGED --> RESOLVED: Hazard Cleared / Worker Leaves
+    OPEN --> RESOLVED: Automated Hazard Clearing
+    OPEN --> DISMISSED: Operator Dismisses (False Positive)
+    ACKNOWLEDGED --> DISMISSED: Operator Overrides
+    RESOLVED --> [*]
+    DISMISSED --> [*]
+```
+
+### Lifecycle Mechanics:
+- **Creation:** A new `Incident` is generated when an event occurs with no open incident matching the same camera and event type.
+- **Deduplication:** Subsequent observations for the same worker or hazard update the existing incident rather than creating duplicate database rows.
+- **Cooldown Suppression:** Configurable suppression timers (e.g. 60s for missing helmet, 30s for fire) prevent operator notification fatigue.
+- **Escalation:** If an unacknowledged incident remains active past `escalation_persistence_seconds` (default: 30s), its severity escalates (e.g. `HIGH` $\rightarrow$ `CRITICAL`).
+
+---
+
+## 9. Alert Engine & Multi-Channel Providers
+
+The `AlertEngine` decouples internal telemetry from external notifications:
+
+```
+AlertEngine ──> WebSocket Broadcaster (Real-Time UI)
+             ──> SQLite Persistence (Audit Trail)
+             ──> ProviderRegistry ──┬──> Webhook Provider (HMAC-SHA256)
+                                   ├──> Email Provider (SMTP / STARTTLS)
+                                   └──> SMS Provider (Gateway Stub)
+```
+
+### Provider Implementation Status:
+
+| Provider | Status | Implementation Details |
+|:---|:---|:---|
+| **Internal Dashboard** | **Implemented & Verified** | Bi-directional WebSocket (`/ws/alerts`) with instant JSON dispatch. |
+| **Database Audit Trail** | **Implemented & Verified** | Every alert action logged in `alert_history` table with timestamps and operator reasons. |
+| **HTTP Webhook** | **Implemented — Configurable** | Sends JSON payloads with cryptographic `X-Rakshya-Signature` (HMAC-SHA256) and exponential retry. |
+| **Email (SMTP)** | **Implemented — Configurable** | Sends MIME multipart notifications via SMTP with STARTTLS encryption. |
+| **SMS Gateway** | **Implemented — Gateway Stub** | Structured SMS integration stub ready for Twilio/AWS SNS API credentials. |
+
+> [!NOTE]
+> External alert channels remain in `NOT_CONFIGURED` status until production SMTP credentials or Webhook URLs are provided in `.env`. The system never fabricates delivery receipts.
+
+---
+
+## 10. Human-Centric Operator Dashboard
+
+The user interface is built with React 18, TypeScript, and Vite, running as a Security Operations Center (SOC) dark-theme dashboard.
+
+### Core Dashboard Features:
+1. **Overview View:** Real-time KPI summary (active alerts, critical hazards, compliant workers count, camera status).
+2. **Cameras Matrix:** Live multi-camera grid showing FPS, capture source, resolution, and operational start/stop controls.
+3. **Workers & PPE Inspector:** Displays anonymous worker cards with ByteTrack IDs and checklist HUD badges.
+4. **Fire & Smoke Monitor:** Spatial threat cards detailing detected combustion coordinates, confidence, and containment zones.
+5. **Alerts & Incidents Center:** Filterable audit table with immediate human-in-the-loop actions (`Acknowledge`, `Resolve`, `Dismiss`).
+6. **Incident Evidence Modal:** Displays cryptographically verified snapshot captures with SHA-256 integrity badges and secure download links.
+7. **System Analytics:** Distribution charts computed from live SQLite records without fake data.
+
+---
+
+## 11. Detection Classes
+
+The model detects 7 canonical classes verified in the model registry:
+
+| Class ID | Class Name | Function / Object | Confidence Threshold |
+|:---:|:---|:---|:---:|
+| `0` | `person` | Worker anchor bounding box | `0.40` |
+| `1` | `helmet` | Hard hat / protective helmet | `0.30` |
+| `2` | `safety_vest` | High-visibility reflective vest | `0.30` |
+| `3` | `gloves` | Protective handwear | `0.25` |
+| `4` | `safety_footwear` | Steel-toe / industrial boots | `0.25` |
+| `5` | `fire` | Open flames / combustion | `0.35` |
+| `6` | `smoke` | Atmospheric smoke plumes | `0.35` |
+
+---
+
+## 12. Technology Stack
+
+| Layer | Technology | Purpose |
+|:---|:---|:---|
+| **Core Language** | Python 3.13 | Backend runtime, computer vision pipeline, API |
+| **Computer Vision** | OpenCV (`opencv-python` 4.11) | Video decoding, frame preprocessing, annotations |
+| **Deep Learning** | PyTorch 2.6.0 + Ultralytics YOLOv8 | Convolutional object detection model inference |
+| **Worker Tracking** | Custom ByteTrack (NumPy + SciPy) | Multi-object tracking with 8-state Kalman Filter |
+| **Web Framework** | FastAPI 0.115 + Starlette | Asynchronous REST API, WebSocket server |
+| **Data Validation** | Pydantic v2 | Strict schema validation, configuration typing |
+| **Database ORM** | SQLAlchemy 2.0 | Relational database mapping and migrations |
+| **Database Engine** | SQLite 3 (WAL Mode) | Thread-safe edge persistence with 5s busy timeout |
+| **Authentication** | PyJWT + Passlib (PBKDF2-HMAC-SHA256) | Token authentication with 600,000 iterations |
+| **Observability** | Prometheus 0.0.4 + psutil | Metrics exposition and system telemetry |
+| **Frontend Framework** | React 18.3 + TypeScript 5.7 | Component architecture, type safety |
+| **Build Tooling** | Vite 6.4 | Modern ESM bundler and development server |
+| **UI Components** | Lucide React | Clean icon set |
+| **Testing Framework** | Pytest 9.1 + HTTPX | Automated test runner, client simulation |
+
+---
+
+## 13. Repository Structure
 
 ```
 RAKSHYA-VISION/
-├── backend/            # FastAPI application, database session, schemas, and tests
-├── frontend/           # React + TypeScript Vite dashboard
-├── models/             # Target directories for trained models (PPE, Fire/Smoke)
-├── datasets/           # Raw and processed datasets (to be populated in Phase 2)
-├── scripts/            # Automation and data processing scripts
-├── docs/               # System and architecture documentation
-├── .gitignore          # Version control ignore rules
-├── PROJECT_STATUS.md   # Current environment and inspection log
-└── README.md           # Project documentation
+├── backend/
+│   ├── app/
+│   │   ├── ai/
+│   │   │   ├── compliance/       # ByteTrack, anatomical association, temporal state machine
+│   │   │   ├── detection/        # YOLO detector, ModelLoader, video processor
+│   │   │   ├── hazards/          # Fire & smoke tracker, spatial analysis, temporal confirmation
+│   │   │   └── risk/             # Pydantic schemas for events, risks, and alerts
+│   │   ├── api/
+│   │   │   ├── alerts.py         # Alert lifecycle endpoints
+│   │   │   ├── auth.py           # Authentication & RBAC endpoints
+│   │   │   ├── cameras.py        # Camera worker controls & snapshot API
+│   │   │   ├── compliance.py     # Worker compliance analysis endpoints
+│   │   │   ├── detection.py      # Raw detection endpoints
+│   │   │   ├── evidence.py       # Evidence archival & download API
+│   │   │   ├── hazards.py        # Hazard analysis endpoints
+│   │   │   ├── monitoring.py     # Liveness, readiness, and Prometheus metrics
+│   │   │   └── websocket.py      # Live WebSocket event broadcaster
+│   │   ├── camera/               # Multi-Camera Manager & thread-isolated workers
+│   │   ├── database/             # SQLite session, engine, WAL configuration
+│   │   ├── models/               # SQLAlchemy ORM models (User, Incident, Alert, Evidence, etc.)
+│   │   ├── security/             # Password hashing, JWT token creation, RBAC guards
+│   │   ├── services/             # AlertEngine, RiskEngine, EvidenceManager, MetricsCollector
+│   │   ├── config.py             # Centralized typed settings & secret protection
+│   │   └── main.py               # FastAPI application entrypoint & lifespan
+│   ├── tests/                    # 154 automated pytest unit and integration tests
+│   └── requirements.txt          # Python dependencies
+├── configs/
+│   ├── alert_policy.yaml         # Cooldown and escalation rules
+│   ├── cameras.yaml              # Multi-camera sources and resolution configs
+│   ├── detection.yaml            # YOLO confidence and NMS thresholds
+│   ├── production.yaml           # Centralized production configuration
+│   └── risk_policy.yaml          # Risk factor scoring and zone multipliers
+├── datasets/
+│   ├── manifests/                # Checksums, class mappings, version manifests
+│   ├── processed/                # Unified train/val/test YOLO dataset (22,453 images)
+│   ├── README.md                 # Dataset usage instructions
+│   └── SOURCES.md                # Official source registry and licensing
+├── docs/                         # Technical documentation across all 10 phases
+├── frontend/
+│   ├── src/
+│   │   ├── components/           # SOC UI components (Alerts, Cameras, Modals)
+│   │   ├── pages/                # Views (Overview, Cameras, Workers, Hazards, Alerts, Analytics)
+│   │   ├── services/             # REST API and WebSocket client services
+│   │   ├── types/                # TypeScript schemas matching backend models
+│   │   └── App.tsx               # Root React application
+│   ├── package.json              # Frontend dependencies
+│   └── vite.config.ts            # Vite configuration
+├── models/
+│   ├── detection/                # Model checkpoints (best.pt weights)
+│   └── registry/                 # model_registry.yaml with SHA-256 hashes
+├── outputs/
+│   ├── evidence/                 # Visual evidence archive (YYYY/MM/DD/{camera}/)
+│   └── logs/                     # Rotating production log files
+├── runs/                         # Model training evaluation artifacts
+├── scripts/
+│   ├── cleanup_retention.py      # Automated database and evidence retention script
+│   └── testing/                  # run_integration_tests.py (39 E2E scenarios)
+├── .env.example                  # Safe configuration template
+├── .gitignore                    # Version control exclusions
+├── PROJECT_STATUS.md             # Project lifecycle history
+└── README.md                     # Master project documentation
 ```
 
 ---
 
-## Quick Start & Verification Commands
+## 14. Model & Model Registry
 
-### 1. Backend Setup & Activation
-```powershell
+The active production model is managed through an explicit registry:
+
+- **Checkpoint Path:** `models/detection/ppe_fire_smoke_v2/weights/best.pt`
+- **Model Architecture:** YOLOv8n (nano)
+- **Model Framework:** Ultralytics YOLO / PyTorch
+- **Input Resolution:** $384 \times 384$ pixels
+- **SHA-256 Checksum:** `490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3`
+- **Model Status:** `production` in `models/registry/model_registry.yaml`
+
+### Checksum Verification Workflow:
+The `ModelLoader` (`backend/app/ai/detection/model_loader.py`) enforces strict cryptographic validation:
+
+```
+ModelLoader.load_model()
+    │
+    ├── 1. Reads models/registry/model_registry.yaml
+    ├── 2. Identifies active model marked status: production
+    ├── 3. Computes live SHA-256 digest of weights file on disk
+    ├── 4. Compares computed hash against registry value
+    │
+    ├── Match? ──> Loads neural network into memory
+    └── Mismatch? ──> Halts loading immediately with RuntimeError:
+                      "MODEL CHECKSUM VERIFICATION FAILED"
+```
+
+---
+
+## 15. Datasets — Source & Traceability
+
+RAKSHYA VISION was trained and validated on four open datasets compiled into a unified training split of **22,453 images** and **51,195 verified annotations**:
+
+### 1. PPE Detection & Compliance
+- **Source:** Roboflow Universe
+- **Official URL:** [https://universe.roboflow.com/izanagi/ppe-detection-and-compliance](https://universe.roboflow.com/izanagi/ppe-detection-and-compliance)
+- **License:** CC BY 4.0
+- **Usage:** Primary multi-class PPE dataset providing diverse coverage of boots, gloves, vests, helmets, and full-body worker postures.
+
+### 2. Construction PPE
+- **Source:** Roboflow Universe
+- **Official URL:** [https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo](https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo)
+- **License:** CC BY 4.0
+- **Usage:** Supplementary dataset providing real-world construction site backgrounds, lighting angles, and hard hat variations.
+
+### 3. Hard Hat Workers
+- **Source:** Roboflow Public / Harvard Dataverse
+- **Official URL:** [https://public.roboflow.com/object-detection/hard-hat-workers](https://public.roboflow.com/object-detection/hard-hat-workers)
+- **License:** CC0: Public Domain
+- **Usage:** Core dataset for head-to-helmet spatial association and dense worker crowd modeling.
+
+### 4. D-Fire (Fire & Smoke)
+- **Source:** GAIA Solutions / Roboflow Universe
+- **Official URL:** [https://github.com/gaia-solutions-on-demand/DFireDataset](https://github.com/gaia-solutions-on-demand/DFireDataset)
+- **License:** CC BY 4.0 / GPL-3.0
+- **Usage:** Dedicated combustion dataset providing varied fire flame intensities and industrial smoke plume patterns.
+
+---
+
+## 16. Dataset Source Mapping
+
+| Dataset Name | Type | Images | Purpose in Project | Storage Location | Verified License |
+|:---|:---|:---:|:---|:---|:---|
+| **PPE Detection & Compliance** | Dataset | 9,663 | Primary multi-class PPE training | `datasets/raw/ppe_detection/` | CC BY 4.0 |
+| **Construction PPE** | Dataset | 1,124 | Site backgrounds & vest diversity | `datasets/raw/construction_ppe/` | CC BY 4.0 |
+| **Hard Hat Workers** | Dataset | 7,035 | Worker & helmet relationship modeling | `datasets/raw/hard_hat_workers/` | CC0 (Public Domain) |
+| **D-Fire Dataset** | Dataset | 4,631 | Fire & smoke hazard training | `datasets/raw/d_fire/` | CC BY 4.0 / GPL-3.0 |
+| **Unified Processed Split** | Unified Split | 22,453 | Train (15,717), Val (4,490), Test (2,246) | `datasets/processed/` | Combined Under Terms |
+
+---
+
+## 17. External Technology Sources
+
+Every core library and framework used in RAKSHYA VISION is grounded in an official repository:
+
+- **Ultralytics YOLOv8:** [https://docs.ultralytics.com/](https://docs.ultralytics.com/)
+- **OpenCV Computer Vision:** [https://opencv.org/](https://opencv.org/)
+- **PyTorch Machine Learning:** [https://pytorch.org/](https://pytorch.org/)
+- **FastAPI Framework:** [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
+- **React 18:** [https://react.dev/](https://react.dev/)
+- **TypeScript:** [https://www.typescriptlang.org/](https://www.typescriptlang.org/)
+- **Vite:** [https://vite.dev/](https://vite.dev/)
+- **SQLAlchemy:** [https://www.sqlalchemy.org/](https://www.sqlalchemy.org/)
+- **SQLite:** [https://www.sqlite.org/](https://www.sqlite.org/)
+- **ByteTrack Research:** [https://github.com/ifzhang/ByteTrack](https://github.com/ifzhang/ByteTrack)
+
+---
+
+## 18. Problem Statement Source
+
+- **Competition:** BPUT Hackathon 2026
+- **Track:** Artificial Intelligence & Computer Vision
+- **Problem Statement Code:** PS06
+- **Title:** Prototype AI system that detects safety gear compliance
+- **Organizing Entities:** Software Technology Parks of India (STPI) & EmTek
+- **Source Context:** Based on the official BPUT Hackathon 2026 problem statement guidelines supplied to participating engineering teams.
+
+---
+
+## 19. Source → Project Traceability
+
+| External Source | Category | What It Provides | How RAKSHYA VISION Uses It | Repository Location |
+|:---|:---|:---|:---|:---|
+| **Roboflow Universe** | Dataset Source | Raw annotated bounding box datasets | Training data for canonical classes | `datasets/raw/` |
+| **D-Fire (GAIA)** | Dataset Source | Fire and smoke bounding annotations | Training data for hazard detection | `datasets/raw/d_fire/` |
+| **Ultralytics** | Neural Framework | YOLOv8 architecture & inference engine | Object detector backbone (`best.pt`) | `backend/app/ai/detection/` |
+| **ByteTrack** | Tracking Algorithm | Kalman filter multi-object tracking | Worker identity persistence | `backend/app/ai/compliance/tracker.py` |
+| **FastAPI** | Web Framework | ASGI async HTTP & WebSocket server | Real-time REST API & live alerting | `backend/app/api/` |
+| **React / Vite** | Frontend Engine | Reactive Virtual DOM & ESM bundler | Human-in-the-loop SOC dashboard | `frontend/src/` |
+
+---
+
+## 20. Licenses & Attribution
+
+| Resource | Origin | License | Attribution Requirement | Project Compliance |
+|:---|:---|:---|:---|:---|
+| **RAKSHYA VISION** | Project Team | MIT License | Standard MIT notice | Included in repository |
+| **PPE Detection Dataset** | Izanagi (Roboflow) | CC BY 4.0 | Attribution required | Cited in `datasets/SOURCES.md` |
+| **Construction PPE** | SKCET (Roboflow) | CC BY 4.0 | Attribution required | Cited in `datasets/SOURCES.md` |
+| **Hard Hat Workers** | Roboflow / Harvard | CC0 1.0 | Public Domain | Preserved in dataset registry |
+| **D-Fire Dataset** | GAIA / Pedro Vinicius | CC BY 4.0 | Attribution required | Cited in `datasets/SOURCES.md` |
+| **Ultralytics YOLO** | Ultralytics Inc. | AGPL-3.0 / Enterprise | License compliance required | Maintained under open-source evaluation terms |
+| **OpenCV** | OpenCV Team | Apache 2.0 | Apache notice | Maintained |
+| **FastAPI** | Sebastián Ramírez | MIT License | Standard notice | Maintained |
+| **React** | Meta Platforms, Inc. | MIT License | Standard notice | Maintained |
+
+---
+
+## 21. Performance Benchmarks
+
+Performance was benchmarked across repeated end-to-end cycles (`outputs/integration/performance_report.json`) on the development host:
+
+### Benchmark Environment:
+- **Processor:** Intel Core i5-13420H (8 Cores / 12 Threads)
+- **Host Memory:** 15.59 GB RAM
+- **Execution Mode:** CPU-Only PyTorch (`device: cpu`)
+- **Neural Model:** YOLOv8n ($384 \times 384$ input)
+
+### Measured Results:
+| Benchmark Dimension | Measured Result | Latency Budget | Status |
+|:---|:---:|:---:|:---:|
+| **Mean Pipeline Latency (End-to-End)** | **41.55 ms** | $< 100.0\text{ ms}$ | **PASS** |
+| **Median Pipeline Latency** | **40.34 ms** | $< 100.0\text{ ms}$ | **PASS** |
+| **Effective Frame Rate (CPU)** | **24.1 FPS** | $\ge 15.0\text{ FPS}$ | **PASS** |
+| **Subsystem: YOLOv8n Detection** | 41.47 ms | $< 80.0\text{ ms}$ | **PASS** |
+| **Subsystem: ByteTrack Tracking** | 0.01 ms | $< 5.0\text{ ms}$ | **PASS** |
+| **Subsystem: Anatomical Association** | $< 0.01\text{ ms}$ | $< 5.0\text{ ms}$ | **PASS** |
+| **Process Resident Memory (RSS)** | 423 MB $\rightarrow$ 432 MB | $< 1000.0\text{ MB}$ | **PASS** (Zero Leaks) |
+
+> [!NOTE]
+> Development host benchmarks reflect single-camera CPU performance. Multi-camera deployments at scale require edge accelerators (e.g. NVIDIA Jetson, Intel OpenVINO, or dedicated GPU instances).
+
+---
+
+## 22. Testing & Verification
+
+The repository contains an automated testing suite covering all architectural layers:
+
+```
+pytest backend/tests -v
+===================== 154 passed, 3 warnings in 41.33s =====================
+```
+
+### Coverage by Subsystem:
+1. **Model Registry & SHA-256 Checksum (`test_model_registry_phase10.py`):** 7/7 tests passed.
+2. **Production Config & Secrets (`test_production_config_phase10.py`):** 9/9 tests passed.
+3. **Database WAL & Data Retention (`test_database_phase10.py`):** 6/6 tests passed.
+4. **Multi-Camera Manager (`test_camera_manager_phase10.py`):** 7/7 tests passed.
+5. **Camera API & Control (`test_camera_api_phase10.py`):** 7/7 tests passed.
+6. **Authentication & RBAC (`test_auth_rbac_phase10.py`):** 8/8 tests passed.
+7. **External Alert Providers (`test_alert_providers_phase10.py`):** 6/6 tests passed.
+8. **Incident Evidence Archival (`test_evidence_phase10.py`):** 8/8 tests passed.
+9. **Observability & Metrics (`test_observability_phase10.py`):** 8/8 tests passed.
+10. **Object Detection Pipeline (`test_detection.py`):** 19/19 tests passed.
+11. **Worker Compliance & Association (`test_compliance.py`):** 14/14 tests passed.
+12. **Fire & Smoke Hazard Tracking (`test_hazards.py`):** 16/16 tests passed.
+13. **Risk & Smart Alerts (`test_risk_alerts.py`):** 19/19 tests passed.
+14. **WebSocket Streaming (`test_websocket.py`):** 3/3 tests passed.
+15. **Application Health & Routing (`test_main.py`):** 4/4 tests passed.
+16. **Full Integration Suite (`test_integration_phase9.py`):** 6 tests passed (covering 39 scenarios).
+
+### Integration Test Runner:
+```
+python scripts/testing/run_integration_tests.py
+Total Tests: 39 | Passed: 39 | Failed: 0 (100% Pass Rate)
+```
+
+---
+
+## 23. Production Status Matrix
+
+| Subsystem / Capability | Operational Status | Evidence in Codebase |
+|:---|:---:|:---|
+| **YOLOv8 Object Detection** | **Implemented & Verified** | `backend/app/ai/detection/detector.py` |
+| **Model Registry & SHA-256 Checksum** | **Implemented & Verified** | `models/registry/model_registry.yaml`, `model_loader.py` |
+| **ByteTrack Worker Tracking** | **Implemented & Verified** | `backend/app/ai/compliance/tracker.py` |
+| **Anatomical PPE Association** | **Implemented & Verified** | `backend/app/ai/compliance/association.py` |
+| **Temporal Compliance State Machine** | **Implemented & Verified** | `backend/app/ai/compliance/temporal.py` |
+| **Fire & Smoke Hazard Tracking** | **Implemented & Verified** | `backend/app/ai/hazards/tracker.py` |
+| **Explainable Risk Engine (0-100)** | **Implemented & Verified** | `backend/app/services/risk_engine.py` |
+| **Smart Alert Engine & Deduplication** | **Implemented & Verified** | `backend/app/services/alert_engine.py` |
+| **Database WAL Mode & Foreign Keys** | **Implemented & Verified** | `backend/app/database/session.py` |
+| **Multi-Camera Manager Pool** | **Implemented & Verified** | `backend/app/camera/manager.py`, `worker.py` |
+| **Camera Control & Snapshot API** | **Implemented & Verified** | `backend/app/api/cameras.py` |
+| **Authentication & RBAC (PBKDF2/JWT)** | **Implemented & Verified** | `backend/app/security/auth.py`, `api/auth.py` |
+| **External Alert Providers (Webhook/Email)** | **Implemented & Verified** | `backend/app/services/alert_providers/` |
+| **Incident Evidence Archival & Checksum** | **Implemented & Verified** | `backend/app/services/evidence_manager.py` |
+| **Observability (/health, /metrics)** | **Implemented & Verified** | `backend/app/api/monitoring.py`, `services/metrics.py` |
+| **React 18 SOC Dashboard** | **Implemented & Verified** | `frontend/src/` (`npm run build` succeeds in 3.5s) |
+| **Physical Industrial CCTV Pilot** | **Not Tested** | Hardware unavailable in test environment |
+| **Long-Duration Stress Test (> 72h)** | **Not Tested** | Awaiting pilot edge deployment |
+| **Edge Hardware Packaging (Docker/K8s)** | **Planned** | Container manifests scheduled for Phase 11 |
+
+---
+
+## 24. Real-World Deployment Architecture
+
+```
+[Industrial Area / Construction Site]
+  ├── Camera 01 (Entrance Gate)      ──RTSP──> [Edge Compute Server / On-Premise Box]
+  ├── Camera 02 (Workshop Floor)     ──RTSP──>   │ - Multi-Camera Ingestion Pool
+  ├── Camera 03 (Hazard Zone)        ──RTSP──>   │ - YOLOv8n Multi-Task Inference
+  └── Camera 04 (Electrical Room)    ──RTSP──>   │ - ByteTrack & Temporal Validation
+                                                 │ - Risk & Incident Lifecycle Engine
+                                                 │ - Local SQLite Database (WAL Mode)
+                                                 │ - Evidence Archival (outputs/evidence/)
+                                                 │
+                                                 ├──> [FastAPI Server (Port 8000)]
+                                                 │      ├── REST Endpoints (/api/...)
+                                                 │      ├── Prometheus Metrics (/metrics)
+                                                 │      └── WebSocket Broadcaster (/ws/alerts)
+                                                 │
+                                                 ├──> [Safety Operations Center (SOC)]
+                                                 │      └── Web Browser (React 18 Dashboard)
+                                                 │
+                                                 └──> [External Emergency Channels]
+                                                        ├── Automated Webhooks
+                                                        └── Email / SMS Alerts
+```
+
+> [!NOTE]
+> Physical industrial CCTV deployment is marked as **Not Tested** because development was conducted using recorded test video, local webcams, synthetic streams, and mobile network streams.
+
+---
+
+## 25. Configuration Guide
+
+System behavior is governed by centralized, typed YAML configurations:
+
+### Configuration Files:
+- **`configs/production.yaml`:** Central production configuration (server settings, database timeouts, evidence retention windows, logging parameters, security flags).
+- **`configs/cameras.yaml`:** Camera configurations (camera ID, name, RTSP/USB source, target FPS, assigned zone).
+- **`configs/risk_policy.yaml`:** Risk scoring weights, persistence penalties, and zone risk multipliers.
+- **`configs/alert_policy.yaml`:** Deduplication cooldown windows and escalation persistence thresholds.
+- **`models/registry/model_registry.yaml`:** Active model catalog and immutable SHA-256 hashes.
+
+### Secret Management (`.env`):
+Secrets and API credentials are kept strictly isolated from version control. A sanitized template is provided in `.env.example`:
+
+```bash
+# Application Environment
+APP_ENV=production
+SECRET_KEY=generate_with_openssl_rand_hex_32
+JWT_SECRET_KEY=generate_with_openssl_rand_hex_32
+
+# Security & RBAC
+AUTH_ENABLED=true
+JWT_EXPIRATION_MINUTES=480
+
+# External Alert Providers (Leave blank if unconfigured)
+ALERT_WEBHOOK_ENABLED=false
+WEBHOOK_URL=
+WEBHOOK_SECRET=
+
+ALERT_EMAIL_ENABLED=false
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USERNAME=
+SMTP_PASSWORD=
+EMAIL_FROM_ADDRESS=
+EMAIL_RECIPIENTS=
+```
+
+---
+
+## 26. Installation & Quick Start
+
+### Prerequisites
+- **Operating System:** Windows 10/11, Ubuntu 22.04+, or macOS
+- **Python:** Python 3.10 to 3.13 (64-bit)
+- **Node.js:** Node.js v18+ and npm
+
+---
+
+### Step 1: Clone Repository
+```bash
+git clone https://github.com/SMRU08/RAKSHYA-VISION.git
+cd RAKSHYA-VISION
+```
+
+---
+
+### Step 2: Backend Setup
+```bash
+# Navigate to backend directory
 cd backend
+
+# Create and activate Python virtual environment
 python -m venv .venv
+
+# Windows activation:
 .venv\Scripts\Activate.ps1
+# Linux/macOS activation:
+# source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Run Backend Server
-```powershell
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-- API Root: `http://localhost:8000/`
-- Health Endpoint: `http://localhost:8000/health`
-- OpenAPI Swagger Docs: `http://localhost:8000/docs`
+---
 
-### 3. Run Backend Tests
-```powershell
-pytest -v
+### Step 3: Configure Environment
+```bash
+# Return to root and create .env file from template
+cd ..
+cp .env.example .env
 ```
 
-### 4. Frontend Installation & Startup
-```powershell
-cd ../frontend
+---
+
+### Step 4: Run Backend Server
+```bash
+cd backend
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+- **API Root:** [http://localhost:8000/](http://localhost:8000/)
+- **Liveness Probe:** [http://localhost:8000/health/live](http://localhost:8000/health/live)
+- **Readiness Probe:** [http://localhost:8000/health/ready](http://localhost:8000/health/ready)
+- **Prometheus Metrics:** [http://localhost:8000/metrics](http://localhost:8000/metrics)
+- **OpenAPI Swagger Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+### Step 5: Frontend Setup & Startup
+In a separate terminal:
+```bash
+cd frontend
 npm install
 npm run dev
 ```
-- Dashboard Interface: `http://localhost:5173`
+- **Dashboard Interface:** [http://localhost:5173](http://localhost:5173)
 
-### 5. Frontend Production Build
-```powershell
+---
+
+### Step 6: Verify System Health
+Run automated tests to confirm system integrity:
+```bash
+# Backend pytest suite (154 tests)
+pytest backend/tests -v
+
+# Phase 9 integration test runner (39 scenarios)
+python scripts/testing/run_integration_tests.py
+
+# Frontend production build
+cd frontend
 npm run build
 ```
+
+---
+
+## 27. API & WebSocket Reference
+
+### System Health & Monitoring
+- `GET /health/live` — Lightweight container liveness probe (`HTTP 200`).
+- `GET /health/ready` — Deep readiness probe validating DB, AI model, and storage (`HTTP 200` or `HTTP 503`).
+- `GET /health` — Legacy health endpoint for backward compatibility.
+- `GET /health/database` — SQLite WAL mode, PRAGMA, and table connection health.
+- `GET /metrics` — Prometheus 0.0.4 metrics exposition.
+- `GET /api/monitoring/metrics` — JSON operational metrics summary.
+- `GET /api/monitoring/health/deep` — Detailed diagnostics report.
+
+### Camera Management
+- `GET /api/cameras` — Real-time operational statuses and FPS metrics.
+- `GET /api/cameras/{camera_id}` — Single camera status.
+- `POST /api/cameras/{camera_id}/start` — Starts capture worker thread.
+- `POST /api/cameras/{camera_id}/stop` — Gracefully stops capture worker thread.
+- `GET /api/cameras/{camera_id}/snapshot` — Streams live JPEG frame inspection.
+
+### Safety Incidents & Alerts
+- `GET /api/risk/summary` — Active incident, alert, and hazard counts.
+- `GET /api/alerts` — Lists alerts with severity and status filters.
+- `GET /api/alerts/{alert_id}` — Alert detail and audit timeline.
+- `POST /api/alerts/{alert_id}/acknowledge` — Operator acknowledgement.
+- `POST /api/alerts/{alert_id}/resolve` — Operator incident resolution.
+- `POST /api/alerts/{alert_id}/dismiss` — Operator alert dismissal.
+- `GET /api/incidents` — Lists safety incidents.
+- `GET /api/incidents/{incident_id}` — Incident details.
+- `GET /api/alerts/providers/status` — Status of external alert notification channels.
+
+### Evidence Archival
+- `GET /api/incidents/{incident_id}/evidence` — Lists archived evidence for an incident.
+- `GET /api/evidence/{evidence_id}` — Evidence metadata and live SHA-256 integrity check.
+- `GET /api/evidence/{evidence_id}/download` — Secure image download with path traversal defense.
+- `GET /api/evidence/storage/status` — Evidence disk usage and quota limits.
+
+### Authentication & Audit
+- `POST /api/auth/login` — Issues JWT bearer token.
+- `GET /api/auth/me` — Current authenticated user profile.
+- `GET /api/auth/users` — Admin user management.
+- `GET /api/auth/audit-logs` — Immutable audit log of administrative actions.
+
+### Real-Time WebSockets
+- `WS /ws/alerts` — Live push stream for `AlertCreated`, `AlertUpdated`, `AlertEscalated`, and `IncidentCreated` events. Supports bi-directional ping/pong heartbeats.
+
+---
+
+## 28. Security & Privacy
+
+1. **Authentication & RBAC:** Passwords hashed using PBKDF2-HMAC-SHA256 with 600,000 iterations. JWT tokens expire after 8 hours. Roles include `ADMIN`, `OPERATOR`, and `VIEWER`.
+2. **Credential Redaction:** Camera RTSP passwords and database secrets are masked in logs and API outputs (`mask_camera_source`).
+3. **Path Traversal Defenses:** File endpoints canonicalize relative paths against base directories. Requests attempting directory traversal (e.g. `../../`) raise `HTTP 403 Forbidden`.
+4. **Tamper-Evident Storage:** Visual evidence files are cryptographically hashed using SHA-256 upon write. Verification re-calculates hashes to expose tampering.
+5. **Privacy by Design:** Worker tracking uses anonymous integer IDs (`Track #101`). No facial recognition, biometric identification, or PII is recorded.
+6. **Data Retention & Pruning:** Automated maintenance (`scripts/cleanup_retention.py`) purges expired records and unlinks evidence files according to retention policies.
+
+---
+
+## 29. Known Limitations
+
+- **Small & Distant Combustion:** Fire or smoke signatures smaller than $15 \times 15$ pixels in wide-angle views may remain below the detection confidence threshold.
+- **Optical Smoke Confusion:** Visual smoke detection may be prone to false alerts in areas with heavy steam or dense industrial dust clouds.
+- **Extreme Footwear Occlusion:** Safety footwear detection can be challenged when workers stand behind pallets or materials.
+- **CPU Throughput Bounds:** CPU inference runs at ~24 FPS for single streams. Multi-camera concurrent inference requires edge hardware acceleration.
+- **Physical CCTV Pilot Status:** Physical industrial CCTV hardware has not yet been piloted in a live factory environment.
+
+---
+
+## 30. Roadmap
+
+### Completed (Phases 1–10)
+- [x] Phase 1: Foundation, testing harness, and React dashboard scaffold.
+- [x] Phase 2: Dataset pipeline (22,453 unified images across 4 open sources).
+- [x] Phase 3 & 3.1: Multi-task YOLOv8n detector with 7 canonical classes.
+- [x] Phase 4: Video and camera stream ingestion pipeline.
+- [x] Phase 5: ByteTrack multi-worker tracking and spatial anatomical PPE association.
+- [x] Phase 6: Fire & smoke hazard tracking with temporal state confirmation.
+- [x] Phase 7: Explainable risk engine (0–100 score) and smart alert lifecycle.
+- [x] Phase 8: Real-time WebSocket channel and React 18 SOC dashboard.
+- [x] Phase 9: System integration, latency benchmarking, and 39 E2E test scenarios.
+- [x] Phase 10: Model registry with SHA-256 validation, SQLite WAL, multi-camera manager, RBAC authentication, external alert providers, evidence archival, and Prometheus metrics.
+
+### In Progress & Future Work
+- [ ] Edge runtime acceleration with TensorRT and ONNX Runtime.
+- [ ] Containerized deployment manifests (Docker Compose and Kubernetes Helm charts).
+- [ ] Mobile push notifications for on-duty safety managers (FCM / APNs).
+- [ ] Physical CCTV on-site pilot trial in an active industrial facility.
+
+---
+
+## 31. Authors & Acknowledgments
+
+- **Lead Engineer & Maintainer:** Smruti Ranjan Nayak ([@SMRU08](https://github.com/SMRU08))
+- **Project:** RAKSHYA VISION
+- **Competition:** BPUT Hackathon 2026
+- **Problem Statement:** PS06 — AI Vision-Based Safety Gear Compliance
+- **Organized By:** Software Technology Parks of India (STPI) & EmTek
+- **License:** MIT License — see [LICENSE](LICENSE) for details.

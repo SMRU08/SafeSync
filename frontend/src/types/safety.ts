@@ -67,6 +67,20 @@ export interface Incident {
   }[];
 }
 
+export interface EvidenceItem {
+  evidence_id: string;
+  incident_id: string;
+  camera_id: string;
+  evidence_type: string;
+  file_size_bytes: number;
+  sha256_checksum: string;
+  created_at: string;
+  download_url: string;
+  computed_sha256?: string;
+  verified?: boolean;
+  tampered?: boolean;
+}
+
 export interface WorkerTrack {
   track_id: number;
   bbox: [number, number, number, number];
@@ -103,14 +117,38 @@ export interface HazardEventDetail {
   bbox?: [number, number, number, number];
 }
 
+export interface CameraMetrics {
+  fps: number;
+  frame_count: number;
+  dropped_frames: number;
+  reconnect_count: number;
+  last_successful_frame_timestamp?: number | null;
+  last_error?: string | null;
+  uptime_seconds: number;
+}
+
+export type RealCameraState =
+  | 'DISABLED'
+  | 'CONNECTING'
+  | 'CONNECTED'
+  | 'RECONNECTING'
+  | 'DEGRADED'
+  | 'DISCONNECTED'
+  | 'ERROR';
+
 export interface CameraConfig {
   camera_id: string;
   name: string;
   zone_id: string;
   status: 'ACTIVE' | 'STANDBY' | 'OFFLINE';
+  state?: RealCameraState;
+  source_type?: string;
+  enabled?: boolean;
   resolution: string;
   fps: number;
   rtsp_url?: string;
+  safe_source?: string;
+  metrics?: CameraMetrics;
 }
 
 export interface ZoneConfig {

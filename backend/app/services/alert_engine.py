@@ -28,6 +28,11 @@ try:
     from app.services.risk_engine import RiskEngine
     from app.services.event_broadcaster import broadcaster
     from app.models.risk_alert import Incident, Alert, AlertHistory
+    from app.models.evidence import EvidenceItem
+    from app.services.alert_providers.registry import ProviderRegistry
+    from app.services.alert_providers.base import AlertNotificationPayload
+    from app.services.evidence_manager import EvidenceManager
+    from app.services.metrics import MetricsCollector
 except ImportError:
     from backend.app.ai.risk.schemas import (
         EventType,
@@ -43,6 +48,11 @@ except ImportError:
     from backend.app.services.risk_engine import RiskEngine
     from backend.app.services.event_broadcaster import broadcaster
     from backend.app.models.risk_alert import Incident, Alert, AlertHistory
+    from backend.app.models.evidence import EvidenceItem
+    from backend.app.services.alert_providers.registry import ProviderRegistry
+    from backend.app.services.alert_providers.base import AlertNotificationPayload
+    from backend.app.services.evidence_manager import EvidenceManager
+    from backend.app.services.metrics import MetricsCollector
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 DEFAULT_ALERT_POLICY = os.path.join(ROOT, "configs", "alert_policy.yaml")
@@ -220,6 +230,24 @@ class AlertEngine:
                     "zone_id": event.zone_id,
                     "risk_level": risk.risk_level.value,
                 })
+                try:
+                    EvidenceManager.get_instance().capture_incident_evidence(
+                        incident_id=incident_id,
+                        camera_id=event.camera_id,
+                        frame=None,
+                        annotations={"risk_score": risk.risk_score, "event_type": event.event_type.value},
+                        db=db,
+                    )
+                except Exception as ev_err:
+                    log.debug("Fault-isolated evidence capture skipped: %s", ev_err)
+
+                try:
+                    MetricsCollector.get_instance().increment_counter(
+                        "rakshya_incidents_total",
+                        labels={"risk_level": risk.risk_level.value, "camera_id": event.camera_id},
+                    )
+                except Exception:
+                    pass
 
         incident_schema = IncidentSchema(
             incident_id=incident_id,
@@ -291,6 +319,43 @@ class AlertEngine:
                     status=AlertStatus.ACTIVE,
                 )
                 broadcaster.broadcast("AlertEscalated", escalated_alert.model_dump())
+
+                # Dispatch to external notification channels
+                try:
+                    ev_ref = None
+                    if db is not None:
+                        try:
+                            ev_item = db.query(EvidenceItem).filter(EvidenceItem.incident_id == incident_id).first()
+                            if ev_item:
+                                ev_ref = f"/api/evidence/{ev_item.evidence_id}/download"
+                        except Exception:
+                            pass
+
+                    ext_payload = AlertNotificationPayload(
+                        incident_id=incident_id,
+                        alert_id=alert_id,
+                        camera_id=event.camera_id,
+                        zone_id=event.zone_id,
+                        event_type=event.event_type.value,
+                        severity=risk.risk_level.value,
+                        title=title,
+                        message=msg,
+                        timestamp=now.isoformat(),
+                        affected_workers_count=len(affected_list),
+                        evidence_reference=ev_ref,
+                    )
+                    ProviderRegistry.get_instance().dispatch_alert(ext_payload)
+                except Exception as ext_err:
+                    log.error("Failed to dispatch external alert notification: %s", ext_err)
+
+                try:
+                    MetricsCollector.get_instance().increment_counter(
+                        "rakshya_alert_actions_total",
+                        labels={"action": "ESCALATED"},
+                    )
+                except Exception:
+                    pass
+
                 return escalated_alert, incident_schema, "ESCALATED"
 
             # Check Cooldown
@@ -361,6 +426,47 @@ class AlertEngine:
             status=AlertStatus.ACTIVE,
         )
         broadcaster.broadcast("AlertCreated", new_alert.model_dump())
+
+        # Dispatch to external notification channels
+        try:
+            ev_ref = None
+            if db is not None:
+                try:
+                    ev_item = db.query(EvidenceItem).filter(EvidenceItem.incident_id == incident_id).first()
+                    if ev_item:
+                        ev_ref = f"/api/evidence/{ev_item.evidence_id}/download"
+                except Exception:
+                    pass
+
+            ext_payload = AlertNotificationPayload(
+                incident_id=incident_id,
+                alert_id=alert_id,
+                camera_id=event.camera_id,
+                zone_id=event.zone_id,
+                event_type=event.event_type.value,
+                severity=risk.risk_level.value,
+                title=title,
+                message=msg,
+                timestamp=now.isoformat(),
+                affected_workers_count=len(affected_list),
+                evidence_reference=ev_ref,
+            )
+            ProviderRegistry.get_instance().dispatch_alert(ext_payload)
+        except Exception as ext_err:
+            log.error("Failed to dispatch external alert notification: %s", ext_err)
+
+        try:
+            MetricsCollector.get_instance().increment_counter(
+                "rakshya_alerts_total",
+                labels={"severity": risk.risk_level.value, "event_type": event.event_type.value},
+            )
+            MetricsCollector.get_instance().increment_counter(
+                "rakshya_alert_actions_total",
+                labels={"action": "CREATED"},
+            )
+        except Exception:
+            pass
+
         return new_alert, incident_schema, "CREATED"
 
     def acknowledge_alert(self, alert_id: str, db: Session) -> AlertSchema:
@@ -403,6 +509,13 @@ class AlertEngine:
             acknowledged_at=now.isoformat(),
         )
         broadcaster.broadcast("AlertUpdated", result.model_dump())
+        try:
+            MetricsCollector.get_instance().increment_counter(
+                "rakshya_alert_actions_total",
+                labels={"action": "ACKNOWLEDGED"}
+            )
+        except Exception:
+            pass
         return result
 
     def resolve_alert(self, alert_id: str, db: Session) -> AlertSchema:
@@ -452,6 +565,13 @@ class AlertEngine:
         )
         broadcaster.broadcast("AlertUpdated", result.model_dump())
         broadcaster.broadcast("IncidentResolved", {"incident_id": db_alert.incident_id})
+        try:
+            MetricsCollector.get_instance().increment_counter(
+                "rakshya_alert_actions_total",
+                labels={"action": "RESOLVED"},
+            )
+        except Exception:
+            pass
         return result
 
     def dismiss_alert(self, alert_id: str, db: Session) -> AlertSchema:
@@ -499,6 +619,13 @@ class AlertEngine:
             resolved_at=now.isoformat(),
         )
         broadcaster.broadcast("AlertUpdated", result.model_dump())
+        try:
+            MetricsCollector.get_instance().increment_counter(
+                "rakshya_alert_actions_total",
+                labels={"action": "DISMISSED"},
+            )
+        except Exception:
+            pass
         return result
 
     def get_risk_summary(self, db: Session) -> RiskSummaryResponse:
