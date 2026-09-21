@@ -7,7 +7,8 @@
 **Problem Statement:** PS06 — Build a prototype AI system that detects safety gear compliance  
 **Organization:** Software Technology Parks of India (STPI) & EmTek  
 **Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)  
-**System Status:** Complete & Verified (Phases 1–10 Tested: 154/154 Unit Tests, 39/39 Integration Scenarios)
+**System Status:** Complete & Verified (160/160 Unit Tests Passing, 39/39 Integration Scenarios Verified)  
+**Documentation Index:** [docs/README.md](docs/README.md)  
 
 ---
 
@@ -496,7 +497,7 @@ RAKSHYA-VISION/
 │   │   ├── services/             # AlertEngine, RiskEngine, EvidenceManager, MetricsCollector
 │   │   ├── config.py             # Centralized typed settings & secret protection
 │   │   └── main.py               # FastAPI application entrypoint & lifespan
-│   ├── tests/                    # 154 automated pytest unit and integration tests
+│   ├── tests/                    # 160 automated pytest unit and integration tests
 │   └── requirements.txt          # Python dependencies
 ├── configs/
 │   ├── alert_policy.yaml         # Cooldown and escalation rules
@@ -509,7 +510,16 @@ RAKSHYA-VISION/
 │   ├── processed/                # Unified train/val/test YOLO dataset (22,453 images)
 │   ├── README.md                 # Dataset usage instructions
 │   └── SOURCES.md                # Official source registry and licensing
-├── docs/                         # Technical documentation across all 10 phases
+├── docs/                         # Technical documentation & engineering references
+│   ├── architecture/             # System design, processing pipeline, data contracts, database
+│   ├── ai/                       # Detection model, model registry, PPE compliance, tracking, hazards
+│   ├── operations/               # Multi-camera management, alerts, incidents, evidence, monitoring
+│   ├── deployment/               # Installation, configuration, production setup, troubleshooting
+│   ├── security/                 # Authentication, RBAC, security model & threat mitigations
+│   ├── testing/                  # Testing strategy, integration report, benchmarks, known issues
+│   ├── datasets/                 # Dataset strategy & source provenance
+│   ├── reports/                  # Production readiness scorecard & known limitations
+│   └── README.md                 # Master documentation index
 ├── frontend/
 │   ├── src/
 │   │   ├── components/           # SOC UI components (Alerts, Cameras, Modals)
@@ -531,13 +541,29 @@ RAKSHYA-VISION/
 │   └── testing/                  # run_integration_tests.py (39 E2E scenarios)
 ├── .env.example                  # Safe configuration template
 ├── .gitignore                    # Version control exclusions
-├── PROJECT_STATUS.md             # Project lifecycle history
+├── PROJECT_STATUS.md             # Current system status & verification evidence
 └── README.md                     # Master project documentation
 ```
 
 ---
 
-## 14. Model & Model Registry
+## 14. Technical Documentation Directory
+
+Complete engineering documentation is organized logically in the [`docs/`](./docs/README.md) directory:
+
+| Section | Key Documents |
+|---|---|
+| **Architecture** | [System Architecture](docs/architecture/system-architecture.md) • [Processing Pipeline](docs/architecture/processing-pipeline.md) • [Data Flow](docs/architecture/data-flow.md) • [Database Architecture](docs/architecture/database.md) |
+| **AI & Vision** | [Detection Model](docs/ai/detection-model.md) • [Model Registry](docs/ai/model-registry.md) • [PPE Compliance](docs/ai/ppe-compliance.md) • [Worker Tracking](docs/ai/worker-tracking.md) • [Hazards](docs/ai/fire-smoke-detection.md) • [Risk Engine](docs/ai/risk-engine.md) |
+| **Operations** | [Camera Management](docs/operations/camera-management.md) • [Camera Dashboard](docs/operations/camera-dashboard.md) • [Alerts](docs/operations/alerts.md) • [Incidents](docs/operations/incident-management.md) • [Evidence](docs/operations/evidence-management.md) • [Monitoring](docs/operations/monitoring.md) |
+| **Deployment** | [Installation](docs/deployment/installation.md) • [Configuration](docs/deployment/configuration.md) • [Production Deployment](docs/deployment/production-deployment.md) • [Troubleshooting](docs/deployment/troubleshooting.md) |
+| **Security** | [Authentication](docs/security/authentication.md) • [Authorization & RBAC](docs/security/authorization.md) • [Security Model](docs/security/security-model.md) |
+| **Testing** | [Testing Strategy](docs/testing/testing-strategy.md) • [Integration Report](docs/testing/integration-testing.md) • [Benchmarks](docs/testing/performance.md) • [Known Issues](docs/testing/known-issues.md) |
+| **Data & Reports** | [Dataset Strategy](docs/datasets/dataset-strategy.md) • [Dataset Sources](docs/datasets/sources.md) • [Production Readiness](docs/reports/production-readiness.md) • [Limitations](docs/reports/known-limitations.md) |
+
+---
+
+## 15. Model & Model Registry
 
 The active production model is managed through an explicit registry:
 
