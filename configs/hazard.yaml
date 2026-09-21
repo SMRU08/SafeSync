@@ -1,0 +1,28 @@
+# configs/hazard.yaml — RAKSHYA VISION Phase 6
+# Fire and Smoke Hazard Analysis Configuration
+# All parameters are configurable and decouple from PPE compliance.
+
+hazard:
+  # Minimum confidence required for initial detection consideration
+  confidence_threshold: 0.25
+
+  # Specific thresholds (based on Phase 3.1 measured performance:
+  # fire precision=41.99%, smoke precision=57.74%)
+  fire_confidence: 0.25
+  smoke_confidence: 0.25
+
+  # Temporal validation parameters
+  confirmation_frames: 5            # Frames of consistent detection required to transition SUSPECTED -> CONFIRMED
+  minimum_observation_ratio: 0.60   # Minimum ratio of frames detected in the sliding window to maintain CONFIRMED
+  clear_frames: 10                  # Consecutive missed frames before transitioning CONFIRMED -> CLEARED
+  max_gap_frames: 5                 # Maximum transient flicker tolerance frames before SUSPECTED decays
+
+tracking:
+  tracker: "spatial_centroid"
+  iou_threshold: 0.20               # IoU threshold for associating bounding boxes across adjacent frames
+  center_distance_threshold: 0.25   # Relative frame distance threshold for tracking smoke/fire expansion
+  max_unseen_frames: 15             # Frames to retain an unobserved hazard event before archiving
+
+zones:
+  enabled: true
+  default_zone_id: "UNKNOWN"

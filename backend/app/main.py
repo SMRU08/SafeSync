@@ -42,13 +42,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Ensure database schema is created on startup / import
+Base.metadata.create_all(bind=engine)
 
 from app.api.detection import router as detection_router
 from app.api.compliance import router as compliance_router
+from app.api.hazards import router as hazards_router
 from app.ai.detection.model_loader import ModelLoader
 
 app.include_router(detection_router)
 app.include_router(compliance_router)
+app.include_router(hazards_router)
 
 
 @app.get("/", response_model=RootResponse, status_code=status.HTTP_200_OK)

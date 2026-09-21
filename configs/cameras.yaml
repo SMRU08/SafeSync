@@ -1,0 +1,49 @@
+# configs/cameras.yaml — RAKSHYA VISION Phase 6
+# Camera and Zone Metadata Configuration
+# Supports optional polygon ROI regions. If no zone matches, zone defaults to UNKNOWN.
+
+cameras:
+  - id: "camera_01"
+    name: "CCTV - Production Floor South"
+    zone_id: "production_floor"
+    source: "configured_elsewhere"
+
+  - id: "camera_02"
+    name: "CCTV - Raw Material Storage"
+    zone_id: "storage_area"
+    source: "configured_elsewhere"
+
+  - id: "camera_03"
+    name: "CCTV - High Voltage Electrical Room"
+    zone_id: "electrical_room"
+    source: "configured_elsewhere"
+
+  - id: "camera_04"
+    name: "CCTV - Loading Dock Outer"
+    zone_id: "loading_dock"
+    source: "configured_elsewhere"
+
+zones:
+  - id: "production_floor"
+    name: "Production Floor"
+    description: "Main assembly and fabrication area"
+    # Optional polygon ROI in normalized [0..1] or pixel coordinates.
+    # If omitted, all coordinates within camera_01 map to this zone.
+
+  - id: "storage_area"
+    name: "Storage Area"
+    description: "Warehouse aisle and racked material bins"
+
+  - id: "electrical_room"
+    name: "Electrical Room"
+    description: "Substation and transformer enclosure"
+    # Example normalized polygon ROI for high-risk transformer zone
+    polygon_normalized:
+      - [0.1, 0.1]
+      - [0.9, 0.1]
+      - [0.9, 0.9]
+      - [0.1, 0.9]
+
+  - id: "loading_dock"
+    name: "Loading Dock"
+    description: "Logistics bay and exterior staging"

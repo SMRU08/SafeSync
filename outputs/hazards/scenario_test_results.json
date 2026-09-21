@@ -1,0 +1,80 @@
+[
+  {
+    "scenario": 1,
+    "name": "No fire / no smoke",
+    "result": "PASS",
+    "state": "NO_HAZARD"
+  },
+  {
+    "scenario": 2,
+    "name": "Single-frame fire detection",
+    "result": "PASS",
+    "state": "SUSPECTED"
+  },
+  {
+    "scenario": 3,
+    "name": "Persistent fire",
+    "result": "PASS",
+    "state": "CONFIRMED"
+  },
+  {
+    "scenario": 4,
+    "name": "Single-frame smoke detection",
+    "result": "PASS",
+    "state": "SUSPECTED"
+  },
+  {
+    "scenario": 5,
+    "name": "Persistent smoke",
+    "result": "PASS",
+    "state": "CONFIRMED"
+  },
+  {
+    "scenario": 6,
+    "name": "Fire disappearing temporarily",
+    "result": "PASS",
+    "state": "CONFIRMED"
+  },
+  {
+    "scenario": 7,
+    "name": "Smoke disappearing temporarily",
+    "result": "PASS",
+    "state": "CONFIRMED"
+  },
+  {
+    "scenario": 8,
+    "name": "Fire + smoke together",
+    "result": "PASS",
+    "relationship": "FIRE_AND_SMOKE"
+  },
+  {
+    "scenario": 9,
+    "name": "False/brief detection",
+    "result": "PASS",
+    "cleared_state": "CLEARED",
+    "final_state": "NO_HAZARD"
+  },
+  {
+    "scenario": 10,
+    "name": "Multiple hazard locations",
+    "result": "PASS",
+    "events": [
+      "HAZARD-0001",
+      "HAZARD-0002"
+    ]
+  },
+  {
+    "scenario": 11,
+    "name": "Multiple cameras",
+    "result": "PASS",
+    "cam1_zone": "production_floor",
+    "cam2_zone": "storage_area"
+  },
+  {
+    "scenario": 12,
+    "name": "Unknown zone",
+    "result": "PASS",
+    "unmapped": "UNKNOWN",
+    "outside": "UNKNOWN"
+  }
+]
