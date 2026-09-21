@@ -1,4 +1,4 @@
-# BPUT Hackathon 2026 — Presentation Slide Deck Guide
+# BPUT Hackathon 2026 — Presentation Slide Deck Architecture & Reference Guide
 
 > **System:** RAKSHYA VISION — AI-Powered Workplace Safety Monitoring System  
 > **Problem Statement:** PS06 — Build a prototype AI system that detects safety gear compliance  
@@ -9,275 +9,441 @@
 
 ---
 
-## Presentation Overview
+## Executive Summary of the Presentation
 
-This companion guide provides a complete slide-by-slide breakdown of the official presentation deck, detailing the visual layout, exact technical data, recommended spoken pitch script, and answers to expected jury questions.
+The presentation deck [`RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx`](./RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx) translates the RAKSHYA VISION engineering codebase into a professional, visual-first presentation for the BPUT Hackathon 2026 jury. It strictly follows the real project implementation, verified test data, and architectural guarantees without artificial marketing claims or AI development chronology.
 
 ```
-Slide Deck Structure (13 Slides):
-├── 01. Title & Hackathon Context
-├── 02. The Industrial Challenge (PS06)
-├── 03. The Solution — RAKSHYA VISION
-├── 04. End-to-End System Architecture
-├── 05. AI Detection Model & 7-Class Ontology
-├── 06. PPE Compliance & Anatomical Association
-├── 07. Environmental Hazards (Fire & Smoke)
-├── 08. Real-Time SOC Dashboard & WebSockets
-├── 09. Risk Scoring, Alert Engine & Evidence Archival
-├── 10. Production-Grade Technology Stack
-├── 11. Testing & Empirical Verification Scorecard
-├── 12. Industrial Impact & Engineering Roadmap
-└── 13. Project Summary & Q&A Closing
+Slide Structure Overview:
+├── Slide 01: Title & Hackathon Context
+├── Slide 02: The Industrial Challenge (Problem Statement PS06)
+├── Slide 03: The Solution — RAKSHYA VISION Overview
+├── Slide 04: End-to-End System Architecture Pipeline
+├── Slide 05: AI Detection Model & Canonical 7-Class Ontology
+├── Slide 06: PPE Compliance & Anatomical Spatial Association
+├── Slide 07: Environmental Hazard Monitoring (Fire & Smoke)
+├── Slide 08: Real-Time Security Operations Center (SOC) Dashboard
+├── Slide 09: Explainable Risk Scoring, Alerts & Evidence Archival
+├── Slide 10: Production-Grade Technology Stack
+├── Slide 11: Testing, Verification & Empirical Scorecard
+├── Slide 12: Business Impact & Future Engineering Roadmap
+└── Slide 13: Project Submission Summary & Conclusion
 ```
 
 ---
 
-## Slide-by-Slide Presentation Breakdown
+## Comprehensive Technical Slide Descriptions
+
+---
 
 ### Slide 1: Title & Hackathon Context
 
-- **Header Tag:** `BPUT HACKATHON 2026 • PROBLEM STATEMENT PS06`
-- **Slide Title:** **RAKSHYA VISION**
-- **Subtitle:** AI-Powered Workplace Safety Monitoring & Compliance Platform
-- **Motto / Tagline:** *Detect • Understand • Alert • Protect*
-- **Visual Design:** Dark slate canvas (`#0F172A`), vertical emerald glow accent bar, dual summary cards (Capabilities overview on left; Team XERSES, STPI & EmTek credits on right).
-- **Core Content:**
-  - Automated PPE Compliance Tracking (Helmets, Safety Vests, Gloves, Footwear)
-  - Anonymous Worker Tracking (ByteTrack 8-state Kalman Filter)
-  - Early Combustion Confirmation (Dual-channel fire & smoke tracking)
-  - Explainable Risk Scoring ($0 \dots 100$) & Anti-Flood Cooldowns
-  - Tamper-Evident Evidence Store (Cryptographic SHA-256 snapshots)
-  - Live Security Operations Center (React 18 + WebSocket broadcast)
-- **Speaker Script (Pitch Opening):**
-  > "Respected judges and organizers from STPI and EmTek, we are Team XERSES presenting RAKSHYA VISION for Problem Statement PS06. In high-hazard industrial manufacturing, construction sites, and power plants, safety gear compliance is the difference between life and death. RAKSHYA VISION is an autonomous, edge-ready artificial intelligence platform that combines real-time multi-task object detection, anonymous worker tracking, anatomical compliance validation, fire and smoke tracking, and tamper-evident incident governance into a unified operational command center."
+#### 1. Purpose & Strategic Focus
+Establishes project identity, competitive domain, organizing bodies, and core product value proposition. Highlights the high-contrast industrial safety branding.
+
+#### 2. Visual Layout & Color Accents
+- **Canvas:** Deep Dark Slate (`#0F172A`)
+- **Accent Strip:** Left vertical glowing emerald bar (`#10B981`)
+- **Header Badge:** Pill container in dark navy with cyan text (`#38BDF8`): `BPUT HACKATHON 2026 • PROBLEM STATEMENT PS06`
+- **Typography:**
+  - Main Title: `RAKSHYA VISION` in 46pt Bold White (`#F8FAFC`)
+  - Subtitle: `AI-Powered Workplace Safety Monitoring & Compliance Platform` in 18pt Emerald Green (`#10B981`)
+  - Tagline Pill: `Detect • Understand • Alert • Protect` in dark green container with safety green text
+
+#### 3. Content Breakdown
+- **Capabilities Container (Left Card):**
+  - Real-Time PPE Compliance: Helmets, Safety Vests, Gloves, Footwear
+  - Anonymous Worker Tracking: ByteTrack 8-State Kalman Trajectories
+  - Early Hazard Confirmation: Dual-Channel Fire & Smoke Tracking
+  - Explainable Risk Governance: 0–100 Deterministic Scoring & Cooldowns
+  - Tamper-Evident Evidence: Visual Snapshots with SHA-256 Checksums
+  - Live Operations Center: WebSocket Streaming to React 18 SOC Dashboard
+- **Team & Partner Metadata (Right Card):**
+  - **Team:** XERSES
+  - **Organizers:** Software Technology Parks of India (STPI) & EmTek
+  - **Hackathon:** BPUT Hackathon 2026
+  - **Problem Statement:** PS06 — Vision-Based Industrial Safety Gear Compliance
+  - **Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
 
 ---
 
 ### Slide 2: The Industrial Challenge (PS06)
 
-- **Header Tag:** `PROBLEM STATEMENT • PS06`
-- **Slide Title:** **The Industrial Safety Challenge: Human Monitoring Bottlenecks**
-- **Visual Design:** 4 color-accented vertical cards highlighting the critical failure modes of conventional safety monitoring.
-- **Card Breakdown:**
-  1. **Observer Fatigue (Amber):** Human safety officers monitoring multiple simultaneous CCTV feeds experience steep visual vigilance degradation within 20–30 minutes, missing subtle PPE omissions.
-  2. **Detection Delays (Red):** Traditional thermal alarms or point smoke detectors trigger only after flame or smoke rises to ceiling height, losing crucial initial seconds.
-  3. **Spot-Check Blindness (Amber):** Manual walkthrough audits capture isolated compliance moments; workers remove protective gear once safety officers depart.
-  4. **Audit Disputes (Cyan):** Workplace injury post-mortems suffer from missing timestamps, absent footage, and unverified logs, leading to contested liability.
-- **Bottom Callout:** Traditional monitoring is reactive, intermittent, and vulnerable to human fatigue. High-hazard workplaces demand continuous, automated, edge-intelligent oversight.
-- **Speaker Script:**
-  > "Why do industrial accidents persist despite mandatory PPE regulations? Because human monitoring cannot scale. Safety officers suffer fatigue within thirty minutes of watching camera walls. Walkthroughs only catch isolated moments. Meanwhile, traditional smoke alarms only trigger when fire has already propagated. We need an automated, continuous, edge-based visual system that never sleeps and never loses vigilance."
+#### 1. Purpose & Strategic Focus
+Breaks down the operational failure modes of conventional manual and automated safety monitoring, justifying the need for an edge-intelligent computer vision system.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[PROBLEM STATEMENT PS06]`, Title: *The Industrial Safety Challenge: Human Monitoring Bottlenecks*
+- **Layout:** 4 vertically oriented problem dimension cards ($200 \times 320$ pt) spanning the width with dedicated color highlights.
+- **Bottom Callout Panel:** Full-width summary card in dark slate with green accent border.
+
+#### 3. Detailed Card Content
+1. **1. Observer Fatigue (Amber Card):**
+   - *Perceptual Vigilance Decay:* Human safety officers monitoring multi-screen CCTV feeds experience cognitive vigilance decay within 20–30 minutes of continuous observation. Subtle PPE lapses go unnoticed during high-activity factory operations.
+2. **2. Detection Delays (Red Card):**
+   - *Delayed Emergency Triggers:* Traditional smoke detectors and thermal sensors only engage after combustion products rise to ceiling height, sacrificing vital developmental seconds before emergency response can begin.
+3. **3. Spot-Check Blindness (Amber Card):**
+   - *Intermittent Enforcement:* Manual floor inspections provide only isolated spot-checks. Workers frequently remove mandatory gear immediately after auditors leave, creating extensive unmonitored risk windows.
+4. **4. Audit Disputes (Cyan Card):**
+   - *Lack of Verified Evidence:* Post-incident regulatory inquiries often suffer from missing footage, ambiguous timestamps, or unverified logs, leading to disputed liability and unresolved hazard causes.
 
 ---
 
-### Slide 3: The Solution — RAKSHYA VISION
+### Slide 3: The Solution — RAKSHYA VISION Overview
 
-- **Header Tag:** `SYSTEM OVERVIEW`
-- **Slide Title:** **RAKSHYA VISION: Continuous, Edge-Intelligent Safety Governance**
-- **Visual Design:** 3 primary architectural pillar cards on top; 4 large KPI metric tiles at the base.
-- **Pillar Cards:**
-  1. **Decoupled Vision Pipeline (Cyan):** Object detection is strictly decoupled from spatial body anatomy and temporal state machines, eliminating false alarms from bare heads or reflections.
-  2. **Zero-Biometric Privacy (Green):** Workers are assigned temporary anonymous integer IDs (`Track #101`) via ByteTrack Kalman filters; zero facial recognition, zero biometrics, and zero PII stored.
-  3. **Ambiguity Invariant (Amber):** Foundational rule: **`UNKNOWN != VIOLATION`**. Partial occlusion, machine obstruction, or frame boundary clipping strictly never generates a false violation.
-- **Metric Tiles:**
+#### 1. Purpose & Strategic Focus
+Presents RAKSHYA VISION's architectural philosophy, demonstrating how the platform addresses each challenge through decoupled vision, privacy by design, and strict ambiguity tolerance.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[SYSTEM OVERVIEW]`, Title: *RAKSHYA VISION: Continuous, Edge-Intelligent Safety Governance*
+- **Top Section:** 3 large feature pillar cards ($270 \times 250$ pt).
+- **Bottom Section:** 4 high-contrast KPI metric callout tiles ($200 \times 120$ pt) featuring large 28pt numbers.
+
+#### 3. Detailed Content
+- **Pillar 1: Decoupled Vision Pipeline (Cyan):**
+  - Object detection is strictly isolated from anatomical association and temporal state persistence. Eliminates noisy false alarms from bare heads, hair textures, or yellow clothing.
+- **Pillar 2: Zero-Biometric Privacy (Green):**
+  - Continuous tracking uses temporary integer IDs (`Track #101`) via ByteTrack Kalman filters. Zero facial recognition, zero biometric capture, and zero PII stored, ensuring full privacy regulation compliance.
+- **Pillar 3: Ambiguity Invariant (Amber):**
+  - Foundational rule: **`UNKNOWN != VIOLATION`**. Occlusions, machinery obstruction, and frame boundary clipping strictly never trigger alarms. Violations require verified absence over consecutive confirmation frames.
+- **KPI Metrics Grid:**
   - `7 Classes`: Unified safety ontology (Person, Helmet, Vest, Gloves, Footwear, Fire, Smoke)
-  - `45.5 ms`: Mean end-to-end CPU pipeline latency (~22–24 FPS on commodity CPU)
-  - `N = 3`: Consecutive confirmation frames required to confirm a PPE violation
-  - `SHA-256`: Cryptographic checksum calculated upon snapshot write
-- **Speaker Script:**
-  > "RAKSHYA VISION solves these challenges through three foundational engineering principles: First, a decoupled pipeline that separates physical object detection from anatomical compliance. Second, privacy by design: we track workers anonymously using Kalman motion filters without facial recognition. Third, our strict mathematical invariant: UNKNOWN does not equal VIOLATION. If a worker is behind a forklift or at the edge of the lens, we mark them UNKNOWN rather than harassing operators with false alarms."
+  - `45.5 ms`: Mean end-to-end CPU pipeline latency (~22–24 FPS on commodity CPU hardware)
+  - `N = 3`: Consecutive frames confirmation threshold eliminating single-frame false violation flickers
+  - `SHA-256`: Cryptographic checksum calculated upon image snapshot write for tamper-evident auditing
 
 ---
 
-### Slide 4: End-to-End System Architecture
+### Slide 4: End-to-End System Architecture Pipeline
 
-- **Header Tag:** `ENGINEERING ARCHITECTURE`
-- **Slide Title:** **Decoupled Multi-Subsystem Processing Pipeline**
-- **Visual Design:** 6 horizontal pipeline stage cards connected with directional flow indicators, supported by an architectural fault-isolation panel at the base.
-- **Pipeline Stages:**
-  1. **Ingestion Layer:** Multi-Camera Manager, IP/RTSP streams, USB webcams, video files, bounded exponential backoff.
-  2. **AI Vision Layer:** Ultralytics YOLOv8n detector ($384\times 384$), 7 canonical classes, cryptographic SHA-256 weight verification.
-  3. **Tracking & Association:** ByteTrack 8-state Kalman Filter motion model, spatial anatomical body associator (Head, Torso, Hands, Feet).
-  4. **Temporal State Machine:** PPE persistence verification ($N_{\text{confirm}} = 3$), dual-channel hazard tracker ($N_{\text{confirm}} = 5$), tolerance window ($N_{\text{tol}} = 5$).
-  5. **Risk & Governance:** Explainable deterministic risk engine ($0 \dots 100$), deduplication engine, 60-second cooldown suppression.
-  6. **Storage & Presentation:** SQLite Write-Ahead Logging (WAL) mode, SHA-256 evidence archival, React 18 SOC dashboard, bi-directional WebSockets.
-- **Fault Isolation Guarantees:** Complete worker thread isolation (one camera failure never crashes another), non-blocking background alert queues, and thread-safe SQLite concurrency.
-- **Speaker Script:**
-  > "Here is our end-to-end engineering architecture. Notice that our pipeline is completely modular. Frames enter through thread-isolated camera workers. YOLOv8n performs multi-task detection. ByteTrack estimates trajectories. Our anatomical associator maps items to body zones. The temporal engine eliminates single-frame flickers. Confirmed events flow to our explainable risk engine, which coordinates incidents, dispatches alerts with cooldowns, writes hashed evidence, and streams live updates over WebSockets to our React 18 dashboard."
+#### 1. Purpose & Strategic Focus
+Visualizes the complete multi-stage software architecture, tracing a video frame from camera capture through inference, tracking, temporal validation, risk governance, and storage.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[ENGINEERING ARCHITECTURE]`, Title: *Decoupled Multi-Subsystem Processing Pipeline*
+- **Central Diagram:** 6 horizontal pipeline cards ($135 \times 270$ pt) connected sequentially with directional arrows.
+- **Bottom Panel:** Architectural fault isolation guarantee container ($860 \times 95$ pt).
+
+#### 3. Detailed Pipeline Stages
+1. **1. Ingestion:** Heterogeneous source support (IP/RTSP cameras, USB webcams, recorded video files) managed via thread-isolated `CameraWorker` with bounded exponential backoff reconnection.
+2. **2. AI Vision:** Ultralytics YOLOv8n multi-task detector ($384\times 384$) evaluating 7 canonical classes with cryptographic SHA-256 weight verification on startup.
+3. **3. Tracking & Association:** ByteTrack 8-state Kalman Filter motion estimation and spatial anatomical associator dividing worker bounding boxes into Head, Torso, Hands, and Feet zones.
+4. **4. Temporal Validation:** Dual-channel state machine requiring $N_{\text{confirm}} = 3$ frames for PPE absence and $N_{\text{confirm}} = 5$ frames for combustion hazards.
+5. **5. Governance:** Deterministic $0 \dots 100$ risk scoring engine, in-memory alert deduplication, 60-second cooldown windows, and formal incident lifecycle management.
+6. **6. Storage & UI:** Relational SQLite in Write-Ahead Logging (WAL) mode, cryptographic SHA-256 evidence archival, React 18 SOC dashboard, and real-time WebSocket push.
+- **Fault Isolation Principles:**
+  - Complete worker thread isolation: one failing camera stream never crashes neighboring cameras.
+  - Asynchronous background alert dispatch: external webhook/SMTP drops never block the video inference loop.
+  - Concurrency resilience: 5,000 ms SQLite busy timeout eliminates edge write lock contention.
 
 ---
 
-### Slide 5: Multi-Task AI Detection & Ontology
+### Slide 5: AI Detection Model & Canonical 7-Class Ontology
 
-- **Header Tag:** `AI & COMPUTER VISION`
-- **Slide Title:** **YOLOv8n Multi-Task Neural Detector & 7-Class Ontology**
-- **Visual Design:** Left card details the canonical 7-class safety ontology; left-bottom card covers model provenance & checksum verification; right card embeds an **actual validation prediction image** from model validation (`val_batch0_pred.jpg`).
-- **Canonical 7 Classes:**
-  - `0: person` — Worker identity & trajectory tracking
-  - `1: helmet` — Head protection gear
-  - `2: safety_vest` — Torso high-visibility gear
-  - `3: gloves` — Hand mechanical & chemical protection
-  - `4: safety_footwear` — Toe crush & puncture protection boots
-  - `5: fire` — Open flame & active combustion
-  - `6: smoke` — Visible smoke plume & atmospheric emission
-- **Verified Model Specifications:**
-  - Model: `ppe_fire_smoke_v2` (Ultralytics YOLOv8n, $384 \times 384$)
-  - Checkpoint SHA-256: `490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3`
-  - Dataset: 22,453 normalized images across 51,195 verified annotations (zero cross-split leakage)
-  - Benchmark: mAP@50: **25.23%** (3.61× improvement over baseline V1), Precision: 37.60%, Recall: 37.44%
-- **Speaker Script:**
-  > "On Slide 5, you see our AI detection model and actual predictions from our validation batch. We unified four public safety datasets into 22,453 images across a canonical seven-class ontology. Crucially, we reject negative 'no-helmet' training classes because bare heads lack distinctive features. Our single-stage YOLOv8n model detects only positive physical objects, with checkpoint integrity cryptographically verified via SHA-256 before weight loading."
+#### 1. Purpose & Strategic Focus
+Details the machine learning foundation, training dataset provenance, canonical class definitions, cryptographic model registry, and actual model validation performance.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[AI & COMPUTER VISION]`, Title: *YOLOv8n Multi-Task Neural Detector & 7-Class Ontology*
+- **Left Column:**
+  - Top Card ($370 \times 240$ pt): Canonical 7-class ontology definitions and negative absence exclusion philosophy.
+  - Bottom Card ($370 \times 135$ pt): Model registry specification and SHA-256 verification workflow.
+- **Right Column:** Large visual showcase card ($470 \times 390$ pt) displaying an **actual validation prediction image** (`val_batch0_pred.jpg`) generated by the model during evaluation.
+
+#### 3. Detailed Technical Content
+- **The Canonical 7 Classes:**
+  - `0: person` $\rightarrow$ Worker identity & trajectory tracking
+  - `1: helmet` $\rightarrow$ Head protective equipment
+  - `2: safety_vest` $\rightarrow$ Torso high-visibility visibility gear
+  - `3: gloves` $\rightarrow$ Hand mechanical & chemical protection
+  - `4: safety_footwear` $\rightarrow$ Protective boots & safety shoes
+  - `5: fire` $\rightarrow$ Open flame & active combustion
+  - `6: smoke` $\rightarrow$ Visible smoke plume & emissions
+- **Core Model Invariants:**
+  - Single-stage positive object detection; absence is derived anatomically rather than learned as noisy negative classes.
+  - Active Checkpoint: `models/detection/ppe_fire_smoke_v2/weights/best.pt`
+  - Cryptographic SHA-256: `490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3`
+  - Dataset: 22,453 normalized images across 51,195 verified annotations (zero cross-split leakage).
+  - Benchmark Performance (conf = 0.25): Baseline V1 mAP@50 = 7.15% $\rightarrow$ Production V2 mAP@50 = **25.23%** (3.61× improvement), Precision: 37.60%, Recall: 37.44%.
 
 ---
 
 ### Slide 6: PPE Compliance & Anatomical Association
 
-- **Header Tag:** `COMPLIANCE LOGIC`
-- **Slide Title:** **Anatomical Spatial Association & Multi-Frame Temporal Validation**
-- **Visual Design:** Left column details the anthropometric body zoning model; right column covers the multi-frame temporal state machine and occlusion rules.
-- **Anatomical Body Zoning Model:**
-  - **Head Zone (Top 0% – 25% height):** Bounding box center must fall within top 25% of worker height $\rightarrow$ Target for `helmet`.
-  - **Torso Zone (20% – 70% height):** Requires $\ge 40\%$ horizontal overlap with worker body $\rightarrow$ Target for `safety_vest`.
-  - **Hands Zone (Lateral 40% – 75% height):** Target for `gloves`.
+#### 1. Purpose & Strategic Focus
+Explains the anatomical body zoning logic that translates raw object detections into worker PPE compliance states without false alarms, and details the temporal debouncing state machine.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[COMPLIANCE LOGIC]`, Title: *Anatomical Spatial Association & Multi-Frame Temporal Validation*
+- **Left Column:** Anatomical body zoning specification card ($420 \times 390$ pt).
+- **Right Column:**
+  - Top Card ($420 \times 220$ pt): Temporal confirmation thresholds and tolerance windows.
+  - Bottom Card ($420 \times 155$ pt): Mandatory occlusion rule (`UNKNOWN != VIOLATION`).
+
+#### 3. Detailed Technical Content
+- **Anthropometric Spatial Zoning:**
+  - **Head Zone (Top 0% – 25% height):** Bounding box center of `helmet` must reside within top 25% of worker height.
+  - **Torso Zone (20% – 70% height):** Bounding box of `safety_vest` must maintain $\ge 40\%$ horizontal overlap with worker body.
+  - **Hands Zone (Lateral 40% – 75% height):** Target for protective `gloves`.
   - **Feet Zone (Bottom 75% – 100% height):** Target for `safety_footwear`.
-  - **Mutual Exclusion:** When workers stand in close proximity, Euclidean IoU distance assigns each item to the nearest anatomical centroid, preventing double-counting.
-- **Temporal Debouncing Rules:**
-  - $N_{\text{confirm}} = 3$ consecutive frames without gear required before transitioning from provisional to confirmed `ABSENT`.
-  - $N_{\text{tol}} = 5$ frames tolerance absorbs brief glance-away occlusions.
+  - **Mutual Exclusion Guarantee:** Overlapping workers in close proximity have PPE assigned to the nearest anatomical centroid via Euclidean IoU distance, preventing double-counting.
+- **Temporal State Machine Rules:**
+  - $N_{\text{confirm}} = 3$ consecutive missing frames required before transitioning from provisional to confirmed `ABSENT`.
+  - $N_{\text{tol}} = 5$ frames tolerance window absorbs brief glance-away occlusions without dropping state.
   - Boundary clipping & partial occlusion immediately lock state to `UNKNOWN`.
-  - **`UNKNOWN != VIOLATION`**: Zero false alarms generated during occlusion.
-- **Speaker Script:**
-  > "How do we derive non-compliance without negative classes? Through our Anatomical Spatial Associator. A worker's bounding box is segmented using standard anthropometric ratios: the head is the top 25%, torso is 20 to 70%, hands in the mid-lateral zone, and feet at the bottom. A helmet must fall in the head zone; a vest must cover the torso. Furthermore, our temporal state machine requires three consecutive frames of confirmed absence before raising an alert, absorbing quick glances away and brief occlusions."
+  - **`UNKNOWN != VIOLATION` Rule:** Occlusions and partial views strictly yield zero violation events and zero operator alerts; rendered as neutral gray on the dashboard HUD.
 
 ---
 
 ### Slide 7: Environmental Hazard Monitoring (Fire & Smoke)
 
-- **Header Tag:** `ENVIRONMENTAL HAZARDS`
-- **Slide Title:** **Decoupled Dual-Channel Combustion Detection & Multi-Modal Verification**
-- **Visual Design:** Left cards outline the decoupled hazard engine and false positive mitigations; right card highlights the multi-modal relationship matrix.
+#### 1. Purpose & Strategic Focus
+Presents the decoupled dual-channel combustion detection pipeline, multi-modal relationship modes, and false positive mitigation strategies for harsh industrial environments.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[ENVIRONMENTAL HAZARDS]`, Title: *Decoupled Dual-Channel Combustion Detection & Multi-Modal Verification*
+- **Left Column:**
+  - Top Card ($420 \times 240$ pt): Decoupled hazard tracking architecture and temporal confirmation.
+  - Bottom Card ($420 \times 135$ pt): False positive mitigations for boiler steam and forklift strobes.
+- **Right Column:** Multi-modal hazard relationship modes card ($420 \times 390$ pt) highlighted in emergency red.
+
+#### 3. Detailed Technical Content
 - **Decoupled Architecture:**
-  - Shared feature backbone with YOLOv8 for CPU efficiency, routing directly to independent spatial hazard trackers (`HAZARD-0001`).
-  - Multi-frame confirmation ($N_{\text{confirm}} = 5$ frames, ~150–200 ms) filters out 1-frame welding flashes, halogen headlight flares, and reflective surfaces.
+  - Shared convolutional backbone with YOLOv8 for edge CPU efficiency, routing directly to independent spatial hazard trackers (`HAZARD-0001`, `HAZARD-0002`).
+  - Multi-frame confirmation ($N_{\text{confirm}} = 5$ frames, ~150–200 ms) filters out 1-frame welding arcs, flashlight flares, and reflections.
   - Clearing state machine requires 10 consecutive clear frames before confirming suppression.
-- **Multi-Modal Modes:**
-  - `FIRE_AND_SMOKE` (**CRITICAL**): Simultaneous flame and plume detection (high-intensity active combustion).
-  - `FIRE_ONLY` (**HIGH**): Clean-burning flame, early flare, or localized electrical arc.
-  - `SMOKE_ONLY` (**HIGH**): Smoldering materials or concealed fire.
-  - `NO_HAZARD` (**NORMAL**): Baseline operational condition.
-- **Industrial False Positive Hardening:** Configurable polygon exclusion masks (`roi_polygons`) allow masking known stationary boiler blowdown steam vents.
-- **Speaker Script:**
-  > "Slide 7 showcases our dual-channel combustion engine. Industrial plants have open welding arcs and forklift headlights that trick basic AI models. We solve this by requiring five consecutive frames of spatial confirmation. We also classify co-occurrence: fire with smoke represents active critical combustion; smoke alone indicates smoldering hazards. Furthermore, operators can configure polygon exclusion zones around boiler steam vents to prevent false smoke alarms."
+- **Multi-Modal Relationship Modes:**
+  1. `FIRE_AND_SMOKE` (**CRITICAL**): Simultaneous flame and plume detection in shared zone (high-intensity active combustion). Triggers full-screen visual alarms, sirens, and immediate dispatches.
+  2. `FIRE_ONLY` (**HIGH**): Confirmed flame without visible smoke (clean fuel combustion, electrical arc, early flare).
+  3. `SMOKE_ONLY` (**HIGH**): Confirmed smoke plume without visible flame (smoldering materials or concealed fire).
+  4. `NO_HAZARD` (**NORMAL**): Zero combustion signatures detected.
+- **Industrial False Positive Hardening:** Configurable polygon exclusion masks (`roi_polygons`) allow masking known stationary boiler blowdown steam vents; neural detector fine-tuned on yellow/orange forklift warning lights.
 
 ---
 
 ### Slide 8: Real-Time Security Operations Center (SOC) Dashboard
 
-- **Header Tag:** `OPERATIONS CENTER`
-- **Slide Title:** **Web-Based Real-Time Security Operations Center (SOC) Dashboard**
-- **Visual Design:** 4 balanced operational cards covering live video feeds, worker checklist HUDs, WebSocket communications, and operator command triggers.
-- **Capabilities Detailed:**
-  1. **Multi-Camera Grid:** Responsive camera tiles supporting RTSP, USB, and file streams with live annotated snapshot streams (bounding boxes, track IDs, and compliance badges). Live telemetry displays rolling FPS, dropped frames, and inference latency.
-  2. **Worker Checklist HUD:** Compact visual badges above workers showing individual gear status: Green (`PRESENT`), Red (`ABSENT`), Gray (`UNKNOWN`).
-  3. **Bi-Directional WebSockets:** Mounted at `/ws/alerts` for sub-100 ms event push, supported by heartbeat ping/pong keep-alive checks.
-  4. **Human-in-the-Loop Actions:** Direct operator command triggers on incident cards: `Acknowledge` (stops visual pulsing), `Resolve` (closes incident with notes), and `Dismiss` (justified exception logged to audit trail).
-- **Speaker Script:**
-  > "Slide 8 details our React 18 SOC dashboard. It is a true operations center. Safety officers can view multi-camera grids, inspect real-time FPS and latency telemetry, and see our worker checklist HUD overlaid on the stream. When an incident occurs, operators have human-in-the-loop control: they can acknowledge, resolve, or dismiss alerts with mandatory audit justification notes. Everything connects via WebSockets for instantaneous real-time updates."
+#### 1. Purpose & Strategic Focus
+Demonstrates the user interface, operational workflows, live camera streams, real-time telemetry, and human-in-the-loop incident response mechanisms available to safety officers.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[OPERATIONS CENTER]`, Title: *Web-Based Real-Time Security Operations Center (SOC) Dashboard*
+- **Layout:** 4 balanced operational capability cards ($420 \times 180$ pt and $420 \times 195$ pt) in a $2 \times 2$ grid.
+
+#### 3. Detailed Content
+1. **Multi-Camera Monitoring Grid (Top-Left):**
+   - Responsive multi-camera tile grid supporting RTSP, USB, and file streams.
+   - Live annotated snapshot stream delivering bounding boxes, track IDs, and compliance badges.
+   - Live telemetry display: Rolling FPS, dropped frames, and inference latency in milliseconds.
+2. **Worker Checklist HUD & Hazard Overlays (Bottom-Left):**
+   - Compact visual checklist badges above tracked workers showing status for Helmet, Vest, Gloves, Footwear.
+   - Color-coded badges: Green (`PRESENT`), Red (`ABSENT`), Gray (`UNKNOWN`).
+   - Thermal/smoke indicators displaying active hazard relationships.
+   - Zero fabricated data: every tile and metric binds to real database records.
+3. **Bi-Directional WebSocket Streaming (Top-Right):**
+   - Mounted at `/ws/alerts` for sub-100 ms event push.
+   - In-memory `EventBroadcaster` pub/sub queue distributing events to connected clients.
+   - Bi-directional heartbeat ping/pong protocol maintains socket liveness.
+   - Automatic client disconnect cleanup and reconnection backoff.
+4. **Operator Incident Action Triggers (Bottom-Right):**
+   - Immediate human-in-the-loop controls directly on incident cards.
+   - `Acknowledge`: Safety officer accepts incident, stopping visual flashing.
+   - `Resolve`: Closes incident with mandatory resolution summary.
+   - `Dismiss`: Records justified operational exception in immutable audit trail.
+   - Role-Based Access Control: `VIEWER`, `OPERATOR`, and `ADMIN` operational tiers.
 
 ---
 
-### Slide 9: Risk Scoring, Alert Lifecycle & Evidence Archival
+### Slide 9: Explainable Risk Scoring, Alerts & Evidence Archival
 
-- **Header Tag:** `GOVERNANCE & EVIDENCE`
-- **Slide Title:** **Explainable Risk Scoring, Smart Cooldowns & Tamper-Evident Evidence**
-- **Visual Design:** Left column breaks down the mathematical risk scoring formula and deduplication engine; right column details tamper-evident visual evidence and external notifications.
-- **Explainable Risk Formula:**
+#### 1. Purpose & Strategic Focus
+Covers the mathematical risk scoring formula, anti-flood alert deduplication rules, and tamper-evident visual evidence archival engine.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[GOVERNANCE & EVIDENCE]`, Title: *Explainable Risk Scoring, Smart Cooldowns & Tamper-Evident Evidence*
+- **Left Column:**
+  - Top Card ($420 \times 220$ pt): Deterministic 0–100 risk formula and factor weights.
+  - Bottom Card ($420 \times 155$ pt): Alert deduplication, cooldowns, and escalation.
+- **Right Column:**
+  - Top Card ($420 \times 220$ pt): Tamper-evident SHA-256 evidence archival.
+  - Bottom Card ($420 \times 155$ pt): External alert providers (Webhooks & Email).
+
+#### 3. Detailed Technical Content
+- **Explainable Risk Scoring Formula:**
   $$\text{Score} = \text{clamp}\left( \big(\text{BaseSeverity} + \text{Persistence} + \text{Density} + \text{Recurrence}\big) \times \text{ZoneMultiplier},\; 0,\; 100 \right)$$
-  - Missing Helmet: $+30$ | Missing Vest: $+25$ | Smoke: $+70$ | Fire: $+90$
-  - Persistence: $+0.5\text{ pts/sec}$ (max $+20$) | Density: $+5\text{ pts per extra worker}$ | Zone Multipliers: $1.1\times$ to $1.8\times$
+  - Base Severity: Missing Helmet ($+30$), Vest ($+25$), Smoke ($+70$), Fire ($+90$)
+  - Persistence Factor: $+0.5\text{ pts/sec}$ of sustained violation (capped at $+20$)
+  - Worker Density: $+5\text{ pts per additional worker exposed}$
+  - Zone Multiplier: Hazardous plant zones scaled from $1.1\times$ to $1.8\times$
   - Tiers: LOW (0–29) • MEDIUM (30–59) • HIGH (60–84) • CRITICAL (85–100)
-- **Smart Alert Deduplication:** Aggregates repeat violations from the same worker into an ongoing `OPEN` incident; 60-second cooldown suppresses alarm flooding; violations unaddressed for $>120$s auto-escalate in severity.
-- **Tamper-Evident Visual Evidence:** Captures annotated JPEG frame upon incident creation; computes cryptographic SHA-256 hash upon write; verification API recomputes hash on disk to detect file tampering. Rolling 10 GB quota with automatic oldest-first pruning.
-- **Speaker Script:**
-  > "On Slide 9, we govern safety through mathematical rigor and cryptographic evidence. Our risk engine is completely explainable: scores from zero to one hundred are calculated from base severity, violation duration, worker density, and hazardous zone multipliers. To protect operators from alert fatigue, we enforce sixty-second cooldowns. And for regulatory investigations, every incident snapshot is cryptographically hashed with SHA-256 upon write, providing tamper-evident visual proof."
+- **Smart Alert Deduplication & Cooldowns:**
+  - Aggregates repeat violations from the same worker into an ongoing `OPEN` incident record.
+  - Enforces a 60-second cooldown window preventing alarm flooding during ongoing non-compliance.
+  - Automatic escalation: violations unaddressed for $> 120$ seconds escalate in severity tier.
+- **Tamper-Evident Visual Evidence:**
+  - Annotated JPEG snapshot archived upon incident creation (`outputs/evidence/YYYY/MM/DD/{camera_id}/`).
+  - Cryptographic SHA-256 checksum computed on write and permanently stored in database.
+  - Verification API (`GET /api/evidence/{id}`) streams file and recomputes hash to detect unauthorized alterations.
+  - Rolling 10 GB storage quota with automatic oldest-first pruning; path traversal defense blocks directory escapes.
+- **External Alert Providers:**
+  - Webhook Provider: JSON POST with HMAC-SHA256 signature in `X-Rakshya-Signature` header.
+  - Email Provider: Plain text alerts via `smtplib` with STARTTLS encryption.
+  - Zero fake claims: strictly reports `NOT_CONFIGURED` unless verified endpoints exist.
 
 ---
 
 ### Slide 10: Production-Grade Technology Stack
 
-- **Header Tag:** `ENGINEERING STACK`
-- **Slide Title:** **Edge-Ready, Scalable Technology Stack**
-- **Visual Design:** 4 clean vertical technology columns organizing libraries by architectural responsibility.
-- **Stack Columns:**
-  - **AI & Vision:** Python 3.13, PyTorch 2.14, Ultralytics YOLOv8n, ByteTrack, OpenCV, NumPy.
-  - **Backend & APIs:** FastAPI (Asynchronous REST), Pydantic v2, Uvicorn ASGI server, ThreadPoolExecutor.
-  - **Persistence & Security:** SQLite (Write-Ahead Logging mode, `PRAGMA synchronous=NORMAL`, `PRAGMA foreign_keys=ON`, 5000ms busy timeout), SQLAlchemy ORM, PBKDF2-HMAC-SHA256 (600,000 iterations), PyJWT.
-  - **Frontend & Observability:** React 18, TypeScript, Vite 6, Tailwind CSS, Native WebSockets, Prometheus `/metrics`, Kubernetes liveness/readiness probes.
-- **Speaker Script:**
-  > "Slide 10 highlights our production technology stack. We chose Python 3.13 and PyTorch with YOLOv8n for edge inference. Our backend uses FastAPI with asynchronous worker thread pools. For persistence, we configured SQLite in Write-Ahead Logging mode with foreign keys and five-second busy timeouts, delivering high concurrency without server overhead. Our frontend is built with React 18 and TypeScript, accompanied by Prometheus metrics and Kubernetes probes."
+#### 1. Purpose & Strategic Focus
+Outlines the complete software engineering stack, categorizing tools by architectural tier and demonstrating enterprise readiness.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[ENGINEERING STACK]`, Title: *Edge-Ready, Scalable Technology Stack*
+- **Layout:** 4 clean vertical technology columns ($200 \times 390$ pt each) spanning the slide width.
+
+#### 3. Detailed Stack Breakdown
+1. **AI & Vision (Cyan):**
+   - Python 3.13 runtime
+   - Ultralytics YOLOv8n single-stage neural detector
+   - PyTorch 2.14.0+cpu (CUDA hardware acceleration ready)
+   - Custom ByteTrack multi-object tracker
+   - 8-State Kalman Filter (`KalmanBoxTracker`) & Hungarian association
+   - OpenCV (`cv2`) frame decoding & letterbox resizing
+   - NumPy array operations
+2. **Backend Services (Green):**
+   - FastAPI asynchronous REST framework
+   - Starlette & Uvicorn ASGI server
+   - Pydantic v2 typed schema validation
+   - Thread-isolated camera workers
+   - Background `ThreadPoolExecutor` for non-blocking alert dispatch
+   - In-memory `EventBroadcaster` pub/sub message bus
+3. **Persistence & Security (Amber):**
+   - SQLite relational database in Write-Ahead Logging (WAL) mode
+   - `PRAGMA synchronous=NORMAL` & `PRAGMA foreign_keys=ON`
+   - 5,000 ms busy timeout preventing write lock contention
+   - SQLAlchemy ORM database models
+   - Cryptographic PBKDF2-HMAC-SHA256 password hashing (600,000 iterations)
+   - PyJWT token authentication (`HS256`)
+   - SHA-256 cryptographic image hashing
+4. **Frontend & Operations (Cyan):**
+   - React 18 single-page application
+   - TypeScript typed component architecture
+   - Vite 6 production bundler
+   - Tailwind CSS responsive styling
+   - Native bi-directional WebSockets with heartbeat ping/pong
+   - Prometheus `/metrics` exposition
+   - Kubernetes `/health/live` and `/health/ready` probe endpoints
+   - Rotating structured JSON logging
 
 ---
 
 ### Slide 11: Testing & Empirical Verification Scorecard
 
-- **Header Tag:** `VERIFICATION EVIDENCE`
-- **Slide Title:** **Rigorous Automated Testing & Hardware Verification Scorecard**
-- **Visual Design:** 4 prominent KPI metric tiles on top; dual cards below cleanly separating verified subsystems from items scheduled for future industrial pilots.
-- **Verified Numerical Metrics:**
-  - **160 / 160** Backend Pytest Tests Passing (100% Pass Rate)
-  - **39 / 39** End-to-End System Integration Scenarios Verified (100%)
-  - **45.5 ms** Mean CPU Pipeline Latency (~22–24 FPS on commodity 8-core CPU)
-  - **0 Memory Leaks** (Process RSS stable: $+9.1\text{ MB}$ transient allocation across 25 cycles)
-- **Factual Verification Breakdown:**
-  - **Verified (Tested & Confirmed):** YOLOv8n detection, ByteTrack tracking, Anatomical PPE association, `UNKNOWN != VIOLATION` rule, Fire/smoke dual state machine, Risk scoring, Evidence hashing, Real laptop integrated webcam live feed.
-  - **Partially Verified:** IP/RTSP camera streaming (verified against simulated network RTSP feeds; physical factory CCTV pilot scheduled).
-  - **Implemented (Configuration Required):** External Webhooks with HMAC-SHA256 signatures and SMTP email alerts.
-  - **Not Yet Validated (Roadmap):** Physical industrial CCTV hardware pilot in live plant; 24/72-hour continuous endurance soak test.
-- **Speaker Script:**
-  > "We believe in honest, empirical engineering. On Slide 11, you see our verified test results: 160 out of 160 unit tests passing, 39 out of 39 end-to-end integration scenarios passing, and a benchmarked latency of 45.5 milliseconds on standard CPU hardware. We have verified the pipeline on live laptop webcams. And we are completely transparent: while our RTSP code is validated against simulated streams, physical industrial CCTV factory pilots and 72-hour soak tests are scheduled for our next operational deployment."
+#### 1. Purpose & Strategic Focus
+Provides an unvarnished, empirical verification scorecard presenting exact test results, latency benchmarks, memory stability measurements, and honest maturity classifications.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[VERIFICATION EVIDENCE]`, Title: *Rigorous Automated Testing & Hardware Verification Scorecard*
+- **Top Section:** 4 large KPI metric tiles ($200 \times 110$ pt).
+- **Bottom Section:** Dual comparison cards ($420 \times 265$ pt) cleanly segregating verified subsystems from items scheduled for industrial pilots.
+
+#### 3. Detailed Verification Data
+- **Numerical Metric Callouts:**
+  - `160 / 160`: Backend Pytest Unit Tests Passing (**100% Pass Rate**)
+  - `39 / 39`: End-to-End System Integration Scenarios Verified (**100% Pass Rate**)
+  - `45.5 ms`: Mean CPU Pipeline Latency (~22–24 FPS on commodity 8-core CPU)
+  - `0 Leaks`: Memory RSS Stability (+9.1 MB transient cache warm-up over 25 cycles)
+- **Factual Verification Scorecard (Left Card):**
+  - `[PASS]` AI Detection: 7 Canonical classes with verified SHA-256 weights
+  - `[PASS]` Worker Tracking: ByteTrack 8-state Kalman trajectories
+  - `[PASS]` PPE Compliance: Anatomical association & $N_{\text{confirm}} = 3$
+  - `[PASS]` Occlusion Safety: `UNKNOWN` state strictly yields 0 false violations
+  - `[PASS]` Hazard Engine: Dual-channel fire/smoke state machine ($N=5$)
+  - `[PASS]` Risk & Alerts: Deterministic 0–100 score & 60s cooldown
+  - `[PASS]` Evidence Store: SHA-256 checksummed snapshots & quota pruning
+  - `[PASS]` Laptop Integrated Webcam: Real OpenCV live stream AI processing verified
+- **Transparent Maturity Classification (Right Card):**
+  - **Partially Verified:** RTSP IP camera streaming (validated via simulated network RTSP feeds; physical factory CCTV pilot pending).
+  - **Implemented (Configuration Required):** External Webhooks with HMAC-SHA256 signatures and SMTP email notifications (fully coded; requires client endpoint URLs).
+  - **Not Yet Validated (Roadmap):** Physical industrial CCTV hardware pilot in live factory environment; 24/72-hour continuous edge endurance soak test.
 
 ---
 
 ### Slide 12: Business Impact & Future Engineering Roadmap
 
-- **Header Tag:** `IMPACT & ROADMAP`
-- **Slide Title:** **Industrial Impact & Future Engineering Scope**
-- **Visual Design:** Dual-column presentation contrasting immediate operational dividends against concrete near-term and future engineering roadmap milestones.
-- **Immediate Business & Safety Impact:**
-  1. **24/7 Automated Vigilance:** Replaces periodic walkthroughs and human perceptual fatigue with continuous surveillance across all camera views.
-  2. **Catastrophic Loss Prevention:** Sub-second fire and smoke confirmation catches early combustion before sprinklers or manual alarms engage.
-  3. **Regulatory Audit Protection:** Tamper-evident visual evidence satisfies OSHA, STPI, and safety compliance audits.
-  4. **Frictionless Worker Acceptance:** Anonymous tracking eliminates surveillance pushback while enforcing life-safety standards.
-- **Engineering Roadmap:**
-  - *Near-Term:* TensorRT & ONNX Runtime INT8 quantization for 10+ simultaneous 4K streams on NVIDIA Jetson; physical on-site plant CCTV pilot; 72-hour soak test.
-  - *Future Scope:* Industrial PLC protocol interlocks (Modbus TCP, OPC-UA, MQTT) for automatic machinery shutoffs; expanded PPE classes (face shields, fall-arrest harnesses).
-- **Speaker Script:**
-  > "Slide 12 demonstrates our business impact and future engineering roadmap. RAKSHYA VISION transforms safety from reactive post-mortems into proactive, predictive governance. It eliminates observer fatigue, catches fires in their earliest developmental seconds, and protects worker privacy. Moving forward, we will add TensorRT acceleration for edge Jetson devices and integrate Modbus and OPC-UA protocols to trigger automatic industrial machinery cutoffs when critical violations occur."
+#### 1. Purpose & Strategic Focus
+Demonstrates operational value, ROI, and life-safety dividends for industrial enterprise adopters, while outlining concrete near-term and long-term engineering milestones.
+
+#### 2. Visual Layout & Composition
+- **Header:** Category Pill `[IMPACT & ROADMAP]`, Title: *Industrial Impact & Future Engineering Scope*
+- **Layout:** Dual-column format ($420 \times 390$ pt each) contrasting operational impact against the engineering roadmap.
+
+#### 3. Detailed Content
+- **Immediate Operational & Economic Impact (Left Column):**
+  1. *24/7 Automated Vigilance:* Replaces periodic walkthroughs and human observer fatigue with continuous computer vision surveillance across all facility zones.
+  2. *Catastrophic Loss Prevention:* Sub-second flame and smoke confirmation detects early combustion before traditional ceiling smoke alarms or sprinklers engage.
+  3. *Tamper-Evident Regulatory Compliance:* Cryptographically verified visual snapshot audit trail satisfies OSHA, STPI, and industrial safety compliance audits.
+  4. *Frictionless Worker Experience:* Anonymous trajectory estimation avoids facial recognition privacy concerns while upholding life-safety standards.
+- **Concrete Engineering Roadmap (Right Column):**
+  - *Near-Term Priorities:*
+    - Edge GPU Acceleration: TensorRT & ONNX Runtime INT8 quantization for 10+ simultaneous 4K streams on NVIDIA Jetson / RTX.
+    - Extended Industrial Pilots: On-site pilot deployment with physical CCTV feeds at manufacturing plants.
+    - 72-Hour Soak Testing: Extended memory stability and WAL checkpoint evaluation under continuous multi-camera load.
+  - *Future Innovations:*
+    - Industrial Protocol Interlocks: Modbus TCP, OPC-UA, and MQTT integrations for automated machinery emergency cutoffs.
+    - Expanded Safety Gear: High-angle face shields, safety harnesses for work-at-height, and hearing protection.
 
 ---
 
-### Slide 13: Closing & Acknowledgments
+### Slide 13: Project Submission Summary & Conclusion
 
-- **Header Tag:** `BPUT HACKATHON 2026`
-- **Slide Title:** **RAKSHYA VISION: Detect • Understand • Alert • Protect**
-- **Visual Design:** Prominent central showcase container with glowing emerald accent border, presenting final team credentials, project summary, and repository link.
-- **Submission Details:**
-  - **Team:** XERSES
-  - **Problem Statement:** PS06 — Build a prototype AI system that detects safety gear compliance
-  - **Organizers:** Software Technology Parks of India (STPI) & EmTek
-  - **Verified System Capabilities:** 160/160 Unit Tests Passing • 39/39 Integration Scenarios Verified • ~24 FPS CPU Inference • Anonymous Tracking • Anatomical PPE Association • Dual-Channel Fire/Smoke Detection • Explainable Risk Engine • SHA-256 Evidence Archival • React 18 SOC Dashboard
-  - **Official GitHub Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
-- **Speaker Script (Pitch Closing):**
-  > "In conclusion, RAKSHYA VISION is not just a model—it is a complete, decoupled, tamper-evident safety operations platform built for the realities of modern industrial environments. We thank the organizers at STPI, EmTek, and BPUT Hackathon 2026 for this opportunity. Team XERSES is now ready for your questions."
+#### 1. Purpose & Strategic Focus
+Provides a dignified closing slide summarizing project credentials, submission details, problem statement alignment, and the official GitHub repository.
+
+#### 2. Visual Layout & Composition
+- **Header Badge:** Pill container in dark navy with cyan text: `BPUT HACKATHON 2026 • PROBLEM STATEMENT PS06`
+- **Vertical Accent:** Left vertical glowing emerald bar (`#10B981`)
+- **Title Block:**
+  - `RAKSHYA VISION` in 44pt Bold White
+  - `Detect • Understand • Alert • Protect` in 20pt Emerald Green
+- **Central Showcase Container:** Large bordered card ($730 \times 220$ pt) presenting complete submission details.
+
+#### 3. Content Breakdown
+- **Team:** XERSES
+- **Challenge:** PS06 — Build a prototype AI system that detects safety gear compliance
+- **Organized By:** Software Technology Parks of India (STPI) & EmTek
+- **Verified System Capabilities:**
+  - 160 / 160 Unit Tests Passing
+  - 39 / 39 Integration Scenarios Verified
+  - ~24 FPS Real-Time CPU Inference
+  - Zero-Biometric Anonymous Tracking
+  - Anatomical PPE Association
+  - Dual-Channel Fire/Smoke Detection
+  - Explainable 0–100 Risk Engine
+  - Tamper-Evident SHA-256 Evidence
+  - React 18 Real-Time SOC Dashboard
+- **Official GitHub Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
 
 ---
 
-## Strategic Q&A Cheat Sheet for the Team
+## Technical Data Reference Sheet
 
-| Expected Jury Question | Recommended Technical Response |
-|---|---|
-| **Why not train negative classes like `no_helmet` directly?** | *"Negative absence classes suffer from high visual ambiguity. A bare head has no distinct geometry compared to a hard hat with standardized contours and colors. Direct absence detection also conflates physical vision with administrative spatial policy. By detecting positive items and using anatomical spatial containment, we achieve zero false absence alarms."* |
-| **How do you prevent false alarms when workers walk behind columns?** | *"We enforce our foundational invariant: UNKNOWN != VIOLATION. Boundary contact or partial occlusion locks state to UNKNOWN. Furthermore, ByteTrack's 8-state Kalman filter maintains worker trajectories across brief obstructions, and our temporal engine requires 3 consecutive frames of confirmed absence before creating a violation."* |
-| **Can this run on edge devices without expensive GPUs?** | *"Yes. Our pipeline executes at 45.5 ms mean latency—approximately 22 to 24 FPS on commodity 8-core CPUs. Using our scheduled inference (infer_interval_frames = 2), a 30 FPS camera feed runs with smooth display and low CPU utilization. For multi-camera scaling, TensorRT export is on our roadmap."* |
-| **How do you ensure worker privacy?** | *"We collect zero facial embeddings, zero gait signatures, and zero personally identifiable information. ByteTrack assigns transient integer IDs (Track #101) that exist only in memory and expire thirty frames after the worker leaves the camera's field of view."* |
-| **What happens if a network drop disconnects a camera?** | *"Each camera worker runs in an isolated daemon thread with bounded exponential backoff. A failure or timeout on one stream never crashes neighboring cameras or stalls the FastAPI backend. Reconnection attempts proceed automatically while other feeds continue processing."* |
-| **How is visual evidence protected from tampering?** | *"Every incident snapshot is cryptographically hashed with SHA-256 upon write, storing the digest in our SQLite database. Our verification API recomputes the hash on disk; if a file has been modified by even one byte, the system flags it as tampered."* |
+For quick reference during jury discussions, here are the verified system numbers:
+
+| Parameter | Measured Value | Validation Reference |
+|---|---|---|
+| **Neural Architecture** | Ultralytics YOLOv8n (Nano) | `models/detection/ppe_fire_smoke_v2/` |
+| **Active Checkpoint SHA-256** | `490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3` | `models/registry/model_registry.yaml` |
+| **Canonical Classes** | 7 (`person`, `helmet`, `safety_vest`, `gloves`, `safety_footwear`, `fire`, `smoke`) | Standardized Safety Ontology |
+| **Dataset Volume** | 22,453 normalized images / 51,195 bounding boxes | `datasets/processed/` |
+| **Model Benchmark (mAP@50)** | **25.23%** (3.61× over V1 baseline) | `models/detection/ppe_fire_smoke_v2/` |
+| **Mean End-to-End Latency** | **45.5 ms** (CPU-only execution) | `outputs/integration/performance_report.json` |
+| **Effective Throughput** | ~22.0 to 24.1 FPS on 8-core CPU | Integration Benchmark |
+| **Memory Delta (25 Cycles)** | +9.1 MB transient cache warm-up (0 leaks) | Process RSS Measurement |
+| **Backend Unit Tests** | **160 / 160 Passed (100%)** | `backend/tests/` |
+| **Integration Test Scenarios** | **39 / 39 Passed (100%)** | `scripts/testing/run_integration_tests.py` |
+| **Frontend Production Build** | **Built in 3.44s (0 errors)** | `npm run build` (Vite 6 + React 18) |
+| **Password Hashing** | PBKDF2-HMAC-SHA256 (600,000 iterations) | `backend/app/security/` |
+| **Database Concurrency Mode** | SQLite Write-Ahead Logging (WAL) Mode | `backend/app/database/session.py` |
+| **Evidence Checksum Algorithm** | Cryptographic SHA-256 | `backend/app/services/evidence_manager.py` |
+| **Webcam Ingestion** | Integrated Laptop Webcam Index 0 Verified | `CameraWorker` (`backend/app/camera/worker.py`) |
