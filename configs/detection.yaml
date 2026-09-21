@@ -2,8 +2,8 @@
 # Real-Time & Video Detection Configuration
 
 model:
-  path: "models/detection/ppe_fire_smoke_v1/weights/best.pt"
-  name: "ppe_fire_smoke_v1"
+  path: "models/detection/ppe_fire_smoke_v2/weights/best.pt"
+  name: "ppe_fire_smoke_v2"
   architecture: "yolov8n"
   expected_classes: 7
 

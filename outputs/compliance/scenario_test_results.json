@@ -1,0 +1,12 @@
+{
+  "scenario_1_worker_with_helmet": "PASSED",
+  "scenario_2_worker_without_helmet": "PASSED",
+  "scenario_3_worker_with_vest": "PASSED",
+  "scenario_4_worker_without_vest": "PASSED",
+  "scenario_5_worker_with_gloves": "PASSED",
+  "scenario_6_worker_without_gloves": "PASSED",
+  "scenario_7_worker_with_footwear": "PASSED",
+  "scenario_8_worker_without_footwear": "PASSED",
+  "scenario_9_multiple_workers": "PASSED",
+  "scenario_10_occluded_worker": "PASSED"
+}

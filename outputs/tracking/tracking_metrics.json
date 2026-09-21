@@ -1,0 +1,19 @@
+{
+  "video": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\test_safety_video.mp4",
+  "resolution": "640x480",
+  "total_source_frames": 75,
+  "processed_frames": 75,
+  "total_unique_tracks": 2,
+  "average_track_duration_frames": 30.0,
+  "lost_track_events": 2,
+  "recovered_track_events": 1,
+  "id_switches": 0,
+  "processing_fps": 9.2,
+  "mean_latency_ms": 105.76,
+  "compliance_summary": {
+    "total_workers": 2,
+    "compliant": 0,
+    "non_compliant": 2,
+    "unknown": 0
+  }
+}

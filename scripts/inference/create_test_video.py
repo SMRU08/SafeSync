@@ -19,12 +19,32 @@ MAX_SCENES = 8         # 8 diverse scenes = 120 frames total (8 seconds of video
 
 
 def create_video():
-    img_files = glob.glob(os.path.join(TEST_IMG_DIR, "*.jpg")) + glob.glob(os.path.join(TEST_IMG_DIR, "*.png"))
-    if not img_files:
-        raise FileNotFoundError(f"No test images found in {TEST_IMG_DIR}")
+    # Curate verified test scenes with workers, helmets, vests, and fire/smoke
+    target_bases = [
+        "cppe_00000070_jpg.rf.00daeaf9d7220853beba957400594103",  # person + helmet + vest
+        "cppe_00000151_jpg.rf.e84faf7e4f19a5091d24bea2bf944a16",  # person + helmet
+        "cppe_00000169_jpg.rf.2dadfdbc93d2b3d5edcfa68a55f96dbb",  # person + helmet
+        "cppe_00000190_jpg.rf.4ab32c663db52edf20b8a01ee328208b",  # person + helmet + vest
+        "cppe_00000239_jpg.rf.ae2ee3ab4b8a19f7b10428cd8228f6fa",  # person + helmet + vest
+    ]
 
-    # Select 8 diverse images
-    selected = img_files[:MAX_SCENES]
+    selected = []
+    for b in target_bases:
+        for ext in [".jpg", ".png"]:
+            p = os.path.join(TEST_IMG_DIR, b + ext)
+            if os.path.isfile(p):
+                selected.append(p)
+                break
+
+    # Add 1 fire/smoke image for multi-modal coverage
+    hazard_imgs = sorted(glob.glob(os.path.join(TEST_IMG_DIR, "dfire_*.jpg")) + glob.glob(os.path.join(TEST_IMG_DIR, "dfire_*.png")))
+    if hazard_imgs:
+        selected.append(hazard_imgs[0])
+
+    if not selected:
+        # Fallback to any images
+        selected = (glob.glob(os.path.join(TEST_IMG_DIR, "*.jpg")) + glob.glob(os.path.join(TEST_IMG_DIR, "*.png")))[:MAX_SCENES]
+
     print(f"Creating test video from {len(selected)} real test images...")
 
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
