@@ -843,23 +843,46 @@ npm run build
 
 ## 30. Roadmap
 
-### Completed (Phases 1–10)
-- [x] Phase 1: Foundation, testing harness, and React dashboard scaffold.
-- [x] Phase 2: Dataset pipeline (22,453 unified images across 4 open sources).
-- [x] Phase 3 & 3.1: Multi-task YOLOv8n detector with 7 canonical classes.
-- [x] Phase 4: Video and camera stream ingestion pipeline.
-- [x] Phase 5: ByteTrack multi-worker tracking and spatial anatomical PPE association.
-- [x] Phase 6: Fire & smoke hazard tracking with temporal state confirmation.
-- [x] Phase 7: Explainable risk engine (0–100 score) and smart alert lifecycle.
-- [x] Phase 8: Real-time WebSocket channel and React 18 SOC dashboard.
-- [x] Phase 9: System integration, latency benchmarking, and 39 E2E test scenarios.
-- [x] Phase 10: Model registry with SHA-256 validation, SQLite WAL, multi-camera manager, RBAC authentication, external alert providers, evidence archival, and Prometheus metrics.
+### Current Capabilities
 
-### In Progress & Future Work
-- [ ] Edge runtime acceleration with TensorRT and ONNX Runtime.
-- [ ] Containerized deployment manifests (Docker Compose and Kubernetes Helm charts).
-- [ ] Mobile push notifications for on-duty safety managers (FCM / APNs).
-- [ ] Physical CCTV on-site pilot trial in an active industrial facility.
+RAKSHYA VISION currently provides:
+
+- **AI-Based PPE Detection:** Real-time multi-task object detection across 7 canonical classes (`person`, `helmet`, `safety_vest`, `gloves`, `safety_footwear`, `fire`, `smoke`) using a single-stage YOLOv8 architecture.
+- **Worker Tracking:** Multi-person identity tracking using ByteTrack with Kalman filtering and Hungarian association across continuous frames.
+- **PPE Compliance Analysis:** Deterministic anatomical bounding box association mapping detected protective equipment to corresponding worker body zones (head, torso, hands, feet) without relying on noisy absence classes.
+- **Fire & Smoke Hazard Monitoring:** Dual-channel spatial detection for open flame and atmospheric smoke emissions.
+- **Temporal Event Confirmation:** State machine stabilization requiring consecutive frame confirmations ($N_{\text{confirm}} = 3$ for PPE violations, $N_{\text{confirm}} = 5$ for environmental hazards) to prevent transient false alarms.
+- **Explainable Risk Assessment:** Transparent $0–100$ scoring calculated from severity weights, spatial proximity, and worker exposure duration.
+- **Incident Lifecycle Management:** Automatic transition governance for safety events (`NEW` $\to$ `ACKNOWLEDGED` $\to$ `RESOLVED`) with complete audit trails.
+- **Real-Time Operator Dashboard:** Web-based control room interface delivering live annotated video overlays, dynamic telemetry, and incident queues over WebSockets.
+- **Multi-Camera Management:** Dynamic multi-stream orchestration supporting simultaneous IP/RTSP streams, USB webcams, and recorded video files with independent thread workers.
+- **Authenticated Access & RBAC:** Role-based access control (`admin`, `operator`, `auditor`) with PBKDF2-HMAC-SHA256 password hashing and JWT token authentication.
+- **Incident Evidence Archival:** Automated capture of JPEG frame snapshots and structured JSON telemetry tagged with cryptographic SHA-256 checksums for auditability.
+- **Configurable External Alert Providers:** Dispatch engine supporting outgoing webhooks, SMTP email alerts, and Slack notifications with rate limiting and retry handling.
+- **System Health & Operational Monitoring:** Prometheus `/metrics` exposition alongside Kubernetes-compatible `/health/live` and `/health/ready` probe endpoints.
+
+### Near-Term Improvements
+
+The next engineering priorities for operational readiness include:
+
+- **GPU and Edge Acceleration:** Benchmarking and runtime optimization for NVIDIA Jetson and discrete CUDA environments to maximize multi-stream frame rates.
+- **Small-Object & Distant PPE Optimization:** Further tuning of detector anchors and input resolution to enhance glove and footwear detection at extended camera distances.
+- **Extended Real-World Validation:** Validation against diverse industrial RTSP camera hardware, varied focal lengths, and complex lighting environments.
+- **Longer-Duration Reliability Testing:** Extended continuous multi-stream soak testing to evaluate memory stability and SQLite WAL performance under sustained load.
+- **Broader Alert Provider Validation:** End-to-end delivery testing across enterprise incident response systems (Microsoft Teams, PagerDuty, enterprise SMS gateways).
+- **Deployment Packaging:** Production containerization manifests including multi-stage Dockerfiles and Docker Compose profiles for simplified deployment.
+- **Operational Hardening:** Dynamic camera reconnect handling with automated exponential backoff for intermittent network drops.
+
+### Future Development
+
+Potential future work includes:
+
+- **Hardware-Specific Engine Optimization:** Exporting trained weights to TensorRT engines and ONNX Runtime with INT8 quantization for ultra-low-power edge nodes.
+- **Large-Scale Multi-Camera Orchestration:** Distributed worker pipeline using Celery/Redis or Kafka for centralized monitoring across dozens of concurrent feeds.
+- **Expanded PPE Classification:** Support for additional specialized safety equipment such as face shields, fall arrest harnesses, and ear protection.
+- **Domain-Specific Dataset Expansion:** Gathering and annotating low-light, adverse weather, and heavy dust workplace imagery to boost domain generalization.
+- **Advanced Predictive Safety Analytics:** Heatmap analytics for spatial violation congestion and worker dwell time trends across facility zones.
+- **Enterprise System Integrations:** Bi-directional webhooks with existing Environmental Health & Safety (EHS) and industrial ERP platforms.
 
 ---
 
