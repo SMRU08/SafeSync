@@ -103,6 +103,43 @@ flowchart TD
 
 ## 4. End-to-End Processing Pipeline
 
+```mermaid
+flowchart LR
+    subgraph S1["1. Ingestion"]
+        direction TB
+        IN["Video / RTSP / Webcam"] --> PRE["Resize & Normalize<br>(384x384 RGB)"]
+    end
+
+    subgraph S2["2. AI Detection"]
+        direction TB
+        PRE --> YOLO["YOLOv8n Multi-Task<br>(best.pt)"]
+        YOLO --> DETS["7 Canonical Classes"]
+    end
+
+    subgraph S3["3. Tracking & Association"]
+        direction TB
+        DETS --> BT["ByteTrack Algorithm<br>(Kalman Filter)"]
+        BT --> ANAT["Anatomical Spatial<br>Zone Matcher"]
+        ANAT --> TEMP["Temporal Confirmation<br>(N=3 / N=5 Frames)"]
+    end
+
+    subgraph S4["4. Decision Engine"]
+        direction TB
+        TEMP --> RISK["Explainable Risk<br>Engine (0-100)"]
+        RISK --> INC["Incident Lifecycle<br>Governance"]
+        INC --> EV["SHA-256 Evidence<br>Archival"]
+    end
+
+    subgraph S5["5. Distribution & UI"]
+        direction TB
+        INC --> WS["WebSocket Channel<br>(/ws/alerts)"]
+        WS --> SOC["React 18 Operator HUD"]
+        INC --> EXT["External Dispatcher<br>(Webhook / Email / Slack)"]
+    end
+
+    S1 --> S2 --> S3 --> S4 --> S5
+```
+
 ### 4.1 Camera & Video Ingestion
 The system supports multiple input formats managed by `backend/app/camera/worker.py` and `backend/app/camera/manager.py`:
 - **Local USB Webcam:** Ingested via OpenCV device indexing (`0`, `1`). Tested and verified.
@@ -175,6 +212,36 @@ Workers are assigned one of four definitive states:
 - **`VIOLATION`:** One or more mandatory PPE items (e.g. helmet or safety vest in high-risk zones) are confirmed `ABSENT` after temporal validation.
 - **`UNKNOWN`:** The worker is occluded, partially outside the camera frame, or undergoing initial tracking acquisition.
 
+```mermaid
+flowchart TD
+    P["Worker Detected (Person Class)"] --> ZONES["Partition Bounding Box into Anatomical Sub-Zones"]
+    
+    ZONES --> Z_HEAD["Head Zone (Top 0–25%)"]
+    ZONES --> Z_TORSO["Torso Zone (15–65%)"]
+    ZONES --> Z_HANDS["Hand Zones (Lateral / Wrists)"]
+    ZONES --> Z_FEET["Foot Zone (Bottom 80–100%)"]
+
+    Z_HEAD --> CHK_H{"Helmet Detected?"}
+    Z_TORSO --> CHK_V{"Vest Detected?"}
+
+    CHK_H -- "Yes" --> H_OK["Helmet: PRESENT"]
+    CHK_H -- "No" --> OCC_H{"Occluded / Clipped?"}
+    OCC_H -- "Yes" --> H_UNK["Helmet: UNKNOWN<br>(No Alert Triggered)"]
+    OCC_H -- "No" --> H_CONF{"Absence >= 3 Frames?"}
+    H_CONF -- "No" --> H_PEND["Pending Confirmation"]
+    H_CONF -- "Yes" --> H_VIO["Helmet: VIOLATION (ABSENT)"]
+
+    CHK_V -- "Yes" --> V_OK["Vest: PRESENT"]
+    CHK_V -- "No" --> V_CONF{"Absence >= 3 Frames?"}
+    V_CONF -- "No" --> V_PEND["Pending Confirmation"]
+    V_CONF -- "Yes" --> V_VIO["Vest: VIOLATION (ABSENT)"]
+
+    H_OK & V_OK --> STATE_SAFE["Worker State: SAFE"]
+    H_UNK --> STATE_UNK["Worker State: UNKNOWN"]
+    H_VIO --> STATE_VIOL["Worker State: VIOLATION"]
+    V_VIO --> STATE_VIOL
+```
+
 > [!IMPORTANT]
 > **Mandatory Safety Rule:** An `UNKNOWN` state **strictly never** triggers an alert or violation. Violations are only generated when temporal evidence proves confirmed absence.
 
@@ -184,10 +251,14 @@ Workers are assigned one of four definitive states:
 
 Fire and smoke hazards are decoupled from worker compliance logic:
 
-```
-[No Hazard] ──(Detections >= 1)──> [SUSPECTED] ──(5 Consecutive Frames)──> [CONFIRMED]
-    ▲                                    │                                     │
-    └────────(10 Absent Frames)──────────┴─────────────────────────────────────┘
+```mermaid
+stateDiagram-v2
+    [*] --> IDLE: Continuous Ingestion
+    IDLE --> SUSPECTED: Flame or Smoke Detected (Conf >= 0.40)
+    SUSPECTED --> IDLE: Transient Disappears (< 5 frames)
+    SUSPECTED --> CONFIRMED: Detection Persists >= 5 Frames
+    CONFIRMED --> CLEARED: Absence Persists >= 10 Frames
+    CLEARED --> IDLE: Return to Normal Monitoring
 ```
 
 ### Operational Behavior:
@@ -206,6 +277,33 @@ Fire and smoke hazards are decoupled from worker compliance logic:
 The `RiskEngine` calculates a deterministic score from $0$ to $100$ according to configurable weights defined in `configs/risk_policy.yaml`:
 
 $$\text{Risk Score} = \min\left(100, \; (\text{Base Severity} + \text{Persistence Factor} + \text{Worker Density Factor}) \times \text{Zone Multiplier}\right)$$
+
+```mermaid
+flowchart TD
+    subgraph IN["Input Risk Factors"]
+        B["Base Severity Weight<br>(Fire: +60, Smoke: +40, Helmet: +35, Vest: +25)"]
+        P["Temporal Persistence<br>(+1 pt/sec up to +20)"]
+        D["Worker Exposure Density<br>(+10 pts per additional worker)"]
+        Z["Zone Risk Multiplier<br>(Loading Bay: 1.3x, Workshop: 1.0x, Break Room: 0.7x)"]
+    end
+
+    subgraph CALC["Risk Formula Computation"]
+        SUM["Raw Score = Base Severity + Persistence + Density"]
+        MULT["Weighted Score = Raw Score * Zone Multiplier"]
+        CLAMP["Final Score = min(100, max(0, Weighted Score))"]
+        SUM --> MULT --> CLAMP
+    end
+
+    subgraph TIERS["Risk Level Protocol"]
+        CLAMP --> T1["0 – 29: LOW<br>(Audit Log Only)"]
+        CLAMP --> T2["30 – 59: MEDIUM<br>(Dashboard Visual Banner)"]
+        CLAMP --> T3["60 – 79: HIGH<br>(Visual + Audio Chime + Ack Required)"]
+        CLAMP --> T4["80 – 100: CRITICAL<br>(Modal Takeover + Auto External Dispatch)"]
+    end
+
+    B & P & D --> SUM
+    Z --> MULT
+```
 
 ### Factor Breakdown:
 - **Base Severity:**
@@ -260,12 +358,23 @@ stateDiagram-v2
 
 The `AlertEngine` decouples internal telemetry from external notifications:
 
-```
-AlertEngine ──> WebSocket Broadcaster (Real-Time UI)
-             ──> SQLite Persistence (Audit Trail)
-             ──> ProviderRegistry ──┬──> Webhook Provider (HMAC-SHA256)
-                                   ├──> Email Provider (SMTP / STARTTLS)
-                                   └──> SMS Provider (Gateway Stub)
+```mermaid
+flowchart LR
+    INC["Incident / Safety Event<br>(Confirmed Breach)"] --> DEDUP{"Deduplication &<br>Cooldown Check"}
+    
+    DEDUP -- "Within Cooldown" --> SUPPRESS["Suppress Duplicate<br>(Prevent Alert Fatigue)"]
+    
+    DEDUP -- "New / Escalated" --> FANOUT["Alert Dispatch Engine"]
+    
+    FANOUT --> DB[("SQLite WAL Audit Log<br>(alert_history)")]
+    FANOUT --> EV["Evidence Manager<br>(SHA-256 Hashed Snapshot)"]
+    FANOUT --> WS["WebSocket Broadcaster<br>(/ws/alerts to React SOC)"]
+    
+    subgraph EXT["Configurable External Providers"]
+        FANOUT --> WH["HTTP Webhook<br>(HMAC-SHA256 Signed)"]
+        FANOUT --> SMTP["Email Dispatcher<br>(SMTP / STARTTLS)"]
+        FANOUT --> SLACK["Slack Webhook<br>(#safety-alerts)"]
+    end
 ```
 
 ### Provider Implementation Status:
@@ -621,27 +730,47 @@ Total Tests: 39 | Passed: 39 | Failed: 0 (100% Pass Rate)
 
 ## 24. Real-World Deployment Architecture
 
-```
-[Industrial Area / Construction Site]
-  ├── Camera 01 (Entrance Gate)      ──RTSP──> [Edge Compute Server / On-Premise Box]
-  ├── Camera 02 (Workshop Floor)     ──RTSP──>   │ - Multi-Camera Ingestion Pool
-  ├── Camera 03 (Hazard Zone)        ──RTSP──>   │ - YOLOv8n Multi-Task Inference
-  └── Camera 04 (Electrical Room)    ──RTSP──>   │ - ByteTrack & Temporal Validation
-                                                 │ - Risk & Incident Lifecycle Engine
-                                                 │ - Local SQLite Database (WAL Mode)
-                                                 │ - Evidence Archival (outputs/evidence/)
-                                                 │
-                                                 ├──> [FastAPI Server (Port 8000)]
-                                                 │      ├── REST Endpoints (/api/...)
-                                                 │      ├── Prometheus Metrics (/metrics)
-                                                 │      └── WebSocket Broadcaster (/ws/alerts)
-                                                 │
-                                                 ├──> [Safety Operations Center (SOC)]
-                                                 │      └── Web Browser (React 18 Dashboard)
-                                                 │
-                                                 └──> [External Emergency Channels]
-                                                        ├── Automated Webhooks
-                                                        └── Email / SMS Alerts
+```mermaid
+flowchart TD
+    subgraph FIELD["Industrial Workplace / Facility"]
+        C1["Camera 01: Entrance Gate<br>(RTSP / H.264)"]
+        C2["Camera 02: Workshop Floor<br>(RTSP / H.264)"]
+        C3["Camera 03: Loading Bay<br>(RTSP / H.264)"]
+        C4["Camera 04: Hazardous Storage<br>(RTSP / H.264)"]
+    end
+
+    subgraph EDGE["Edge Compute Server / On-Premise Gateway"]
+        MCM["Multi-Camera Stream Manager"]
+        YOLO["YOLOv8n Multi-Task AI Engine (384x384)"]
+        TRACK["ByteTrack & Anatomical Compliance Engine"]
+        RISK["Risk Scoring & Incident Lifecycle Engine"]
+        DB[("SQLite WAL Database<br>(rakshya_vision.db)")]
+        EVID["Evidence Archival<br>(outputs/evidence/ + SHA-256)"]
+        FASTAPI["FastAPI App Server<br>(Port 8000)"]
+        PROM["Prometheus Metrics<br>(/metrics Endpoint)"]
+
+        MCM --> YOLO --> TRACK --> RISK
+        RISK --> DB
+        RISK --> EVID
+        RISK --> FASTAPI
+        FASTAPI --> PROM
+    end
+
+    subgraph SOC["Safety Operations Center (SOC)"]
+        DASH["React 18 / Vite Web Dashboard<br>(Live Annotated Streams, Alert HUD, Risk Gauges)"]
+    end
+
+    subgraph EXTERNAL["Enterprise Integrations & Dispatch"]
+        WH["HTTP Webhook Endpoint<br>(HMAC-SHA256 Signed)"]
+        MAIL["Safety Management (SMTP Email)"]
+        SLACK["Incident Channel (Slack App)"]
+    end
+
+    C1 & C2 & C3 & C4 -->|RTSP Network Feeds| MCM
+    FASTAPI -->|WebSocket /ws/alerts & REST /api| DASH
+    FASTAPI -->|Signed Webhook| WH
+    FASTAPI -->|STARTTLS Email| MAIL
+    FASTAPI -->|Incoming Webhook| SLACK
 ```
 
 > [!NOTE]
