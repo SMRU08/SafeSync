@@ -56,47 +56,71 @@ Camera Observations → Detected Objects → Worker Tracks → PPE Associations 
 ```mermaid
 flowchart TD
     subgraph INGESTION["1. Ingestion Layer"]
-        C1["RTSP / IP Camera"] --> CM["Multi-Camera Manager"]
-        C2["USB Webcam"] --> CM
-        C3["Recorded Video / File"] --> CM
-        C4["Network Stream / Phone"] --> CM
+        C1["RTSP / IP Camera"]
+        C2["USB Webcam"]
+        C3["Recorded Video / File"]
+        C4["Network Stream / Phone"]
+        CM["Multi-Camera Manager"]
+        C1 --> CM
+        C2 --> CM
+        C3 --> CM
+        C4 --> CM
     end
 
     subgraph VISION["2. AI Vision & Inference"]
-        CM --> PRE["Frame Acquisition & Preprocessing (384x384)"]
-        PRE --> YOLO["YOLOv8 Multi-Task Detector (best.pt)"]
-        YOLO --> DET["Detections: person, helmet, vest, gloves, footwear, fire, smoke"]
+        PRE["Frame Acquisition & Preprocessing<br>384x384 RGB"]
+        YOLO["YOLOv8 Multi-Task Detector<br>best.pt"]
+        DET["Detections: person, helmet, vest,<br>gloves, footwear, fire, smoke"]
+        PRE --> YOLO
+        YOLO --> DET
     end
 
     subgraph TRACKING["3. Tracking & Association"]
-        DET --> BT["ByteTrack (Kalman Filter + Hungarian)"]
-        BT --> ANAT["Anatomical Spatial Associator (Head, Torso, Hands, Feet)"]
-        ANAT --> TEMP_PPE["Temporal Compliance Tracker (N_confirm=3)"]
-        DET --> TEMP_HAZ["Hazard Tracker & State Machine (N_confirm=5)"]
+        BT["ByteTrack Algorithm<br>Kalman Filter + Hungarian"]
+        ANAT["Anatomical Spatial Associator<br>Head, Torso, Hands, Feet"]
+        TEMP_PPE["Temporal Compliance Tracker<br>N_confirm = 3"]
+        TEMP_HAZ["Hazard Tracker & State Machine<br>N_confirm = 5"]
+        BT --> ANAT
+        ANAT --> TEMP_PPE
     end
 
     subgraph RISK_ALERT["4. Risk, Incident & Alert Governance"]
-        TEMP_PPE --> NORM["Event Normalizer (Enforces UNKNOWN != VIOLATION)"]
-        TEMP_HAZ --> NORM
-        NORM --> RISK["Risk Engine (0-100 Score, Severity, Zone Multipliers)"]
-        RISK --> INC["Incident Lifecycle Engine (OPEN, ACK, RESOLVED, DISMISSED)"]
-        INC --> ALERT["Alert Engine (Deduplication, Cooldown, Escalation)"]
+        NORM["Event Normalizer<br>UNKNOWN != VIOLATION Rule"]
+        RISK["Risk Engine<br>0–100 Score & Zone Multipliers"]
+        INC["Incident Lifecycle Engine<br>OPEN, ACK, RESOLVED, DISMISSED"]
+        ALERT["Alert Engine<br>Deduplication & Cooldown"]
+        NORM --> RISK
+        RISK --> INC
+        INC --> ALERT
     end
 
-    subgraph EVIDENCE["5. Tamper-Evident Storage & DB"]
-        INC --> EV_MGR["Evidence Manager (SHA-256 Checksum + Quota)"]
-        EV_MGR --> EV_DISK["outputs/evidence/ (Encrypted/Hashed JPEG)"]
-        INC --> DB[("SQLite WAL Database (rakshya_vision.db)")]
-        ALERT --> DB
+    subgraph EVIDENCE["5. Evidence Storage & DB"]
+        EV_MGR["Evidence Manager<br>SHA-256 Checksum & Quota"]
+        EV_DISK["outputs/evidence/<br>Hashed JPEG Frames"]
+        DB["SQLite Database<br>WAL Mode: rakshya_vision.db"]
+        EV_MGR --> EV_DISK
     end
 
-    subgraph PRESENTATION["6. Distribution & Human Dashboard"]
-        ALERT --> EXT["External Dispatcher (Webhook, Email SMTP, SMS Gateway)"]
-        ALERT --> WS["WebSocket Broadcaster (/ws/alerts)"]
-        ALERT --> REST["FastAPI REST Endpoints (/api/...)"]
-        WS --> SOC["React 18 / Vite Security Operations Center (SOC) Dashboard"]
-        REST --> SOC
+    subgraph PRESENTATION["6. Distribution & Dashboard"]
+        EXT["External Dispatcher<br>Webhook, Email SMTP, Slack"]
+        WS["WebSocket Broadcaster<br>/ws/alerts"]
+        REST["FastAPI REST Endpoints<br>/api/v1/..."]
+        SOC["React 18 / Vite SOC<br>Web Dashboard"]
     end
+
+    CM --> PRE
+    DET --> BT
+    DET --> TEMP_HAZ
+    TEMP_PPE --> NORM
+    TEMP_HAZ --> NORM
+    INC --> EV_MGR
+    INC --> DB
+    ALERT --> DB
+    ALERT --> EXT
+    ALERT --> WS
+    ALERT --> REST
+    WS --> SOC
+    REST --> SOC
 ```
 
 ---
@@ -366,7 +390,7 @@ flowchart LR
     
     DEDUP -- "New / Escalated" --> FANOUT["Alert Dispatch Engine"]
     
-    FANOUT --> DB[("SQLite WAL Audit Log<br>(alert_history)")]
+    FANOUT --> DB[("SQLite WAL Audit Log<br>Table: alert_history")]
     FANOUT --> EV["Evidence Manager<br>(SHA-256 Hashed Snapshot)"]
     FANOUT --> WS["WebSocket Broadcaster<br>(/ws/alerts to React SOC)"]
     
@@ -744,7 +768,7 @@ flowchart TD
         YOLO["YOLOv8n Multi-Task AI Engine (384x384)"]
         TRACK["ByteTrack & Anatomical Compliance Engine"]
         RISK["Risk Scoring & Incident Lifecycle Engine"]
-        DB[("SQLite WAL Database<br>(rakshya_vision.db)")]
+        DB[("SQLite WAL Database<br>rakshya_vision.db")]
         EVID["Evidence Archival<br>(outputs/evidence/ + SHA-256)"]
         FASTAPI["FastAPI App Server<br>(Port 8000)"]
         PROM["Prometheus Metrics<br>(/metrics Endpoint)"]
