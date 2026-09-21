@@ -7,7 +7,7 @@ configuration loading, dynamic start/stop, state querying, and graceful shutdown
 import os
 import yaml
 import logging
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 import numpy as np
 
 from app.camera.schemas import CameraConfigModel, CameraStatus, CameraState
@@ -115,6 +115,10 @@ class CameraManager:
         self.workers[camera_id].stop()
         return True
 
+    def get_worker(self, camera_id: str) -> Optional[CameraWorker]:
+        """Returns the worker instance for a camera if registered."""
+        return self.workers.get(camera_id)
+
     def get_camera_status(self, camera_id: str) -> Optional[CameraStatus]:
         """Gets current operational status and metrics for a camera."""
         if camera_id not in self.workers:
@@ -125,11 +129,33 @@ class CameraManager:
         """Returns operational statuses for all registered cameras."""
         return [worker.get_status() for worker in self.workers.values()]
 
-    def get_latest_frame(self, camera_id: str) -> Tuple[Optional[np.ndarray], Optional[float]]:
+    def get_latest_frame(self, camera_id: str, annotated: bool = True) -> Tuple[Optional[np.ndarray], Optional[float]]:
         """Retrieves the latest frame and timestamp from a camera worker."""
         if camera_id not in self.workers:
             return None, None
-        return self.workers[camera_id].get_latest_frame()
+        return self.workers[camera_id].get_latest_frame(annotated=annotated)
+
+    def get_live_compliance(self, camera_id: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Retrieves the latest active worker tracking and compliance data.
+        If camera_id is not specified, returns data from the first active camera worker.
+        """
+        if camera_id and camera_id in self.workers:
+            return self.workers[camera_id].get_live_compliance()
+
+        # Find first worker with active tracking data
+        for cid, worker in self.workers.items():
+            if worker.state == CameraState.CONNECTED:
+                data = worker.get_live_compliance()
+                if data.get("workers") or data.get("summary"):
+                    return data
+
+        # Fallback to first registered worker
+        if self.workers:
+            first_worker = next(iter(self.workers.values()))
+            return first_worker.get_live_compliance()
+
+        return {"camera_id": "none", "workers": [], "summary": None, "annotated_image_base64": None, "timestamp": None}
 
     def register_camera(self, config: CameraConfigModel, start_immediately: bool = False) -> bool:
         """Dynamically registers or updates a camera configuration."""

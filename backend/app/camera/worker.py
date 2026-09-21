@@ -9,7 +9,7 @@ import re
 import time
 import logging
 import threading
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, Dict, List
 import numpy as np
 import cv2
 
@@ -66,13 +66,92 @@ class CameraWorker:
         self.metrics = CameraMetrics()
         self._start_time: Optional[float] = None
 
-        # Frame buffer
+        # Frame buffers
         self._latest_frame: Optional[np.ndarray] = None
+        self._latest_annotated_frame: Optional[np.ndarray] = None
         self._latest_frame_time: Optional[float] = None
+        self._latest_workers: List[Any] = []
+        self._latest_compliance_summary: Optional[Any] = None
+        self._latest_annotated_b64: Optional[str] = None
+
+        # AI Pipeline configuration
+        self.infer_interval_frames = 2  # Run AI inference every 2 frames for smooth 15 FPS inference on 30 FPS stream
+        self._compliance_engine: Optional[Any] = None
+        self._alert_engine: Optional[Any] = None
+        self._event_normalizer: Optional[Any] = None
 
         # FPS calculation window
         self._fps_window_start = time.time()
         self._fps_window_frames = 0
+
+    def _init_ai_engines(self):
+        """Initializes thread-local AI inference, tracking, and compliance components."""
+        if self._compliance_engine is None:
+            try:
+                from app.ai.compliance.compliance_engine import WorkerComplianceEngine
+                from app.services.event_normalizer import EventNormalizer
+                from app.services.alert_engine import AlertEngine
+                self._compliance_engine = WorkerComplianceEngine()
+                self._alert_engine = AlertEngine()
+                self._event_normalizer = EventNormalizer()
+                logger.info("Initialized AI compliance engine for camera %s", self.camera_id)
+            except Exception as e:
+                logger.error("Failed to initialize AI compliance engine for %s: %s", self.camera_id, e, exc_info=True)
+
+    def _process_frame_ai(self, frame: np.ndarray, frame_time: float):
+        """Runs scheduled live YOLO detection, ByteTrack tracking, PPE association, and alert dispatch."""
+        if self._compliance_engine is None:
+            return
+
+        try:
+            t_start = time.perf_counter()
+            compliance_resp, annotated_frame, latencies = self._compliance_engine.process_frame(
+                frame,
+                confidence_threshold=0.25,
+                annotate=True,
+            )
+            ai_duration_ms = (time.perf_counter() - t_start) * 1000.0
+
+            with self._lock:
+                self._latest_annotated_frame = annotated_frame
+                self._latest_workers = compliance_resp.workers
+                self._latest_compliance_summary = compliance_resp.summary
+                self._latest_annotated_b64 = compliance_resp.annotated_image_base64
+                self.metrics.inference_latency_ms = round(ai_duration_ms, 2)
+                self.metrics.active_workers = len(compliance_resp.workers)
+                self.metrics.active_violations = compliance_resp.summary.non_compliant_workers
+
+            # If safety events were detected, normalize and dispatch
+            if self._event_normalizer and self._alert_engine:
+                events = self._event_normalizer.from_compliance_response(
+                    compliance_resp,
+                    camera_id=self.camera_id,
+                    zone_id=self.config.zone_id,
+                )
+                if events:
+                    from app.database.session import SessionLocal
+                    from app.services.evidence_manager import EvidenceManager
+                    with SessionLocal() as db:
+                        for ev in events:
+                            try:
+                                alert, incident, action = self._alert_engine.process_event(ev, db=db)
+                                if action in ("CREATED", "ESCALATED") and incident:
+                                    try:
+                                        EvidenceManager.get_instance().capture_incident_evidence(
+                                            incident_id=incident.incident_id,
+                                            camera_id=self.camera_id,
+                                            frame=annotated_frame,
+                                            annotations=ev.details,
+                                            db=db,
+                                            evidence_type="SNAPSHOT",
+                                        )
+                                    except Exception as ev_err:
+                                        logger.debug("Evidence capture error: %s", ev_err)
+                            except Exception as alert_err:
+                                logger.warning("Alert processing error: %s", alert_err)
+
+        except Exception as e:
+            logger.error("Error in AI frame processing for %s: %s", self.camera_id, e, exc_info=True)
 
     def start(self):
         """Starts the camera capture worker thread if enabled."""
@@ -89,6 +168,7 @@ class CameraWorker:
             self._stop_event.clear()
             self.state = CameraState.CONNECTING
             self._start_time = time.time()
+            self._init_ai_engines()
             self._thread = threading.Thread(
                 target=self._run_loop,
                 name=f"CameraWorker-{self.camera_id}",
@@ -105,6 +185,10 @@ class CameraWorker:
         with self._lock:
             self.state = CameraState.DISCONNECTED
             self._latest_frame = None
+            self._latest_annotated_frame = None
+            self._latest_workers = []
+            self._latest_compliance_summary = None
+            self._latest_annotated_b64 = None
             logger.info("Stopped CameraWorker for %s", self.camera_id)
 
     def get_status(self) -> CameraStatus:
@@ -125,12 +209,25 @@ class CameraWorker:
                 safe_source=self.safe_source,
             )
 
-    def get_latest_frame(self) -> Tuple[Optional[np.ndarray], Optional[float]]:
+    def get_latest_frame(self, annotated: bool = True) -> Tuple[Optional[np.ndarray], Optional[float]]:
         """Returns the most recent captured frame (copy) and timestamp."""
         with self._lock:
+            if annotated and self._latest_annotated_frame is not None:
+                return self._latest_annotated_frame.copy(), self._latest_frame_time
             if self._latest_frame is None:
                 return None, None
             return self._latest_frame.copy(), self._latest_frame_time
+
+    def get_live_compliance(self) -> Dict[str, Any]:
+        """Returns the latest active worker tracking and compliance data."""
+        with self._lock:
+            return {
+                "camera_id": self.camera_id,
+                "workers": [w.model_dump() if hasattr(w, "model_dump") else w for w in self._latest_workers],
+                "summary": self._latest_compliance_summary.model_dump() if hasattr(self._latest_compliance_summary, "model_dump") else self._latest_compliance_summary,
+                "annotated_image_base64": self._latest_annotated_b64,
+                "timestamp": self._latest_frame_time,
+            }
 
     def _open_capture(self) -> Optional[cv2.VideoCapture]:
         """Resolves source and attempts to initialize cv2.VideoCapture safely."""
@@ -215,6 +312,9 @@ class CameraWorker:
                             self._latest_frame_time = now
                             self.metrics.frame_count += 1
                             self.metrics.last_successful_frame_timestamp = now
+
+                        if self.metrics.frame_count % self.infer_interval_frames == 0:
+                            self._process_frame_ai(frame, now)
 
                         try:
                             from app.services.metrics import MetricsCollector
@@ -307,6 +407,10 @@ class CameraWorker:
                     self._latest_frame_time = now
                     self.metrics.frame_count += 1
                     self.metrics.last_successful_frame_timestamp = now
+
+                # Run AI pipeline on scheduled frames
+                if self.metrics.frame_count % self.infer_interval_frames == 0:
+                    self._process_frame_ai(frame, now)
 
                 try:
                     from app.services.metrics import MetricsCollector

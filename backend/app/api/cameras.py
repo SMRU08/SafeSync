@@ -91,13 +91,17 @@ def create_or_update_camera(
 
 
 @router.get("/{camera_id}/snapshot")
-def get_camera_snapshot(camera_id: str):
+def get_camera_snapshot(
+    camera_id: str,
+    annotated: bool = True,
+):
     """
-    Returns the latest raw frame captured by the camera worker as a JPEG image.
+    Returns the latest frame captured by the camera worker as a JPEG image.
+    By default (annotated=True), includes real-time YOLO bounding boxes, worker tracking IDs, and compliance HUD.
     If stream is offline or no frame captured yet, returns 503.
     """
     manager = CameraManager.get_instance()
-    frame, ts = manager.get_latest_frame(camera_id)
+    frame, ts = manager.get_latest_frame(camera_id, annotated=annotated)
     if frame is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

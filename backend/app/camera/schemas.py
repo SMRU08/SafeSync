@@ -52,6 +52,11 @@ class CameraMetrics(BaseModel):
     last_successful_frame_timestamp: Optional[float] = Field(default=None)
     last_error: Optional[str] = Field(default=None)
     uptime_seconds: float = Field(default=0.0)
+    inference_latency_ms: float = Field(default=0.0, description="Latest AI inference latency in milliseconds")
+    active_workers: int = Field(default=0, description="Current number of tracked workers in frame")
+    active_violations: int = Field(default=0, description="Current number of workers in violation state")
+    active_hazards: int = Field(default=0, description="Current number of confirmed environmental hazards")
+
 
 
 class CameraStatus(BaseModel):

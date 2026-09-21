@@ -56,6 +56,22 @@ def get_compliance_configuration():
     }
 
 
+@router.get("/live", response_model=dict)
+def get_live_compliance(camera_id: Optional[str] = Query(None, description="Optional camera ID filter")):
+    """
+    Returns real-time worker tracking and compliance data from the active camera worker.
+    Enables continuous live dashboard safety monitoring without requiring manual file uploads.
+    """
+    try:
+        from app.camera.manager import CameraManager
+        manager = CameraManager.get_instance()
+        return manager.get_live_compliance(camera_id)
+    except Exception as e:
+        logger.error("Error retrieving live compliance data: %s", e)
+        return {"camera_id": camera_id or "unknown", "workers": [], "summary": None, "annotated_image_base64": None, "timestamp": None}
+
+
+
 @router.post("/analyze", response_model=ComplianceAnalysisResponse)
 async def analyze_frame(
     file: UploadFile = File(..., description="Image or frame to analyze for worker PPE compliance"),

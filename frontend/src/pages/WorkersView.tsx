@@ -28,6 +28,38 @@ export const WorkersView: React.FC<WorkersViewProps> = ({ complianceConfig }) =>
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
 
+  // Auto-poll live stream workers and PPE compliance from active camera worker
+  React.useEffect(() => {
+    let isMounted = true;
+    const pollLiveWorkers = async () => {
+      if (isAnalyzing) return;
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/compliance/live`);
+        if (response.ok && isMounted) {
+          const data = await response.json();
+          if (data && Array.isArray(data.workers)) {
+            setWorkers(data.workers);
+            if (data.summary) {
+              setSummary(data.summary);
+            }
+            if (data.annotated_image_base64) {
+              setAnnotatedImage(`data:image/jpeg;base64,${data.annotated_image_base64}`);
+            }
+          }
+        }
+      } catch {
+        // Silently tolerate background polling dropouts
+      }
+    };
+
+    pollLiveWorkers();
+    const interval = setInterval(pollLiveWorkers, 1500);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isAnalyzing]);
+
   const handleFrameUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
