@@ -3,7 +3,7 @@
 ## Project Overview
 - **Project Name:** RAKSHYA VISION
 - **Tagline:** AI Vision-Based Safety Monitoring
-- **Current Phase:** Phase 7 — Risk Analysis + Smart Alert Engine (COMPLETED & VERIFIED)
+- **Current Phase:** Phase 8 — Safety Dashboard & Live Monitoring (COMPLETED & VERIFIED)
 
 ---
 
@@ -78,14 +78,29 @@
   - `POST /api/alerts/{alert_id}/dismiss`
   - `GET /api/incidents`
   - `GET /api/incidents/{incident_id}`
-- **Verification:**
-  - Automated Tests: 72/72 passed (including 19 risk & alert tests).
-  - Performance: 0.028 ms risk evaluation latency, 5.69 ms total event processing & DB latency (175.5 events/sec).
 
 ---
 
-## 8. Automated Test Suite
-- Full test suite passing: `pytest backend/tests -v` (72/72 tests passed).
+## 8. Phase 8 Safety Dashboard & Live Monitoring Status (COMPLETED)
+- **Production React 18 + TypeScript + Vite Dashboard:** Modern Security Operations Center (SOC) dark-theme interface with zero fabricated data.
+- **Real-Time WebSocket Channel:** Mounted at `/ws/alerts` and `/ws/events`, hooked directly to `EventBroadcaster.subscribe()` with bi-directional heartbeat ping/pong.
+- **Live SOC Views:**
+  - **Overview:** Real-time KPI counters, zone hazard threat status, live camera grid thumbnails, latest alerts stream.
+  - **Live Cameras:** Optical feed inspection, resolution/FPS telemetry, zone geofence previews, and interactive frame upload tester.
+  - **Workers & PPE:** Anonymous ByteTrack cards, checklist HUD with strictly segregated `UNKNOWN` (occluded) vs `ABSENT` (violation) states.
+  - **Fire & Smoke:** Continuous zone thermal/smoke signature indicators with spatial relationship detection.
+  - **Alerts & Incidents:** Centralized operations center with search, severity filtering, and immediate human-in-the-loop action triggers (`Acknowledge`, `Resolve`, `Dismiss`).
+  - **Analytics:** Real incident distributions calculated directly from database records (no fake mock graphs).
+  - **System Settings:** Read-only inspection of active neural network checkpoints, tracking heuristics, and policy cooldowns.
+- **Verification:**
+  - Frontend production build: `npm run build` succeeds in 3.59s with 0 errors.
+  - Backend test suite: `pytest backend/tests -v` passes 75/75 tests in 9.96s (including new WebSocket tests in `test_websocket.py`).
+
+---
+
+## 9. Automated Test Suite Summary
+- Full test suite passing: `pytest backend/tests -v` (75/75 tests passed in 9.96s).
+  - `test_websocket.py`: 3 tests passed.
   - `test_risk_alerts.py`: 19 tests passed.
   - `test_hazards.py`: 16 tests passed.
   - `test_compliance.py`: 14 tests passed.
@@ -94,5 +109,5 @@
 
 ---
 
-## 9. Next Steps — Phase 8
-- Awaiting explicit user approval before beginning Phase 8 (Live Safety Dashboard & WebSocket Integration).
+## 10. Next Steps — Phase 9
+- Awaiting explicit user approval before proceeding to Phase 9.
