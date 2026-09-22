@@ -12,33 +12,6 @@
 
 ---
 
-## BPUT Hackathon 2026 — Presentation Slide Deck (PPT)
-
-> **Official Presentation File:** [`BPUT-HACKATHON-2026/RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx`](BPUT-HACKATHON-2026/RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx)  
-> **Executive Presentation Synthesis (Final 10-Slide Structure):** [BPUT-HACKATHON-2026/README2.md](BPUT-HACKATHON-2026/README2.md)  
-> **Slide-by-Slide Technical Reference & Architecture Guide:** [BPUT-HACKATHON-2026/README.md](BPUT-HACKATHON-2026/README.md)  
-> **Format:** 10 Core Presentation Sections (16:9 Widescreen, Dark Industrial Safety Theme)  
-> **Problem Statement:** PS06 — Build a prototype AI system that detects safety gear compliance  
-> **Organizers:** Software Technology Parks of India (STPI) & EmTek | **Team:** XERSES  
-
-### Final 10-Slide Structure Overview:
-```
-Final 10-Slide Structure:
-├── Slide 01: RAKSHYA VISION (Title, Problem Statement PS06, Edge Architecture Overview)
-├── Slide 02: The Idea (Paradigm Shift from Post-Incident Forensics to Active Prevention)
-├── Slide 03: Technical Approach (Deterministic 6-Stage Pipeline, Anatomical Spatial Mapping)
-├── Slide 04: Feasibility (45.5ms CPU Latency, Zero GPU Required, Operational Modularity)
-├── Slide 05: Industry Impact & Benefits (75% Trauma Reduction, Insurance ROI, OSHA/ISO Compliance)
-├── Slide 06: System Workflow (End-to-End Sequence: Optical Ingestion to SHA-256 Evidence Vault)
-├── Slide 07: AI Safety Detection (Canonical 7-Class Model, Cascaded Person Recall, Anatomical Zones)
-├── Slide 08: Live Safety Dashboard (React 18 Real-Time SOC, WebSockets, Worker Compliance Cards)
-├── Slide 09: Deployment & Future Scope (Multi-Source Ingestion, 160/160 Tests, Industrial Roadmap)
-└── Slide 10: Research & References (Peer-Reviewed Papers, OSHA/ISO Standards, Open Repositories)
-```
-
-For full executive technical synthesis and clickable academic/regulatory source links, see [**BPUT Hackathon Executive Readme (README2.md)**](BPUT-HACKATHON-2026/README2.md). For granular UI component breakdowns, refer to the [**Slide Deck Guide (README.md)**](BPUT-HACKATHON-2026/README.md).
-
----
 
 ## 1. Problem Statement
 
