@@ -23,6 +23,9 @@ class CameraSourceType(str, Enum):
     USB = "usb"
     FILE = "file"
     SYNTHETIC = "synthetic"
+    HTTP = "http"
+    NETWORK = "network"
+    ANDROID = "android"
 
 
 class ReconnectPolicy(BaseModel):

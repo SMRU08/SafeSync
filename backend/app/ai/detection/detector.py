@@ -30,9 +30,24 @@ class Detector:
     def __init__(self, model_loader: Optional[ModelLoader] = None):
         self.loader = model_loader or ModelLoader.get_instance()
         self.config = self.loader.config.get("inference", {})
-        self.default_conf = float(self.config.get("confidence_threshold", 0.25))
+        self.default_conf = float(self.config.get("confidence_threshold", 0.20))
         self.default_iou = float(self.config.get("iou_threshold", 0.45))
         self.default_imgsz = int(self.config.get("image_size", 384))
+        self._person_model = None
+
+    def _get_person_model(self):
+        """Loads lightweight base detector for person recall when specialized model misses portrait/webcam silhouettes."""
+        if self._person_model is None:
+            try:
+                from ultralytics import YOLO
+                root_backend = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+                w_path = os.path.join(root_backend, "yolov8n.pt")
+                if not os.path.isfile(w_path):
+                    w_path = "yolov8n.pt"
+                self._person_model = YOLO(w_path)
+            except Exception as e:
+                log.debug("Base person detector unavailable: %s", e)
+        return self._person_model
 
     def detect_image(
         self,
@@ -118,6 +133,43 @@ class Detector:
                     )
                     detections.append(det)
                     class_counts[cls_name] = class_counts.get(cls_name, 0) + 1
+
+        # 4b. Ensure person recall for close-up webcam and low-light scenes:
+        # If the fine-tuned model didn't detect any person, run fallback person detector
+        has_person = any(d.class_name.lower() == "person" for d in detections)
+        if not has_person and (filter_set is None or "person" in filter_set):
+            p_model = self._get_person_model()
+            if p_model is not None:
+                try:
+                    p_results = p_model.predict(
+                        source=frame,
+                        conf=max(0.18, conf_thresh),
+                        iou=iou_thresh,
+                        imgsz=inference_size,
+                        device=device,
+                        verbose=False,
+                    )
+                    if p_results and len(p_results) > 0 and p_results[0].boxes is not None:
+                        for box in p_results[0].boxes:
+                            if int(box.cls[0].item()) == 0:  # Class 0 in COCO is 'person'
+                                score = float(box.conf[0].item())
+                                coords = box.xyxy[0].tolist()
+                                bbox = BoundingBox(
+                                    x1=round(float(coords[0]), 2),
+                                    y1=round(float(coords[1]), 2),
+                                    x2=round(float(coords[2]), 2),
+                                    y2=round(float(coords[3]), 2),
+                                )
+                                det = DetectionObject(
+                                    class_id=0,
+                                    class_name="person",
+                                    confidence=round(score, 4),
+                                    bbox=bbox,
+                                )
+                                detections.append(det)
+                                class_counts["person"] = class_counts.get("person", 0) + 1
+                except Exception as p_err:
+                    log.debug("Fallback person detection error: %s", p_err)
 
         # 5. Build response
         response = ImageDetectionResponse(

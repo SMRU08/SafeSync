@@ -5,7 +5,7 @@ Pydantic v2 schemas for Worker Tracking, Spatial PPE Association, and Compliance
 
 from enum import Enum
 from typing import Dict, List, Optional, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class PPEItemType(str, Enum):
@@ -71,6 +71,28 @@ class WorkerTrack(BaseModel):
     overall_status: OverallComplianceState = OverallComplianceState.UNKNOWN
     history_length: int = 1
     is_partially_occluded: bool = False
+
+    @computed_field
+    @property
+    def ppe_status(self) -> Dict[str, str]:
+        """Frontend-compatible dictionary mapping of gear states."""
+        res = {}
+        for item in ["helmet", "safety_vest", "gloves", "safety_footwear"]:
+            val = self.ppe.get(item, PPEState.UNKNOWN)
+            res[item] = val.value if hasattr(val, "value") else str(val)
+        return res
+
+    @computed_field
+    @property
+    def overall_compliant(self) -> bool:
+        """Frontend-compatible boolean compliance flag."""
+        return self.overall_status == OverallComplianceState.COMPLIANT
+
+    @computed_field
+    @property
+    def active_frames(self) -> int:
+        """Frontend-compatible frame persistence count."""
+        return self.history_length
 
 
 class ComplianceSummary(BaseModel):

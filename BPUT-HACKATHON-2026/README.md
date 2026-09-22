@@ -5,7 +5,8 @@
 > **Organizers:** Software Technology Parks of India (STPI) & EmTek  
 > **Team:** XERSES  
 > **Presentation File:** [`RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx`](./RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx)  
-> **Slide Count:** 13 Slides (16:9 Widescreen, Dark Industrial Safety Theme)  
+> **Final 10-Slide Executive Structure:** [**BPUT-HACKATHON-2026/README2.md**](./README2.md)  
+> **Full Architecture & Layout Breakdown:** 13 Comprehensive Slide Specifications below  
 
 ---
 
@@ -832,3 +833,41 @@ For quick reference during jury discussions, here are the verified system number
 | **Database Concurrency Mode** | SQLite Write-Ahead Logging (WAL) Mode | `backend/app/database/session.py` |
 | **Evidence Checksum Algorithm** | Cryptographic SHA-256 | `backend/app/services/evidence_manager.py` |
 | **Webcam Ingestion** | Integrated Laptop Webcam Index 0 Verified | `CameraWorker` (`backend/app/camera/worker.py`) |
+| **Cascaded Person Recall** | Hybrid YOLOv8n Cascade Active | `backend/app/ai/detection/detector.py` |
+| **Multi-Camera Deployment** | Dual Ingestion: Laptop Webcam (Cam 1) + Mobile Camera (Cam 2) | `configs/cameras.yaml` |
+
+---
+
+## Live Jury Demonstration Quick-Start Guide
+
+Follow this streamlined script during your live technical evaluation before the BPUT Hackathon panel:
+
+### 1. Boot the Full Stack in VS Code (Two Terminals)
+```powershell
+# Terminal 1 — Backend API & AI Surveillance Pipeline
+cd backend
+.\.venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2 — Real-Time Safety Operations Center (SOC) Dashboard
+cd frontend
+npm run dev
+```
+
+### 2. Evaluator Presentation Flow
+1. **Executive SOC Overview:** Navigate to `http://localhost:5173` to demonstrate the live operations room with active cameras, real-time worker count, compliance percentage, and hazard indicators.
+2. **Multi-Camera Surveillance Hub:**
+   - Go to the **Cameras** tab: Show **Camera 01 (Laptop Webcam)** streaming live with DirectShow acceleration.
+   - Show **Camera 02 (Mobile Phone Camera)** streaming over Wi-Fi (`http://<phone_ip>:8080/video`) via IP Webcam or USB DirectShow.
+3. **Live Worker Tracking & Safety Violations:**
+   - Sit or stand before the camera without a helmet or safety vest.
+   - Switch to the **Workers** tab: Show **Worker #1** bounded and tracked across frames, displaying real-time checklist states:
+     - `Hard Hat: CONFIRMED ABSENT` (Red badge)
+     - `Safety Vest: CONFIRMED ABSENT` (Red badge)
+     - `Overall Status: VIOLATION`
+4. **Real-Time Incident & Alert Feed:**
+   - Go to the **Alerts** tab: Point out the live alerts generated (`MISSING_HELMET`, `MISSING_SAFETY_VEST`) with severity ratings, affected track IDs, and camera zone mapping.
+5. **Architectural Defense (`UNKNOWN != VIOLATION`):**
+   - Emphasize to the jury that partially occluded or ambiguous limbs remain in the `UNKNOWN` state to prevent costly false alarms.
+6. **Tamper-Evident Evidence Vault:**
+   - Go to **Evidence**: Show incident visual frames hashed with SHA-256 upon generation, ensuring evidentiary integrity for regulatory reporting.

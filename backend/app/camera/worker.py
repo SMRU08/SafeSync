@@ -107,7 +107,7 @@ class CameraWorker:
             t_start = time.perf_counter()
             compliance_resp, annotated_frame, latencies = self._compliance_engine.process_frame(
                 frame,
-                confidence_threshold=0.25,
+                confidence_threshold=0.20,
                 annotate=True,
             )
             ai_duration_ms = (time.perf_counter() - t_start) * 1000.0
@@ -221,9 +221,33 @@ class CameraWorker:
     def get_live_compliance(self) -> Dict[str, Any]:
         """Returns the latest active worker tracking and compliance data."""
         with self._lock:
+            workers_out = []
+            for w in self._latest_workers:
+                try:
+                    if hasattr(w, "model_dump"):
+                        wd = w.model_dump()
+                    elif isinstance(w, dict):
+                        wd = dict(w)
+                    else:
+                        wd = vars(w).copy()
+                    
+                    # Ensure bbox is a 4-element array [x1, y1, x2, y2]
+                    if "bbox" in wd:
+                        b = wd["bbox"]
+                        if isinstance(b, dict):
+                            wd["bbox"] = [
+                                float(b.get("x1", 0)),
+                                float(b.get("y1", 0)),
+                                float(b.get("x2", 0)),
+                                float(b.get("y2", 0)),
+                            ]
+                    workers_out.append(wd)
+                except Exception as e:
+                    logger.debug("Error serializing worker in get_live_compliance: %s", e)
+
             return {
                 "camera_id": self.camera_id,
-                "workers": [w.model_dump() if hasattr(w, "model_dump") else w for w in self._latest_workers],
+                "workers": workers_out,
                 "summary": self._latest_compliance_summary.model_dump() if hasattr(self._latest_compliance_summary, "model_dump") else self._latest_compliance_summary,
                 "annotated_image_base64": self._latest_annotated_b64,
                 "timestamp": self._latest_frame_time,
@@ -238,9 +262,13 @@ class CameraWorker:
             return None
 
         target_source: Any = source_str
-        if self.config.source_type == CameraSourceType.USB:
+        is_device_index = False
+        st = str(self.config.source_type).lower()
+
+        if st in ("usb", "camera", "webcam") or self.config.source_type == CameraSourceType.USB:
             try:
                 target_source = int(source_str)
+                is_device_index = True
             except ValueError:
                 target_source = source_str
 
@@ -249,9 +277,31 @@ class CameraWorker:
             if "nonexistent" in str(source_str).lower():
                 return None
 
-            cap = cv2.VideoCapture(target_source)
+            cap = None
+            # On Windows, try DirectShow (cv2.CAP_DSHOW) for device indices for fast initialization
+            if is_device_index and os.name == "nt":
+                try:
+                    cap = cv2.VideoCapture(target_source, cv2.CAP_DSHOW)
+                    if not cap.isOpened():
+                        cap = None
+                except Exception:
+                    cap = None
+
+            if cap is None:
+                cap = cv2.VideoCapture(target_source)
+
             if not cap.isOpened():
                 return None
+
+            # Optional: set camera resolution if specified and using physical device
+            if is_device_index and self.config.resolution and "x" in self.config.resolution:
+                try:
+                    rw, rh = [int(v) for v in self.config.resolution.split("x")]
+                    cap.set(cv2.CAP_PROP_FRAME_WIDTH, rw)
+                    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, rh)
+                except Exception:
+                    pass
+
             return cap
         except Exception as e:
             logger.error("Error opening capture for %s: %s", self.camera_id, e)
@@ -401,8 +451,41 @@ class CameraWorker:
                     continue
 
                 now = time.time()
+
+                # Hardware privacy shutter / disabled camera sensor check:
+                # When laptop webcam shutter is closed or toggled off via hotkey (e.g. F10 / Fn+F10 on Asus),
+                # OpenCV receives solid color/near-zero variance frames with the crossed-out camera logo.
+                is_shutter_blocked = False
+                is_severe_dark = False
+                if frame is not None and frame.size > 0:
+                    try:
+                        sample = frame[::8, ::8]
+                        sample_std = float(np.std(sample))
+                        sample_mean = float(np.mean(sample))
+                        if sample_std < 2.5:
+                            is_shutter_blocked = True
+                        elif sample_mean < 25.0:
+                            is_severe_dark = True
+                    except Exception:
+                        pass
+
                 with self._lock:
-                    self.state = CameraState.CONNECTED
+                    if is_shutter_blocked:
+                        self.state = CameraState.DEGRADED
+                        self.metrics.last_error = (
+                            "Camera privacy shutter closed or disabled via laptop hotkey (e.g. F10 / Fn+F10 on Asus). Physical sensor is blocked."
+                        )
+                    elif is_severe_dark:
+                        self.state = CameraState.DEGRADED
+                        self.metrics.last_error = (
+                            "Severe low-light detected (room is too dark). Turn on room lighting and step back so your upper body/torso is visible."
+                        )
+                    elif self.state == CameraState.DEGRADED and self.metrics.last_error and ("shutter" in str(self.metrics.last_error) or "low-light" in str(self.metrics.last_error)):
+                        self.state = CameraState.CONNECTED
+                        self.metrics.last_error = None
+                    else:
+                        self.state = CameraState.CONNECTED
+
                     self._latest_frame = frame
                     self._latest_frame_time = now
                     self.metrics.frame_count += 1

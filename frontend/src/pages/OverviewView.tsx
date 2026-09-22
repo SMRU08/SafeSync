@@ -3,7 +3,7 @@
  * Main SOC Executive Dashboard with real-time KPI metrics, zone hazard summary, and live alerts.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Video,
   Users,
@@ -20,6 +20,7 @@ import { RiskSummary, Alert, HazardEventDetail, CameraConfig, NavigationTab } fr
 import { MetricCard } from '../components/MetricCard';
 import { HazardStatusPanel } from '../components/HazardStatusPanel';
 import { AlertsTable } from '../components/AlertsTable';
+import { API_BASE_URL } from '../utils/constants';
 
 interface OverviewViewProps {
   summary: RiskSummary | null;
@@ -51,6 +52,38 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
   const criticalCount = summary?.critical ?? activeAlerts.filter((a) => a.severity === 'CRITICAL').length;
   const highCount = summary?.high ?? activeAlerts.filter((a) => a.severity === 'HIGH').length;
+
+  const [liveWorkersCount, setLiveWorkersCount] = useState<number | null>(null);
+  const [liveComplianceRate, setLiveComplianceRate] = useState<number | null>(null);
+  const [snapshotTimestamp, setSnapshotTimestamp] = useState<number>(Date.now());
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLive = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/compliance/live`);
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          if (data && data.summary) {
+            setLiveWorkersCount(data.summary.total_workers);
+            setLiveComplianceRate(data.summary.compliance_percentage);
+          } else if (data && Array.isArray(data.workers)) {
+            setLiveWorkersCount(data.workers.length);
+          }
+          setSnapshotTimestamp(Date.now());
+        }
+      } catch {
+        // Silently ignore dropouts
+      }
+    };
+
+    fetchLive();
+    const interval = setInterval(fetchLive, 2500);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <div className="overview-container">
@@ -90,18 +123,18 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         />
         <MetricCard
           title="Tracked Workers"
-          value="0"
-          subtitle="Standby / No active stream"
+          value={liveWorkersCount !== null ? liveWorkersCount : '0'}
+          subtitle={liveWorkersCount !== null && liveWorkersCount > 0 ? `${liveWorkersCount} active in view` : 'Standby / No active stream'}
           icon={<Users size={20} />}
-          variant="default"
+          variant={liveWorkersCount && liveWorkersCount > 0 ? 'info' : 'default'}
           onClick={() => onNavigate('workers')}
         />
         <MetricCard
           title="PPE Compliance Rate"
-          value="NO DATA"
-          subtitle="Awaiting active video feed"
+          value={liveComplianceRate !== null ? `${Math.round(liveComplianceRate)}%` : 'NO DATA'}
+          subtitle={liveComplianceRate !== null ? 'Live stream evaluation' : 'Awaiting active video feed'}
           icon={<ShieldCheck size={20} />}
-          variant="default"
+          variant={liveComplianceRate !== null ? (liveComplianceRate >= 80 ? 'success' : 'warning') : 'default'}
           onClick={() => onNavigate('workers')}
         />
         <MetricCard
@@ -168,29 +201,45 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             {(cameras.length > 0
               ? cameras
               : [
-                  { camera_id: 'CAM-01', name: 'Fabrication Bay', zone_id: 'FAB_BAY_01', status: 'ACTIVE', resolution: '1280x720', fps: 30 },
-                  { camera_id: 'CAM-02', name: 'Paint & Coating Area', zone_id: 'PAINT_COAT_02', status: 'ACTIVE', resolution: '1280x720', fps: 30 },
-                  { camera_id: 'CAM-03', name: 'Chemical Storage', zone_id: 'CHEM_STORE_03', status: 'ACTIVE', resolution: '1280x720', fps: 30 },
-                  { camera_id: 'CAM-04', name: 'Assembly Line B', zone_id: 'ASSEMBLY_B_04', status: 'ACTIVE', resolution: '1280x720', fps: 30 },
+                  { camera_id: 'camera_01', name: 'Production Floor South', zone_id: 'production_floor', status: 'ACTIVE', resolution: '1280x720', fps: 30 },
+                  { camera_id: 'camera_02', name: 'Raw Material Storage', zone_id: 'storage_area', status: 'STANDBY', resolution: '1280x720', fps: 25 },
+                  { camera_id: 'camera_03', name: 'Electrical Room', zone_id: 'electrical_room', status: 'STANDBY', resolution: '640x480', fps: 20 },
+                  { camera_id: 'camera_04', name: 'Loading Dock Outer', zone_id: 'loading_dock', status: 'STANDBY', resolution: '1920x1080', fps: 25 },
                 ]
-            ).map((cam) => (
-              <div key={cam.camera_id} className="camera-thumb-card" onClick={() => onNavigate('cameras')}>
-                <div className="camera-thumb-screen">
-                  <div className="camera-thumb-overlay">
-                    <span className="camera-badge-id">{cam.camera_id}</span>
-                    <span className="badge badge-success text-xs">ONLINE</span>
+            ).map((cam) => {
+              const isLive = (cam as any).state === 'CONNECTED' || cam.status === 'ACTIVE';
+              return (
+                <div key={cam.camera_id} className="camera-thumb-card" onClick={() => onNavigate('cameras')}>
+                  <div className="camera-thumb-screen relative overflow-hidden bg-black flex items-center justify-center min-h-[120px]">
+                    <div className="camera-thumb-overlay z-10">
+                      <span className="camera-badge-id">{cam.camera_id}</span>
+                      <span className={`badge ${isLive ? 'badge-success' : 'badge-neutral'} text-xs`}>
+                        {isLive ? 'ONLINE' : 'STANDBY'}
+                      </span>
+                    </div>
+                    {isLive ? (
+                      <img
+                        src={`${API_BASE_URL}/api/cameras/${cam.camera_id}/snapshot?t=${snapshotTimestamp}`}
+                        alt={cam.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="camera-standby-placeholder">
+                        <Video size={24} className="text-muted" />
+                        <span>{cam.resolution || '720p'}</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="camera-standby-placeholder">
-                    <Video size={24} className="text-muted" />
-                    <span>720p @ 30 FPS</span>
+                  <div className="camera-thumb-meta">
+                    <div className="camera-thumb-name">{cam.name}</div>
+                    <div className="camera-thumb-zone">{cam.zone_id}</div>
                   </div>
                 </div>
-                <div className="camera-thumb-meta">
-                  <div className="camera-thumb-name">{cam.name}</div>
-                  <div className="camera-thumb-zone">{cam.zone_id}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       </div>

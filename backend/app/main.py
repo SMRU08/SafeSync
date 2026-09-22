@@ -24,6 +24,15 @@ async def lifespan(app: FastAPI):
         logger.info("Database connectivity established successfully at %s", settings.DATABASE_URL)
     else:
         logger.warning("Database connectivity check failed.")
+    
+    # Auto-start configured camera stream workers
+    try:
+        from app.camera.manager import CameraManager
+        CameraManager.get_instance().start_all()
+        logger.info("Auto-started enabled camera stream workers.")
+    except Exception as e:
+        logger.warning("Camera stream worker auto-start deferred: %s", e)
+
     yield
     logger.info("Shutting down %s...", settings.APP_NAME)
     try:

@@ -51,7 +51,14 @@ export const WorkerComplianceCard: React.FC<WorkerComplianceCardProps> = ({ work
   };
 
   const isCompliant = worker.overall_compliant;
-  const hasUnknown = Object.values(worker.ppe_status).some((s) => s === 'UNKNOWN');
+  const ppe = worker.ppe_status || { helmet: 'UNKNOWN', safety_vest: 'UNKNOWN', gloves: 'UNKNOWN', safety_footwear: 'UNKNOWN' };
+  const hasUnknown = Object.values(ppe).some((s) => s === 'UNKNOWN');
+
+  const bboxDisplay = Array.isArray(worker.bbox)
+    ? worker.bbox.map((v) => Math.round(Number(v) || 0)).join(', ')
+    : typeof worker.bbox === 'object' && worker.bbox !== null
+    ? `${Math.round((worker.bbox as any).x1 || 0)}, ${Math.round((worker.bbox as any).y1 || 0)}, ${Math.round((worker.bbox as any).x2 || 0)}, ${Math.round((worker.bbox as any).y2 || 0)}`
+    : 'N/A';
 
   return (
     <div className={`worker-card ${isCompliant ? 'card-compliant' : 'card-non-compliant'}`}>
@@ -100,16 +107,16 @@ export const WorkerComplianceCard: React.FC<WorkerComplianceCardProps> = ({ work
 
       {/* PPE Checklist Grid */}
       <div className="ppe-grid">
-        {renderPpeBadge('Hard Hat', <HardHat size={16} />, worker.ppe_status.helmet)}
-        {renderPpeBadge('Safety Vest', <Shirt size={16} />, worker.ppe_status.safety_vest)}
-        {renderPpeBadge('Safety Gloves', <Hand size={16} />, worker.ppe_status.gloves)}
-        {renderPpeBadge('Safety Footwear', <Footprints size={16} />, worker.ppe_status.safety_footwear)}
+        {renderPpeBadge('Hard Hat', <HardHat size={16} />, ppe.helmet || 'UNKNOWN')}
+        {renderPpeBadge('Safety Vest', <Shirt size={16} />, ppe.safety_vest || 'UNKNOWN')}
+        {renderPpeBadge('Safety Gloves', <Hand size={16} />, ppe.gloves || 'UNKNOWN')}
+        {renderPpeBadge('Safety Footwear', <Footprints size={16} />, ppe.safety_footwear || 'UNKNOWN')}
       </div>
 
       {/* Bounding Box Info */}
       <div className="worker-card-footer">
         <span className="text-muted font-mono text-xs">
-          BBOX: [{worker.bbox.map((v) => Math.round(v)).join(', ')}]
+          BBOX: [{bboxDisplay}]
         </span>
       </div>
     </div>

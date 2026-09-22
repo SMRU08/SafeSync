@@ -3,9 +3,9 @@
 
 tracking:
   tracker: "bytetrack"
-  track_high_thresh: 0.25      # Detection confidence threshold for first-stage ByteTrack matching
+  track_high_thresh: 0.20      # Detection confidence threshold for first-stage ByteTrack matching
   track_low_thresh: 0.10       # Detection confidence threshold for second-stage matching (low-conf recovery)
-  new_track_thresh: 0.25       # Confidence required to initialize a new track ID
+  new_track_thresh: 0.20       # Confidence required to initialize a new track ID
   track_buffer: 30             # Number of frames to keep a lost track in memory
   match_thresh: 0.80           # IoU threshold for track matching
   min_box_area: 100            # Minimum pixel area for a valid person bounding box

@@ -107,7 +107,7 @@ class WorkerComplianceEngine:
     def process_frame(
         self,
         frame: np.ndarray,
-        confidence_threshold: float = 0.25,
+        confidence_threshold: float = 0.20,
         annotate: bool = True,
     ) -> Tuple[ComplianceAnalysisResponse, np.ndarray, Dict[str, float]]:
         """

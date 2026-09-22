@@ -200,18 +200,27 @@ class Settings(BaseSettings):
         super().__init__(**merged)
 
         # 4. Synchronize CORS_ALLOWED_ORIGINS env string into CORS_ORIGINS list
-        if self.CORS_ALLOWED_ORIGINS:
+        if self.CORS_ALLOWED_ORIGINS and self.APP_ENV == "production":
             origins = [o.strip() for o in self.CORS_ALLOWED_ORIGINS.split(",") if o.strip()]
             self.CORS_ORIGINS = origins
         elif self.APP_ENV == "production" and "CORS_ORIGINS" not in values:
             yaml_cors = yaml_defaults.get("CORS_ORIGINS", [])
             self.CORS_ORIGINS = yaml_cors if yaml_cors else []
         elif self.APP_ENV in ("development", "test") and "CORS_ORIGINS" not in values:
-            self.CORS_ORIGINS = DEVELOPMENT_CORS_DEFAULTS.copy()
+            if self.CORS_ALLOWED_ORIGINS and "CORS_ALLOWED_ORIGINS" in values:
+                origins = [o.strip() for o in self.CORS_ALLOWED_ORIGINS.split(",") if o.strip()]
+                for d in DEVELOPMENT_CORS_DEFAULTS:
+                    if d not in origins:
+                        origins.append(d)
+                self.CORS_ORIGINS = origins
+            else:
+                self.CORS_ORIGINS = DEVELOPMENT_CORS_DEFAULTS.copy()
 
         # 5. Synchronize DEBUG flag with environment
         if self.APP_ENV == "production" and "DEBUG" not in values:
             self.DEBUG = False
+        elif self.APP_ENV in ("development", "test") and "DEBUG" not in values:
+            self.DEBUG = True
 
     @property
     def raw_config(self) -> Dict[str, Any]:

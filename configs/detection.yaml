@@ -8,7 +8,7 @@ model:
   expected_classes: 7
 
 inference:
-  confidence_threshold: 0.25
+  confidence_threshold: 0.20
   iou_threshold: 0.45
   image_size: 384
   device: "auto"        # "auto" | "cpu" | "cuda" | "0"

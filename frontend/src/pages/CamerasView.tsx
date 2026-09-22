@@ -18,6 +18,8 @@ import {
   Square,
   RefreshCw,
   Radio,
+  AlertTriangle,
+  Smartphone,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { API_BASE_URL } from '../utils/constants';
@@ -73,7 +75,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({ cameras, hazardConfig,
     };
 
     fetchSnapshot();
-    interval = setInterval(fetchSnapshot, 2000);
+    interval = setInterval(fetchSnapshot, 500);
     return () => {
       if (interval) clearInterval(interval);
     };
@@ -370,6 +372,16 @@ export const CamerasView: React.FC<CamerasViewProps> = ({ cameras, hazardConfig,
               )}
             </div>
 
+            {/* Camera Diagnostics Warning Banner */}
+            {currentCamera.metrics?.last_error && (
+              <div className="bg-amber-950/70 border border-amber-500/50 text-amber-200 text-xs p-3 rounded mt-2 flex items-start gap-2">
+                <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong>Hardware / Stream Advisory:</strong> {currentCamera.metrics.last_error}
+                </div>
+              </div>
+            )}
+
             {/* Analysis Summary */}
             {analysisSummary && (
               <div className="analysis-summary-banner">
@@ -482,6 +494,24 @@ export const CamerasView: React.FC<CamerasViewProps> = ({ cameras, hazardConfig,
                       ? `[${hazardConfig.zones[currentCamera.zone_id].polygon.length} vertices]`
                       : 'Full Frame [0, 0, 1280, 720]'}
                   </span>
+                </div>
+              </div>
+
+              {/* Android & External Camera Integration Guide */}
+              <div className="mt-4 p-3 bg-[#171b26] rounded border border-border">
+                <div className="flex items-center gap-2 mb-2 text-xs font-bold text-accent">
+                  <Smartphone size={15} /> Android &amp; External Camera Setup Guide
+                </div>
+                <div className="text-xs text-muted space-y-1">
+                  <p>
+                    <strong className="text-foreground">Option 1 — Wi-Fi Network Stream (Recommended):</strong> Install <em>IP Webcam</em> or <em>DroidCam</em> on Android, start the server, and configure in <code>configs/cameras.yaml</code>:
+                  </p>
+                  <code className="block bg-black/40 p-1.5 rounded font-mono text-[11px] text-info">
+                    source: "http://&lt;phone_ip&gt;:8080/video" | source_type: "http"
+                  </code>
+                  <p className="mt-2">
+                    <strong className="text-foreground">Option 2 — USB Connection:</strong> Connect phone via USB and select <em>"Webcam" mode</em> (Android 14+) or use <em>DroidCam PC client</em> to expose DirectShow device index (e.g., <code>source: "1", source_type: "usb"</code>).
+                  </p>
                 </div>
               </div>
             </div>
