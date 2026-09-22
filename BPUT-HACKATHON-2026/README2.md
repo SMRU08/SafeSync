@@ -17,21 +17,6 @@ RAKSHYA VISION is an autonomous, edge-native computer vision and safety intellig
 Developed for **BPUT Hackathon 2026 Problem Statement PS06**, the platform automates the continuous surveillance of industrial worksites by verifying Personal Protective Equipment (PPE) compliance, detecting early-stage environmental hazards (fire and smoke), calculating explainable risk scores, and generating legally defensible, cryptographically verified audit records in real time.
 
 ```mermaid
-flowchart LR
-    A["Industrial Video Feeds<br/>(CCTV / RTSP / Webcams / Mobile)"] --> B["RAKSHYA VISION<br/>Edge Intelligence Engine"]
-    B --> C["Continuous PPE Compliance<br/>(Helmets, Vests, Gloves, Footwear)"]
-    B --> D["Nascent Hazard Detection<br/>(Early Fire & Smoke Plumes)"]
-    B --> E["Explainable Risk Scoring<br/>(0–100 Mathematical Score)"]
-    B --> F["Auditable Evidence Vault<br/>(Cryptographic SHA-256 Hashes)"]
-```
-
-### Strategic Objectives
-* **Autonomous Continuous Vigilance:** Replaces error-prone manual observation with non-stop 24/7 algorithmic verification across all facility camera feeds.
-* **Privacy-First Tracking:** Employs anonymous Kalman trajectory filtering to track worker safety without facial recognition, biometric storage, or personal identity harvesting.
-* **Low-Latency Edge Computing:** Delivers 45.5 ms end-to-end CPU inference, eliminating cloud GPU expenses and external bandwidth dependencies.
-* **Cryptographic Accountability:** Authenticates incident records with immutable SHA-256 checksums at the point of capture, satisfying regulatory compliance and insurance verifications.
-
-```mermaid
 flowchart TD
     subgraph INGESTION["Multi-Source Edge Ingestion"]
         I1["Fixed CCTV RTSP Stream"]
@@ -70,6 +55,12 @@ flowchart TD
     O1 --> O3
 ```
 
+### Strategic Objectives
+* **Autonomous Continuous Vigilance:** Replaces error-prone manual observation with non-stop 24/7 algorithmic verification across all facility camera feeds.
+* **Privacy-First Tracking:** Employs anonymous Kalman trajectory filtering to track worker safety without facial recognition, biometric storage, or personal identity harvesting.
+* **Low-Latency Edge Computing:** Delivers 45.5 ms end-to-end CPU inference, eliminating cloud GPU expenses and external bandwidth dependencies.
+* **Cryptographic Accountability:** Authenticates incident records with immutable SHA-256 checksums at the point of capture, satisfying regulatory compliance and insurance verifications.
+
 ---
 
 ## 2. The Idea
@@ -102,44 +93,11 @@ flowchart TD
 * **Ambient Safety Governance:** The system evaluates not just whether a violation exists, but its situational context—factoring in nearby thermal hazards, active worker counts, and zone-specific risk profiles.
 * **Democratic Edge Accessibility:** Rather than requiring tens of thousands of dollars in specialized GPU appliances or cloud subscriptions, the system is designed to run efficiently on commodity multi-core processors, making high-end AI safety accessible to small and medium enterprises.
 
-```mermaid
-flowchart TD
-    subgraph TIMELINE_TRADITIONAL["Traditional Passive Monitoring: Post-Accident Reaction"]
-        direction TB
-        TT1["t = 00:00:00 — Worker enters hazardous zone without hard hat or vest"]
-        TT2["t = 00:14:30 — Overhead gantry crane load shifts unexpectedly"]
-        TT3["t = 00:14:32 — Severe trauma impact occurs in active aisle"]
-        TT4["t = 00:18:00 — Coworker discovers injury and summons emergency response"]
-        TT5["Day +3 — Safety inspectors review archived CCTV footage post-incident"]
-        TT1 --> TT2 --> TT3 --> TT4 --> TT5
-    end
-
-    subgraph TIMELINE_RAKSHYA["RAKSHYA VISION: Proactive Real-Time Prevention"]
-        direction TB
-        RT1["t = 00:00:00 — Worker enters camera field of view"]
-        RT2["t = 00:00:00.15 — ByteTrack initializes anonymous Track #104"]
-        RT3["t = 00:00:00.30 — Cranial containment confirms NO helmet for N=3 frames"]
-        RT4["t = 00:00:00.45 — Risk score surges to 74 (HIGH); WebSocket alert broadcasts"]
-        RT5["t = 00:00:01.00 — Visual alarm flashes; worker equips helmet before entering danger area"]
-        RT1 --> RT2 --> RT3 --> RT4 --> RT5
-    end
-```
-
 ---
 
 ## 3. Technical Approach
 
 RAKSHYA VISION implements a deterministic, multi-stage computer vision and safety governance architecture. Rather than relying on an opaque, end-to-end neural network, the system enforces a clean separation of concerns across perception, tracking, spatial association, temporal confirmation, and risk scoring.
-
-```mermaid
-flowchart LR
-    S1["Multi-Source Ingestion<br/>(RTSP / USB / HTTP)"] --> S2["Canonical Detection<br/>(7 Physical Classes)"]
-    S2 --> S3["Anonymous Tracking<br/>(ByteTrack Kalman)"]
-    S3 --> S4["Anatomical Spatial Association<br/>(Body-Part Containment)"]
-    S4 --> S5["Temporal Hysteresis<br/>(N_confirm=3 Frames)"]
-    S5 --> S6["Deterministic Risk Engine<br/>(0–100 Score)"]
-    S6 --> S7["Real-Time Dispatch & Vault<br/>(WebSockets + SHA-256)"]
-```
 
 ### Engineering Pillars of the Technical Approach
 1. **Canonical Positive-Class Detection:** The perception model identifies 7 physical classes (`person`, `helmet`, `safety_vest`, `gloves`, `safety_footwear`, `fire`, `smoke`).
@@ -178,29 +136,6 @@ stateDiagram-v2
 
 RAKSHYA VISION is engineered for immediate real-world deployability across resource-constrained industrial sites without infrastructure overhaul.
 
-```mermaid
-flowchart TD
-    subgraph TECHNICAL["Technical Feasibility"]
-        TF1["CPU Execution Efficiency<br/>(45.5 ms mean latency on 8-core CPU)"]
-        TF2["Modest Memory Footprint<br/>(< 250 MB operational RAM usage)"]
-        TF3["Zero Data Leaks<br/>(+9.1 MB transient cache warm-up over 25 cycles)"]
-    end
-
-    subgraph OPERATIONAL["Operational Feasibility"]
-        OF1["Zero Optical Retrofits<br/>(Direct ingestion of legacy RTSP / USB webcams)"]
-        OF2["Thread-Isolated Architecture<br/>(Camera worker failures never halt adjacent streams)"]
-        OF3["Offline Autonomy<br/>(100% local processing; zero cloud dependency)"]
-    end
-
-    subgraph ECONOMIC["Economic Feasibility"]
-        EF1["Zero GPU Surcharges<br/>(Runs on standard office / plant workstation hardware)"]
-        EF2["Open Protocol Interoperability<br/>(HTTP, RTSP, WebSockets, REST APIs)"]
-        EF3["Immediate Enterprise ROI<br/>(Payback achieved in reduced worker downtime)"]
-    end
-
-    TECHNICAL --- OPERATIONAL --- ECONOMIC
-```
-
 ### Empirical Resource & Latency Profile
 * **Inference Throughput:** Sustained ~22.0 to 24.1 FPS on standard consumer/workstation CPUs.
 * **Latency Budget:** Total per-frame processing of 45.5 ms (YOLO detection: 28.2 ms; ByteTrack: 3.4 ms; Spatial association: 4.1 ms; Temporal state evaluation: 2.3 ms; HUD rendering: 5.8 ms; Risk governance: 1.7 ms).
@@ -226,38 +161,6 @@ flowchart LR
 ## 5. Industry Impact & Benefits
 
 Deploying RAKSHYA VISION yields immediate, quantifiable safety improvements and enterprise economic value across multiple operational dimensions.
-
-```mermaid
-flowchart LR
-    subgraph IMPACT["Safety & Operational Impact"]
-        I1["75% Drop in Trauma Incidents<br/>(Continuous behavioral compliance enforcement)"]
-        I2["Instantaneous Combustion Warning<br/>(Optical fire/smoke detection in < 3 seconds)"]
-        I3["Zero False-Alarm Operational Stoppages<br/>(Guaranteed by UNKNOWN != VIOLATION invariant)"]
-    end
-
-    subgraph BENEFITS["Enterprise & Financial Benefits"]
-        B1["Substantial Insurance Reductions<br/>(Lower premiums via verifiable audit trails)"]
-        B2["Eliminated Regulatory Penalties<br/>(Continuous adherence to OSHA/ISO safety mandates)"]
-        B3["Zero Capital Hardware Expenditure<br/>(Direct leverage of installed CCTV base)"]
-        B4["Legally Defensible Records<br/>(Tamper-proof SHA-256 cryptographic evidence vault)"]
-    end
-
-    IMPACT --> BENEFITS
-```
-
-### Enterprise Safety ROI Flywheel
-
-```mermaid
-flowchart TD
-    subgraph FLYWHEEL["The Enterprise Safety ROI Flywheel"]
-        F1["24/7 Autonomous Visual Inspection"] --> F2["Instant Correction of Absent PPE & Hazards"]
-        F2 --> F3["75% Reduction in Lost-Time Injury (LTI) Rates"]
-        F3 --> F4["Elimination of OSHA Statutory Violations & Fines"]
-        F4 --> F5["Substantial Underwriting Premium Discounts (ISO 45001 Verified)"]
-        F5 --> F6["Direct Savings Reinvested into Facility Productivity"]
-        F6 --> F1
-    end
-```
 
 ### Comparative Advantage
 
@@ -310,72 +213,12 @@ sequenceDiagram
 5. **Temporal Confirmation:** Violations are declared only after 3 consecutive frames of confirmed absence, preventing false alarms from brief motion blur.
 6. **Risk-Governed Dispatch:** Confirmed incidents trigger alerts based on severity and risk score, with automated cooldowns suppressing duplicate notifications for 60 seconds.
 
-```mermaid
-flowchart TD
-    subgraph THREAD["Isolated CameraWorker Pipeline Architecture"]
-        C1["OpenCV VideoCapture<br/>(DirectShow / RTSP / Mobile IP)"] --> C2{"Queue Full?<br/>(buffer_size > 1)"}
-        C2 -- "Yes" --> C3["Drop Stale Frame<br/>(Zero Pipeline Buffer Lag)"]
-        C2 -- "No" --> C4["Push to Ingestion Queue"]
-        C4 --> C5["Adaptive Rate Throttler<br/>(Synchronizes to 15 FPS Inference)"]
-        
-        C5 --> C6["Two-Tier Cascaded YOLOv8"]
-        C6 --> C7{"Persons Detected?"}
-        C7 -- "Yes" --> C8["Direct Spatial Containment Engine"]
-        C7 -- "No" --> C9["Invoke Base YOLOv8n Fallback"]
-        C9 --> C8
-        
-        C8 --> C10["ByteTrack Association & State Debounce"]
-        C10 --> C11["Compute Dynamic Risk Index (0-100)"]
-        C11 --> C12{"Violation or Hazard Escalation?"}
-        C12 -- "Yes" --> C13["Atomic SHA-256 Image Hash & Disk Write"]
-        C12 -- "No" --> C14["Update Rolling Memory State"]
-        C13 --> C15["Broadcast Event via WebSockets"]
-        C14 --> C15
-    end
-```
-
 ---
 
 ## 7. AI Safety Detection
 
 The artificial intelligence subsystem combines a canonical 7-class single-stage detection model with anatomical containment logic and an adaptive cascaded recall mechanism.
 
-```mermaid
-classDiagram
-    class CanonicalOntology {
-        +Class 0: person
-        +Class 1: helmet
-        +Class 2: safety_vest
-        +Class 3: gloves
-        +Class 4: safety_footwear
-        +Class 5: fire
-        +Class 6: smoke
-    }
-
-    class AnatomicalZoning {
-        +Cranial Zone: [-5%, 30%] -> Helmet
-        +Thoracic Zone: [15%, 70%] -> Safety Vest
-        +Brachial Zone: [35%, 90%] -> Protective Gloves
-        +Pedal Zone: [70%, 105%] -> Safety Footwear
-    }
-
-    class CascadedRecallEngine {
-        +Primary: ppe_fire_smoke_v2 (Specialized 7-Class Model)
-        +Fallback: Base YOLOv8n (Low-Light / Close-Up Person Recovery)
-        +Condition: Triggered only when primary model detects 0 persons
-    }
-
-    class ComplianceState {
-        +SUSPECTED
-        +CONFIRMED PRESENT
-        +CONFIRMED ABSENT (Violation)
-        +UNKNOWN (Occluded)
-    }
-
-    CanonicalOntology --> AnatomicalZoning : Spatial Containment
-    CascadedRecallEngine --> CanonicalOntology : Guaranteed Person Recall
-    AnatomicalZoning --> ComplianceState : Temporal Confirmation
-```
 
 ### Anatomical Containment Boundaries
 * **Cranial Region (Helmet):** Vertical relative bounds `[-0.05, 0.30]`, lateral offset margin `±0.25`, minimum containment ratio `0.20`.
@@ -457,58 +300,11 @@ flowchart LR
 * **Live Incident Feed:** Streaming tabular alert ledger detailing severity classifications (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), originating camera IDs, affected workers, and one-click incident lifecycle management (Acknowledge, Resolve, Dismiss).
 * **Cryptographic Evidence Inspector:** Allows safety officers to view incident frames, download evidence packages, and run automated SHA-256 checksum verifications directly in the browser to ensure zero tampering.
 
-```mermaid
-flowchart TD
-    subgraph BACKEND_BROKER["FastAPI Streaming Broker"]
-        EP["/api/ws/events WebSocket Stream"]
-    end
-
-    subgraph CLIENT_APP["React 18 SOC Dashboard Architecture"]
-        WS["WebSocket Client Hook (Auto-Reconnect)"]
-        STORE["Global Safety State Store"]
-        
-        subgraph MODULAR_VIEWS["SOC Modular Operational Views"]
-            V1["<b>Executive Overview View</b><br/>Live KPI Counters, Incident Summary, System Status"]
-            V2["<b>Multi-Camera Hub</b><br/>Low-Latency Video Grid, Individual FPS & Status Telemetry"]
-            V3["<b>Worker Compliance Inspector</b><br/>Per-Worker Real-Time Checklist (Helmet, Vest, Gloves, Shoes)"]
-            V4["<b>Environmental Hazard Monitor</b><br/>Dual-Plume Fire/Smoke Spatial Mapping & Spread Vector"]
-            V5["<b>Evidence Vault & Audit Explorer</b><br/>SHA-256 In-Browser Verification, Tamper-Evident Ledger"]
-        end
-
-        EP -->|"JSON Telemetry Stream"| WS
-        WS --> STORE
-        STORE --> V1
-        STORE --> V2
-        STORE --> V3
-        STORE --> V4
-        STORE --> V5
-    end
-```
-
 ---
 
 ## 9. Deployment & Future Scope
 
 RAKSHYA VISION is fully functional, empirically verified, and ready for immediate pilot deployment, with a structured engineering roadmap for enterprise-scale manufacturing integration.
-
-```mermaid
-flowchart TD
-    subgraph CURRENT["Verified Implementation (Ready Now)"]
-        C1["Multi-Camera Ingestion (Integrated Webcams, Mobile IP Streams, RTSP, Video)"]
-        C2["End-to-End AI Pipeline (Detection, Tracking, Association, Risk, Alerting)"]
-        C3["Full Test Verification (160/160 Unit Tests, 39/39 Integration Scenarios)"]
-        C4["Production SOC Web Dashboard (React 18 + Fast WebSockets)"]
-    end
-
-    subgraph ROADMAP["Production Engineering Roadmap"]
-        P1["Phase 1: Edge Acceleration<br/>TensorRT & ONNX Runtime (60+ FPS on Nvidia Jetson Orin)"]
-        P2["Phase 2: Expanded Safety Ontology<br/>Fall Arrest Harnesses, Face Shields, Respirators, Ear Protection"]
-        P3["Phase 3: Spatial Safety Analytics<br/>Worker Density Heatmaps, Heavy Machinery Near-Miss Trajectories"]
-        P4["Phase 4: Industrial Control Integration<br/>Modbus TCP & OPC-UA Emergency Machine Stop Relays"]
-    end
-
-    CURRENT ==> ROADMAP
-```
 
 ### Industrial Edge Deployment Topology
 
@@ -561,64 +357,6 @@ flowchart TD
 ## 10. Research & References
 
 The architecture, perception models, and governance logic of RAKSHYA VISION are anchored in peer-reviewed academic literature, open-source computer vision datasets, and statutory workplace safety standards.
-
-```mermaid
-flowchart LR
-    subgraph REGULATIONS["Occupational Safety Regulations"]
-        R1["OSHA 1910.135<br/>(Head Protection)"]
-        R2["ANSI/ISEA 107<br/>(High-Visibility Vests)"]
-        R3["OSHA 1910.138<br/>(Hand Protection)"]
-        R4["OSHA 1910.136<br/>(Foot Protection)"]
-        R5["NFPA / OSHA<br/>(Early Fire & Smoke)"]
-    end
-
-    subgraph ENGINE_CLASS["RAKSHYA VISION Classes & Zoning"]
-        C1["Class 1: helmet<br/>(Cranial Zone [-5%, 30%])"]
-        C2["Class 2: safety_vest<br/>(Thoracic Zone [15%, 70%])"]
-        C3["Class 3: gloves<br/>(Brachial Zone [35%, 90%])"]
-        C4["Class 4: safety_footwear<br/>(Pedal Zone [70%, 105%])"]
-        C5["Classes 5 & 6: fire & smoke<br/>(Multi-Frame Plume Tracker)"]
-    end
-
-    subgraph CITATIONS["Foundational Literature & Benchmarks"]
-        L1["YOLOv8 & CPPE-5 Benchmark (CVPR 2022)"]
-        L2["ByteTrack Kalman Filter (ECCV 2022)"]
-        L3["Mackworth Vigilance Research (1948)"]
-        L4["ISO 45001:2018 Management Standard"]
-    end
-
-    R1 --> C1 --> L1
-    R2 --> C2 --> L1
-    R3 --> C3 --> L1
-    R4 --> C4 --> L1
-    R5 --> C5 --> L1
-    C1 -.-> L2
-    ENGINE_CLASS -.-> L3
-    REGULATIONS -.-> L4
-```
-
-```mermaid
-flowchart TD
-    subgraph PAPERS["Academic & Algorithmic Literature"]
-        P1["Deep Learning Object Detection<br/>Ultralytics YOLOv8 Architecture"]
-        P2["Multi-Object Trajectory Tracking<br/>ByteTrack (ECCV 2022)"]
-        P3["Visual Supervisory Vigilance<br/>Mackworth's Clock Research (1948)"]
-    end
-
-    subgraph DATASETS["Open-Source Datasets & Benchmarks"]
-        D1["CPPE-5 Benchmark Dataset (CVPR 2022)"]
-        D2["Hard Hat Workers (HHW) Industrial Registry"]
-        D3["Computer Vision Fire & Smoke Detection Datasets"]
-    end
-
-    subgraph STANDARDS["Occupational & Regulatory Standards"]
-        S1["OSHA 1910 General Industry PPE Mandates"]
-        S2["ANSI/ISEA 107 High-Visibility Standards"]
-        S3["ISO 45001 Occupational Health & Safety"]
-    end
-
-    PAPERS --- DATASETS --- STANDARDS
-```
 
 ### Academic Papers & Technical Citations
 1. **YOLOv8 Architecture & Anchor-Free Convolutions:**  
