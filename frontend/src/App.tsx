@@ -1,143 +1,125 @@
-/**
- * App.tsx — RAKSHYA VISION Phase 8
- * Root Application Shell for AI Vision-Based Safety Monitoring SOC Dashboard.
- */
-
-import React, { useState } from 'react';
-import { NavigationTab, Alert } from './types';
-import { useSafetyData } from './hooks/useSafetyData';
-import { useWebSocket } from './hooks/useWebSocket';
-import { Header } from './components/Header';
-import { OverviewView } from './pages/OverviewView';
-import { CamerasView } from './pages/CamerasView';
-import { WorkersView } from './pages/WorkersView';
-import { HazardsView } from './pages/HazardsView';
-import { AlertsView } from './pages/AlertsView';
-import { AnalyticsView } from './pages/AnalyticsView';
-import { SettingsView } from './pages/SettingsView';
-import { AlertDetailModal } from './components/AlertDetailModal';
-import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ActiveTab, Sidebar } from './components/Sidebar';
+import { TopHeader } from './components/TopHeader';
+import { SocOverview } from './components/SocOverview';
+import { CamerasFeed } from './components/CamerasFeed';
+import { WorkersMonitoring } from './components/WorkersMonitoring';
+import { FireSmokeHazard } from './components/FireSmokeHazard';
+import { AlertsTriage } from './components/AlertsTriage';
+import { AnalyticsTrends } from './components/AnalyticsTrends';
+import { SystemHealth } from './components/SystemHealth';
+import { ConfigurationSettings } from './components/ConfigurationSettings';
+import { EscalationSimulation } from './components/EscalationSimulation';
+import './styles/custom-theme.css';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<NavigationTab>('overview');
-  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
+  const [showQuickNav, setShowQuickNav] = useState<boolean>(false);
 
-  const {
-    status,
-    summary,
-    alerts,
-    incidents,
-    hazards,
-    cameras,
-    complianceConfig,
-    hazardConfig,
-    isLoading,
-    actionError,
-    actionSuccess,
-    clearBanner,
-    refreshAll,
-    handleWebSocketMessage,
-    handleAcknowledge,
-    handleResolve,
-    handleDismiss,
-  } = useSafetyData();
+  // Synchronize with URL hash for easy bookmarking and external linking
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (
+        hash === 'overview' ||
+        hash === 'cameras' ||
+        hash === 'workers' ||
+        hash === 'hazards' ||
+        hash === 'alerts' ||
+        hash === 'analytics' ||
+        hash === 'health' ||
+        hash === 'settings' ||
+        hash === 'simulation'
+      ) {
+        setActiveTab(hash as ActiveTab);
+      }
+    };
 
-  const { status: wsStatus } = useWebSocket(handleWebSocketMessage);
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleTabChange = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    window.location.hash = tab;
+  };
 
   return (
-    <div className="soc-layout">
-      {/* Top Header & Navigation */}
-      <Header
-        currentTab={currentTab}
-        onTabChange={setCurrentTab}
-        systemStatus={status}
-        wsStatus={wsStatus}
-        activeAlertsCount={summary?.active_alerts ?? alerts.filter((a) => a.status === 'ACTIVE').length}
-        onRefresh={refreshAll}
-        isRefreshing={isLoading}
-      />
+    <div className="flex flex-col w-full h-screen overflow-hidden bg-[#eef3f9]">
+      {/* Exact Custom Top Header */}
+      <TopHeader unreadAlertsCount={3} />
 
-      {/* Global Action Notifications Banner */}
-      {actionSuccess && (
-        <div className="toast-notification toast-success">
-          <div className="toast-content">
-            <CheckCircle2 size={16} />
-            <span>{actionSuccess}</span>
+      {/* Main Container: Sidebar + Active View */}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Exact Custom Left Sidebar */}
+        <Sidebar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          activeAlertsCount={3}
+        />
+
+        {/* View Surface: 100% Exact Custom Design Replication */}
+        <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#eef3f9]">
+          {activeTab === 'overview' && <SocOverview onNavigate={handleTabChange} />}
+          {activeTab === 'cameras' && <CamerasFeed onNavigate={handleTabChange} />}
+          {activeTab === 'workers' && <WorkersMonitoring onNavigate={handleTabChange} />}
+          {activeTab === 'hazards' && <FireSmokeHazard onNavigate={handleTabChange} />}
+          {activeTab === 'alerts' && <AlertsTriage onNavigate={handleTabChange} />}
+          {activeTab === 'analytics' && <AnalyticsTrends onNavigate={handleTabChange} />}
+          {activeTab === 'health' && <SystemHealth onNavigate={handleTabChange} />}
+          {activeTab === 'settings' && <ConfigurationSettings onNavigate={handleTabChange} />}
+          {activeTab === 'simulation' && <EscalationSimulation onNavigate={handleTabChange} />}
+
+          {/* Discreet Quick View Switcher Pill */}
+          <div className="absolute bottom-3 right-4 z-40">
+            {showQuickNav && (
+              <div className="mb-2 bg-slate-900/95 backdrop-blur border border-slate-700 p-2 rounded-xl shadow-2xl flex flex-col gap-1 w-52 text-xs">
+                <div className="text-[10px] font-bold text-sky-400 px-2 py-1 uppercase tracking-wider border-b border-slate-800">
+                  Select Custom Screen
+                </div>
+                {[
+                  { key: 'overview', label: '1. SOC Overview' },
+                  { key: 'cameras', label: '2. Cameras & Feeds' },
+                  { key: 'workers', label: '3. Workers & PPE' },
+                  { key: 'hazards', label: '4. Fire & Smoke' },
+                  { key: 'alerts', label: '5. Alerts & Triage' },
+                  { key: 'analytics', label: '6. Analytics & Trends' },
+                  { key: 'health', label: '7. System Health' },
+                  { key: 'settings', label: '8. Configuration' },
+                  { key: 'simulation', label: '9. Live Simulation' },
+                ].map((s) => (
+                  <button
+                    key={s.key}
+                    onClick={() => {
+                      handleTabChange(s.key as ActiveTab);
+                      setShowQuickNav(false);
+                    }}
+                    className={`text-left px-2 py-1.5 rounded text-[11px] font-medium transition ${
+                      activeTab === s.key
+                        ? 'bg-sky-600 text-white font-semibold'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => setShowQuickNav(!showQuickNav)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-full shadow-lg text-[11px] font-medium transition cursor-pointer"
+              title="Quick Jump between Custom Screens"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Screen: <strong className="text-sky-400 capitalize">{activeTab}</strong></span>
+              <svg className={`w-3 h-3 transition-transform ${showQuickNav ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M5 15l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+              </svg>
+            </button>
           </div>
-          <button className="toast-close" onClick={clearBanner}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {actionError && (
-        <div className="toast-notification toast-error">
-          <div className="toast-content">
-            <AlertTriangle size={16} />
-            <span>{actionError}</span>
-          </div>
-          <button className="toast-close" onClick={clearBanner}>
-            <X size={14} />
-          </button>
-        </div>
-      )}
-
-      {/* Main View Router */}
-      <main className="soc-main-content">
-        {currentTab === 'overview' && (
-          <OverviewView
-            summary={summary}
-            alerts={alerts}
-            hazards={hazards}
-            cameras={cameras}
-            onNavigate={setCurrentTab}
-            onSelectAlert={(a) => setSelectedAlert(a)}
-            onAcknowledge={handleAcknowledge}
-            onResolve={handleResolve}
-            onDismiss={handleDismiss}
-          />
-        )}
-
-        {currentTab === 'cameras' && (
-          <CamerasView cameras={cameras} hazardConfig={hazardConfig} onRefreshCameras={refreshAll} />
-        )}
-
-        {currentTab === 'workers' && (
-          <WorkersView complianceConfig={complianceConfig} />
-        )}
-
-        {currentTab === 'hazards' && (
-          <HazardsView hazards={hazards} hazardConfig={hazardConfig} />
-        )}
-
-        {currentTab === 'alerts' && (
-          <AlertsView
-            alerts={alerts}
-            incidents={incidents}
-            summary={summary}
-            onAcknowledge={handleAcknowledge}
-            onResolve={handleResolve}
-            onDismiss={handleDismiss}
-          />
-        )}
-
-        {currentTab === 'analytics' && (
-          <AnalyticsView alerts={alerts} incidents={incidents} summary={summary} />
-        )}
-
-        {currentTab === 'settings' && (
-          <SettingsView complianceConfig={complianceConfig} hazardConfig={hazardConfig} />
-        )}
-      </main>
-
-      {/* Global Alert Detail Modal (from Overview or any view) */}
-      <AlertDetailModal
-        alert={selectedAlert}
-        onClose={() => setSelectedAlert(null)}
-        onAcknowledge={handleAcknowledge}
-        onResolve={handleResolve}
-        onDismiss={handleDismiss}
-      />
+        </main>
+      </div>
     </div>
   );
 };

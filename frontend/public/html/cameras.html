@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAKSHYA VISION - Industrial Safety &amp; Hazard Monitoring System</title>
+<!-- Tailwind CSS CDN with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface": "#f8f9ff",
+          "on-surface-variant": "#44474c",
+          "on-error-container": "#93000a",
+          "primary-fixed-dim": "#bac7e1",
+          "surface-container-highest": "#d3e4fe",
+          "error": "#ba1a1a",
+          "on-secondary-fixed": "#001d31",
+          "tertiary-container": "#00174b",
+          "secondary-fixed": "#cce5ff",
+          "surface-container-high": "#dce9ff",
+          "primary": "#000000",
+          "inverse-on-surface": "#eaf1ff",
+          "on-secondary-container": "#00476e",
+          "surface-bright": "#f8f9ff",
+          "inverse-primary": "#bac7e1",
+          "on-surface": "#0b1c30",
+          "surface-variant": "#d3e4fe",
+          "surface-container": "#e5eeff",
+          "error-container": "#ffdad6",
+          "on-secondary": "#ffffff",
+          "on-background": "#0b1c30",
+          "on-primary-fixed-variant": "#3a475c",
+          "on-secondary-fixed-variant": "#004b73",
+          "primary-container": "#0e1c2f",
+          "secondary-fixed-dim": "#93ccff",
+          "tertiary": "#000000",
+          "on-primary": "#ffffff",
+          "on-primary-container": "#77849c",
+          "surface-container-low": "#eff4ff",
+          "on-tertiary-fixed-variant": "#003ea8",
+          "on-error": "#ffffff",
+          "surface-container-lowest": "#ffffff",
+          "secondary": "#006398",
+          "surface-dim": "#cbdbf5",
+          "on-tertiary-container": "#497cff",
+          "background": "#f8f9ff",
+          "on-tertiary-fixed": "#00174b",
+          "secondary-container": "#5bb8fe",
+          "on-primary-fixed": "#0e1c2f",
+          "outline-variant": "#c5c6cd",
+          "on-tertiary": "#ffffff",
+          "outline": "#75777d",
+          "tertiary-fixed-dim": "#b4c5ff",
+          "primary-fixed": "#d6e3fe",
+          "tertiary-fixed": "#dbe1ff",
+          "surface-tint": "#525f75",
+          "inverse-surface": "#213145"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "margin-sm": "1rem",
+          "space-sm": "0.5rem",
+          "space-2xs": "0.125rem",
+          "margin": "1.5rem",
+          "space-2xl": "1.5rem",
+          "space-xs": "0.25rem",
+          "space-md": "0.75rem",
+          "space-lg": "1rem",
+          "gutter-sm": "0.75rem",
+          "gutter": "1rem",
+          "space-xl": "1.25rem"
+        },
+        "fontFamily": {
+          "body-sm": ["Inter"],
+          "body-md": ["Inter"],
+          "label-lg": ["Inter"],
+          "label-md": ["Inter"],
+          "body-lg": ["Inter"],
+          "label-sm": ["Inter"],
+          "headline-xl": ["Inter"],
+          "metric-display": ["Inter"],
+          "telemetry-mono": ["Inter"],
+          "headline-lg": ["Inter"],
+          "headline-md": ["Inter"]
+        },
+        "fontSize": {
+          "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+          "body-md": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+          "label-lg": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+          "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+          "body-lg": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+          "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+          "headline-xl": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "metric-display": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "telemetry-mono": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+          "headline-lg": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+          "headline-md": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  @layer base {
+    html {
+      overscroll-behavior: none;
+    }
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  .font-mono-nums {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: "tnum" 1;
+  }
+</style>
+<meta content="web_dashboard" name="shell-type"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head>
+<body class="bg-surface text-on-surface font-body-sm min-h-screen">
+<!-- BEGIN: TopHeader -->
+<header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-lowest shadow-sm z-50 flex items-center justify-between px-space-lg">
+<!-- Brand / Search Area -->
+<div class="flex items-center gap-space-xl">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+<svg class="w-5 h-5 text-secondary-container" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.07-7 10.18-3.87-1.11-7-5.51-7-10.18V6.3l7-3.12z"></path>
+<path d="M12 6a4 4 0 100 8 4 4 0 000-8zm0 6a2 2 0 110-4 2 2 0 010 4z"></path>
+</svg>
+</div>
+<div>
+<h1 class="font-headline-md text-on-surface leading-none flex items-center gap-space-2xs">
+        RAKSHYA <span class="text-secondary">VISION</span>
+</h1>
+<p class="font-label-sm text-on-surface-variant mt-0.5">AI Safety &amp; Hazard Operations</p>
+</div>
+</div>
+<!-- Header Search Input -->
+<div class="relative w-72 hidden md:block">
+<span class="absolute inset-y-0 left-0 flex items-center pl-space-sm pointer-events-none text-outline">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</span>
+<input class="w-full bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg pl-8 pr-space-sm py-1.5 focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary placeholder:text-outline" placeholder="Search cameras, workers, incidents..." type="text"/>
+</div>
+</div>
+<!-- Health Indicators & User Profile -->
+<div class="flex items-center gap-space-lg">
+<!-- Status Badges -->
+<div class="hidden xl:flex items-center gap-space-sm">
+<div class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded-lg">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-label-md text-on-surface">API <span class="font-normal text-on-surface-variant">Online</span></span>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded-lg">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-label-md text-on-surface">AI Engine <span class="font-normal text-on-surface-variant">Ready</span></span>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded-lg">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-label-md text-on-surface">Database <span class="font-normal text-on-surface-variant">Connected</span></span>
+</div>
+<div class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded-lg">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-label-md text-on-surface">WebSocket <span class="font-normal text-on-surface-variant">Connected</span></span>
+</div>
+</div>
+<!-- Right Action Tools -->
+<div class="flex items-center gap-space-md">
+<!-- Notification Bell -->
+<button class="relative p-1.5 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container transition">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="absolute top-0.5 right-0.5 bg-error text-on-error font-label-sm w-3.5 h-3.5 rounded-full flex items-center justify-center ring-2 ring-surface-container-lowest">3</span>
+</button>
+<!-- User Profile Pill -->
+<div class="flex items-center gap-space-xs pl-space-2xs cursor-pointer group">
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary font-bold text-[10px] flex items-center justify-center">
+        SN
+      </div>
+<div class="text-left hidden sm:block">
+<div class="font-label-lg text-on-surface leading-tight">Sahil</div>
+<div class="font-label-sm text-on-surface-variant">Operator</div>
+</div>
+<svg class="w-3 h-3 text-outline group-hover:text-on-surface transition" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<!-- Real-time Clock -->
+<div class="text-right pl-space-xs hidden sm:block">
+<div class="font-label-sm text-on-surface-variant">Mon, 22 Sep 2026</div>
+<div class="font-headline-md text-on-surface font-mono-nums">18:32:17</div>
+</div>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: LeftSidebar -->
+<aside class="fixed top-14 left-0 bottom-0 w-60 bg-primary-container text-primary-fixed flex flex-col justify-between z-40 shadow-md">
+<nav class="p-space-md space-y-1" data-active-classes="bg-secondary text-on-secondary shadow-sm shadow-secondary/30">
+<!-- Overview -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="overview" href="#">
+<svg class="w-4 h-4 text-current" fill="currentColor" viewbox="0 0 24 24">
+<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+</svg>
+<span>Overview</span>
+</a>
+<!-- Live Monitoring -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="live-monitoring" href="#">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Live Monitoring</span>
+</a>
+<!-- Cameras (ACTIVE) -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg bg-secondary text-on-secondary shadow-sm shadow-secondary/30 transition font-label-lg" data-path="cameras" href="#">
+<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-white">Cameras</span>
+</a>
+<!-- Workers & PPE -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="workers-ppe" href="#">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Workers &amp; PPE</span>
+</a>
+<!-- Fire & Smoke -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="fire-smoke" href="#">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Fire &amp; Smoke</span>
+</a>
+<!-- Alerts & Incidents -->
+<a class="flex items-center justify-between px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="alerts-incidents" href="#">
+<div class="flex items-center gap-space-md">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Alerts &amp; Incidents</span>
+</div>
+<span class="w-4 h-4 rounded-full bg-error text-[9px] font-bold text-on-error flex items-center justify-center">3</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="analytics" href="#">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Analytics</span>
+</a>
+<!-- System Health -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="system-health" href="#">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>System Health</span>
+</a>
+<!-- Configuration -->
+<a class="flex items-center gap-space-md px-space-md py-2 rounded-lg text-on-primary-container hover:bg-surface-variant/10 hover:text-surface-bright transition font-label-lg" data-path="configuration" href="#">
+<svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Configuration</span>
+</a>
+</nav>
+<!-- Sidebar Footer Safety Card -->
+<div class="p-space-md">
+<div class="relative overflow-hidden rounded-xl bg-inverse-surface p-space-md shadow-inner">
+<div class="relative z-10 flex flex-col gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-secondary-container/20 flex items-center justify-center text-secondary-container">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+</div>
+<div>
+<p class="font-label-md text-surface-bright leading-snug">Safer People<br/>Safer Workplaces<br/>A Safer Tomorrow</p>
+</div>
+<div class="pt-space-xs flex items-center gap-space-xs">
+<div class="w-3.5 h-3.5 rounded text-secondary-container flex items-center justify-center">
+<svg class="w-3 h-3" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"></path>
+</svg>
+</div>
+<div>
+<p class="font-label-sm text-surface-container-high">RAKSHYA VISION</p>
+<p class="text-[8px] text-on-primary-container">v1.0.0 Team XERSES</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContentSlot -->
+<main class="pt-14 pl-60 min-h-screen bg-surface p-space-lg">
+<div class="flex flex-col w-full gap-space-lg">
+<!-- Breadcrumbs & Page Header Section -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-md">
+<div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm uppercase tracking-wider mb-1">
+<span>Fleet Operations</span>
+<svg class="w-3 h-3 text-outline" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-secondary font-semibold">Video Feeds &amp; Hardware</span>
+</div>
+<h2 class="font-headline-xl text-on-surface">Cameras Management &amp; Configuration</h2>
+<p class="font-body-md text-on-surface-variant mt-0.5">Real-time RTSP/WebRTC feeds, stream health diagnostics, PTZ controls, and edge inference pipeline orchestration</p>
+</div>
+<!-- Top Action Toolbar -->
+<div class="flex items-center gap-space-sm self-start sm:self-auto">
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-lg flex items-center gap-space-xs transition shadow-sm">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Restart Video Pipeline</span>
+</button>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-lg flex items-center gap-space-xs transition shadow-sm">
+<svg class="w-3.5 h-3.5 text-on-surface-variant" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Global Stream Diagnostic</span>
+</button>
+<button class="px-space-lg py-1.5 rounded-lg bg-secondary text-on-secondary font-label-lg flex items-center gap-space-xs hover:bg-secondary/90 transition shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Add Camera Node</span>
+</button>
+</div>
+</div>
+<!-- KPI Fleet Summary Cards -->
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-space-md">
+<!-- Total Configured -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">Fleet Nodes</span>
+<span class="p-1 rounded bg-secondary-fixed text-secondary">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-display text-on-surface">4 <span class="font-body-sm text-on-surface-variant font-normal">/ 8 slots</span></div>
+<p class="font-label-sm text-secondary mt-0.5">50% Plant Capacity</p>
+</div>
+</div>
+<!-- Active Streaming -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">Active Streaming</span>
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+</div>
+<div class="mt-2">
+<div class="font-metric-display text-on-surface flex items-baseline gap-space-xs">
+          1
+          <span class="font-label-sm px-1.5 py-0.5 rounded bg-surface-container font-medium text-on-surface-variant">CAM-01</span>
+</div>
+<p class="font-label-sm text-emerald-600 mt-0.5">100% Target Throughput</p>
+</div>
+</div>
+<!-- Offline / Error -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">Offline / Disconnected</span>
+<span class="p-1 rounded bg-error-container text-error">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-display text-error">1 <span class="font-body-sm text-on-surface-variant font-normal">Node</span></div>
+<p class="font-label-sm text-error mt-0.5">CAM-02 Carrier Timeout</p>
+</div>
+</div>
+<!-- Standby Mode -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">Standby / Eco</span>
+<span class="p-1 rounded bg-surface-container text-on-surface-variant">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-display text-on-surface">2 <span class="font-body-sm text-on-surface-variant font-normal">CAM-03, CAM-04</span></div>
+<p class="font-label-sm text-secondary mt-0.5">Motion Wake Armed</p>
+</div>
+</div>
+<!-- Avg Latency -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between col-span-2 sm:col-span-1">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">Edge Latency</span>
+<span class="font-label-sm text-emerald-600 font-mono-nums">WebRTC</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-display text-on-surface font-mono-nums">54 <span class="font-body-sm text-on-surface-variant font-normal">ms</span></div>
+<p class="font-label-sm text-on-surface-variant mt-0.5">H.265 Hardware Synced</p>
+</div>
+</div>
+</div>
+<!-- Filter & Control Ribbon -->
+<div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs">
+<!-- View mode switch -->
+<div class="bg-surface-container-low p-0.5 rounded-lg flex items-center">
+<button class="px-space-md py-1 rounded bg-surface-container-lowest font-label-md text-on-surface shadow-xs flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Grid View
+        </button>
+<button class="px-space-md py-1 rounded font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          List View
+        </button>
+<button class="px-space-md py-1 rounded font-label-md text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Topology Map
+        </button>
+</div>
+<div class="h-5 w-px bg-surface-container"></div>
+<!-- Zone Dropdown -->
+<div class="relative">
+<select class="bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg pl-3 pr-8 py-1 focus:ring-1 focus:ring-secondary font-medium">
+<option>All Plant Zones (Zones 1-6)</option>
+<option>Zone 1: Production Floor South</option>
+<option>Zone 2: Raw Material Storage</option>
+<option>Zone 3: Paint &amp; Spray Booth</option>
+<option>Zone 4: Chemical Staging Vault</option>
+</select>
+</div>
+<!-- Status Dropdown -->
+<div class="relative hidden sm:block">
+<select class="bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg pl-3 pr-8 py-1 focus:ring-1 focus:ring-secondary font-medium">
+<option>All Statuses (Active, Standby, Offline)</option>
+<option>Live Only (1)</option>
+<option>Standby / Trigger (2)</option>
+<option>Offline / Failure (1)</option>
+</select>
+</div>
+</div>
+<!-- Quick Search Field -->
+<div class="relative flex-1 max-w-sm min-w-[220px]">
+<span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-outline">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg pl-8 pr-3 py-1 focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary placeholder:text-outline" placeholder="Search Camera ID, RTSP URL, IP, or Zone..." type="text"/>
+</div>
+</div>
+<!-- Main Content Layout (Grid + Hardware Config Split) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT COLUMN: Camera Feeds Matrix (7 of 12 cols on desktop) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-md text-on-surface">Surveillance Matrix</h3>
+<span class="font-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-medium">4 Channels</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1 font-label-sm text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live
+          </span>
+<span class="flex items-center gap-1 font-label-sm text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-error"></span> Fault
+          </span>
+<span class="flex items-center gap-1 font-label-sm text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-surface-tint"></span> Standby
+          </span>
+</div>
+</div>
+<!-- 2x2 Camera Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- CARD 1: CAM-01 (ACTIVE & SELECTED) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col transition ring-2 ring-secondary">
+<!-- Card Header -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-label-lg text-on-surface font-mono-nums">CAM-01</span>
+<span class="font-body-sm text-on-surface-variant truncate max-w-[140px]">Production Floor South</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-label-sm font-semibold uppercase">LIVE</span>
+<button class="p-1 hover:bg-surface-container rounded text-secondary" title="Currently Selected">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+</button>
+</div>
+</div>
+<!-- Video Stream Container with In-Feed AI Overlays -->
+<div class="relative w-full aspect-video bg-inverse-surface overflow-hidden group">
+<!-- Simulated CCTV Feed Background -->
+<img class="w-full h-full object-cover" data-alt="High quality factory production floor security camera angle with industrial machinery, assembly line conveyor belts, brightly lit fluorescent ceiling lights, concrete flooring, workers in yellow safety vests and hardhats with subtle bounding boxes in a modern smart factory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASVdtAzHFO_WwT4q4oYC89mNA1YMeO_Ad480AVtXRtZX9xdXBTJXaTsUIUbKIpdZsGtltL_yN61LO32C4AUK1FKiLy4vtSY1JkIkVP1969VO0tRecuz_8vA0d3h9NvSnVGT5N-Cq6efHpoJJgABdsu5UheiAEq4jxTTZktnjkg_8mKgn7Zdq09YtKI3ePNkKqbTdekTMHARd7inK1jI3JSlnqioWrgDtcwZCtJvSE"/>
+<!-- Video Overlay AI Bounding Boxes HUD -->
+<div class="absolute inset-0 p-2 pointer-events-none flex flex-col justify-between">
+<!-- Top In-feed Telemetry -->
+<div class="flex items-center justify-between text-[10px] font-mono-nums text-white bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span> REC
+                </span>
+<span>2026-09-22 18:32:17 GMT</span>
+</div>
+<!-- AI Detection Overlays (Worker with Violations) -->
+<div class="absolute top-[28%] left-[24%] border border-red-500 w-[18%] h-[55%] pointer-events-none">
+<div class="bg-red-600 text-white text-[9px] px-1 py-0.5 font-mono-nums font-semibold uppercase flex items-center justify-between -mt-4">
+<span>ID: 002</span>
+<span class="bg-black/50 px-0.5 rounded">PPE!</span>
+</div>
+<div class="bg-black/80 backdrop-blur-xs text-[8px] text-white p-1 mt-1 rounded space-y-0.5 w-max">
+<div class="text-red-400 font-semibold">Helmet: ✕ Missing</div>
+<div class="text-red-400 font-semibold">Vest: ✕ Missing</div>
+<div class="text-emerald-400">Shoes: ✓ OK</div>
+</div>
+</div>
+<!-- AI Detection Overlay (Compliant Worker) -->
+<div class="absolute top-[32%] right-[28%] border border-emerald-500 w-[16%] h-[50%] pointer-events-none">
+<div class="bg-emerald-600 text-white text-[9px] px-1 py-0.5 font-mono-nums font-semibold uppercase flex items-center justify-between -mt-4">
+<span>ID: 003</span>
+<span class="bg-black/50 px-0.5 rounded">100%</span>
+</div>
+<div class="bg-black/80 backdrop-blur-xs text-[8px] text-white p-1 mt-1 rounded space-y-0.5 w-max">
+<div class="text-emerald-400">Helmet: ✓ OK</div>
+<div class="text-emerald-400">Vest: ✓ OK</div>
+<div class="text-emerald-400">Gloves: ✓ OK</div>
+</div>
+</div>
+<!-- Bottom In-Feed Telemetry Bar -->
+<div class="w-full bg-black/75 backdrop-blur-xs text-[10px] text-primary-fixed flex items-center justify-between px-2 py-1 rounded font-mono-nums">
+<div class="flex items-center gap-space-sm">
+<span>18.4 FPS</span>
+<span>|</span>
+<span>1280x720</span>
+<span>|</span>
+<span class="text-emerald-400">82ms Inf</span>
+</div>
+<div class="flex items-center gap-space-xs text-white">
+<span>Trackers: 3</span>
+<span class="text-red-400 font-bold">(1 Viol)</span>
+</div>
+</div>
+</div>
+<!-- Hover Quick Controls Floating Overlay -->
+<div class="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-7 h-7 rounded bg-black/70 hover:bg-black text-white flex items-center justify-center transition shadow-sm" title="PTZ Controls">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4m14.071 6.071l-12.142-12.142m0 12.142l12.142-12.142" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="w-7 h-7 rounded bg-black/70 hover:bg-black text-white flex items-center justify-center transition shadow-sm" title="Snapshot Frame">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="w-7 h-7 rounded bg-black/70 hover:bg-black text-white flex items-center justify-center transition shadow-sm" title="Fullscreen Stream">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- Bottom Micro Metrics & Quick Actions -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between font-label-md">
+<div class="flex items-center gap-space-sm text-on-surface-variant font-mono-nums">
+<span>H.264 RTSP</span>
+<span class="text-secondary font-medium">4.2 Mbps</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm font-semibold hover:bg-secondary-fixed-dim transition">Configure Node</button>
+</div>
+</div>
+</div>
+<!-- CARD 2: CAM-02 (OFFLINE / ERROR STATE) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col transition hover:shadow-md">
+<!-- Card Header -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-label-lg text-on-surface font-mono-nums">CAM-02</span>
+<span class="font-body-sm text-on-surface-variant truncate max-w-[140px]">Raw Material Storage</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm font-semibold uppercase">OFFLINE</span>
+</div>
+</div>
+<!-- Offline Visual Placeholder Frame -->
+<div class="relative w-full aspect-video bg-primary-container flex flex-col items-center justify-center p-space-md text-center">
+<div class="w-10 h-10 rounded-full bg-surface-variant/20 flex items-center justify-center text-outline mb-2">
+<svg class="w-5 h-5 text-on-error" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 8.96 8.96 0 01-2.121-6.364m6.364-2.636a9 9 0 016.364 0M1 1l22 22" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<p class="font-label-lg text-on-primary">NO SIGNAL / CARRIER TIMEOUT</p>
+<p class="font-label-sm text-outline-variant font-mono-nums mt-0.5">Error 504: RTSP Handshake Failed</p>
+<p class="text-[10px] text-outline mt-1 font-mono-nums">Last Frame Received: 14:12:08 GMT</p>
+</div>
+<!-- Bottom Diagnostics & Action Bar -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between font-label-md">
+<div class="flex items-center gap-space-xs text-on-surface-variant text-[11px] font-mono-nums">
+<span>IP: 192.168.1.102</span>
+<span>•</span>
+<span class="text-error font-semibold">Loss: 100%</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high transition font-label-sm">Ping</button>
+<button class="px-2 py-1 rounded bg-secondary text-on-secondary hover:bg-secondary/90 transition font-label-sm">Reconnect</button>
+</div>
+</div>
+</div>
+<!-- CARD 3: CAM-03 (STANDBY / MOTION TRIGGER) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden flex flex-col transition hover:shadow-md">
+<!-- Card Header -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span>
+<span class="font-label-lg text-on-surface font-mono-nums">CAM-03</span>
+<span class="font-body-sm text-on-surface-variant truncate max-w-[140px]">Paint &amp; Coating Booth</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm font-semibold uppercase">STANDBY</span>
+</div>
+</div>
+<!-- Standby Visual Preview -->
+<div class="relative w-full aspect-video bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover opacity-40 grayscale" data-alt="Industrial paint spray booth automated manufacturing chamber with robotic arms stationary clean lighting empty work floor security camera view" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC6Qit8-zPZ1F8u3X4Zt3d_bAw9tHtTMCC2V1wUtO4xbg2SzWdolJIz4S3kpHW0jtAnERw_OB5TOF_zFJVYdTFbij08ctuinHMQoJbPphDF2KHq1WK3ImdxEClhKWu7KJ5o2OWCTqGdMynXf4q-6QR3QokAgKi9bUbEVWpSUKqtnYqnIyjohnArgeO45wQLX9s3TGdj6zHqbg2U5raDLmMIrd0QFns3Dy7I40hYc0"/>
+<div class="absolute inset-0 bg-primary-container/60 flex flex-col items-center justify-center p-2 text-center">
+<div class="w-8 h-8 rounded-full bg-surface-container-low/20 flex items-center justify-center text-primary-fixed mb-1">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<p class="font-label-md text-surface-bright">PIR Motion-Trigger Standby</p>
+<p class="text-[10px] text-on-primary-container font-mono-nums mt-0.5">Idle: 5.0 FPS (Boost to 30 FPS on Motion)</p>
+</div>
+</div>
+<!-- Bottom Diagnostics & Action Bar -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between font-label-md">
+<div class="flex items-center gap-space-xs text-on-surface-variant text-[11px] font-mono-nums">
+<span>PIR Armed</span>
+<span>•</span>
+<span>Temp: 26.1°C</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high transition font-label-sm">Wake Stream</button>
+</div>
+</div>
+</div>
+<!-- CARD 4: CAM-04 (ACTIVE EVENT / HAZARD DETECTED) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col transition ring-2 ring-error">
+<!-- Card Header -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-error animate-ping"></span>
+<span class="font-label-lg text-on-surface font-mono-nums">CAM-04</span>
+<span class="font-body-sm text-error font-semibold truncate max-w-[140px]">Chemical Staging Vault</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="px-2 py-0.5 rounded-full bg-error text-on-error font-label-sm font-semibold uppercase animate-pulse">SMOKE HAZARD</span>
+</div>
+</div>
+<!-- Hazard Video Viewport with Smoke Bounding Box -->
+<div class="relative w-full aspect-video bg-inverse-surface overflow-hidden group">
+<img class="w-full h-full object-cover" data-alt="Warehouse storage facility with tall metal racks holding blue chemical drums and wooden pallets with visible white smoke plumes emerging from barrels in aisle aisle C-4, dark industrial atmosphere CCTV surveillance camera perspective" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-XgLGrG--kmA9NCC7hIuY-mS4GX8b0IVUvdOD6mqv1xqa22-g8Kmu9_e5CvG5zvYOE8x1I-ZskMBECQgAQyf2RN_PVLv0ESyxnw2qyIhUEqRoA-8su5oTnPxyAGQ80IbePC90Gz65oX6ba4RqlCuBjI9wyIV8Q5cCUsUBEv-bKX_wiuDnry--GCBSXFv135k5E5VSMiHvjvEkpG6EG9DTBtEDPZr-iXPlxH-9e8s"/>
+<!-- In-Feed AI Smoke Detection Box -->
+<div class="absolute inset-0 p-2 pointer-events-none flex flex-col justify-between">
+<div class="flex items-center justify-between text-[10px] font-mono-nums text-white bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded">
+<span class="text-error font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> THERMAL ANOMALY
+                </span>
+<span>ZONE 4 - AISLE C-4</span>
+</div>
+<!-- Smoke Bounding Box with Label -->
+<div class="absolute top-[35%] left-[38%] border-2 border-red-600 w-[28%] h-[48%] pointer-events-none shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+<div class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 font-mono-nums font-bold uppercase -mt-5 w-max">
+                  SMOKE DETECTED: 94.8%
+                </div>
+</div>
+<!-- Telemetry -->
+<div class="w-full bg-black/85 backdrop-blur-xs text-[10px] text-white flex items-center justify-between px-2 py-1 rounded font-mono-nums">
+<span class="text-amber-400 font-semibold">Dual-Spectrum: Optical + FLIR</span>
+<span class="text-white">Aisle C-4, Bin 3</span>
+</div>
+</div>
+<!-- Floating Action Overlay -->
+<div class="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-7 h-7 rounded bg-red-600 text-white flex items-center justify-center transition shadow-sm" title="View Thermal Spectrum">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- Bottom Micro Metrics & Quick Actions -->
+<div class="p-space-sm bg-surface-container-lowest flex items-center justify-between font-label-md">
+<div class="flex items-center gap-space-xs text-error font-semibold text-[11px] font-mono-nums">
+<span>ALARM DISPATCHED</span>
+<span>•</span>
+<span>Auto-Suppression Ready</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-2 py-1 rounded bg-error text-on-error font-label-sm font-semibold hover:bg-error/90 transition shadow-xs">Zone Isolation</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Fleet Diagnostic Stream Log (Collapsed micro-table) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<h4 class="font-headline-md text-on-surface">RTSP Transport Session Diagnostics</h4>
+<span class="font-label-sm text-on-surface-variant font-mono-nums">(WebRTC 1.0 / GStreamer 1.22)</span>
+</div>
+<button class="font-label-md text-secondary hover:underline">Download Telemetry Log</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm">
+<thead>
+<tr class="text-on-surface-variant font-label-sm uppercase tracking-wider bg-surface-container-low">
+<th class="py-1.5 px-3 rounded-l">Camera Channel</th>
+<th class="py-1.5 px-3">Protocol / URI</th>
+<th class="py-1.5 px-3">Bitrate</th>
+<th class="py-1.5 px-3">Jitter</th>
+<th class="py-1.5 px-3">Pipeline Status</th>
+<th class="py-1.5 px-3 rounded-r text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container font-mono-nums text-[12px]">
+<tr class="hover:bg-surface-container-lowest">
+<td class="py-2 px-3 font-semibold text-on-surface">CAM-01</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px]">rtsp://192.168.1.101:554/live/stream1</td>
+<td class="py-2 px-3 text-emerald-600 font-semibold">4.2 Mbps</td>
+<td class="py-2 px-3 text-on-surface-variant">2.1 ms</td>
+<td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">SYNCED</span></td>
+<td class="py-2 px-3 text-right"><button class="text-secondary font-label-md hover:underline">Inspect</button></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest">
+<td class="py-2 px-3 font-semibold text-on-surface">CAM-02</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px]">rtsp://192.168.1.102:554/stream_main</td>
+<td class="py-2 px-3 text-error">0.0 Kbps</td>
+<td class="py-2 px-3 text-error">Timeout</td>
+<td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold">SOCKET_ERR</span></td>
+<td class="py-2 px-3 text-right"><button class="text-secondary font-label-md hover:underline">Reset</button></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest">
+<td class="py-2 px-3 font-semibold text-on-surface">CAM-03</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px]">rtsp://192.168.1.103:554/h265_ch0</td>
+<td class="py-2 px-3 text-on-surface-variant">512 Kbps</td>
+<td class="py-2 px-3 text-on-surface-variant">4.8 ms</td>
+<td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-[10px] font-bold">STANDBY</span></td>
+<td class="py-2 px-3 text-right"><button class="text-secondary font-label-md hover:underline">Trigger</button></td>
+</tr>
+<tr class="hover:bg-surface-container-lowest">
+<td class="py-2 px-3 font-semibold text-on-surface">CAM-04</td>
+<td class="py-2 px-3 text-on-surface-variant text-[11px]">rtsp://192.168.1.104:554/flir_dual</td>
+<td class="py-2 px-3 text-amber-600 font-semibold">6.8 Mbps</td>
+<td class="py-2 px-3 text-on-surface-variant">1.9 ms</td>
+<td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">HAZARD_REC</span></td>
+<td class="py-2 px-3 text-right"><button class="text-error font-label-md hover:underline">Stream ISO</button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Selected Camera Configuration & Hardware Diagnostics (5 of 12 cols on desktop) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<div class="bg-surface-container-lowest rounded-xl shadow-md p-space-lg flex flex-col gap-space-md">
+<!-- Drawer Header -->
+<div class="flex items-start justify-between pb-space-sm border-b border-surface-container">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-sm font-semibold">LIVE STREAMING</span>
+<span class="font-label-sm text-outline font-mono-nums">NODE_ID: CAM-01</span>
+</div>
+<h3 class="font-headline-md text-on-surface mt-1">CAM-01 Configuration</h3>
+<p class="font-body-sm text-on-surface-variant">Production Floor South • Zone 1</p>
+</div>
+<button class="px-space-md py-1.5 rounded-lg bg-secondary text-on-secondary font-label-lg hover:bg-secondary/90 shadow-sm transition">
+            Save Changes
+          </button>
+</div>
+<!-- Configuration Tab Strip -->
+<div class="flex items-center border-b border-surface-container gap-space-sm overflow-x-auto pb-1 text-nowrap">
+<button class="pb-1.5 px-1 font-label-lg text-secondary border-b-2 border-secondary font-semibold">Stream &amp; Network</button>
+<button class="pb-1.5 px-1 font-label-lg text-on-surface-variant hover:text-on-surface transition">AI Pipeline Models</button>
+<button class="pb-1.5 px-1 font-label-lg text-on-surface-variant hover:text-on-surface transition">PTZ &amp; Privacy Masks</button>
+<button class="pb-1.5 px-1 font-label-lg text-on-surface-variant hover:text-on-surface transition">Storage &amp; Retention</button>
+</div>
+<!-- SECTION 1: Stream & Hardware Parameters -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface uppercase tracking-wider">Stream Endpoint &amp; Encoders</span>
+<span class="font-label-sm text-emerald-600 font-mono-nums">Active RTSP Socket</span>
+</div>
+<!-- Primary RTSP URI Field -->
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-on-surface-variant">Primary RTSP Ingestion URI</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg px-3 py-1.5 font-mono-nums text-[12px] focus:ring-1 focus:ring-secondary" type="text" value="rtsp://operator:secOps2026@192.168.1.101:554/live/stream1"/>
+</div>
+</div>
+<!-- Fallback WebRTC Stream -->
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-on-surface-variant">WebRTC / HLS Low-Latency Fallback</label>
+<input class="w-full bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg px-3 py-1.5 font-mono-nums text-[12px] focus:ring-1 focus:ring-secondary" type="text" value="wss://soc-edge-01.rakshya.internal:8443/webrtc/cam01"/>
+</div>
+<!-- Codec & Resolution Grid -->
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-on-surface-variant">Ingest Resolution</label>
+<select class="bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg px-3 py-1.5 focus:ring-1 focus:ring-secondary font-medium">
+<option>1080p (1920x1080) @ 25 FPS</option>
+<option selected="">720p (1280x720) @ 30 FPS</option>
+<option>4K UltraHD @ 15 FPS</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-on-surface-variant">Video Codec &amp; Profile</label>
+<select class="bg-surface-container-low border-0 text-body-sm text-on-surface rounded-lg px-3 py-1.5 focus:ring-1 focus:ring-secondary font-medium">
+<option>H.265 / HEVC Main 10</option>
+<option selected="">H.264 / AVC High Profile</option>
+<option>AV1 Edge Real-time</option>
+</select>
+</div>
+</div>
+<!-- Hardware Acceleration Chip Meter -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-[10px]">
+                NV
+              </div>
+<div>
+<p class="font-label-md text-on-surface">NVIDIA DeepStream Hardware Decoding</p>
+<p class="font-label-sm text-on-surface-variant font-mono-nums">NVDEC: 0.8ms latency per frame</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-label-sm font-semibold">Hardware Accel ON</span>
+</div>
+</div>
+<div class="h-px bg-surface-container"></div>
+<!-- SECTION 2: AI Vision Inference Pipeline Settings -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface uppercase tracking-wider">AI Inference Models &amp; Detectors</span>
+<span class="font-label-sm text-secondary font-mono-nums">Engine: YOLOv8x-Orin</span>
+</div>
+<!-- Model 1: Worker Tracking -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-on-surface font-semibold">Worker Pose &amp; Zone Presence</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-on-surface text-[10px] font-mono-nums">YOLO-Pose v8</span>
+</div>
+<p class="font-label-sm text-on-surface-variant">Tracks floor presence, danger zones, fall detection</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Model 2: PPE Detection Checklist -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-md text-on-surface font-semibold">PPE Compliance Verification</span>
+<p class="font-label-sm text-on-surface-variant">Helmet, High-Vis Vest, Safety Gloves, Steel-toe Boots</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Confidence Threshold Slider -->
+<div class="pt-1 flex items-center gap-space-sm">
+<span class="font-label-sm text-on-surface-variant">Min Confidence:</span>
+<input class="w-full h-1 bg-surface-container rounded-lg appearance-none cursor-pointer accent-secondary" max="95" min="50" type="range" value="75"/>
+<span class="font-label-sm font-mono-nums text-secondary font-bold">75%</span>
+</div>
+</div>
+<!-- Model 3: Flame & Smoke -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-md text-on-surface font-semibold">Smoke &amp; Thermal Plume Detection</span>
+<span class="px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 text-[10px] font-mono-nums">FlameNet 4.1</span>
+</div>
+<p class="font-label-sm text-on-surface-variant">Detects volumetric grey/black particulates and hot-spots</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Inference Optimization Option -->
+<div class="flex items-center justify-between pt-1">
+<span class="font-label-sm text-on-surface-variant">Inference Frame Skipping:</span>
+<select class="bg-surface-container-low border-0 text-label-md text-on-surface rounded px-2 py-1 focus:ring-1 focus:ring-secondary font-medium">
+<option>Process Every Frame (100% Load)</option>
+<option selected="">Skip Every 2nd Frame (Saves 40% GPU)</option>
+<option>Dynamic Adaptive Skip</option>
+</select>
+</div>
+</div>
+<div class="h-px bg-surface-container"></div>
+<!-- SECTION 3: Privacy & Edge Health Bar -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-on-surface uppercase tracking-wider">Privacy Mask &amp; Hardware Telemetry</span>
+<button class="font-label-sm text-secondary hover:underline font-semibold">+ Add Privacy Mask</button>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Privacy Mask Badge -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between">
+<div>
+<p class="font-label-sm text-on-surface-variant">Masking Zones</p>
+<p class="font-label-md text-on-surface font-semibold">1 Configured</p>
+<p class="text-[10px] text-outline">Breakroom Door Occluded</p>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface hover:bg-surface-container-high font-label-sm">Edit</button>
+</div>
+<!-- Local Storage Health -->
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-on-surface-variant">NVMe Edge Storage</span>
+<span class="font-label-sm text-emerald-600 font-mono-nums">14 Days</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden mt-1">
+<div class="bg-secondary h-full rounded-full w-[64%]"></div>
+</div>
+<p class="text-[10px] text-on-surface-variant mt-1 font-mono-nums">428 GB Free of 1.2 TB</p>
+</div>
+</div>
+<!-- Compute Core Allocation -->
+<div class="p-space-sm rounded-lg bg-primary-container text-primary-fixed flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+<div>
+<p class="font-label-md text-surface-bright">Jetson AGX Orin Cluster Allocation</p>
+<p class="text-[10px] text-primary-fixed-dim font-mono-nums">Core #2 (DLA 0): 24% load • 54°C • TensorRT 8.6</p>
+</div>
+</div>
+<span class="font-label-sm text-emerald-400 font-mono-nums font-semibold">OPTIMAL</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple micro-interactions for Camera configuration tabs and diagnostics
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabButtons = document.querySelectorAll('.configuration-tab-btn');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => {
+          b.classList.remove('text-secondary', 'border-b-2', 'border-secondary', 'font-semibold');
+          b.classList.add('text-on-surface-variant');
+        });
+        btn.classList.add('text-secondary', 'border-b-2', 'border-secondary', 'font-semibold');
+        btn.classList.remove('text-on-surface-variant');
+      });
+    });
+  });
+</script>
+</main>
+<!-- END: MainContentSlot -->
+</body></html>

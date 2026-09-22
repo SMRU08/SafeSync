@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RAKSHYA VISION - Industrial Safety &amp; Hazard Monitoring System</title>
+<!-- Tailwind CSS CDN with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0f1e36',
+              dark: '#0a1424',
+              blue: '#1b68d6',
+              lightBlue: '#2575fc',
+              border: '#e2e8f0',
+              bgLight: '#f1f5fa'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Core Styles -->
+<style data-purpose="custom-styling">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #f1f5f9;
+    }
+
+    .font-mono-nums {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: "tnum" 1;
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Pulsing animation */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="text-slate-800 text-xs min-h-screen flex flex-col bg-[#eef3f9]">
+<!-- BEGIN: TopHeader -->
+<header class="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between sticky top-0 z-50">
+<!-- Brand / Logo Area -->
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-700 to-cyan-500 flex items-center justify-center text-white shadow-sm shadow-cyan-500/20">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.07-7 10.18-3.87-1.11-7-5.51-7-10.18V6.3l7-3.12z"></path>
+<path d="M12 6a4 4 0 100 8 4 4 0 000-8zm0 6a2 2 0 110-4 2 2 0 010 4z"></path>
+</svg>
+</div>
+<div>
+<h1 class="text-sm font-extrabold tracking-tight text-slate-900 leading-none flex items-center gap-1">
+            RAKSHYA <span class="text-sky-600">VISION</span>
+</h1>
+<p class="text-[9px] text-slate-400 font-medium tracking-wide mt-0.5">AI-Powered Safety &amp; Hazard Monitoring System</p>
+</div>
+</div>
+<!-- Header Search Input -->
+<div class="relative w-72">
+<span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</span>
+<input class="w-full bg-slate-50 border border-slate-200 text-xs rounded-md pl-8 pr-3 py-1.5 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition placeholder:text-slate-400" placeholder="Search cameras, workers, incidents..." type="text"/>
+</div>
+</div>
+<!-- Health Indicators & User Profile -->
+<div class="flex items-center gap-5">
+<!-- Status Badges -->
+<div class="hidden lg:flex items-center gap-2.5">
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50/80 border border-emerald-100 rounded-md">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] font-semibold text-emerald-800">API <span class="font-normal text-emerald-600">Online</span></span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50/80 border border-emerald-100 rounded-md">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] font-semibold text-emerald-800">AI Engine <span class="font-normal text-emerald-600">Ready</span></span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50/80 border border-emerald-100 rounded-md">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] font-semibold text-emerald-800">Database <span class="font-normal text-emerald-600">Connected</span></span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50/80 border border-emerald-100 rounded-md">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[10px] font-semibold text-emerald-800">WebSocket <span class="font-normal text-emerald-600">Connected</span></span>
+</div>
+</div>
+<div class="h-4 w-px bg-slate-200 hidden sm:block"></div>
+<!-- Right Action Tools -->
+<div class="flex items-center gap-3">
+<!-- Notification Bell -->
+<button class="relative p-1.5 text-slate-500 hover:text-slate-700 rounded-full hover:bg-slate-100 transition">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="absolute top-0.5 right-0.5 bg-rose-500 text-white font-bold text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center ring-2 ring-white">3</span>
+</button>
+<!-- User Profile Pill -->
+<div class="flex items-center gap-2 pl-1 cursor-pointer group">
+<div class="w-7 h-7 rounded-full bg-sky-700 text-white font-bold text-[10px] flex items-center justify-center">
+            SN
+          </div>
+<div class="text-left hidden sm:block">
+<div class="text-[11px] font-bold text-slate-800 leading-tight">Sahil</div>
+<div class="text-[9px] text-slate-400 font-medium">Operator</div>
+</div>
+<svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="h-4 w-px bg-slate-200"></div>
+<!-- Real-time Clock -->
+<div class="text-right">
+<div class="text-[9px] text-slate-400 font-medium">Mon, 22 Sep 2026</div>
+<div class="text-xs font-bold text-slate-800 font-mono-nums">18:32:17</div>
+</div>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<!-- BEGIN: MainBodyContainer -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-56 bg-[#0c1a2e] text-slate-300 flex flex-col justify-between flex-shrink-0 border-r border-slate-800">
+<!-- Navigation Links -->
+<nav class="p-3 space-y-1">
+<!-- Overview (Active) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-sky-600 text-white font-medium text-[11px] shadow-sm shadow-sky-600/30" href="#">
+<svg class="w-4 h-4 text-white" fill="currentColor" viewbox="0 0 24 24">
+<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"></path>
+</svg>
+<span>Overview</span>
+</a>
+<!-- Live Monitoring -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Live Monitoring</span>
+</a>
+<!-- Cameras -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Cameras</span>
+</a>
+<!-- Workers & PPE -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Workers &amp; PPE</span>
+</a>
+<!-- Fire & Smoke -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Fire &amp; Smoke</span>
+</a>
+<!-- Alerts & Incidents -->
+<a class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Alerts &amp; Incidents</span>
+</div>
+<span class="w-4 h-4 rounded-full bg-rose-500 text-[9px] font-bold text-white flex items-center justify-center">3</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Analytics</span>
+</a>
+<!-- System Health -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>System Health</span>
+</a>
+<!-- Configuration -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800/60 hover:text-white text-slate-400 transition text-[11px] font-medium" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Configuration</span>
+</a>
+</nav>
+<!-- Sidebar Footer Safety Card -->
+<div class="p-3">
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-b from-[#162744] to-[#0f1c30] p-3 border border-slate-700/60 shadow-lg">
+<!-- Industrial plant graphic watermark -->
+<div class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<div class="relative z-10 flex flex-col gap-2">
+<div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-400/20 flex items-center justify-center text-sky-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+</div>
+<div>
+<p class="text-[10px] font-semibold text-slate-200 leading-snug">Safer People<br/>Safer Workplaces<br/>A Safer Tomorrow</p>
+</div>
+<div class="pt-2 border-t border-slate-700/50 flex items-center gap-2">
+<div class="w-4 h-4 rounded text-sky-400 flex items-center justify-center">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"></path>
+</svg>
+</div>
+<div>
+<p class="text-[9px] font-bold text-slate-300">RAKSHYA VISION</p>
+<p class="text-[8px] text-slate-500">v1.0.0 Team XERSES</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContentScrollable -->
+<main class="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4">
+<!-- Top Title & Safety Motto Banner -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Overview</h2>
+<p class="text-xs text-slate-500">Real-time monitoring of workplace safety and hazards</p>
+</div>
+<!-- Safety Quote Pill -->
+<div class="flex items-center gap-2.5 px-3 py-1.5 bg-sky-50/70 border border-sky-200/70 rounded-lg text-sky-900">
+<svg class="w-4 h-4 text-sky-600 flex-shrink-0" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.07-7 10.18-3.87-1.11-7-5.51-7-10.18V6.3l7-3.12z"></path>
+</svg>
+<span class="text-[11px] font-medium italic">"Safety is not an option, it's a responsibility."</span>
+</div>
+</div>
+<!-- BEGIN: KeyMetricsRow -->
+<section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3" data-purpose="metrics-grid">
+<!-- Metric 1: Active Cameras -->
+<div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-slate-500 mb-1">
+<span class="text-[11px] font-medium">Active Cameras</span>
+<div class="w-5 h-5 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div>
+<div class="text-xl font-extrabold text-slate-900 font-mono-nums">1 / 4</div>
+<div class="text-[10px] text-slate-400 mt-0.5">1 online • 3 offline</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 mt-2.5 overflow-hidden flex">
+<div class="bg-emerald-500 h-1 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+<!-- Metric 2: Tracked Workers -->
+<div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-slate-500 mb-1">
+<span class="text-[11px] font-medium">Tracked Workers</span>
+<div class="w-5 h-5 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-xl font-extrabold text-slate-900 font-mono-nums">3</span>
+<span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded">↑ +2</span>
+</div>
+<div class="text-[10px] text-slate-400 mt-0.5">Live on active cameras</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 mt-2.5 overflow-hidden">
+<div class="bg-sky-500 h-1 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+<!-- Metric 3: PPE Compliance -->
+<div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex items-center justify-between">
+<div>
+<div class="flex items-center gap-1.5 text-slate-500 mb-1">
+<svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-medium">PPE Compliance</span>
+</div>
+<div class="text-xl font-extrabold text-slate-900 font-mono-nums">67%</div>
+<div class="text-[10px] text-rose-500 font-medium mt-0.5">2 violations</div>
+</div>
+<!-- Donut gauge -->
+<div class="relative w-11 h-11 flex-shrink-0">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-slate-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-emerald-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="67, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+</div>
+</div>
+<!-- Metric 4: Fire Incidents -->
+<div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-slate-500 mb-1">
+<span class="text-[11px] font-medium">Fire Incidents</span>
+<div class="w-5 h-5 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div>
+<div class="text-xl font-extrabold text-slate-900 font-mono-nums">0</div>
+<div class="text-[10px] text-slate-400 mt-0.5">All zones clear</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 mt-2.5 overflow-hidden">
+<div class="bg-emerald-500 h-1 rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<!-- Metric 5: Smoke Incidents -->
+<div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-slate-500 mb-1">
+<span class="text-[11px] font-medium">Smoke Incidents</span>
+<div class="w-5 h-5 rounded-md bg-sky-50 text-sky-600 flex items-center justify-center">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div>
+<div class="text-xl font-extrabold text-slate-900 font-mono-nums">0</div>
+<div class="text-[10px] text-slate-400 mt-0.5">All zones clear</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 mt-2.5 overflow-hidden">
+<div class="bg-emerald-500 h-1 rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<!-- Metric 6: Active Alerts -->
+<div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-slate-500 mb-1">
+<span class="text-[11px] font-medium">Active Alerts</span>
+<div class="w-5 h-5 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div>
+<div class="text-xl font-extrabold text-rose-600 font-mono-nums">3</div>
+<div class="text-[10px] text-rose-600 font-medium flex items-center gap-1 mt-0.5">
+<span>Needs attention</span>
+<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 mt-2.5 overflow-hidden">
+<div class="bg-rose-500 h-1 rounded-full" style="width: 75%"></div>
+</div>
+</div>
+</section>
+<!-- END: KeyMetricsRow -->
+<!-- BEGIN: CoreDashboardSplitGrid -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+<!-- Center/Left Column: Live Video & Camera Grid (8 Cols) -->
+<div class="xl:col-span-8 space-y-4">
+<!-- Live Camera Feed Box -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+<!-- Feed Header -->
+<div class="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-sky-500"></span>
+<span class="font-bold text-slate-800 text-xs">Live Camera Feed</span>
+<div class="ml-2 relative">
+<select class="text-xs bg-slate-50 border border-slate-200 rounded-md py-1 pl-2.5 pr-7 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500">
+<option>CAM-01 - Production Floor South</option>
+<option>CAM-02 - Raw Material Storage</option>
+<option>CAM-03 - Paint &amp; Coating Area</option>
+<option>CAM-04 - Assembly Line B</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white tracking-wide">
+<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> LIVE
+                </span>
+<button class="p-1 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100" title="Full Screen">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- Feed Viewport -->
+<div class="relative bg-slate-950 aspect-[16/9] w-full overflow-hidden select-none group">
+<!-- Background Floor Video/Image Representation -->
+<img alt="Live Factory Camera Feed" class="w-full h-full object-cover opacity-90 brightness-95" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqD97rlC778iPabJrEhn0Lehto6IWsCmADiSQRMmgxq-D_U3jSmczyw4PM3P1qM-EUjDqTC5unV073qn_GxlFVNN45hrx9DQ6ndbGTgOVDte9wim47w0xbWT197APFIvQcH2uj8ySPbiunXpXksiV8iF95ohKp0GRFskwHGuJtt1YeLCPgJmfVDtelK3F1x_nBO10pqvhKe_z85F4lCDMneXMmbyX1TSCr0Ltu43JKYLemZzBSnEFv"/>
+<!-- Date-Time Overlay Top Right of Stream -->
+<div class="absolute top-2.5 right-3 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white font-mono-nums">
+                2026-09-22 18:32:17
+              </div>
+<!-- Worker 1 Bounding Box (ID: 001 - Green Compliant with Missing Gloves) -->
+<div class="absolute" style="top: 45%; left: 22.5%; width: 5.5%; height: 26%;">
+<div class="w-full h-full border-2 border-emerald-500 relative shadow-sm">
+<!-- Tag Header -->
+<div class="absolute -top-4 left-0 bg-emerald-600 text-white text-[8px] font-bold px-1 rounded-t">
+                    ID: 001
+                  </div>
+<!-- Sub PPE Inspection Box -->
+<div class="absolute top-0 -right-20 bg-black/80 backdrop-blur-sm border border-emerald-500 text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight">
+<div>Helmet: <span class="text-emerald-400 font-bold">✓</span></div>
+<div>Vest: <span class="text-emerald-400 font-bold">✓</span></div>
+<div>Gloves: <span class="text-rose-400 font-bold">✕</span></div>
+<div>Shoes: <span class="text-emerald-400 font-bold">✓</span></div>
+</div>
+</div>
+</div>
+<!-- Worker 2 Bounding Box (ID: 002 - Red Non-compliant) -->
+<div class="absolute" style="top: 45%; left: 38%; width: 5.5%; height: 26%;">
+<div class="w-full h-full border-2 border-rose-500 relative shadow-sm">
+<div class="absolute -top-4 left-0 bg-rose-600 text-white text-[8px] font-bold px-1 rounded-t">
+                    ID: 002
+                  </div>
+<div class="absolute top-0 -right-20 bg-black/80 backdrop-blur-sm border border-rose-500 text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight">
+<div>Helmet: <span class="text-rose-400 font-bold">✕</span></div>
+<div>Vest: <span class="text-rose-400 font-bold">✕</span></div>
+<div>Gloves: <span class="text-rose-400 font-bold">✕</span></div>
+<div>Shoes: <span class="text-emerald-400 font-bold">✓</span></div>
+</div>
+</div>
+</div>
+<!-- Worker 3 Bounding Box (ID: 003 - Green Compliant) -->
+<div class="absolute" style="top: 41%; left: 52%; width: 4.8%; height: 24%;">
+<div class="w-full h-full border-2 border-emerald-500 relative shadow-sm">
+<div class="absolute -top-4 left-0 bg-emerald-600 text-white text-[8px] font-bold px-1 rounded-t">
+                    ID: 003
+                  </div>
+<div class="absolute top-0 -right-20 bg-black/80 backdrop-blur-sm border border-emerald-500 text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight">
+<div>Helmet: <span class="text-emerald-400 font-bold">✓</span></div>
+<div>Vest: <span class="text-emerald-400 font-bold">✓</span></div>
+<div>Gloves: <span class="text-amber-400 font-bold">?</span></div>
+<div>Shoes: <span class="text-emerald-400 font-bold">✓</span></div>
+</div>
+</div>
+</div>
+<!-- Bottom Stream Status Strip -->
+<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-2.5 flex items-center justify-between text-white text-[10px]">
+<div class="flex items-center gap-3 font-mono-nums">
+<span>FPS: <strong class="text-slate-200">18.4</strong></span>
+<span class="text-slate-500">|</span>
+<span>Inference: <strong class="text-slate-200">82 ms</strong></span>
+<span class="text-slate-500">|</span>
+<span>Resolution: <strong class="text-slate-200">1280 × 720</strong></span>
+<span class="text-slate-500">|</span>
+<span>Workers: <strong class="text-emerald-400">3</strong></span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-1 hover:text-sky-400 transition" title="Pause">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewbox="0 0 24 24">
+<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+</svg>
+</button>
+<button class="p-1 hover:text-sky-400 transition" title="Snapshot">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- BEGIN: AllCamerasGrid -->
+<div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-sky-600" fill="currentColor" viewbox="0 0 24 24">
+<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+</svg>
+<h3 class="font-bold text-xs text-slate-800">All Cameras</h3>
+</div>
+<a class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1" href="#">
+                View All <span>→</span>
+</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<!-- CAM-01 -->
+<div class="border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col justify-between">
+<div class="px-2 py-1.5 bg-white border-b border-slate-200 flex items-center justify-between">
+<span class="font-bold text-[10px] text-slate-800">CAM-01</span>
+<span class="text-[8px] bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded">LIVE</span>
+</div>
+<div class="relative aspect-video bg-slate-900 overflow-hidden">
+<img alt="CAM-01 Thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBb32ISWJdvfqStTmbjydoWXHGn4MH7q0_9kHTyy1jDavP54MfIgoWuASYkF7Xh1qvOc6EiVi0WYFtcjQiyXFyab-jDiuZMFDSLTDEixDp8bWkRLQn-EAow89ePm4DyjgF_FuYKKza8QRCDKo6XXh_9lOCZGY0smF_g4XoqE03u3RUGlAGa9NxjMwIeTahHUQzltnJGOTz3RHhW7HxxrHR0PuJ3tDP9Nn-3V1h85Rv8ycBe9e2l0EX"/>
+</div>
+<div class="p-2 bg-white">
+<p class="text-[10px] font-medium text-slate-700 truncate">Production Floor South</p>
+<div class="flex items-center justify-between text-[9px] text-slate-400 mt-1">
+<span>18.4 FPS</span>
+<span class="flex items-center gap-0.5 text-slate-600">
+<svg class="w-2.5 h-2.5" fill="currentColor" viewbox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path></svg> 3
+                    </span>
+<span class="text-rose-500 font-bold flex items-center gap-0.5">
+<svg class="w-2.5 h-2.5" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg> 1
+                    </span>
+</div>
+<div class="w-full bg-emerald-500 h-1 rounded-full mt-1.5"></div>
+</div>
+</div>
+<!-- CAM-02 -->
+<div class="border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col justify-between">
+<div class="px-2 py-1.5 bg-white border-b border-slate-200 flex items-center justify-between">
+<span class="font-bold text-[10px] text-slate-800">CAM-02</span>
+<span class="text-[8px] bg-rose-500 text-white font-bold px-1.5 py-0.5 rounded">OFFLINE</span>
+</div>
+<div class="aspect-video bg-slate-900 flex flex-col items-center justify-center text-slate-500">
+<svg class="w-6 h-6 opacity-40 mb-1" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="p-2 bg-white">
+<p class="text-[10px] font-medium text-slate-700 truncate">Raw Material Storage</p>
+<p class="text-[9px] text-slate-400 mt-1">No Signal</p>
+<div class="w-full bg-slate-200 h-1 rounded-full mt-1.5"></div>
+</div>
+</div>
+<!-- CAM-03 -->
+<div class="border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col justify-between">
+<div class="px-2 py-1.5 bg-white border-b border-slate-200 flex items-center justify-between">
+<span class="font-bold text-[10px] text-slate-800">CAM-03</span>
+<span class="text-[8px] bg-slate-500 text-white font-bold px-1.5 py-0.5 rounded">STANDBY</span>
+</div>
+<div class="aspect-video bg-slate-800 flex items-center justify-center text-slate-400">
+<svg class="w-6 h-6 opacity-50" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8 5v14l11-7z"></path>
+</svg>
+</div>
+<div class="p-2 bg-white">
+<p class="text-[10px] font-medium text-slate-700 truncate">Paint &amp; Coating Area</p>
+<p class="text-[9px] text-slate-400 mt-1">Standby</p>
+<div class="w-full bg-slate-200 h-1 rounded-full mt-1.5"></div>
+</div>
+</div>
+<!-- CAM-04 -->
+<div class="border border-slate-200 rounded-lg overflow-hidden bg-slate-50 flex flex-col justify-between">
+<div class="px-2 py-1.5 bg-white border-b border-slate-200 flex items-center justify-between">
+<span class="font-bold text-[10px] text-slate-800">CAM-04</span>
+<span class="text-[8px] bg-slate-500 text-white font-bold px-1.5 py-0.5 rounded">STANDBY</span>
+</div>
+<div class="aspect-video bg-slate-800 flex items-center justify-center text-slate-400">
+<svg class="w-6 h-6 opacity-50" fill="currentColor" viewbox="0 0 24 24">
+<path d="M8 5v14l11-7z"></path>
+</svg>
+</div>
+<div class="p-2 bg-white">
+<p class="text-[10px] font-medium text-slate-700 truncate">Assembly Line B</p>
+<p class="text-[9px] text-slate-400 mt-1">Standby</p>
+<div class="w-full bg-slate-200 h-1 rounded-full mt-1.5"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: AllCamerasGrid -->
+</div>
+<!-- Right Column: Incident Feed, PPE Analytics, Zones (4 Cols) -->
+<div class="xl:col-span-4 space-y-4">
+<!-- Panel 1: Recent Alerts & Incidents -->
+<div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<h3 class="font-bold text-xs text-slate-800">Recent Alerts &amp; Incidents</h3>
+</div>
+<a class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1" href="#">
+                View All <span>→</span>
+</a>
+</div>
+<!-- Incidents List -->
+<div class="space-y-2.5">
+<!-- Item 1: High Severity PPE Violation -->
+<div class="p-2.5 rounded-lg border border-rose-100 bg-rose-50/30 flex items-start gap-2.5">
+<span class="w-2 h-2 rounded-full bg-rose-500 mt-1 flex-shrink-0"></span>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<span class="font-mono-nums text-[10px] text-slate-500">18:28:14</span>
+<span class="bg-rose-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded tracking-wide">HIGH</span>
+</div>
+<div class="font-bold text-slate-800 text-[11px] mt-0.5">PPE Violation</div>
+<p class="text-[10px] text-slate-500 leading-snug">Worker #002 - No Helmet, No Vest, No Gloves</p>
+<p class="text-[9px] text-slate-400 mt-0.5">CAM-01 | Production Floor South</p>
+</div>
+<!-- Thumbnail -->
+<div class="w-9 h-9 rounded bg-slate-200 overflow-hidden flex-shrink-0 border border-slate-200">
+<img alt="Worker 002" class="w-full h-full object-cover object-center scale-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrqiDMoaWvHKgNW6Ivm1MW7xnlaVaTwCKNcptHlFINZZrVBcNkli9nhUAYBLfVAUVu6Q_l_oPaEDPXepXugrAoOAGt5AS9xlfB_n5gqP0LZ4jk9NJAZw8U4doplpNaYslSGHWo-8kpgNHfiBglJqvEodBF-TyL9-2KQRQHCHt5zTSoIStpGLNA_C7Zw59XzrLqMLgerknWvfoz9J7YYp7nqArynPfW8ga6RTqVXv0vKpxG0KruK2Li"/>
+</div>
+</div>
+<!-- Item 2: Medium Severity Worker Detected -->
+<div class="p-2.5 rounded-lg border border-amber-100 bg-amber-50/30 flex items-start gap-2.5">
+<span class="w-2 h-2 rounded-full bg-amber-500 mt-1 flex-shrink-0"></span>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<span class="font-mono-nums text-[10px] text-slate-500">18:25:03</span>
+<span class="bg-amber-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded tracking-wide">MEDIUM</span>
+</div>
+<div class="font-bold text-slate-800 text-[11px] mt-0.5">Worker Detected</div>
+<p class="text-[10px] text-slate-500 leading-snug">New worker #003 entered monitoring zone</p>
+<p class="text-[9px] text-slate-400 mt-0.5">CAM-01 | Production Floor South</p>
+</div>
+<div class="w-9 h-9 rounded bg-slate-200 overflow-hidden flex-shrink-0 border border-slate-200">
+<img alt="Worker 003" class="w-full h-full object-cover object-right scale-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXDnGOvoFcda2zuocWRBe7aRjqw8qZJ1Mpo9cPuN2_4VUIq6Bexl583aJ_BLxa6ZLyV3HR-W6CF0KkAAfEBunQfdjcWsEJjPDHm6Wy17oaF0h44hBpKJ4N5_TBE7inKNYE5rhfB9hSSX6o1APLZ0N1TCFPYZOcv5rX6B-nMzfCuYfVizpsb8wKycQnri7mW4i4lCYa0feB7HAsVtxbEVLQ6nffg5Z_k0isNORNEgoEirvsygvjJTJD"/>
+</div>
+</div>
+<!-- Item 3: Info Camera Reconnected -->
+<div class="p-2.5 rounded-lg border border-sky-100 bg-sky-50/30 flex items-start gap-2.5">
+<span class="w-2 h-2 rounded-full bg-sky-500 mt-1 flex-shrink-0"></span>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<span class="font-mono-nums text-[10px] text-slate-500">18:21:40</span>
+<span class="bg-sky-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded tracking-wide">INFO</span>
+</div>
+<div class="font-bold text-slate-800 text-[11px] mt-0.5">Camera Reconnected</div>
+<p class="text-[10px] text-slate-500 leading-snug">CAM-01 is now online</p>
+<p class="text-[9px] text-slate-400 mt-0.5">Production Floor South</p>
+</div>
+<div class="w-9 h-9 rounded bg-slate-200 overflow-hidden flex-shrink-0 border border-slate-200">
+<img alt="CAM-01" class="w-full h-full object-cover scale-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzCHIfIVw2fM8obhQs016tvNDr-SPTbHOVHAYKlUwH-4BjPVkNIoGRAHTMpIsu4kT_c8bPCDg6iKzuPRvBZb7ulN4SfNZ_TjiXUVUKADToiOfbY4F2yIgbij5Ps-M6K_jQFiErslmeG1Ncrh-CjPlPruf30b4tIDLm-ZL86c183HR1bURQFnORQJ35jh4uSMaB9yLzzLLe1grJf19bmaxaCJI01h3jM0fmbOSYtezvVHUg5zjcTqcS"/>
+</div>
+</div>
+<!-- Item 4: High Severity Worker 001 Gloves -->
+<div class="p-2.5 rounded-lg border border-rose-100 bg-rose-50/30 flex items-start gap-2.5">
+<span class="w-2 h-2 rounded-full bg-rose-500 mt-1 flex-shrink-0"></span>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<span class="font-mono-nums text-[10px] text-slate-500">18:19:12</span>
+<span class="bg-rose-500 text-white font-bold text-[8px] px-1.5 py-0.5 rounded tracking-wide">HIGH</span>
+</div>
+<div class="font-bold text-slate-800 text-[11px] mt-0.5">PPE Violation</div>
+<p class="text-[10px] text-slate-500 leading-snug">Worker #001 - No Gloves</p>
+<p class="text-[9px] text-slate-400 mt-0.5">CAM-01 | Production Floor South</p>
+</div>
+<div class="w-9 h-9 rounded bg-slate-200 overflow-hidden flex-shrink-0 border border-slate-200">
+<img alt="Worker 001" class="w-full h-full object-cover object-left scale-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOzqXuaMo7xgm4HkM6ULYFBFe9si7gJ6hZjnXsDDFGJ7FJ4TsEnvPS_Q7Kd4lhhrJ_lzSQ_Twx15IGYNwBAhIyz8Oigk94mzDJI0ZIEVuKpQMA20D6mYOjteze_wEaV0dEOWNYu7HA3WaQKQHO4_tzDl7fQnxc7FFDceo6mIQxtnNU_UzxvSfwjP_C58-mSghA1TEwTptc0tciqWXysiyLYF_-6Ts1zLLyfF9hH3kua25S5eN04goQ"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel 2: PPE Compliance (Last 24 Hours) -->
+<div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm">
+<div class="flex items-center gap-2 mb-3">
+<svg class="w-4 h-4 text-sky-600" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"></path>
+</svg>
+<h3 class="font-bold text-xs text-slate-800">PPE Compliance <span class="font-normal text-slate-400">(Last 24 Hours)</span></h3>
+</div>
+<!-- Horizontal Bars -->
+<div class="space-y-3">
+<!-- Helmet -->
+<div>
+<div class="flex justify-between items-center text-[10px] mb-1 font-medium">
+<span class="text-slate-700 flex items-center gap-1.5">
+<span class="text-slate-400">🪖</span> Helmet
+                  </span>
+<span class="font-mono-nums font-bold text-slate-800">78%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-emerald-500 h-2 rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<!-- Safety Vest -->
+<div>
+<div class="flex justify-between items-center text-[10px] mb-1 font-medium">
+<span class="text-slate-700 flex items-center gap-1.5">
+<span class="text-slate-400">🦺</span> Safety Vest
+                  </span>
+<span class="font-mono-nums font-bold text-slate-800">67%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-amber-500 h-2 rounded-full" style="width: 67%"></div>
+</div>
+</div>
+<!-- Gloves -->
+<div>
+<div class="flex justify-between items-center text-[10px] mb-1 font-medium">
+<span class="text-slate-700 flex items-center gap-1.5">
+<span class="text-slate-400">🧤</span> Gloves
+                  </span>
+<span class="font-mono-nums font-bold text-slate-800">52%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-rose-500 h-2 rounded-full" style="width: 52%"></div>
+</div>
+</div>
+<!-- Safety Footwear -->
+<div>
+<div class="flex justify-between items-center text-[10px] mb-1 font-medium">
+<span class="text-slate-700 flex items-center gap-1.5">
+<span class="text-slate-400">🥾</span> Safety Footwear
+                  </span>
+<span class="font-mono-nums font-bold text-slate-800">85%</span>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+<div class="bg-emerald-500 h-2 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel 3: Zone Status -->
+<div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<h3 class="font-bold text-xs text-slate-800">Zone Status</h3>
+</div>
+<a class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1" href="#">
+                View Map <span>→</span>
+</a>
+</div>
+<!-- Zones Grid -->
+<div class="grid grid-cols-2 gap-2 text-[10px]">
+<!-- Zone 1 -->
+<div class="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
+<span class="w-2 h-2 rounded-full bg-rose-500 mt-1 flex-shrink-0 animate-pulse"></span>
+<div>
+<div class="font-bold text-slate-800">Production Floor</div>
+<div class="text-[9px] text-rose-500 font-semibold">1 violation</div>
+</div>
+</div>
+<!-- Zone 2 -->
+<div class="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 mt-1 flex-shrink-0"></span>
+<div>
+<div class="font-bold text-slate-800">Paint &amp; Coating</div>
+<div class="text-[9px] text-slate-400">Normal</div>
+</div>
+</div>
+<!-- Zone 3 -->
+<div class="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 mt-1 flex-shrink-0"></span>
+<div>
+<div class="font-bold text-slate-800">Raw Material</div>
+<div class="text-[9px] text-slate-400">Normal</div>
+</div>
+</div>
+<!-- Zone 4 -->
+<div class="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 mt-1 flex-shrink-0"></span>
+<div>
+<div class="font-bold text-slate-800">Assembly Line</div>
+<div class="text-[9px] text-slate-400">Normal</div>
+</div>
+</div>
+<!-- Zone 5 -->
+<div class="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 mt-1 flex-shrink-0"></span>
+<div>
+<div class="font-bold text-slate-800">Chemical Storage</div>
+<div class="text-[9px] text-slate-400">Normal</div>
+</div>
+</div>
+<!-- Zone 6 -->
+<div class="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-start gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 mt-1 flex-shrink-0"></span>
+<div>
+<div class="font-bold text-slate-800">Loading Dock</div>
+<div class="text-[9px] text-slate-400">Normal</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: CoreDashboardSplitGrid -->
+</main>
+<!-- END: MainContentScrollable -->
+</div>
+<!-- END: MainBodyContainer -->
+</body></html>
