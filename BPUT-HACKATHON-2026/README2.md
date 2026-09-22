@@ -31,6 +31,45 @@ flowchart LR
 * **Low-Latency Edge Computing:** Delivers 45.5 ms end-to-end CPU inference, eliminating cloud GPU expenses and external bandwidth dependencies.
 * **Cryptographic Accountability:** Authenticates incident records with immutable SHA-256 checksums at the point of capture, satisfying regulatory compliance and insurance verifications.
 
+```mermaid
+flowchart TD
+    subgraph INGESTION["Multi-Source Edge Ingestion"]
+        I1["Fixed CCTV RTSP Stream"]
+        I2["Integrated Laptop USB Webcam"]
+        I3["Mobile Camera (IP Webcam Wi-Fi)"]
+        I4["DirectShow Video Capture Device"]
+    end
+
+    subgraph ENGINE["RAKSHYA VISION Edge Engine"]
+        E1["Frame Rate Matcher & Buffer Throttler"]
+        E2["Cascaded YOLOv8 Perception Model"]
+        E3["ByteTrack Kalman Trajectory Predictor"]
+        E4["Anatomical Spatial Geometry Engine"]
+        E5["Sliding-Window Temporal State Machine"]
+        E6["Deterministic Risk Governance Matrix"]
+        
+        E1 --> E2 --> E3 --> E4 --> E5 --> E6
+    end
+
+    subgraph VAULT["Auditable Storage & Ledger"]
+        V1["SQLite WAL Local Database"]
+        V2["SHA-256 Authenticated Snapshot Vault"]
+    end
+
+    subgraph OUTPUT["Real-Time Dispatch Layer"]
+        O1["FastAPI WebSocket Server (/api/ws/events)"]
+        O2["React 18 Live SOC Operations Dashboard"]
+        O3["HMAC Webhook Alert Notification Dispatcher"]
+    end
+
+    INGESTION --> E1
+    E6 --> V1
+    E6 --> V2
+    E6 --> O1
+    O1 --> O2
+    O1 --> O3
+```
+
 ---
 
 ## 2. The Idea
@@ -63,6 +102,29 @@ flowchart TD
 * **Ambient Safety Governance:** The system evaluates not just whether a violation exists, but its situational context—factoring in nearby thermal hazards, active worker counts, and zone-specific risk profiles.
 * **Democratic Edge Accessibility:** Rather than requiring tens of thousands of dollars in specialized GPU appliances or cloud subscriptions, the system is designed to run efficiently on commodity multi-core processors, making high-end AI safety accessible to small and medium enterprises.
 
+```mermaid
+flowchart TD
+    subgraph TIMELINE_TRADITIONAL["Traditional Passive Monitoring: Post-Accident Reaction"]
+        direction TB
+        TT1["t = 00:00:00 — Worker enters hazardous zone without hard hat or vest"]
+        TT2["t = 00:14:30 — Overhead gantry crane load shifts unexpectedly"]
+        TT3["t = 00:14:32 — Severe trauma impact occurs in active aisle"]
+        TT4["t = 00:18:00 — Coworker discovers injury and summons emergency response"]
+        TT5["Day +3 — Safety inspectors review archived CCTV footage post-incident"]
+        TT1 --> TT2 --> TT3 --> TT4 --> TT5
+    end
+
+    subgraph TIMELINE_RAKSHYA["RAKSHYA VISION: Proactive Real-Time Prevention"]
+        direction TB
+        RT1["t = 00:00:00 — Worker enters camera field of view"]
+        RT2["t = 00:00:00.15 — ByteTrack initializes anonymous Track #104"]
+        RT3["t = 00:00:00.30 — Cranial containment confirms NO helmet for N=3 frames"]
+        RT4["t = 00:00:00.45 — Risk score surges to 74 (HIGH); WebSocket alert broadcasts"]
+        RT5["t = 00:00:01.00 — Visual alarm flashes; worker equips helmet before entering danger area"]
+        RT1 --> RT2 --> RT3 --> RT4 --> RT5
+    end
+```
+
 ---
 
 ## 3. Technical Approach
@@ -85,6 +147,30 @@ flowchart LR
 3. **The Core Safety Invariant (`UNKNOWN != VIOLATION`):** When body limbs are hidden by equipment, clipped by camera edges, or occluded by coworkers, the state is designated `UNKNOWN`. The system strictly forbids violations on unknown states, eliminating spurious alerts.
 4. **Temporal State Hysteresis:** Raw frame-level flickers are filtered through sliding temporal windows. An absence state requires $N_{\text{confirm}} = 3$ consecutive frames; a fire or smoke hazard requires $N_{\text{confirm}} = 5$ frames.
 5. **Deterministic Risk Quantification:** Safety risks are scored on an explainable mathematical scale ($0\text{--}100$) rather than neural probability, factoring in violation base weights, worker density, duration, and zone criticality.
+
+```mermaid
+stateDiagram-v2
+    [*] --> UNKNOWN : Worker Track Initialized
+    UNKNOWN --> UNKNOWN : Limb Occluded / Frame Edge Clip
+    UNKNOWN --> SUSPECTED : Anatomical Zone Visible in Frame
+    SUSPECTED --> CONFIRMED_PRESENT : Gear Detected in Zone (N >= 1)
+    CONFIRMED_PRESENT --> SUSPECTED : Gear Detection Drop / Flicker
+    SUSPECTED --> CONFIRMED_ABSENT : Gear Missing for N_confirm >= 3 Frames
+    CONFIRMED_ABSENT --> CONFIRMED_PRESENT : Gear Detected (N >= 2 Recovery)
+    CONFIRMED_ABSENT --> UNKNOWN : Worker Exits View / Occluded
+    
+    note right of UNKNOWN
+        Core Safety Invariant:
+        UNKNOWN != VIOLATION
+        Zero false alerts on occlusions
+    end note
+
+    note left of CONFIRMED_ABSENT
+        Violation State:
+        Dispatches High/Medium Alert
+        Saves SHA-256 Snapshot
+    end note
+```
 
 ---
 
@@ -120,6 +206,21 @@ flowchart TD
 * **Latency Budget:** Total per-frame processing of 45.5 ms (YOLO detection: 28.2 ms; ByteTrack: 3.4 ms; Spatial association: 4.1 ms; Temporal state evaluation: 2.3 ms; HUD rendering: 5.8 ms; Risk governance: 1.7 ms).
 * **Storage Sustainability:** SQLite in Write-Ahead Logging (WAL) mode guarantees zero lock contention and minimal disk I/O, writing visual evidence frames only upon verified state escalation.
 
+```mermaid
+flowchart LR
+    subgraph TOTAL["Total Processing Budget: 45.5 ms per Frame (22.0 FPS on 8-Core CPU)"]
+        direction LR
+        L1["YOLOv8 Detection<br/><b>28.2 ms</b><br/>(62.0%)"]
+        L2["ByteTrack Kalman<br/><b>3.4 ms</b><br/>(7.5%)"]
+        L3["Spatial Mapping<br/><b>4.1 ms</b><br/>(9.0%)"]
+        L4["Temporal Debounce<br/><b>2.3 ms</b><br/>(5.1%)"]
+        L5["HUD Rendering<br/><b>5.8 ms</b><br/>(12.7%)"]
+        L6["Risk Governance<br/><b>1.7 ms</b><br/>(3.7%)"]
+
+        L1 --> L2 --> L3 --> L4 --> L5 --> L6
+    end
+```
+
 ---
 
 ## 5. Industry Impact & Benefits
@@ -142,6 +243,20 @@ flowchart LR
     end
 
     IMPACT --> BENEFITS
+```
+
+### Enterprise Safety ROI Flywheel
+
+```mermaid
+flowchart TD
+    subgraph FLYWHEEL["The Enterprise Safety ROI Flywheel"]
+        F1["24/7 Autonomous Visual Inspection"] --> F2["Instant Correction of Absent PPE & Hazards"]
+        F2 --> F3["75% Reduction in Lost-Time Injury (LTI) Rates"]
+        F3 --> F4["Elimination of OSHA Statutory Violations & Fines"]
+        F4 --> F5["Substantial Underwriting Premium Discounts (ISO 45001 Verified)"]
+        F5 --> F6["Direct Savings Reinvested into Facility Productivity"]
+        F6 --> F1
+    end
 ```
 
 ### Comparative Advantage
@@ -195,6 +310,30 @@ sequenceDiagram
 5. **Temporal Confirmation:** Violations are declared only after 3 consecutive frames of confirmed absence, preventing false alarms from brief motion blur.
 6. **Risk-Governed Dispatch:** Confirmed incidents trigger alerts based on severity and risk score, with automated cooldowns suppressing duplicate notifications for 60 seconds.
 
+```mermaid
+flowchart TD
+    subgraph THREAD["Isolated CameraWorker Pipeline Architecture"]
+        C1["OpenCV VideoCapture<br/>(DirectShow / RTSP / Mobile IP)"] --> C2{"Queue Full?<br/>(buffer_size > 1)"}
+        C2 -- "Yes" --> C3["Drop Stale Frame<br/>(Zero Pipeline Buffer Lag)"]
+        C2 -- "No" --> C4["Push to Ingestion Queue"]
+        C4 --> C5["Adaptive Rate Throttler<br/>(Synchronizes to 15 FPS Inference)"]
+        
+        C5 --> C6["Two-Tier Cascaded YOLOv8"]
+        C6 --> C7{"Persons Detected?"}
+        C7 -- "Yes" --> C8["Direct Spatial Containment Engine"]
+        C7 -- "No" --> C9["Invoke Base YOLOv8n Fallback"]
+        C9 --> C8
+        
+        C8 --> C10["ByteTrack Association & State Debounce"]
+        C10 --> C11["Compute Dynamic Risk Index (0-100)"]
+        C11 --> C12{"Violation or Hazard Escalation?"}
+        C12 -- "Yes" --> C13["Atomic SHA-256 Image Hash & Disk Write"]
+        C12 -- "No" --> C14["Update Rolling Memory State"]
+        C13 --> C15["Broadcast Event via WebSockets"]
+        C14 --> C15
+    end
+```
+
 ---
 
 ## 7. AI Safety Detection
@@ -244,6 +383,33 @@ classDiagram
 * **Brachial Region (Protective Gloves):** Vertical relative bounds `[0.35, 0.90]`, lateral offset margin `±0.35`, minimum containment ratio `0.15`.
 * **Pedal Region (Safety Footwear):** Vertical relative bounds `[0.70, 1.05]`, lateral offset margin `±0.25`, minimum containment ratio `0.15`.
 
+```mermaid
+flowchart TD
+    subgraph WORKER_BBOX["Worker Anatomical Zoning Geometry"]
+        direction TB
+        Z1["<b>Cranial Zone</b> (Head & Neck)<br/>Y: [-5%, 30%] | X: [-25%, +25%]<br/>Bound Target: <b>Hard Hat / Helmet</b>"]
+        Z2["<b>Thoracic Zone</b> (Chest & Torso)<br/>Y: [15%, 70%] | X: [-20%, +20%]<br/>Bound Target: <b>High-Vis Safety Vest</b>"]
+        Z3["<b>Brachial Zone</b> (Arms & Hands)<br/>Y: [35%, 90%] | X: [-35%, +35%]<br/>Bound Target: <b>Protective Gloves</b>"]
+        Z4["<b>Pedal Zone</b> (Feet & Ankles)<br/>Y: [70%, 105%] | X: [-25%, +25%]<br/>Bound Target: <b>Safety Footwear</b>"]
+        
+        Z1 --- Z2 --- Z3 --- Z4
+    end
+
+    subgraph SPATIAL_CHECK["Spatial Intersection Evaluation"]
+        S1["Extract Candidate Gear Bounding Box"]
+        S2["Calculate Intersection Area: Area(Gear &cap; Anatomical Zone)"]
+        S3{"Intersection Ratio &ge; Required Threshold?"}
+        S4["Associate Gear to Worker Track ID"]
+        S5["Reject Spatial Match (Stray Item / Background)"]
+
+        S1 --> S2 --> S3
+        S3 -- "Yes" --> S4
+        S3 -- "No" --> S5
+    end
+
+    WORKER_BBOX --> SPATIAL_CHECK
+```
+
 ### Cascaded Person Recall Engine
 Industrial edge cameras frequently encounter suboptimal conditions—underexposed rooms, tight webcam portrait angles, or extreme backlighting. RAKSHYA VISION solves this through a **two-tier cascade**:
 1. The specialized model `ppe_fire_smoke_v2` evaluates the frame for all 7 classes.
@@ -291,6 +457,34 @@ flowchart LR
 * **Live Incident Feed:** Streaming tabular alert ledger detailing severity classifications (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), originating camera IDs, affected workers, and one-click incident lifecycle management (Acknowledge, Resolve, Dismiss).
 * **Cryptographic Evidence Inspector:** Allows safety officers to view incident frames, download evidence packages, and run automated SHA-256 checksum verifications directly in the browser to ensure zero tampering.
 
+```mermaid
+flowchart TD
+    subgraph BACKEND_BROKER["FastAPI Streaming Broker"]
+        EP["/api/ws/events WebSocket Stream"]
+    end
+
+    subgraph CLIENT_APP["React 18 SOC Dashboard Architecture"]
+        WS["WebSocket Client Hook (Auto-Reconnect)"]
+        STORE["Global Safety State Store"]
+        
+        subgraph MODULAR_VIEWS["SOC Modular Operational Views"]
+            V1["<b>Executive Overview View</b><br/>Live KPI Counters, Incident Summary, System Status"]
+            V2["<b>Multi-Camera Hub</b><br/>Low-Latency Video Grid, Individual FPS & Status Telemetry"]
+            V3["<b>Worker Compliance Inspector</b><br/>Per-Worker Real-Time Checklist (Helmet, Vest, Gloves, Shoes)"]
+            V4["<b>Environmental Hazard Monitor</b><br/>Dual-Plume Fire/Smoke Spatial Mapping & Spread Vector"]
+            V5["<b>Evidence Vault & Audit Explorer</b><br/>SHA-256 In-Browser Verification, Tamper-Evident Ledger"]
+        end
+
+        EP -->|"JSON Telemetry Stream"| WS
+        WS --> STORE
+        STORE --> V1
+        STORE --> V2
+        STORE --> V3
+        STORE --> V4
+        STORE --> V5
+    end
+```
+
 ---
 
 ## 9. Deployment & Future Scope
@@ -316,6 +510,45 @@ flowchart TD
     CURRENT ==> ROADMAP
 ```
 
+### Industrial Edge Deployment Topology
+
+```mermaid
+flowchart TD
+    subgraph SENSORS["Field Sensory Layer"]
+        C1["CCTV Camera 01 (Factory Gate)<br/>RTSP / H.264 over CAT6 Ethernet"]
+        C2["Mobile Camera 02 (Mobile Patrol)<br/>IP Webcam RTSP/HTTP over 5GHz Wi-Fi"]
+        C3["Inspection Cam 03 (Fabrication Bench)<br/>DirectShow USB 3.0 High-Speed"]
+    end
+
+    subgraph EDGE_HOST["Local Plant Edge Computing Appliance"]
+        direction TB
+        SW["Gigabit Industrial PoE Switch"]
+        HOST["On-Premises Edge Server / Workstation<br/>Intel Core i7 / Xeon (No Cloud GPU Required)"]
+        
+        subgraph ENGINE_CORE["RAKSHYA VISION Edge Engine"]
+            P1["Isolated Stream Workers"]
+            P2["Cascaded YOLOv8 + ByteTrack"]
+            P3["FastAPI Async Core & SQLite WAL"]
+        end
+
+        SW --> HOST
+        HOST --- ENGINE_CORE
+    end
+
+    subgraph CONSUMERS["Plant Operations & Safety Control"]
+        D1["Control Room Video Wall (React 18 SOC)"]
+        D2["Safety Officer Mobile Tablet / Laptop"]
+        D3["Automated PLC Emergency Machine Stop (Roadmap)"]
+    end
+
+    C1 --> SW
+    C2 --> SW
+    C3 --> HOST
+    ENGINE_CORE --> D1
+    ENGINE_CORE --> D2
+    ENGINE_CORE -.-> D3
+```
+
 ### Empirical Verification Summary
 * **Unit & Regression Tests:** **160 / 160 tests passed (100%)** across authentication, database concurrency, camera workers, risk evaluation, and alert dispatch.
 * **Integration Scenarios:** **39 / 39 scenarios verified (100%)** across video ingestion, hazard escalation cycles, and network recovery policies.
@@ -328,6 +561,41 @@ flowchart TD
 ## 10. Research & References
 
 The architecture, perception models, and governance logic of RAKSHYA VISION are anchored in peer-reviewed academic literature, open-source computer vision datasets, and statutory workplace safety standards.
+
+```mermaid
+flowchart LR
+    subgraph REGULATIONS["Occupational Safety Regulations"]
+        R1["OSHA 1910.135<br/>(Head Protection)"]
+        R2["ANSI/ISEA 107<br/>(High-Visibility Vests)"]
+        R3["OSHA 1910.138<br/>(Hand Protection)"]
+        R4["OSHA 1910.136<br/>(Foot Protection)"]
+        R5["NFPA / OSHA<br/>(Early Fire & Smoke)"]
+    end
+
+    subgraph ENGINE_CLASS["RAKSHYA VISION Classes & Zoning"]
+        C1["Class 1: helmet<br/>(Cranial Zone [-5%, 30%])"]
+        C2["Class 2: safety_vest<br/>(Thoracic Zone [15%, 70%])"]
+        C3["Class 3: gloves<br/>(Brachial Zone [35%, 90%])"]
+        C4["Class 4: safety_footwear<br/>(Pedal Zone [70%, 105%])"]
+        C5["Classes 5 & 6: fire & smoke<br/>(Multi-Frame Plume Tracker)"]
+    end
+
+    subgraph CITATIONS["Foundational Literature & Benchmarks"]
+        L1["YOLOv8 & CPPE-5 Benchmark (CVPR 2022)"]
+        L2["ByteTrack Kalman Filter (ECCV 2022)"]
+        L3["Mackworth Vigilance Research (1948)"]
+        L4["ISO 45001:2018 Management Standard"]
+    end
+
+    R1 --> C1 --> L1
+    R2 --> C2 --> L1
+    R3 --> C3 --> L1
+    R4 --> C4 --> L1
+    R5 --> C5 --> L1
+    C1 -.-> L2
+    ENGINE_CLASS -.-> L3
+    REGULATIONS -.-> L4
+```
 
 ```mermaid
 flowchart TD
