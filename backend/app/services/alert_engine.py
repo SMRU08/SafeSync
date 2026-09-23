@@ -17,6 +17,7 @@ try:
     from app.ai.risk.schemas import (
         EventType,
         RiskLevel,
+        AlarmPriority,
         IncidentStatus,
         AlertStatus,
         NormalizedSafetyEvent,
@@ -37,6 +38,7 @@ except ImportError:
     from backend.app.ai.risk.schemas import (
         EventType,
         RiskLevel,
+        AlarmPriority,
         IncidentStatus,
         AlertStatus,
         NormalizedSafetyEvent,
@@ -113,6 +115,40 @@ class AlertEngine:
     def _make_dedup_key(self, event: NormalizedSafetyEvent) -> str:
         target = f"worker_{event.track_id}" if event.track_id is not None else f"hazard_{event.hazard_event_id or 'env'}"
         return f"{event.event_type.value}:{event.camera_id}:{target}"
+
+    def _get_priority_for_event(self, event: NormalizedSafetyEvent, risk: RiskScoreBreakdown) -> Tuple[AlarmPriority, bool]:
+        """
+        Determines the alert priority (P0-P3) and whether an audible siren should be sounded.
+        - P0 (CRITICAL): Confirmed Fire, Dual/Multi-Hazard Emergency (Audible Siren = True)
+        - P1 (HIGH): Confirmed Smoke Plume (Audible Siren = True)
+        - P2 (MEDIUM): Confirmed PPE Violation (Visual Dashboard Alert, Audible Siren = False)
+        - P3 (LOW): Camera Offline, System Advisory (Audible Siren = False)
+        """
+        if event.details and "priority" in event.details:
+            try:
+                p_enum = AlarmPriority(event.details["priority"])
+                is_audible = bool(event.details.get("audible", p_enum in (AlarmPriority.P0, AlarmPriority.P1)))
+                return p_enum, is_audible
+            except Exception:
+                pass
+
+        if event.event_type in (EventType.FIRE_DETECTED, EventType.MULTIPLE_HAZARDS):
+            return AlarmPriority.P0, True
+        elif event.event_type == EventType.SMOKE_DETECTED:
+            if event.duration_seconds >= 10.0 or risk.risk_level == RiskLevel.CRITICAL:
+                return AlarmPriority.P0, True
+            return AlarmPriority.P1, True
+        elif event.event_type in (
+            EventType.MISSING_HELMET,
+            EventType.MISSING_SAFETY_VEST,
+            EventType.MISSING_GLOVES,
+            EventType.MISSING_SAFETY_FOOTWEAR,
+            EventType.PPE_VIOLATION,
+        ):
+            return AlarmPriority.P2, False
+        elif event.event_type in (EventType.CAMERA_FAILURE, EventType.SYSTEM_FAILURE):
+            return AlarmPriority.P3, False
+        return AlarmPriority.P3, False
 
     def compose_alert_message(self, event: NormalizedSafetyEvent, risk_breakdown: RiskScoreBreakdown) -> Tuple[str, str]:
         """
@@ -306,10 +342,13 @@ class AlertEngine:
                     db.add(hist)
                     db.commit()
 
+                priority, is_audible = self._get_priority_for_event(event, risk)
                 escalated_alert = AlertSchema(
                     alert_id=alert_id,
                     incident_id=incident_id,
                     severity=risk.risk_level,
+                    priority=priority,
+                    is_audible=is_audible,
                     title=title,
                     message=msg,
                     camera_id=event.camera_id,
@@ -413,10 +452,13 @@ class AlertEngine:
             db.add(hist)
             db.commit()
 
+        priority, is_audible = self._get_priority_for_event(event, risk)
         new_alert = AlertSchema(
             alert_id=alert_id,
             incident_id=incident_id,
             severity=risk.risk_level,
+            priority=priority,
+            is_audible=is_audible,
             title=title,
             message=msg,
             camera_id=event.camera_id,

@@ -13,14 +13,14 @@ tracking:
 association:
   helmet:
     vertical_roi_top: -0.05    # Relative to person box height (allow slightly above top of head)
-    vertical_roi_bottom: 0.30  # Head / upper shoulders zone
-    max_lateral_offset: 0.25   # Maximum relative lateral offset outside person width
-    min_containment_ratio: 0.20
+    vertical_roi_bottom: 0.25  # Cranium / head zone (rejects torso/chest overlap)
+    max_lateral_offset: 0.20   # Maximum relative lateral offset outside person width
+    min_containment_ratio: 0.35
   safety_vest:
-    vertical_roi_top: 0.15     # Torso zone top
-    vertical_roi_bottom: 0.70  # Torso zone bottom
-    max_lateral_offset: 0.20
-    min_containment_ratio: 0.30
+    vertical_roi_top: 0.18     # Torso zone top (below neck)
+    vertical_roi_bottom: 0.58  # Torso zone bottom (above waist)
+    max_lateral_offset: 0.15
+    min_containment_ratio: 0.40
   gloves:
     vertical_roi_top: 0.35     # Lower arm / hand zone top
     vertical_roi_bottom: 0.90  # Lower arm / hand zone bottom
@@ -33,7 +33,7 @@ association:
     min_containment_ratio: 0.15
 
 temporal:
-  confirmation_frames: 3         # Consecutive/accumulated detections required to confirm PRESENT
+  confirmation_frames: 5         # Consecutive/accumulated detections required to confirm PRESENT (prevents flicker)
   missing_detection_tolerance: 5 # Tolerated missed detections before transitioning to ABSENT
   history_window_frames: 30      # Sliding history window per active worker track
   prune_lost_after_frames: 60    # Purge worker history after 60 frames of inactivity

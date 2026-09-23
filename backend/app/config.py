@@ -200,21 +200,23 @@ class Settings(BaseSettings):
         super().__init__(**merged)
 
         # 4. Synchronize CORS_ALLOWED_ORIGINS env string into CORS_ORIGINS list
-        if self.CORS_ALLOWED_ORIGINS and self.APP_ENV == "production":
+        if self.CORS_ALLOWED_ORIGINS is not None:
             origins = [o.strip() for o in self.CORS_ALLOWED_ORIGINS.split(",") if o.strip()]
             self.CORS_ORIGINS = origins
-        elif self.APP_ENV == "production" and "CORS_ORIGINS" not in values:
-            yaml_cors = yaml_defaults.get("CORS_ORIGINS", [])
-            self.CORS_ORIGINS = yaml_cors if yaml_cors else []
-        elif self.APP_ENV in ("development", "test") and "CORS_ORIGINS" not in values:
-            if self.CORS_ALLOWED_ORIGINS and "CORS_ALLOWED_ORIGINS" in values:
-                origins = [o.strip() for o in self.CORS_ALLOWED_ORIGINS.split(",") if o.strip()]
-                for d in DEVELOPMENT_CORS_DEFAULTS:
-                    if d not in origins:
-                        origins.append(d)
-                self.CORS_ORIGINS = origins
-            else:
-                self.CORS_ORIGINS = DEVELOPMENT_CORS_DEFAULTS.copy()
+        elif "CORS_ORIGINS" in values:
+            self.CORS_ORIGINS = list(values["CORS_ORIGINS"])
+        elif yaml_defaults.get("CORS_ORIGINS"):
+            self.CORS_ORIGINS = list(yaml_defaults["CORS_ORIGINS"])
+        elif self.APP_ENV != "production":
+            self.CORS_ORIGINS = DEVELOPMENT_CORS_DEFAULTS.copy()
+        else:
+            self.CORS_ORIGINS = []
+
+        # Only include default development origins in non-production environments
+        if self.APP_ENV != "production":
+            for dev_origin in DEVELOPMENT_CORS_DEFAULTS:
+                if dev_origin not in self.CORS_ORIGINS:
+                    self.CORS_ORIGINS.append(dev_origin)
 
         # 5. Synchronize DEBUG flag with environment
         if self.APP_ENV == "production" and "DEBUG" not in values:

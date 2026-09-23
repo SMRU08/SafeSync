@@ -1,0 +1,461 @@
+{
+  "bangga_ppe": {
+    "dataset_name": "bangga_ppe",
+    "classes": [
+      "Boots",
+      "Ear Protectors",
+      "Ear-protection",
+      "Glasses",
+      "Glove",
+      "Gloves",
+      "Helmet",
+      "Mask",
+      "Person",
+      "Safety_shoes",
+      "Shoes",
+      "Vest",
+      "Without Ear Protectors",
+      "Without Glass",
+      "Without Glove",
+      "Without Helmet",
+      "Without Mask",
+      "Without Shoes",
+      "Without Vest"
+    ],
+    "total_images": 19158,
+    "splits": {
+      "test": 1287,
+      "train": 16734,
+      "val": 1137
+    },
+    "total_bounding_boxes": 68542,
+    "class_distribution": {
+      "Helmet": 7963,
+      "Vest": 9619,
+      "Safety_shoes": 6098,
+      "Person": 7063,
+      "Glasses": 5052,
+      "Shoes": 9898,
+      "Without Helmet": 3774,
+      "Without Vest": 1103,
+      "Mask": 1606,
+      "Gloves": 12300,
+      "Without Mask": 556,
+      "Ear Protectors": 740,
+      "Without Glove": 776,
+      "Without Glass": 307,
+      "Without Ear Protectors": 473,
+      "Boots": 1167,
+      "Ear-protection": 8,
+      "Without Shoes": 22,
+      "Glove": 17
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        640,
+        640
+      ],
+      "samples_count": 19158
+    }
+  },
+  "construction_ppe": {
+    "dataset_name": "construction_ppe",
+    "classes": [
+      "hat",
+      "no hat",
+      "no vest",
+      "vest"
+    ],
+    "total_images": 1124,
+    "splits": {
+      "test": 62,
+      "val": 134,
+      "train": 928
+    },
+    "total_bounding_boxes": 5325,
+    "class_distribution": {
+      "vest": 1303,
+      "hat": 1659,
+      "no vest": 1370,
+      "no hat": 993
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        640,
+        640
+      ],
+      "samples_count": 1124
+    }
+  },
+  "d_fire": {
+    "dataset_name": "d_fire",
+    "classes": [
+      "Fire",
+      "Smoke"
+    ],
+    "total_images": 4632,
+    "splits": {
+      "test": 102,
+      "train": 4175,
+      "val": 354,
+      "unspecified": 1
+    },
+    "total_bounding_boxes": 10706,
+    "class_distribution": {
+      "Smoke": 5373,
+      "Fire": 5333
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        3264,
+        3264
+      ],
+      "samples_count": 4632
+    }
+  },
+  "hard_hat_workers": {
+    "dataset_name": "hard_hat_workers",
+    "classes": [
+      "head",
+      "helmet",
+      "person"
+    ],
+    "total_images": 7035,
+    "splits": {
+      "test": 706,
+      "train": 4916,
+      "val": 1413
+    },
+    "total_bounding_boxes": 27039,
+    "class_distribution": {
+      "helmet": 19747,
+      "head": 6677,
+      "person": 615
+    },
+    "resolutions": {
+      "min": [
+        167,
+        154
+      ],
+      "max": [
+        1000,
+        667
+      ],
+      "samples_count": 7035
+    }
+  },
+  "ppe_detection_compliance": {
+    "dataset_name": "ppe_detection_compliance",
+    "classes": [
+      "Boots",
+      "Gloves",
+      "Goggles",
+      "Helmet",
+      "Mask",
+      "NO-Boots",
+      "NO-Gloves",
+      "NO-Goggles",
+      "NO-Helmet",
+      "NO-Mask",
+      "NO-Vest",
+      "Person",
+      "Vest"
+    ],
+    "total_images": 9663,
+    "splits": {
+      "test": 482,
+      "train": 7721,
+      "val": 1460
+    },
+    "total_bounding_boxes": 39510,
+    "class_distribution": {
+      "NO-Boots": 776,
+      "Boots": 1507,
+      "Mask": 4209,
+      "NO-Vest": 2714,
+      "Goggles": 2370,
+      "Person": 4930,
+      "Gloves": 2634,
+      "NO-Mask": 4064,
+      "Vest": 4969,
+      "Helmet": 3125,
+      "NO-Helmet": 3665,
+      "NO-Goggles": 1836,
+      "NO-Gloves": 2711
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        640,
+        640
+      ],
+      "samples_count": 9663
+    }
+  },
+  "ppe_safup": {
+    "dataset_name": "ppe_safup",
+    "classes": [
+      "Hardhat",
+      "NO-Hardhat",
+      "NO-Safety Vest",
+      "Person",
+      "Safety Vest"
+    ],
+    "total_images": 4254,
+    "splits": {
+      "test": 92,
+      "train": 3808,
+      "val": 354
+    },
+    "total_bounding_boxes": 15511,
+    "class_distribution": {
+      "Hardhat": 4075,
+      "Safety Vest": 4737,
+      "Person": 4273,
+      "NO-Hardhat": 1519,
+      "NO-Safety Vest": 907
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        640,
+        640
+      ],
+      "samples_count": 4254
+    }
+  },
+  "ppe_shikk": {
+    "dataset_name": "ppe_shikk",
+    "classes": [
+      "Glass",
+      "Glasses",
+      "Gloves",
+      "Goggles",
+      "Helmet",
+      "Mask",
+      "No-Helmet",
+      "No-Vest",
+      "Person",
+      "Safety-Boot",
+      "Safety-Vest",
+      "Safety_shoes",
+      "Vest",
+      "combination",
+      "face_mask",
+      "face_nomask",
+      "glasses",
+      "hand_glove",
+      "hand_noglove",
+      "head_helmet",
+      "head_nohelmet",
+      "helmet",
+      "no helmet",
+      "no vest",
+      "no-vest",
+      "person",
+      "protective_suit",
+      "shoes",
+      "vest",
+      "worker"
+    ],
+    "total_images": 259,
+    "splits": {
+      "test": 17,
+      "train": 185,
+      "val": 57
+    },
+    "total_bounding_boxes": 1693,
+    "class_distribution": {
+      "Vest": 106,
+      "No-Vest": 75,
+      "No-Helmet": 210,
+      "Safety_shoes": 49,
+      "Mask": 56,
+      "Gloves": 167,
+      "helmet": 86,
+      "vest": 171,
+      "Glasses": 13,
+      "Helmet": 44,
+      "worker": 22,
+      "no helmet": 5,
+      "no vest": 1,
+      "Person": 68,
+      "combination": 5,
+      "person": 102,
+      "Goggles": 5,
+      "protective_suit": 18,
+      "Safety-Vest": 61,
+      "Glass": 28,
+      "Safety-Boot": 107,
+      "head_nohelmet": 80,
+      "face_nomask": 73,
+      "hand_noglove": 119,
+      "head_helmet": 8,
+      "glasses": 2,
+      "hand_glove": 5,
+      "shoes": 3,
+      "face_mask": 1,
+      "no-vest": 3
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        640,
+        640
+      ],
+      "samples_count": 259
+    }
+  },
+  "safety_ppe": {
+    "dataset_name": "safety_ppe",
+    "classes": [
+      "No_BreathingApparatus",
+      "No_Glove",
+      "No_Goggles",
+      "No_Harness",
+      "No_Helmet",
+      "No_Shoe",
+      "Person"
+    ],
+    "total_images": 6629,
+    "splits": {
+      "test": 294,
+      "train": 5011,
+      "val": 1324
+    },
+    "total_bounding_boxes": 28972,
+    "class_distribution": {
+      "No_Shoe": 1690,
+      "No_Goggles": 2599,
+      "No_Helmet": 3237,
+      "No_BreathingApparatus": 5955,
+      "No_Harness": 3281,
+      "No_Glove": 3445,
+      "Person": 8765
+    },
+    "resolutions": {
+      "min": [
+        100,
+        100
+      ],
+      "max": [
+        6000,
+        4000
+      ],
+      "samples_count": 6629
+    }
+  },
+  "safety_ppe_4": {
+    "dataset_name": "safety_ppe_4",
+    "classes": [
+      "boots",
+      "gloves",
+      "goggles",
+      "helmet",
+      "no-boots",
+      "no-gloves",
+      "no-goggles",
+      "no-helmet",
+      "no-vest",
+      "vest"
+    ],
+    "total_images": 5079,
+    "splits": {
+      "test": 517,
+      "train": 3563,
+      "val": 999
+    },
+    "total_bounding_boxes": 21328,
+    "class_distribution": {
+      "vest": 5779,
+      "no-helmet": 591,
+      "no-gloves": 329,
+      "helmet": 5841,
+      "boots": 4525,
+      "gloves": 1512,
+      "no-vest": 1173,
+      "goggles": 585,
+      "no-goggles": 832,
+      "no-boots": 161
+    },
+    "resolutions": {
+      "min": [
+        640,
+        640
+      ],
+      "max": [
+        640,
+        640
+      ],
+      "samples_count": 5079
+    }
+  },
+  "ultralytics_construction_ppe": {
+    "dataset_name": "ultralytics_construction_ppe",
+    "classes": [
+      "helmet",
+      "gloves",
+      "vest",
+      "boots",
+      "goggles",
+      "none",
+      "Person",
+      "no_helmet",
+      "no_goggle",
+      "no_gloves",
+      "no_boots"
+    ],
+    "total_images": 1416,
+    "splits": {
+      "test": 141,
+      "train": 1132,
+      "val": 143
+    },
+    "total_bounding_boxes": 11521,
+    "class_distribution": {
+      "helmet": 1734,
+      "Person": 2245,
+      "vest": 1618,
+      "gloves": 1445,
+      "boots": 1597,
+      "goggles": 518,
+      "no_helmet": 485,
+      "no_goggle": 411,
+      "none": 797,
+      "no_gloves": 556,
+      "no_boots": 115
+    },
+    "resolutions": {
+      "min": [
+        612,
+        263
+      ],
+      "max": [
+        1024,
+        1024
+      ],
+      "samples_count": 1416
+    }
+  }
+}

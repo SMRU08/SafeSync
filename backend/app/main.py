@@ -3,8 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.database.session import check_database_connection, engine, Base
+from app.database.session import check_database_connection, check_database_health, engine, Base
 from app.schemas.health import RootResponse, HealthResponse
+from app.ai.detection.model_loader import ModelLoader
 
 logging.basicConfig(
     level=logging.INFO if not settings.DEBUG else logging.DEBUG,
@@ -17,14 +18,34 @@ logger = logging.getLogger("rakshya_vision")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing application: %s in %s environment", settings.APP_NAME, settings.APP_ENV)
-    # Ensure database tables/schema can connect
+    
+    # 1. Database schema and connectivity check
     Base.metadata.create_all(bind=engine)
     db_ok = check_database_connection()
     if db_ok:
-        logger.info("Database connectivity established successfully at %s", settings.DATABASE_URL)
+        logger.info("[DATABASE] Connected to %s", settings.DATABASE_URL)
     else:
-        logger.warning("Database connectivity check failed.")
-    
+        logger.error("[DATABASE] Connection failed to %s", settings.DATABASE_URL)
+
+    # 2. AI Engine Model Loader initialization
+    try:
+        loader = ModelLoader.get_instance()
+        loader.load_model()
+        logger.info(
+            "[AI ENGINE] Model '%s' loaded on device '%s' (classes: %d)",
+            getattr(loader, "_loaded_path", "ppe_fire_smoke_v2"),
+            loader.device,
+            len(loader.classes),
+        )
+    except Exception as e:
+        logger.warning("[AI ENGINE] Model loading error or deferred: %s", e)
+
+    # 3. WebSocket Readiness
+    logger.info("[WEBSOCKET] Ready for connections on /ws/events and /ws/alerts")
+
+    # 4. API Confirmation
+    logger.info("[API] Started on %s:%s (Environment: %s)", settings.HOST, settings.PORT, settings.APP_ENV)
+
     # Auto-start configured camera stream workers
     try:
         from app.camera.manager import CameraManager
@@ -34,7 +55,7 @@ async def lifespan(app: FastAPI):
         logger.warning("Camera stream worker auto-start deferred: %s", e)
 
     yield
-    logger.info("Shutting down %s...", settings.APP_NAME)
+    logger.info("[API] Shutting down %s...", settings.APP_NAME)
     try:
         from app.camera.manager import CameraManager
         CameraManager.get_instance().stop_all()
@@ -68,7 +89,6 @@ from app.api.cameras import router as cameras_router
 from app.api.auth import router as auth_router
 from app.api.evidence import router as evidence_router
 from app.api.monitoring import router as monitoring_router
-from app.ai.detection.model_loader import ModelLoader
 from app.config import setup_production_logging
 
 setup_production_logging()
@@ -93,18 +113,86 @@ def read_root():
 
 
 @app.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
-def health_check():
+@app.get("/api/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
+def unified_health_check():
+    """
+    Unified Real Health Check Endpoint (Phase 6).
+    Checks real API, Database, AI Engine, and WebSocket statuses.
+    """
+    # 1. Real API status
+    api_info = {
+        "status": "online",
+        "app_name": settings.APP_NAME,
+        "environment": settings.APP_ENV,
+        "version": "1.0.0",
+    }
+
+    # 2. Real Database probe (executes SELECT 1)
     db_ok = check_database_connection()
+    database_info = {
+        "status": "connected" if db_ok else "disconnected",
+        "dialect": engine.dialect.name,
+        "reachable": db_ok,
+    }
+
+    # 3. Real AI Engine check (ModelLoader)
+    ai_status_val = "unavailable"
+    device_str = "cpu"
+    classes_count = 0
+    model_name = "ppe_fire_smoke_v2"
+    is_loaded = False
     try:
         loader = ModelLoader.get_instance()
-        ai_status = "Connected" if loader.is_loaded() else "Ready"
-    except Exception:
-        ai_status = "Unavailable"
+        if not loader.is_loaded():
+            try:
+                loader.load_model()
+            except Exception as load_err:
+                logger.debug("Model lazy load during health check: %s", load_err)
+
+        if loader.is_loaded():
+            ai_status_val = "available"
+            is_loaded = True
+            device_str = loader.device
+            classes_count = len(loader.classes)
+        else:
+            ai_status_val = "initializing"
+    except Exception as exc:
+        logger.warning("AI Engine health check error: %s", exc)
+        ai_status_val = "unavailable"
+
+    ai_engine_info = {
+        "status": ai_status_val,
+        "loaded": is_loaded,
+        "device": device_str,
+        "model": model_name,
+        "classes": classes_count,
+    }
+
+    # 4. Real WebSocket connection manager probe
+    try:
+        from app.api.websocket import manager as ws_manager
+        ws_count = ws_manager.active_count
+        ws_info = {
+            "status": "connected",
+            "active_connections": ws_count,
+        }
+    except Exception as exc:
+        ws_info = {
+            "status": "unavailable",
+            "error": str(exc),
+        }
+
+    overall_status = "healthy" if (db_ok and is_loaded) else ("degraded" if db_ok else "unhealthy")
 
     return {
-        "status": "healthy",
-        "database": "connected" if db_ok else "disconnected",
-        "ai_engine": ai_status
+        "status": overall_status,
+        "api": api_info,
+        "database": database_info,
+        "database_connected": db_ok,
+        "ai_engine": ai_engine_info,
+        "ai_status": "Connected" if is_loaded else ("Ready" if ai_status_val == "initializing" else "Unavailable"),
+        "model_loaded": is_loaded,
+        "websocket": ws_info,
     }
 
 

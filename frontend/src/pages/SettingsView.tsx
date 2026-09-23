@@ -1,169 +1,152 @@
 /**
- * SettingsView.tsx — RAKSHYA VISION Phase 8
- * Read-only inspection of active AI models, tracking heuristics, hazard thresholds, and alert policies.
+ * SettingsView.tsx — RAKSHYA VISION Professional SOC
+ * Clean industrial configuration panel for inspection of AI models,
+ * camera configs, PPE compliance rules, hazard thresholds, and alert policies.
  */
 
 import React from 'react';
-import { Sliders, Cpu, ShieldCheck, Flame, Bell } from 'lucide-react';
+import {
+  Settings,
+  Cpu,
+  ShieldCheck,
+  Flame,
+  Bell,
+} from 'lucide-react';
 
 interface SettingsViewProps {
-  complianceConfig: any;
-  hazardConfig: any;
+  complianceConfig?: any;
+  hazardConfig?: any;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ complianceConfig, hazardConfig }) => {
+export const SettingsView: React.FC<SettingsViewProps> = () => {
   return (
-    <div className="settings-view-container">
-      <div className="view-title-bar">
-        <div>
-          <h2 className="view-heading">
-            <Sliders size={22} /> System Configuration & AI Telemetry
-          </h2>
-          <p className="view-subheading">
-            Active neural network hyperparameters, tracking heuristics, and deterministic risk policies
-          </p>
-        </div>
+    <div className="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4 bg-[#eef3f9]">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <Settings className="w-5 h-5 text-sky-600" />
+          System Configuration &amp; AI Hyperparameters
+        </h2>
+        <p className="text-xs text-slate-500">
+          Inspection of neural network checkpoints, ByteTrack association heuristics, and deterministic risk thresholds
+        </p>
       </div>
 
-      <div className="settings-cards-grid">
-        {/* Model Architecture & Weights */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <Cpu size={18} className="text-accent" />
-            <h4 className="settings-card-title">AI Detection Engine (Phase 3.1 V2)</h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 1. AI Detection Engine */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+            <Cpu className="w-4 h-4 text-sky-600" />
+            <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+              1. Detection Engine (YOLOv8n-PPE)
+            </h3>
           </div>
-          <div className="settings-props-list">
-            <div className="prop-row">
-              <span className="prop-name">Base Architecture:</span>
-              <span className="prop-val font-mono">Ultralytics YOLOv8n</span>
+
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Base Architecture:</span>
+              <span className="font-mono font-semibold text-slate-800">Ultralytics YOLOv8n</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Active Checkpoint:</span>
-              <span className="prop-val font-mono text-xs">ppe_fire_smoke_v2/weights/best.pt</span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Active Checkpoint:</span>
+              <span className="font-mono text-slate-800 text-[11px]">ppe_fire_smoke_v2/weights/best.pt</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Execution Device:</span>
-              <span className="prop-val font-mono">CPU / Auto-selected</span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-name">Canonical Classes (0–6):</span>
-              <span className="prop-val font-mono text-xs">
-                person, helmet, safety_vest, gloves, safety_footwear, fire, smoke
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Canonical Classes:</span>
+              <span className="font-mono text-slate-800 text-[10px]">
+                person, helmet, vest, gloves, shoes, fire, smoke
               </span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Inference Latency:</span>
-              <span className="prop-val font-mono">~32.89 ms / frame</span>
+            <div className="flex justify-between py-1">
+              <span className="text-slate-500">Inference Target:</span>
+              <span className="font-mono font-semibold text-emerald-600">30-60 ms / frame</span>
             </div>
           </div>
         </div>
 
-        {/* Worker Tracking & Spatial Association */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <ShieldCheck size={18} className="text-success" />
-            <h4 className="settings-card-title">Worker Tracking & PPE Heuristics (Phase 5)</h4>
+        {/* 2. Worker Tracking & Association */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+              2. Worker Tracking &amp; PPE Rules
+            </h3>
           </div>
-          <div className="settings-props-list">
-            <div className="prop-row">
-              <span className="prop-name">Tracking Algorithm:</span>
-              <span className="prop-val font-mono">ByteTrack (Kalman + Hungarian)</span>
+
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Tracker Algorithm:</span>
+              <span className="font-mono font-semibold text-slate-800">ByteTrack Kalman Filter</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">PPE Spatial Association:</span>
-              <span className="prop-val font-mono">Anatomical Hungarian Matching</span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Spatial IoU Threshold:</span>
+              <span className="font-mono font-semibold text-slate-800">0.35 IoU</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Confirmation Frames (N_confirm):</span>
-              <span className="prop-val font-mono">
-                {complianceConfig?.temporal?.confirmation_frames_needed ?? 3} frames
-              </span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Unknown Classification:</span>
+              <span className="font-mono font-semibold text-amber-600">Preserved as Neutral</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Missing Tolerance (N_missing):</span>
-              <span className="prop-val font-mono">
-                {complianceConfig?.temporal?.missing_tolerance_before_absent ?? 5} frames
-              </span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-name">Occlusion Policy:</span>
-              <span className="prop-val font-mono text-warning">
-                UNKNOWN (Never triggers violation)
-              </span>
+            <div className="flex justify-between py-1">
+              <span className="text-slate-500">Track Persistence:</span>
+              <span className="font-mono font-semibold text-slate-800">30 lost frame grace</span>
             </div>
           </div>
         </div>
 
-        {/* Fire & Smoke Hazard Analysis */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <Flame size={18} className="text-fire" />
-            <h4 className="settings-card-title">Fire & Smoke Analysis (Phase 6)</h4>
+        {/* 3. Hazard Detection Policies */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+            <Flame className="w-4 h-4 text-rose-500" />
+            <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+              3. Fire &amp; Smoke Temporal Policies
+            </h3>
           </div>
-          <div className="settings-props-list">
-            <div className="prop-row">
-              <span className="prop-name">Fire Detection Threshold:</span>
-              <span className="prop-val font-mono">
-                {hazardConfig?.thresholds?.fire_confidence_threshold ?? 0.35}
-              </span>
+
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Fire Confidence Threshold:</span>
+              <span className="font-mono font-semibold text-slate-800">0.45</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Smoke Detection Threshold:</span>
-              <span className="prop-val font-mono">
-                {hazardConfig?.thresholds?.smoke_confidence_threshold ?? 0.30}
-              </span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Smoke Plume Minimum Area:</span>
+              <span className="font-mono font-semibold text-slate-800">0.05 normalized bbox</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Confirmation Temporal Frames:</span>
-              <span className="prop-val font-mono">
-                {hazardConfig?.thresholds?.temporal_confirmation_frames ?? 5} frames
-              </span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Temporal Debounce Window:</span>
+              <span className="font-mono font-semibold text-slate-800">3 consecutive frames</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Clearing Frame Count:</span>
-              <span className="prop-val font-mono">
-                {hazardConfig?.thresholds?.temporal_clear_frames ?? 10} frames
-              </span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-name">Spatial Geofencing:</span>
-              <span className="prop-val font-mono">Point-in-Polygon Ray Casting</span>
+            <div className="flex justify-between py-1">
+              <span className="text-slate-500">Spatial Clearance Cooldown:</span>
+              <span className="font-mono font-semibold text-slate-800">10 seconds clean</span>
             </div>
           </div>
         </div>
 
-        {/* Risk & Smart Alert Policy */}
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <Bell size={18} className="text-error" />
-            <h4 className="settings-card-title">Risk Engine & Smart Alert Policy (Phase 7)</h4>
+        {/* 4. Alert & Incident Engine */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+            <Bell className="w-4 h-4 text-amber-500" />
+            <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+              4. Alert Deduplication &amp; Cooldown
+            </h3>
           </div>
-          <div className="settings-props-list">
-            <div className="prop-row">
-              <span className="prop-name">Score Mapping:</span>
-              <span className="prop-val font-mono text-xs">
-                0-29: LOW, 30-59: MEDIUM, 60-84: HIGH, 85-100: CRITICAL
-              </span>
+
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Alert Cooldown Window:</span>
+              <span className="font-mono font-semibold text-slate-800">30 seconds / track</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Helmet / Vest Cooldown:</span>
-              <span className="prop-val font-mono">60 seconds</span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Auto-Escalation Threshold:</span>
+              <span className="font-mono font-semibold text-rose-600">3 repeated violations</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Fire Alert Cooldown:</span>
-              <span className="prop-val font-mono">30 seconds</span>
+            <div className="flex justify-between py-1 border-b border-slate-50">
+              <span className="text-slate-500">Database Storage Mode:</span>
+              <span className="font-mono font-semibold text-slate-800">SQLite WAL with SHA256</span>
             </div>
-            <div className="prop-row">
-              <span className="prop-name">Smoke Alert Cooldown:</span>
-              <span className="prop-val font-mono">45 seconds</span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-name">Severity Escalation Window:</span>
-              <span className="prop-val font-mono">300 seconds (5 min)</span>
-            </div>
-            <div className="prop-row">
-              <span className="prop-name">Event Dispatcher:</span>
-              <span className="prop-val font-mono text-accent">In-Memory EventBroadcaster + WebSocket</span>
+            <div className="flex justify-between py-1">
+              <span className="text-slate-500">WebSocket Broadcast:</span>
+              <span className="font-mono font-semibold text-emerald-600">Event-Driven (push)</span>
             </div>
           </div>
         </div>
@@ -171,3 +154,5 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ complianceConfig, ha
     </div>
   );
 };
+
+export default SettingsView;

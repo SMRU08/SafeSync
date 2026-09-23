@@ -1,523 +1,595 @@
 /**
- * CamerasView.tsx — RAKSHYA VISION Phase 10 Step 6
- * Real Multi-Camera Management Dashboard with live operational metrics,
- * explicit camera worker lifecycle states, dynamic start/stop controls,
- * and live snapshot inspector.
+ * CamerasView.tsx — RAKSHYA VISION Professional SOC
+ * High-performance Multi-Camera Surveillance Dashboard.
+ * Responsive multi-camera grid with real live streams, operational telemetry,
+ * dynamic camera addition/removal, fault-isolated cards, and camera-specific AI analysis.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Video,
   Camera,
-  MapPin,
-  Activity,
-  Upload,
-  CheckCircle2,
-  Layers,
-  Play,
-  Square,
+  Plus,
   RefreshCw,
-  Radio,
+  LayoutGrid,
+  List,
   AlertTriangle,
-  Smartphone,
+  Cpu,
+  X,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
-import { API_BASE_URL } from '../utils/constants';
-import { startCamera, stopCamera, fetchCameras } from '../services/api';
+import { CameraLiveCard } from '../components/CameraLiveCard';
+import { AddCameraModal } from '../components/AddCameraModal';
+import {
+  fetchCameras,
+  deleteCamera,
+  reconnectCamera,
+  analyzeCameraLive,
+  analyzeCameraUpload,
+} from '../services/api';
 
 interface CamerasViewProps {
   cameras: CameraConfig[];
-  hazardConfig: any;
+  hazardConfig?: any;
   onRefreshCameras?: () => void;
 }
 
-export const CamerasView: React.FC<CamerasViewProps> = ({ cameras, hazardConfig, onRefreshCameras }) => {
-  const [activeCameraList, setActiveCameraList] = useState<CameraConfig[]>(cameras);
-  const [selectedCameraId, setSelectedCameraId] = useState<string>(
-    cameras[0]?.camera_id || 'camera_01'
+type FilterTab = 'all' | 'online' | 'offline' | 'alerts';
+type ViewMode = 'grid' | 'list';
+
+export const CamerasView: React.FC<CamerasViewProps> = ({
+  cameras: initialCameras,
+  hazardConfig: _hazardConfig,
+  onRefreshCameras,
+}) => {
+  const [cameraList, setCameraList] = useState<CameraConfig[]>(initialCameras);
+  const [filterTab, setFilterTab] = useState<FilterTab>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // AI Analysis Modal State
+  const [analysisResult, setAnalysisResult] = useState<any | null>(null);
+  const [analysisCameraId, setAnalysisCameraId] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+
+  const loadCameras = async () => {
+    setIsRefreshing(true);
+    try {
+      const data = await fetchCameras();
+      if (Array.isArray(data)) {
+        const mapped: CameraConfig[] = data.map((c: any) => ({
+          camera_id: c.camera_id,
+          name: c.name,
+          location: c.location || c.zone_id,
+          zone_id: c.zone_id,
+          status: c.status || (c.state === 'CONNECTED' ? 'online' : 'offline'),
+          connection_status: c.connection_status || c.state?.toLowerCase(),
+          state: c.state,
+          source: c.source,
+          source_type: c.source_type,
+          enabled: c.enabled,
+          resolution: c.resolution || '1280x720',
+          fps: typeof c.fps === 'number' ? c.fps : (c.metrics?.fps || 0),
+          stream_url: c.stream_url || `/api/cameras/${c.camera_id}/stream`,
+          safe_source: c.safe_source,
+          last_seen: c.last_seen,
+          metrics: c.metrics,
+          ai_analysis: c.ai_analysis,
+        }));
+        setCameraList(mapped);
+      }
+      onRefreshCameras?.();
+    } catch (err) {
+      console.error('Failed to load cameras:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (initialCameras && initialCameras.length > 0) {
+      setCameraList(initialCameras);
+    } else {
+      loadCameras();
+    }
+  }, [initialCameras]);
+
+  // Operational Dashboard Metrics
+  const totalCount = cameraList.length;
+  const onlineCount = cameraList.filter(
+    (c) => c.status === 'online' || c.status === 'ACTIVE' || c.state === 'CONNECTED'
+  ).length;
+  const offlineCount = totalCount - onlineCount;
+  const totalViolations = cameraList.reduce(
+    (acc, c) => acc + (c.metrics?.active_violations ?? 0),
+    0
   );
-  const [testResultImage, setTestResultImage] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [analysisSummary, setAnalysisSummary] = useState<string | null>(null);
-  const [actionInProgress, setActionInProgress] = useState<boolean>(false);
-  const [liveSnapshotUrl, setLiveSnapshotUrl] = useState<string | null>(null);
 
-  // Synchronize when parent cameras update
-  useEffect(() => {
-    if (cameras.length > 0) {
-      setActiveCameraList(cameras);
-      if (!selectedCameraId || !cameras.some((c) => c.camera_id === selectedCameraId)) {
-        setSelectedCameraId(cameras[0].camera_id);
-      }
-    }
-  }, [cameras]);
+  // Filtered cameras based on active filter tab
+  const filteredCameras = useMemo(() => {
+    return cameraList.filter((c) => {
+      const isOnline =
+        c.status === 'online' || c.status === 'ACTIVE' || c.state === 'CONNECTED';
+      if (filterTab === 'online') return isOnline;
+      if (filterTab === 'offline') return !isOnline;
+      if (filterTab === 'alerts') return (c.metrics?.active_violations ?? 0) > 0;
+      return true;
+    });
+  }, [cameraList, filterTab]);
 
-  const currentCamera =
-    activeCameraList.find((c) => c.camera_id === selectedCameraId) ||
-    activeCameraList[0] || {
-      camera_id: 'camera_01',
-      name: 'Default Camera',
-      zone_id: 'UNKNOWN',
-      status: 'ACTIVE' as const,
-      resolution: '1280x720',
-      fps: 0,
-    };
-
-  // Poll live snapshot for selected camera if CONNECTED
-  useEffect(() => {
-    let interval: any = null;
-    const fetchSnapshot = () => {
-      if (currentCamera.state === 'CONNECTED' || currentCamera.status === 'ACTIVE') {
-        setLiveSnapshotUrl(`${API_BASE_URL}/api/cameras/${currentCamera.camera_id}/snapshot?t=${Date.now()}`);
-      } else {
-        setLiveSnapshotUrl(null);
-      }
-    };
-
-    fetchSnapshot();
-    interval = setInterval(fetchSnapshot, 500);
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [currentCamera.camera_id, currentCamera.state, currentCamera.status]);
-
-  const handleStart = async (camId: string) => {
-    setActionInProgress(true);
+  const handleDeleteCamera = async (cameraId: string) => {
     try {
-      await startCamera(camId);
-      const updated = await fetchCameras();
-      if (Array.isArray(updated)) {
-        setActiveCameraList(
-          updated.map((c: any) => ({
-            camera_id: c.camera_id,
-            name: c.name,
-            zone_id: c.zone_id,
-            status: c.state === 'CONNECTED' ? 'ACTIVE' : c.state === 'DISABLED' ? 'STANDBY' : 'OFFLINE',
-            state: c.state,
-            source_type: c.source_type,
-            enabled: c.enabled,
-            resolution: '1280x720',
-            fps: c.metrics?.fps || 0,
-            safe_source: c.safe_source,
-            metrics: c.metrics,
-          }))
-        );
-      }
-      if (onRefreshCameras) onRefreshCameras();
+      await deleteCamera(cameraId);
+      await loadCameras();
     } catch (err: any) {
-      console.error('Failed to start camera:', err);
-    } finally {
-      setActionInProgress(false);
+      alert(`Failed to delete camera: ${err.message || 'Unknown error'}`);
     }
   };
 
-  const handleStop = async (camId: string) => {
-    setActionInProgress(true);
+  const handleReconnect = async (cameraId: string) => {
     try {
-      await stopCamera(camId);
-      const updated = await fetchCameras();
-      if (Array.isArray(updated)) {
-        setActiveCameraList(
-          updated.map((c: any) => ({
-            camera_id: c.camera_id,
-            name: c.name,
-            zone_id: c.zone_id,
-            status: c.state === 'CONNECTED' ? 'ACTIVE' : c.state === 'DISABLED' ? 'STANDBY' : 'OFFLINE',
-            state: c.state,
-            source_type: c.source_type,
-            enabled: c.enabled,
-            resolution: '1280x720',
-            fps: c.metrics?.fps || 0,
-            safe_source: c.safe_source,
-            metrics: c.metrics,
-          }))
-        );
-      }
-      if (onRefreshCameras) onRefreshCameras();
-    } catch (err: any) {
-      console.error('Failed to stop camera:', err);
-    } finally {
-      setActionInProgress(false);
+      await reconnectCamera(cameraId);
+      await loadCameras();
+    } catch (err) {
+      console.error(`Reconnect error on ${cameraId}:`, err);
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const handleAnalyzeLive = async (camera: CameraConfig) => {
+    setAnalysisCameraId(camera.camera_id);
     setIsAnalyzing(true);
-    setAnalysisSummary(null);
-    setTestResultImage(null);
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('camera_id', currentCamera.camera_id);
-    formData.append('zone_id', currentCamera.zone_id);
+    setAnalysisError(null);
+    setAnalysisResult(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/compliance/analyze`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Inference returned HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.annotated_image_base64) {
-        setTestResultImage(`data:image/jpeg;base64,${data.annotated_image_base64}`);
-      }
-      setAnalysisSummary(
-        `Tracked ${data.summary?.total_workers || 0} worker(s). Compliant: ${
-          data.summary?.compliant_workers || 0
-        }, Non-Compliant: ${data.summary?.non_compliant_workers || 0}`
-      );
+      const result = await analyzeCameraLive(camera.camera_id);
+      setAnalysisResult(result);
     } catch (err: any) {
-      setAnalysisSummary(`Analysis error: ${err.message}`);
+      setAnalysisError(err.message || 'AI Live Analysis failed.');
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const getBadgeClass = (state?: string) => {
-    switch (state) {
-      case 'CONNECTED':
-        return 'badge-success';
-      case 'CONNECTING':
-      case 'RECONNECTING':
-        return 'badge-warning';
-      case 'ERROR':
-        return 'badge-danger';
-      case 'DISABLED':
-      case 'DISCONNECTED':
-      default:
-        return 'badge-secondary';
+  const handleUploadAnalyze = async (camera: CameraConfig, file: File) => {
+    setAnalysisCameraId(camera.camera_id);
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    setAnalysisResult(null);
+
+    try {
+      const result = await analyzeCameraUpload(camera.camera_id, file);
+      setAnalysisResult(result);
+    } catch (err: any) {
+      setAnalysisError(err.message || 'Frame analysis failed.');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
   return (
-    <div className="cameras-view-container">
-      {/* Camera Grid Header */}
-      <div className="view-title-bar">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 bg-[#eef3f9]">
+      {/* ─── Top Dashboard Header & Operational Summary ─────────────── */}
+      <div className="bg-white rounded-xl p-4 md:p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="view-heading">
-            <Video size={22} /> Production Multi-Camera Surveillance Hub
-          </h2>
-          <p className="view-subheading">
-            Real-time optical feeds with isolated worker threads, reconnect policies, and live telemetry
-          </p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-sky-700 text-white flex items-center justify-center shadow-sm shadow-sky-700/20">
+              <Video className="w-4 h-4" />
+            </div>
+            <div>
+              <h1 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                CAMERAS <span className="text-sky-600 font-medium text-xs">Surveillance Matrix</span>
+              </h1>
+              <p className="text-xs text-slate-500 font-medium">
+                Live multi-camera operational monitoring and real-time PPE compliance tracking
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Real Summary Metrics Badges */}
+        <div className="flex items-center gap-3 self-start md:self-auto flex-wrap">
+          <div className="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-center">
+            <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              Total
+            </span>
+            <span className="text-sm font-extrabold text-slate-800 font-mono">
+              {totalCount}
+            </span>
+          </div>
+
+          <div className="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg text-center">
+            <span className="block text-[10px] uppercase font-bold text-emerald-600 tracking-wider">
+              Online
+            </span>
+            <span className="text-sm font-extrabold text-emerald-700 font-mono">
+              {onlineCount}
+            </span>
+          </div>
+
+          <div className="bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg text-center">
+            <span className="block text-[10px] uppercase font-bold text-rose-500 tracking-wider">
+              Offline
+            </span>
+            <span className="text-sm font-extrabold text-rose-700 font-mono">
+              {offlineCount}
+            </span>
+          </div>
+
+          <div className="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg text-center">
+            <span className="block text-[10px] uppercase font-bold text-amber-600 tracking-wider">
+              AI Alerts
+            </span>
+            <span className="text-sm font-extrabold text-amber-700 font-mono">
+              {totalViolations}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Surveillance Controls Toolbar ──────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Filter Buttons */}
+        <div className="inline-flex p-1 bg-white border border-slate-200 rounded-lg shadow-sm">
           <button
-            className="btn btn-secondary text-xs flex items-center gap-1"
-            onClick={async () => {
-              if (onRefreshCameras) onRefreshCameras();
-              const updated = await fetchCameras();
-              if (Array.isArray(updated)) {
-                setActiveCameraList(
-                  updated.map((c: any) => ({
-                    camera_id: c.camera_id,
-                    name: c.name,
-                    zone_id: c.zone_id,
-                    status: c.state === 'CONNECTED' ? 'ACTIVE' : c.state === 'DISABLED' ? 'STANDBY' : 'OFFLINE',
-                    state: c.state,
-                    source_type: c.source_type,
-                    enabled: c.enabled,
-                    resolution: '1280x720',
-                    fps: c.metrics?.fps || 0,
-                    safe_source: c.safe_source,
-                    metrics: c.metrics,
-                  }))
-                );
-              }
-            }}
+            onClick={() => setFilterTab('all')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold transition ${
+              filterTab === 'all'
+                ? 'bg-sky-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
-            <RefreshCw size={14} /> Refresh Feeds
+            All Cameras ({totalCount})
+          </button>
+          <button
+            onClick={() => setFilterTab('online')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 ${
+              filterTab === 'online'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            Online ({onlineCount})
+          </button>
+          <button
+            onClick={() => setFilterTab('offline')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 ${
+              filterTab === 'offline'
+                ? 'bg-rose-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-rose-400" />
+            Offline ({offlineCount})
+          </button>
+          <button
+            onClick={() => setFilterTab('alerts')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 ${
+              filterTab === 'alerts'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <AlertTriangle className="w-3 h-3 text-amber-300" />
+            AI Alerts ({totalViolations})
+          </button>
+        </div>
+
+        {/* View Toggle & Add Camera Button */}
+        <div className="flex items-center gap-2">
+          {/* Grid vs List View Switch */}
+          <div className="inline-flex p-1 bg-white border border-slate-200 rounded-lg shadow-sm">
+            <button
+              onClick={() => setViewMode('grid')}
+              title="Grid View (Default)"
+              className={`p-1.5 rounded-md transition ${
+                viewMode === 'grid'
+                  ? 'bg-slate-100 text-sky-700 font-bold'
+                  : 'text-slate-400 hover:text-slate-700'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              title="List View"
+              className={`p-1.5 rounded-md transition ${
+                viewMode === 'list'
+                  ? 'bg-slate-100 text-sky-700 font-bold'
+                  : 'text-slate-400 hover:text-slate-700'
+            }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+
+          <button
+            onClick={loadCameras}
+            disabled={isRefreshing}
+            title="Refresh All Camera Streams"
+            className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg shadow-sm transition disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
+
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg shadow-sm text-xs font-bold transition"
+          >
+            <Plus className="w-4 h-4" />
+            Add Camera
           </button>
         </div>
       </div>
 
-      {/* Main Two-Column Layout */}
-      <div className="cameras-layout-grid">
-        {/* Left: Real Multi-Camera Cards */}
-        <div className="camera-list-column">
-          <div className="camera-cards-grid">
-            {activeCameraList.map((cam) => {
-              const isSelected = cam.camera_id === currentCamera.camera_id;
-              const displayState = cam.state || (cam.status === 'ACTIVE' ? 'CONNECTED' : 'DISCONNECTED');
-              const isConnected = displayState === 'CONNECTED';
-
-              return (
-                <div
-                  key={cam.camera_id}
-                  className={`camera-feed-card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => setSelectedCameraId(cam.camera_id)}
-                >
-                  <div className="feed-header">
-                    <div className="feed-title-row">
-                      <span className="font-mono font-bold">{cam.camera_id}</span>
-                      <span className={`badge ${getBadgeClass(displayState)} text-xs uppercase font-mono`}>
-                        {displayState}
-                      </span>
-                    </div>
-                    <span className="feed-name">{cam.name}</span>
-                  </div>
-
-                  <div className="feed-screen">
-                    <div className="feed-crosshair">
-                      <Camera size={28} className={isConnected ? 'text-success' : 'text-accent'} />
-                      <span className="feed-resolution font-mono">
-                        {cam.metrics?.fps ? `${cam.metrics.fps} FPS` : `${cam.fps} FPS Target`}
-                      </span>
-                    </div>
-                    <div className="feed-zone-pill">
-                      <MapPin size={12} /> {cam.zone_id}
-                    </div>
-                  </div>
-
-                  <div className="feed-footer">
-                    <div className="flex flex-col text-xs text-muted truncate max-w-[180px]">
-                      <span className="font-mono">{cam.source_type?.toUpperCase() || 'RTSP'}</span>
-                      <span className="truncate">{cam.safe_source || 'Managed Worker'}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {displayState === 'CONNECTED' ? (
-                        <button
-                          className="btn btn-danger btn-xs"
-                          title="Stop Camera Stream"
-                          disabled={actionInProgress}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleStop(cam.camera_id);
-                          }}
-                        >
-                          <Square size={12} />
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-primary btn-xs"
-                          title="Start Camera Stream"
-                          disabled={actionInProgress}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleStart(cam.camera_id);
-                          }}
-                        >
-                          <Play size={12} />
-                        </button>
-                      )}
-                      <button className="btn-select-cam">
-                        {isSelected ? 'Inspecting' : 'Select'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* ─── Responsive Multi-Camera Grid ───────────────────────────── */}
+      {filteredCameras.length === 0 ? (
+        <div className="bg-white rounded-xl p-12 border border-slate-200 text-center flex flex-col items-center justify-center">
+          <Camera className="w-12 h-12 text-slate-300 mb-3 stroke-[1.2]" />
+          <h3 className="text-sm font-bold text-slate-700">No cameras match current filter</h3>
+          <p className="text-xs text-slate-400 mt-1 max-w-sm">
+            {filterTab !== 'all'
+              ? `No cameras currently in "${filterTab}" status.`
+              : 'No cameras configured in the system. Click "Add Camera" to register your first stream.'}
+          </p>
+          {filterTab !== 'all' && (
+            <button
+              onClick={() => setFilterTab('all')}
+              className="mt-4 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-bold transition"
+            >
+              Show All Cameras
+            </button>
+          )}
         </div>
+      ) : viewMode === 'grid' ? (
+        /* Desktop: 2 columns default, 3 columns on large screens; Mobile: 1 column */
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+          {filteredCameras.map((camera) => (
+            <CameraLiveCard
+              key={camera.camera_id}
+              camera={camera}
+              onRefresh={handleReconnect}
+              onDelete={handleDeleteCamera}
+              onAnalyzeLive={handleAnalyzeLive}
+              onUploadAnalyze={handleUploadAnalyze}
+            />
+          ))}
+        </div>
+      ) : (
+        /* List View */
+        <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 shadow-sm overflow-hidden">
+          {filteredCameras.map((camera) => {
+            const isOnline =
+              camera.status === 'online' ||
+              camera.status === 'ACTIVE' ||
+              camera.state === 'CONNECTED';
+            return (
+              <div
+                key={camera.camera_id}
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-3 h-3 rounded-full shrink-0 ${
+                      isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+                    }`}
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-slate-800">
+                        {camera.name || camera.camera_id}
+                      </span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                        {camera.camera_id}
+                      </span>
+                      <span
+                        className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                          isOnline
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}
+                      >
+                        {isOnline ? 'ONLINE' : 'OFFLINE'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {camera.location || camera.zone_id} • {camera.source_type} •{' '}
+                      {camera.resolution} • {camera.fps?.toFixed(1) ?? '0.0'} FPS
+                    </p>
+                  </div>
+                </div>
 
-        {/* Right: Camera Inspector & Live Telemetry */}
-        <div className="camera-inspector-column">
-          <div className="inspector-card">
-            <div className="inspector-header">
-              <div className="inspector-title-group">
-                <Layers size={18} />
-                <h3 className="inspector-title">Inspector: {currentCamera.camera_id}</h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleAnalyzeLive(camera)}
+                    className="px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200 hover:bg-sky-100 text-sky-800 text-xs font-bold transition flex items-center gap-1.5"
+                  >
+                    <Cpu className="w-3.5 h-3.5" /> Analyze Live
+                  </button>
+                  <button
+                    onClick={() => handleReconnect(camera.camera_id)}
+                    className="p-2 rounded-lg text-slate-500 hover:text-sky-700 hover:bg-slate-100 border border-slate-200 transition"
+                    title="Reconnect"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ─── Add Camera Modal ────────────────────────────────────────── */}
+      <AddCameraModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onCameraAdded={loadCameras}
+      />
+
+      {/* ─── AI Analysis Results Modal ──────────────────────────────── */}
+      {(analysisResult || isAnalyzing || analysisError) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className={`badge ${getBadgeClass(currentCamera.state)} font-mono text-xs uppercase`}>
-                  {currentCamera.state || currentCamera.status}
-                </span>
-                <span className="badge badge-info font-mono text-xs">{currentCamera.zone_id}</span>
-              </div>
-            </div>
-
-            {/* Live Snapshot or Upload Screen */}
-            <div className="inspector-display-screen">
-              {testResultImage ? (
-                <div className="annotated-image-wrap">
-                  <img
-                    src={testResultImage}
-                    alt="Inference Detection Output"
-                    className="annotated-result-img"
-                  />
-                  <div className="annotation-overlay-tag">
-                    <CheckCircle2 size={14} className="text-success" /> Live Inference Completed
-                  </div>
+                <div className="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
+                  <Cpu className="w-4 h-4" />
                 </div>
-              ) : liveSnapshotUrl && (currentCamera.state === 'CONNECTED' || currentCamera.status === 'ACTIVE') ? (
-                <div className="annotated-image-wrap">
-                  <img
-                    src={liveSnapshotUrl}
-                    alt={`Live feed from ${currentCamera.camera_id}`}
-                    className="annotated-result-img"
-                    onError={() => setLiveSnapshotUrl(null)}
-                  />
-                  <div className="annotation-overlay-tag">
-                    <Radio size={14} className="text-success animate-pulse" /> Live Stream Worker Active
-                  </div>
-                </div>
-              ) : (
-                <div className="screen-placeholder">
-                  <Video size={48} className="text-muted" />
-                  <h4>Stream Inactive</h4>
-                  <p className="text-xs text-muted">
-                    {currentCamera.state === 'ERROR'
-                      ? `Error: ${currentCamera.metrics?.last_error || 'Stream offline'}`
-                      : 'Camera is disconnected or standby. Click Start or upload a test frame.'}
+                <div>
+                  <h2 className="text-sm font-bold text-slate-800">
+                    AI Frame Analysis — {analysisCameraId}
+                  </h2>
+                  <p className="text-[11px] text-slate-500">
+                    YOLO Worker Detection &amp; PPE Compliance Association
                   </p>
                 </div>
+              </div>
+              <button
+                onClick={() => {
+                  setAnalysisResult(null);
+                  setAnalysisError(null);
+                  setIsAnalyzing(false);
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+              {isAnalyzing && (
+                <div className="p-12 flex flex-col items-center justify-center text-slate-500">
+                  <RefreshCw className="w-8 h-8 animate-spin text-sky-600 mb-3" />
+                  <p className="font-semibold text-slate-700">Running AI inference on live frame...</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Executing YOLO model and ByteTrack tracking</p>
+                </div>
+              )}
+
+              {analysisError && (
+                <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2.5">
+                  <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+                  <span>{analysisError}</span>
+                </div>
+              )}
+
+              {analysisResult && (
+                <>
+                  {/* Annotated Image Viewport */}
+                  {analysisResult.annotated_image_base64 && (
+                    <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-950 aspect-video relative flex items-center justify-center">
+                      <img
+                        src={analysisResult.annotated_image_base64}
+                        alt="AI Detection Output"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+
+                  {/* Summary Metric Cards */}
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                      <span className="block text-[10px] text-slate-400 font-bold uppercase">
+                        Tracked Workers
+                      </span>
+                      <span className="text-sm font-extrabold text-slate-800 font-mono">
+                        {analysisResult.summary?.total_workers ?? analysisResult.workers?.length ?? 0}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-emerald-50 rounded-lg border border-emerald-200">
+                      <span className="block text-[10px] text-emerald-600 font-bold uppercase">
+                        Compliant
+                      </span>
+                      <span className="text-sm font-extrabold text-emerald-700 font-mono">
+                        {analysisResult.summary?.compliant_workers ?? 0}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-rose-50 rounded-lg border border-rose-200">
+                      <span className="block text-[10px] text-rose-600 font-bold uppercase">
+                        Violations
+                      </span>
+                      <span className="text-sm font-extrabold text-rose-700 font-mono">
+                        {analysisResult.summary?.non_compliant_workers ?? 0}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Worker Breakdown Table */}
+                  {analysisResult.workers && analysisResult.workers.length > 0 && (
+                    <div className="border border-slate-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 border-b border-slate-200 text-[10px] text-slate-500 font-bold uppercase">
+                            <th className="py-2 px-3">Track ID</th>
+                            <th className="py-2 px-3">Status</th>
+                            <th className="py-2 px-3">Helmet</th>
+                            <th className="py-2 px-3">Vest</th>
+                            <th className="py-2 px-3">Gloves</th>
+                            <th className="py-2 px-3">Footwear</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-[11px]">
+                          {analysisResult.workers.map((w: any) => (
+                            <tr key={w.track_id} className="hover:bg-slate-50">
+                              <td className="py-2 px-3 font-mono font-bold text-slate-800">
+                                #{w.track_id}
+                              </td>
+                              <td className="py-2 px-3">
+                                <span
+                                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                                    w.overall_compliant
+                                      ? 'bg-emerald-50 text-emerald-700'
+                                      : 'bg-rose-50 text-rose-700'
+                                  }`}
+                                >
+                                  {w.overall_compliant ? 'COMPLIANT' : 'VIOLATION'}
+                                </span>
+                              </td>
+                              <td className="py-2 px-3 font-mono">
+                                {w.ppe_status?.helmet === 'PRESENT' ? '✅' : '❌'}
+                              </td>
+                              <td className="py-2 px-3 font-mono">
+                                {w.ppe_status?.safety_vest === 'PRESENT' ? '✅' : '❌'}
+                              </td>
+                              <td className="py-2 px-3 font-mono">
+                                {w.ppe_status?.gloves === 'PRESENT' ? '✅' : '❌'}
+                              </td>
+                              <td className="py-2 px-3 font-mono">
+                                {w.ppe_status?.safety_footwear === 'PRESENT' ? '✅' : '❌'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
-            {/* Camera Diagnostics Warning Banner */}
-            {currentCamera.metrics?.last_error && (
-              <div className="bg-amber-950/70 border border-amber-500/50 text-amber-200 text-xs p-3 rounded mt-2 flex items-start gap-2">
-                <AlertTriangle size={16} className="text-amber-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong>Hardware / Stream Advisory:</strong> {currentCamera.metrics.last_error}
-                </div>
-              </div>
-            )}
-
-            {/* Analysis Summary */}
-            {analysisSummary && (
-              <div className="analysis-summary-banner">
-                <Activity size={16} />
-                <span>{analysisSummary}</span>
-              </div>
-            )}
-
-            {/* Frame Controls & Diagnostics */}
-            <div className="inspector-controls flex items-center justify-between">
-              <label className="btn btn-primary file-upload-label">
-                <Upload size={16} />
-                <span>{isAnalyzing ? 'Running AI Inference...' : 'Upload Frame for AI Analysis'}</span>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={handleFileUpload}
-                  disabled={isAnalyzing}
-                  style={{ display: 'none' }}
-                />
-              </label>
-
-              <div className="flex items-center gap-2">
-                {currentCamera.state === 'CONNECTED' ? (
-                  <button
-                    className="btn btn-danger text-xs flex items-center gap-1"
-                    disabled={actionInProgress}
-                    onClick={() => handleStop(currentCamera.camera_id)}
-                  >
-                    <Square size={14} /> Stop Worker
-                  </button>
-                ) : (
-                  <button
-                    className="btn btn-success text-xs flex items-center gap-1"
-                    disabled={actionInProgress}
-                    onClick={() => handleStart(currentCamera.camera_id)}
-                  >
-                    <Play size={14} /> Start Worker
-                  </button>
-                )}
-
-                {testResultImage && (
-                  <button
-                    className="btn btn-secondary text-xs"
-                    onClick={() => {
-                      setTestResultImage(null);
-                      setAnalysisSummary(null);
-                    }}
-                  >
-                    Reset
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Real Operational Telemetry Metrics */}
-            <div className="inspector-meta-section">
-              <h4 className="meta-heading">Operational Telemetry (Verified Backend Metrics)</h4>
-              <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                <div className="bg-[#1e222d] p-2 rounded border border-border flex justify-between items-center">
-                  <span className="text-muted">Actual FPS:</span>
-                  <span className="font-mono font-bold text-accent">
-                    {currentCamera.metrics?.fps ?? 0} fps
-                  </span>
-                </div>
-                <div className="bg-[#1e222d] p-2 rounded border border-border flex justify-between items-center">
-                  <span className="text-muted">Total Frames:</span>
-                  <span className="font-mono font-bold text-success">
-                    {currentCamera.metrics?.frame_count ?? 0}
-                  </span>
-                </div>
-                <div className="bg-[#1e222d] p-2 rounded border border-border flex justify-between items-center">
-                  <span className="text-muted">Dropped Frames:</span>
-                  <span className="font-mono font-bold text-warning">
-                    {currentCamera.metrics?.dropped_frames ?? 0}
-                  </span>
-                </div>
-                <div className="bg-[#1e222d] p-2 rounded border border-border flex justify-between items-center">
-                  <span className="text-muted">Reconnect Count:</span>
-                  <span className="font-mono font-bold text-info">
-                    {currentCamera.metrics?.reconnect_count ?? 0}
-                  </span>
-                </div>
-              </div>
-
-              <h4 className="meta-heading">Configuration & Security</h4>
-              <div className="meta-props-table">
-                <div className="meta-prop-row">
-                  <span>Camera ID:</span>
-                  <span className="font-mono">{currentCamera.camera_id}</span>
-                </div>
-                <div className="meta-prop-row">
-                  <span>Source URL (Masked):</span>
-                  <span className="font-mono text-muted text-xs truncate max-w-[260px]">
-                    {currentCamera.safe_source || 'Managed Locally'}
-                  </span>
-                </div>
-                <div className="meta-prop-row">
-                  <span>Assigned Zone:</span>
-                  <span className="font-mono">{currentCamera.zone_id}</span>
-                </div>
-                <div className="meta-prop-row">
-                  <span>Stream Protocol:</span>
-                  <span className="font-mono uppercase">{currentCamera.source_type || 'RTSP'}</span>
-                </div>
-                <div className="meta-prop-row">
-                  <span>Spatial ROI Polygon:</span>
-                  <span className="font-mono text-xs text-muted">
-                    {hazardConfig?.zones?.[currentCamera.zone_id]?.polygon
-                      ? `[${hazardConfig.zones[currentCamera.zone_id].polygon.length} vertices]`
-                      : 'Full Frame [0, 0, 1280, 720]'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Android & External Camera Integration Guide */}
-              <div className="mt-4 p-3 bg-[#171b26] rounded border border-border">
-                <div className="flex items-center gap-2 mb-2 text-xs font-bold text-accent">
-                  <Smartphone size={15} /> Android &amp; External Camera Setup Guide
-                </div>
-                <div className="text-xs text-muted space-y-1">
-                  <p>
-                    <strong className="text-foreground">Option 1 — Wi-Fi Network Stream (Recommended):</strong> Install <em>IP Webcam</em> or <em>DroidCam</em> on Android, start the server, and configure in <code>configs/cameras.yaml</code>:
-                  </p>
-                  <code className="block bg-black/40 p-1.5 rounded font-mono text-[11px] text-info">
-                    source: "http://&lt;phone_ip&gt;:8080/video" | source_type: "http"
-                  </code>
-                  <p className="mt-2">
-                    <strong className="text-foreground">Option 2 — USB Connection:</strong> Connect phone via USB and select <em>"Webcam" mode</em> (Android 14+) or use <em>DroidCam PC client</em> to expose DirectShow device index (e.g., <code>source: "1", source_type: "usb"</code>).
-                  </p>
-                </div>
-              </div>
+            {/* Footer */}
+            <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+              <button
+                onClick={() => {
+                  setAnalysisResult(null);
+                  setAnalysisError(null);
+                  setIsAnalyzing(false);
+                }}
+                className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-md transition text-xs"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

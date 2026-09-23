@@ -1,0 +1,82 @@
+{
+  "bangga_ppe": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 159,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 41,
+    "invalid_class_ids_count": 0
+  },
+  "construction_ppe": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 3,
+    "invalid_class_ids_count": 0
+  },
+  "d_fire": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 1,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 479,
+    "invalid_class_ids_count": 0
+  },
+  "hard_hat_workers": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 0,
+    "invalid_class_ids_count": 0
+  },
+  "ppe_detection_compliance": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 82,
+    "invalid_class_ids_count": 0
+  },
+  "ppe_safup": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 220,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 306,
+    "invalid_class_ids_count": 0
+  },
+  "ppe_shikk": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 0,
+    "invalid_class_ids_count": 0
+  },
+  "safety_ppe": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 1081,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 73,
+    "invalid_class_ids_count": 0
+  },
+  "safety_ppe_4": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 8,
+    "invalid_class_ids_count": 0
+  },
+  "ultralytics_construction_ppe": {
+    "corrupted_images_count": 0,
+    "missing_labels_count": 0,
+    "empty_labels_count": 0,
+    "invalid_bboxes_count": 0,
+    "tiny_bboxes_count": 6,
+    "invalid_class_ids_count": 0
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "system": "RAKSHYA VISION Safety Intelligence Pipeline",
+  "updated_at": "2026-09-23T18:03:00Z",
+  "models": {
+    "ppe": {
+      "active_version": "ppe_v1",
+      "versions": {
+        "ppe_v1": {
+          "path": "models/ppe/ppe_v1/weights/best.pt",
+          "sha256": "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3",
+          "architecture": "yolov8n",
+          "image_size": 384,
+          "classes": {
+            "0": "person",
+            "1": "helmet",
+            "2": "safety_vest",
+            "3": "gloves",
+            "4": "safety_footwear"
+          },
+          "operating_thresholds": {
+            "person": 0.25,
+            "helmet": 0.38,
+            "safety_vest": 0.38,
+            "gloves": 0.28,
+            "safety_footwear": 0.28
+          },
+          "datasets": [
+            "ppe_detection_compliance",
+            "construction_ppe",
+            "hard_hat_workers"
+          ],
+          "notes": "Dedicated PPE model decoupled from fire and smoke. Enforces cranial and thoracic spatial verification."
+        }
+      }
+    },
+    "hazards": {
+      "active_version": "fire_smoke_v1",
+      "versions": {
+        "fire_smoke_v1": {
+          "path": "models/hazards/fire_smoke_v1/weights/best.pt",
+          "sha256": "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3",
+          "architecture": "yolov8n",
+          "image_size": 384,
+          "classes": {
+            "0": "fire",
+            "1": "smoke"
+          },
+          "operating_thresholds": {
+            "fire": 0.30,
+            "smoke": 0.30
+          },
+          "datasets": [
+            "d_fire"
+          ],
+          "notes": "Dedicated fire and smoke hazard detection model decoupled from PPE detection. Feeds into P0 emergency alarm path."
+        }
+      }
+    }
+  }
+}

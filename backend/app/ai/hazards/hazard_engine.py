@@ -73,8 +73,8 @@ class HazardAnalysisEngine:
     ):
         self.config = load_hazard_config(hazard_config_path)
 
-        # Initialize detector
-        self.detector = Detector(model_loader)
+        # Initialize detector with decoupled hazard model
+        self.detector = Detector(model_loader, model_type="hazards")
 
         # Detection thresholds
         h_cfg = self.config.get("hazard", {})

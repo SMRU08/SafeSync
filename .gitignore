@@ -35,9 +35,11 @@ yarn-error.log*
 *.sqlite
 *.sqlite3
 
-# Datasets (Raw and processed binary images/labels)
+# Datasets (Raw, normalized, and processed binary images/labels)
 datasets/raw/*
 !datasets/raw/.gitkeep
+datasets/normalized/*
+!datasets/normalized/.gitkeep
 datasets/processed/images/
 datasets/processed/labels/
 datasets/staging/

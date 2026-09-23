@@ -1,0 +1,89 @@
+# datasets/manifests/dataset_manifest.yaml — RAKSHYA VISION
+# Master Dataset Manifest documenting raw dataset provenance, licenses, class inventories, and splits.
+
+metadata:
+  generated_at: "2026-09-23T18:00:00Z"
+  system: "RAKSHYA VISION Safety Intelligence Pipeline"
+  total_raw_images: 22453
+
+datasets:
+  ppe_detection_compliance:
+    name: "PPE Detection & Compliance"
+    source: "https://universe.roboflow.com/izanagi/ppe-detection-and-compliance"
+    license: "CC BY 4.0"
+    role: "Primary PPE positive data & explicit negative non-PPE worker silhouettes"
+    total_images: 9663
+    total_labels: 9663
+    total_annotations: 39510
+    splits:
+      train: 7721
+      valid: 1460
+      test: 482
+    raw_classes:
+      - Boots
+      - Gloves
+      - Goggles
+      - Helmet
+      - Mask
+      - NO-Boots
+      - NO-Gloves
+      - NO-Goggles
+      - NO-Helmet
+      - NO-Mask
+      - NO-Vest
+      - Person
+      - Vest
+    audit_notes: "Contains 3,665 explicit unhelmeted heads (NO-Helmet) and 2,714 plain shirts (NO-Vest). Essential for hard negative background training."
+
+  construction_ppe:
+    name: "Construction PPE"
+    source: "https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo"
+    license: "CC BY 4.0"
+    role: "Construction site worker PPE detection and compliance"
+    total_images: 1124
+    total_labels: 1124
+    total_annotations: 5325
+    splits:
+      train: 928
+      valid: 133
+      test: 63
+    raw_classes:
+      - hat
+      - no hat
+      - no vest
+      - vest
+    audit_notes: "Contains 993 unhelmeted heads ('no hat') and 1,370 casual clothing items ('no vest'). Hard-negative source."
+
+  hard_hat_workers:
+    name: "Hard Hat Workers"
+    source: "https://public.roboflow.com/object-detection/hard-hat-workers"
+    license: "Public Domain"
+    role: "Person and hard hat detection"
+    total_images: 7035
+    total_labels: 7035
+    total_annotations: 27039
+    splits:
+      train: 4916
+      valid: 1413
+      test: 706
+    raw_classes:
+      - head
+      - helmet
+      - person
+    audit_notes: "High-volume hard-hat dataset with 19,747 helmets and 6,677 bare heads ('head')."
+
+  d_fire:
+    name: "D-Fire & Smoke Hazard Dataset"
+    source: "https://github.com/gaia-solutions-on-demand/DFireDataset"
+    license: "CC BY 4.0"
+    role: "Dedicated fire and smoke hazard detection (completely separate from PPE model)"
+    total_images: 4631
+    total_labels: 4631
+    splits:
+      train: 4175
+      valid: 354
+      test: 102
+    raw_classes:
+      - Fire
+      - Smoke
+    audit_notes: "Clean 2-class environmental hazard dataset with varied lighting, wildfire, industrial fire, and indoor smoke."

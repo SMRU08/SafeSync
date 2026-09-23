@@ -29,6 +29,13 @@ class RiskLevel(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class AlarmPriority(str, Enum):
+    P0 = "P0"  # CRITICAL: Emergency Fire/Smoke (immediate audible siren & broadcast)
+    P1 = "P1"  # HIGH: Persistent Smoke / Escalated Hazard (audible siren)
+    P2 = "P2"  # MEDIUM: Confirmed PPE Violation (visual UI alert only, NO siren)
+    P3 = "P3"  # LOW: System Warning / Camera Offline / Advisory
+
+
 class IncidentStatus(str, Enum):
     OPEN = "OPEN"
     ACKNOWLEDGED = "ACKNOWLEDGED"
@@ -97,6 +104,8 @@ class AlertSchema(BaseModel):
     alert_id: str
     incident_id: str
     severity: RiskLevel
+    priority: AlarmPriority = AlarmPriority.P2
+    is_audible: bool = False
     title: str
     message: str
     camera_id: str

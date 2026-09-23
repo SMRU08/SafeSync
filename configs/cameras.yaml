@@ -11,7 +11,7 @@ cameras:
     source_type: "usb"  # "rtsp", "usb", "file", "synthetic"
     enabled: true
     fps_target: 30
-    resolution: "1280x720"
+    resolution: "640x480"
     timeout_seconds: 5.0
     reconnect_policy:
       max_retries: 5
@@ -21,15 +21,11 @@ cameras:
   - id: "camera_02"
     name: "Mobile Phone Camera"
     zone_id: "storage_area"
-    # Option 1 (Wi-Fi Stream): Use free "IP Webcam" app -> start server -> put your phone IP:
-    source: "http://192.168.1.105:8080/video"
+    source: "http://192.168.137.166:8080/video"
     source_type: "http"
-    # Option 2 (USB Cable): Use "1" for USB device index and source_type: "usb"
-    # source: "1"
-    # source_type: "usb"
-    enabled: false  # Set to true once you start the mobile camera stream
-    fps_target: 20
-    resolution: "1280x720"
+    enabled: true
+    fps_target: 25
+    resolution: "1920x1080"
     timeout_seconds: 5.0
     reconnect_policy:
       max_retries: 5

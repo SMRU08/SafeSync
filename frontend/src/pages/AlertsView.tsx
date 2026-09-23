@@ -1,254 +1,277 @@
 /**
- * AlertsView.tsx — RAKSHYA VISION Phase 8
+ * AlertsView.tsx — RAKSHYA VISION Professional SOC
  * Centralized Operations Management for Safety Alerts & Verified Incidents.
+ * Features tabs for ACTIVE, ACKNOWLEDGED, RESOLVED, and DISMISSED alerts with
+ * full operational lifecycle action buttons (Acknowledge, Resolve, Dismiss).
  */
 
 import React, { useState } from 'react';
 import {
-  Bell,
-  Layers,
+  AlertTriangle,
   Search,
   Filter,
-  ChevronRight,
+  CheckCircle2,
+  RefreshCw,
 } from 'lucide-react';
-import { Alert, Incident, RiskSummary } from '../types';
-import { AlertsTable } from '../components/AlertsTable';
-import { AlertDetailModal } from '../components/AlertDetailModal';
-import { IncidentDetailModal } from '../components/IncidentDetailModal';
+import { Alert, Incident, RiskSummary, RiskLevel, AlertStatus } from '../types';
 
 interface AlertsViewProps {
   alerts: Alert[];
-  incidents: Incident[];
-  summary: RiskSummary | null;
+  incidents?: Incident[];
+  summary?: RiskSummary | null;
   onAcknowledge: (alertId: string) => Promise<void>;
   onResolve: (alertId: string) => Promise<void>;
   onDismiss: (alertId: string) => Promise<void>;
+  onRefresh?: () => void;
 }
 
 export const AlertsView: React.FC<AlertsViewProps> = ({
   alerts,
-  incidents,
-  summary,
   onAcknowledge,
   onResolve,
   onDismiss,
+  onRefresh,
 }) => {
-  const [activeTab, setActiveTab] = useState<'alerts' | 'incidents'>('alerts');
-  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
-  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
-  const [incidentSearch, setIncidentSearch] = useState<string>('');
-  const [incidentStatusFilter, setIncidentStatusFilter] = useState<string>('ALL');
+  const [activeTab, setActiveTab] = useState<AlertStatus>('ACTIVE');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [severityFilter, setSeverityFilter] = useState<string>('ALL');
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
-  const filteredIncidents = incidents.filter((inc) => {
-    if (incidentStatusFilter !== 'ALL' && inc.status !== incidentStatusFilter) return false;
-    if (incidentSearch.trim()) {
-      const q = incidentSearch.toLowerCase();
+  // Filter alerts by tab, severity, and search query
+  const filteredAlerts = alerts.filter((alert) => {
+    if (alert.status !== activeTab) return false;
+    if (severityFilter !== 'ALL' && alert.severity !== severityFilter) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
       return (
-        inc.incident_id.toLowerCase().includes(q) ||
-        inc.camera_id.toLowerCase().includes(q) ||
-        inc.zone_id.toLowerCase().includes(q) ||
-        inc.event_types.some((t) => t.toLowerCase().includes(q))
+        alert.alert_id.toLowerCase().includes(q) ||
+        alert.camera_id.toLowerCase().includes(q) ||
+        alert.zone_id.toLowerCase().includes(q) ||
+        alert.event_type.toLowerCase().includes(q) ||
+        (alert.message && alert.message.toLowerCase().includes(q))
       );
     }
     return true;
   });
 
+  const getSeverityBadge = (sev: RiskLevel) => {
+    switch (sev) {
+      case 'CRITICAL':
+        return 'bg-rose-600 text-white';
+      case 'HIGH':
+        return 'bg-rose-500 text-white';
+      case 'MEDIUM':
+        return 'bg-amber-500 text-white';
+      case 'LOW':
+        return 'bg-sky-500 text-white';
+      default:
+        return 'bg-slate-500 text-white';
+    }
+  };
+
+  const counts = {
+    ACTIVE: alerts.filter((a) => a.status === 'ACTIVE').length,
+    ACKNOWLEDGED: alerts.filter((a) => a.status === 'ACKNOWLEDGED').length,
+    RESOLVED: alerts.filter((a) => a.status === 'RESOLVED').length,
+    DISMISSED: alerts.filter((a) => a.status === 'DISMISSED').length,
+  };
+
+  const handleAction = async (id: string, actionFn: (id: string) => Promise<void>) => {
+    setActionInProgress(id);
+    try {
+      await actionFn(id);
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
   return (
-    <div className="alerts-view-container">
-      {/* Title Bar */}
-      <div className="view-title-bar">
+    <div className="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4 bg-[#eef3f9]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="view-heading">
-            <Bell size={22} /> Alerts & Incidents Operations Center
+          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-rose-500" />
+            Alerts &amp; Incident Lifecycle Triage
           </h2>
-          <p className="view-subheading">
-            Deduplicated, prioritized safety alerts with escalation tracking and human-in-the-loop acknowledgement
+          <p className="text-xs text-slate-500">
+            Real-time incident dispatch, human-in-the-loop acknowledgment, and compliance remediation
           </p>
         </div>
 
-        {/* View Toggle Tabs */}
-        <div className="view-tab-toggle">
+        {onRefresh && (
           <button
-            className={`toggle-btn ${activeTab === 'alerts' ? 'active' : ''}`}
-            onClick={() => setActiveTab('alerts')}
+            onClick={onRefresh}
+            className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
           >
-            <Bell size={14} />
-            <span>Alerts ({alerts.length})</span>
+            <RefreshCw className="w-3.5 h-3.5 text-sky-600" />
+            <span>Refresh Ledger</span>
           </button>
-          <button
-            className={`toggle-btn ${activeTab === 'incidents' ? 'active' : ''}`}
-            onClick={() => setActiveTab('incidents')}
-          >
-            <Layers size={14} />
-            <span>Incidents ({incidents.length})</span>
-          </button>
-        </div>
+        )}
       </div>
 
-      {/* Quick Severity Distribution Bar */}
-      <div className="alerts-summary-strip">
-        <div className="summary-strip-item strip-critical">
-          <span className="strip-count font-mono">{summary?.critical ?? 0}</span>
-          <span className="strip-label">CRITICAL</span>
+      {/* Main Ledger Card */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        {/* Tabs Row */}
+        <div className="flex items-center gap-2 px-4 pt-3 border-b border-slate-200 bg-white">
+          {(['ACTIVE', 'ACKNOWLEDGED', 'RESOLVED', 'DISMISSED'] as AlertStatus[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-2.5 px-3 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer ${
+                activeTab === tab
+                  ? 'border-sky-600 text-sky-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <span>{tab}</span>
+              <span
+                className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono ${
+                  activeTab === tab
+                    ? 'bg-sky-100 text-sky-800'
+                    : 'bg-slate-100 text-slate-600'
+                }`}
+              >
+                {counts[tab]}
+              </span>
+            </button>
+          ))}
         </div>
-        <div className="summary-strip-item strip-high">
-          <span className="strip-count font-mono">{summary?.high ?? 0}</span>
-          <span className="strip-label">HIGH</span>
-        </div>
-        <div className="summary-strip-item strip-medium">
-          <span className="strip-count font-mono">{summary?.medium ?? 0}</span>
-          <span className="strip-label">MEDIUM</span>
-        </div>
-        <div className="summary-strip-item strip-low">
-          <span className="strip-count font-mono">{summary?.low ?? 0}</span>
-          <span className="strip-label">LOW</span>
-        </div>
-        <div className="summary-strip-item strip-open">
-          <span className="strip-count font-mono">{summary?.open_incidents ?? 0}</span>
-          <span className="strip-label">OPEN INCIDENTS</span>
-        </div>
-      </div>
 
-      {/* Main Content Area */}
-      {activeTab === 'alerts' ? (
-        <AlertsTable
-          alerts={alerts}
-          onSelectAlert={(alt) => setSelectedAlert(alt)}
-          onAcknowledge={onAcknowledge}
-          onResolve={onResolve}
-          onDismiss={onDismiss}
-        />
-      ) : (
-        <div className="incidents-section">
-          {/* Incident Filter Controls */}
-          <div className="table-controls-bar">
-            <div className="search-input-wrap">
-              <Search size={16} className="search-icon" />
+        {/* Filter Toolbar */}
+        <div className="p-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
+          <div className="flex items-center gap-2">
+            <div className="relative w-64">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-400" />
               <input
                 type="text"
-                className="search-input"
-                placeholder="Search incidents by ID, camera, zone, or event..."
-                value={incidentSearch}
-                onChange={(e) => setIncidentSearch(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search alerts, zones, cameras..."
+                className="w-full bg-slate-50 border border-slate-200 text-xs rounded-md pl-8 pr-3 py-1.5 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
-            <div className="filter-selects-group">
-              <div className="filter-item">
-                <Filter size={14} />
-                <select
-                  className="filter-select"
-                  value={incidentStatusFilter}
-                  onChange={(e) => setIncidentStatusFilter(e.target.value)}
-                >
-                  <option value="ALL">All Statuses</option>
-                  <option value="OPEN">Open</option>
-                  <option value="ACKNOWLEDGED">Acknowledged</option>
-                  <option value="RESOLVED">Resolved</option>
-                  <option value="DISMISSED">Dismissed</option>
-                </select>
-              </div>
+
+            <div className="flex items-center gap-1.5">
+              <Filter className="w-3.5 h-3.5 text-slate-400" />
+              <select
+                value={severityFilter}
+                onChange={(e) => setSeverityFilter(e.target.value)}
+                className="bg-slate-50 border border-slate-200 text-xs rounded-md py-1 px-2.5 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500"
+              >
+                <option value="ALL">All Severities</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
             </div>
           </div>
 
-          {/* Incidents Table */}
-          {filteredIncidents.length === 0 ? (
-            <div className="table-empty-state">
-              <Layers size={36} className="empty-icon" />
-              <h4 className="empty-title">
-                {incidents.length === 0 ? 'NO DATA AVAILABLE' : 'NO MATCHING INCIDENTS'}
-              </h4>
-              <p className="empty-subtitle">
-                {incidents.length === 0
-                  ? 'No safety incidents have been recorded in the database.'
-                  : 'Try changing your filter settings.'}
-              </p>
-            </div>
-          ) : (
-            <div className="responsive-table-wrap">
-              <table className="soc-table">
-                <thead>
-                  <tr>
-                    <th>Incident ID</th>
-                    <th>Risk Score & Level</th>
-                    <th>Events</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th>Created Time</th>
-                    <th className="text-right">Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredIncidents.map((inc) => (
-                    <tr
-                      key={inc.incident_id}
-                      className="soc-row"
-                      onClick={() => setSelectedIncident(inc)}
-                    >
-                      <td className="font-mono text-accent">{inc.incident_id}</td>
-                      <td>
-                        <span className={`badge severity-${inc.risk_level.toLowerCase()}`}>
-                          {inc.risk_level} ({inc.risk_score}/100)
+          <span className="text-[11px] text-slate-400 font-mono-nums">
+            Showing {filteredAlerts.length} entries
+          </span>
+        </div>
+
+        {/* Ledger Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold text-[10px] uppercase">
+                <th className="py-2.5 px-3">Severity</th>
+                <th className="py-2.5 px-3">Incident ID</th>
+                <th className="py-2.5 px-3">Hazard Event</th>
+                <th className="py-2.5 px-3">Camera Node</th>
+                <th className="py-2.5 px-3">Plant Zone</th>
+                <th className="py-2.5 px-3">Timestamp</th>
+                <th className="py-2.5 px-3">Status</th>
+                <th className="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filteredAlerts.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="text-center py-12 text-slate-400">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-1.5" />
+                    <p className="text-xs font-semibold text-slate-700">No {activeTab} Alerts</p>
+                    <p className="text-[10px] text-slate-400">Ledger is clear for this state.</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredAlerts.map((a) => {
+                  const isBusy = actionInProgress === a.alert_id;
+
+                  return (
+                    <tr key={a.alert_id} className="hover:bg-slate-50 transition">
+                      <td className="py-2.5 px-3">
+                        <span
+                          className={`text-[8px] font-bold px-2 py-0.5 rounded tracking-wide ${getSeverityBadge(
+                            a.severity
+                          )}`}
+                        >
+                          {a.severity}
                         </span>
                       </td>
-                      <td>
-                        <div className="incident-events-list">
-                          {inc.event_types.map((e, idx) => (
-                            <span key={idx} className="event-pill">
-                              {e}
-                            </span>
-                          ))}
+                      <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
+                        {a.alert_id}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <div className="font-semibold text-slate-800">
+                          {a.title || a.event_type.replace(/_/g, ' ')}
+                        </div>
+                        <p className="text-[10px] text-slate-500 truncate max-w-xs">{a.message}</p>
+                      </td>
+                      <td className="py-2.5 px-3 font-mono-nums text-slate-600">{a.camera_id}</td>
+                      <td className="py-2.5 px-3 text-slate-600">{a.zone_id}</td>
+                      <td className="py-2.5 px-3 font-mono-nums text-slate-500 text-[11px]">
+                        {new Date(a.timestamp).toLocaleString('en-GB')}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
+                          {a.status}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {a.status === 'ACTIVE' && (
+                            <button
+                              disabled={isBusy}
+                              onClick={() => handleAction(a.alert_id, onAcknowledge)}
+                              className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px] font-semibold transition cursor-pointer shadow-xs disabled:opacity-50"
+                            >
+                              Ack
+                            </button>
+                          )}
+                          {a.status !== 'RESOLVED' && (
+                            <button
+                              disabled={isBusy}
+                              onClick={() => handleAction(a.alert_id, onResolve)}
+                              className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-semibold transition cursor-pointer shadow-xs disabled:opacity-50"
+                            >
+                              Resolve
+                            </button>
+                          )}
+                          {a.status !== 'DISMISSED' && a.status !== 'RESOLVED' && (
+                            <button
+                              disabled={isBusy}
+                              onClick={() => handleAction(a.alert_id, onDismiss)}
+                              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[10px] font-semibold transition cursor-pointer disabled:opacity-50"
+                            >
+                              Dismiss
+                            </button>
+                          )}
                         </div>
                       </td>
-                      <td>
-                        <div>{inc.camera_id}</div>
-                        <div className="text-xs text-muted">{inc.zone_id}</div>
-                      </td>
-                      <td>
-                        <span className={`badge status-${inc.status.toLowerCase()}`}>
-                          {inc.status}
-                        </span>
-                      </td>
-                      <td className="text-muted text-xs">
-                        {new Date(inc.created_at).toLocaleString()}
-                      </td>
-                      <td className="text-right">
-                        <button
-                          className="btn-icon btn-action-detail"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedIncident(inc);
-                          }}
-                        >
-                          <ChevronRight size={14} />
-                        </button>
-                      </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
-
-      {/* Modals */}
-      <AlertDetailModal
-        alert={selectedAlert}
-        onClose={() => setSelectedAlert(null)}
-        onAcknowledge={onAcknowledge}
-        onResolve={onResolve}
-        onDismiss={onDismiss}
-      />
-
-      <IncidentDetailModal
-        incident={selectedIncident}
-        onClose={() => setSelectedIncident(null)}
-        onSelectAlert={(altId) => {
-          setSelectedIncident(null);
-          const found = alerts.find((a) => a.alert_id === altId);
-          if (found) setSelectedAlert(found);
-        }}
-      />
+      </div>
     </div>
   );
 };
+
+export default AlertsView;

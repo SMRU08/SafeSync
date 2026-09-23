@@ -37,6 +37,7 @@ class ReconnectPolicy(BaseModel):
 class CameraConfigModel(BaseModel):
     id: str = Field(..., description="Unique camera identifier, e.g. camera_01")
     name: str = Field(..., description="Human readable camera name")
+    location: Optional[str] = Field(default="", description="Physical installation location")
     zone_id: str = Field(default="UNKNOWN", description="Associated facility zone identifier")
     source: str = Field(..., description="Camera source URL, device index, or file path")
     source_type: CameraSourceType = Field(default=CameraSourceType.USB)
@@ -61,13 +62,20 @@ class CameraMetrics(BaseModel):
     active_hazards: int = Field(default=0, description="Current number of confirmed environmental hazards")
 
 
-
 class CameraStatus(BaseModel):
     camera_id: str
     name: str
+    location: Optional[str] = Field(default="")
     zone_id: str
     source_type: str
     enabled: bool
     state: CameraState
+    status: str = Field(default="offline", description="online, offline, connecting, error")
+    connection_status: str = Field(default="offline")
+    stream_url: str = Field(default="")
+    fps: float = Field(default=0.0)
+    resolution: Optional[str] = Field(default="1280x720")
+    last_seen: Optional[str] = Field(default=None)
     metrics: CameraMetrics
     safe_source: str = Field(..., description="Sanitized source with passwords and credentials masked")
+    ai_analysis: Optional[Dict[str, Any]] = Field(default=None)

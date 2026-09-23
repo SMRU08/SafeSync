@@ -167,7 +167,7 @@ class WorkerComplianceEngine:
         t2 = time.perf_counter()
         img_shape = frame.shape[:2]
         associations, unassociated_ppe = self.associator.associate(
-            tracked_workers, ppe_dets, img_shape=img_shape
+            tracked_workers, ppe_dets, img_shape=img_shape, frame=frame
         )
         t_assoc = (time.perf_counter() - t2) * 1000.0
 

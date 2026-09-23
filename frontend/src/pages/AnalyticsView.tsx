@@ -1,8 +1,7 @@
 /**
- * AnalyticsView.tsx — RAKSHYA VISION Phase 8
- * Safety Metrics & Incident Distribution Analytics.
- * Strict No-Fake-Data: Calculates real distributions from actual database records.
- * Renders explicit 'NO HISTORICAL DATA AVAILABLE' if database has zero records.
+ * AnalyticsView.tsx — RAKSHYA VISION Professional SOC
+ * Safety & Compliance Analytics, Incident Distribution, and Temporal Trends.
+ * Displays real-time aggregations with clean industrial visualizations.
  */
 
 import React from 'react';
@@ -11,264 +10,139 @@ import { Alert, Incident, RiskSummary } from '../types';
 
 interface AnalyticsViewProps {
   alerts: Alert[];
-  incidents: Incident[];
-  summary: RiskSummary | null;
+  incidents?: Incident[];
+  summary?: RiskSummary | null;
 }
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ alerts, incidents, summary }) => {
-  const hasData = alerts.length > 0 || incidents.length > 0;
-
-  // Real calculations
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ alerts }) => {
+  // Aggregate real stats
   const totalAlerts = alerts.length;
-  const criticalAlerts = alerts.filter((a) => a.severity === 'CRITICAL').length;
-  const highAlerts = alerts.filter((a) => a.severity === 'HIGH').length;
-  const mediumAlerts = alerts.filter((a) => a.severity === 'MEDIUM').length;
-  const lowAlerts = alerts.filter((a) => a.severity === 'LOW').length;
+  const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL').length;
+  const highCount = alerts.filter((a) => a.severity === 'HIGH').length;
+  const mediumCount = alerts.filter((a) => a.severity === 'MEDIUM').length;
+  const lowCount = alerts.filter((a) => a.severity === 'LOW').length;
 
-  const resolvedAlerts = alerts.filter((a) => a.status === 'RESOLVED').length;
-  const ackAlerts = alerts.filter((a) => a.status === 'ACKNOWLEDGED').length;
-  const activeAlerts = alerts.filter((a) => a.status === 'ACTIVE').length;
-  const dismissedAlerts = alerts.filter((a) => a.status === 'DISMISSED').length;
-
-  // Event type distribution
-  const eventCounts: Record<string, number> = {};
-  alerts.forEach((a) => {
-    eventCounts[a.event_type] = (eventCounts[a.event_type] || 0) + 1;
-  });
-
-  // Camera distribution
-  const cameraCounts: Record<string, number> = {};
-  alerts.forEach((a) => {
-    cameraCounts[a.camera_id] = (cameraCounts[a.camera_id] || 0) + 1;
-  });
-
-  const resolutionRate = totalAlerts > 0 ? ((resolvedAlerts / totalAlerts) * 100).toFixed(1) : '0.0';
-
-  if (!hasData) {
-    return (
-      <div className="analytics-view-container">
-        <div className="view-title-bar">
-          <div>
-            <h2 className="view-heading">
-              <BarChart3 size={22} /> Safety Analytics & Risk Trends
-            </h2>
-            <p className="view-subheading">
-              Historical distribution of safety violations, incident escalations, and resolution performance
-            </p>
-          </div>
-        </div>
-
-        <div className="analytics-empty-state">
-          <BarChart3 size={56} className="empty-icon text-muted" />
-          <h3 className="empty-title">NO HISTORICAL DATA AVAILABLE</h3>
-          <p className="empty-subtitle">
-            The database currently contains zero recorded alerts or incidents. As the computer vision
-            pipeline identifies safety violations or thermal hazards, verified analytical metrics will populate here.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const ppeViolations = alerts.filter((a) => a.event_type.startsWith('MISSING_') || a.event_type.includes('PPE')).length;
+  const fireHazards = alerts.filter((a) => a.event_type.includes('FIRE')).length;
+  const smokeHazards = alerts.filter((a) => a.event_type.includes('SMOKE')).length;
 
   return (
-    <div className="analytics-view-container">
-      <div className="view-title-bar">
-        <div>
-          <h2 className="view-heading">
-            <BarChart3 size={22} /> Safety Analytics & Risk Trends
-          </h2>
-          <p className="view-subheading">
-            Verified analytical metrics calculated directly from {totalAlerts} safety alerts and {incidents.length} incidents
-          </p>
+    <div className="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4 bg-[#eef3f9]">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-sky-600" />
+          Safety Analytics &amp; Compliance Trends
+        </h2>
+        <p className="text-xs text-slate-500">
+          Aggregated plant hazard telemetry, PPE compliance distribution, and incident frequency metrics
+        </p>
+      </div>
+
+      {/* Summary KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-medium text-slate-500">Total Recorded Alerts</span>
+          <div className="text-xl font-extrabold text-slate-900 font-mono-nums mt-1">
+            {totalAlerts}
+          </div>
+          <p className="text-[10px] text-slate-400 mt-0.5">Cumulative telemetry logs</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-medium text-slate-500">Critical Incidents</span>
+          <div className="text-xl font-extrabold text-rose-600 font-mono-nums mt-1">
+            {criticalCount}
+          </div>
+          <p className="text-[10px] text-rose-500 mt-0.5">Requires immediate action</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-medium text-slate-500">PPE Infractions</span>
+          <div className="text-xl font-extrabold text-amber-600 font-mono-nums mt-1">
+            {ppeViolations}
+          </div>
+          <p className="text-[10px] text-slate-400 mt-0.5">Non-compliant detections</p>
+        </div>
+
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-medium text-slate-500">Fire / Smoke Events</span>
+          <div className="text-xl font-extrabold text-slate-900 font-mono-nums mt-1">
+            {fireHazards + smokeHazards}
+          </div>
+          <p className="text-[10px] text-emerald-600 mt-0.5">Thermal monitoring events</p>
         </div>
       </div>
 
-      {/* Analytics KPI Row */}
-      <div className="analytics-kpi-row">
-        <div className="analytics-card">
-          <span className="card-label">Total Recorded Alerts</span>
-          <span className="card-num font-mono">{totalAlerts}</span>
-          <span className="card-sub text-muted">Across all configured cameras</span>
-        </div>
-        <div className="analytics-card">
-          <span className="card-label">Resolution Rate</span>
-          <span className="card-num text-success font-mono">{resolutionRate}%</span>
-          <span className="card-sub text-muted">{resolvedAlerts} of {totalAlerts} resolved</span>
-        </div>
-        <div className="analytics-card">
-          <span className="card-label">Critical Threat Share</span>
-          <span className="card-num text-error font-mono">
-            {totalAlerts > 0 ? ((criticalAlerts / totalAlerts) * 100).toFixed(1) : 0}%
-          </span>
-          <span className="card-sub text-muted">{criticalAlerts} critical incidents</span>
-        </div>
-        <div className="analytics-card">
-          <span className="card-label">Open Incidents</span>
-          <span className="card-num text-accent font-mono">{summary?.open_incidents ?? 0}</span>
-          <span className="card-sub text-muted">Requiring safety officer action</span>
-        </div>
-      </div>
-
-      {/* Distribution Charts Grid */}
-      <div className="analytics-charts-grid">
+      {/* Analytics Breakdown Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Severity Distribution */}
-        <div className="chart-card">
-          <h4 className="chart-title">Alerts by Severity</h4>
-          <div className="bar-chart-wrap">
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Critical</span>
-                <span className="font-mono">{criticalAlerts} ({totalAlerts > 0 ? Math.round((criticalAlerts / totalAlerts) * 100) : 0}%)</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-critical"
-                  style={{ width: `${totalAlerts > 0 ? (criticalAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <h3 className="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider">
+            Alert Severity Breakdown
+          </h3>
 
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>High</span>
-                <span className="font-mono">{highAlerts} ({totalAlerts > 0 ? Math.round((highAlerts / totalAlerts) * 100) : 0}%)</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-high"
-                  style={{ width: `${totalAlerts > 0 ? (highAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Medium</span>
-                <span className="font-mono">{mediumAlerts} ({totalAlerts > 0 ? Math.round((mediumAlerts / totalAlerts) * 100) : 0}%)</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-medium"
-                  style={{ width: `${totalAlerts > 0 ? (mediumAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Low</span>
-                <span className="font-mono">{lowAlerts} ({totalAlerts > 0 ? Math.round((lowAlerts / totalAlerts) * 100) : 0}%)</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-low"
-                  style={{ width: `${totalAlerts > 0 ? (lowAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
+          <div className="space-y-3">
+            {[
+              { label: 'Critical', count: criticalCount, color: 'bg-rose-600' },
+              { label: 'High', count: highCount, color: 'bg-rose-500' },
+              { label: 'Medium', count: mediumCount, color: 'bg-amber-500' },
+              { label: 'Low', count: lowCount, color: 'bg-sky-500' },
+            ].map((s, idx) => {
+              const pct = totalAlerts > 0 ? Math.round((s.count / totalAlerts) * 100) : 0;
+              return (
+                <div key={idx}>
+                  <div className="flex justify-between items-center text-xs mb-1 font-medium">
+                    <span className="text-slate-700">{s.label}</span>
+                    <span className="font-mono-nums font-bold text-slate-800">
+                      {s.count} ({pct}%)
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`h-2 rounded-full ${s.color}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Lifecycle Status Breakdown */}
-        <div className="chart-card">
-          <h4 className="chart-title">Alert Lifecycle Status</h4>
-          <div className="bar-chart-wrap">
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Active / Unacknowledged</span>
-                <span className="font-mono">{activeAlerts}</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-active"
-                  style={{ width: `${totalAlerts > 0 ? (activeAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
+        {/* Hazard Category Distribution */}
+        <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+          <h3 className="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wider">
+            Hazard Categories
+          </h3>
 
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Acknowledged</span>
-                <span className="font-mono">{ackAlerts}</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-ack"
-                  style={{ width: `${totalAlerts > 0 ? (ackAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Resolved</span>
-                <span className="font-mono">{resolvedAlerts}</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-resolved"
-                  style={{ width: `${totalAlerts > 0 ? (resolvedAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="bar-item">
-              <div className="bar-label-row">
-                <span>Dismissed</span>
-                <span className="font-mono">{dismissedAlerts}</span>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill bar-dismissed"
-                  style={{ width: `${totalAlerts > 0 ? (dismissedAlerts / totalAlerts) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Event Type Breakdown */}
-        <div className="chart-card">
-          <h4 className="chart-title">Alerts by Event Type</h4>
-          <div className="bar-chart-wrap">
-            {Object.entries(eventCounts).map(([evt, cnt]) => (
-              <div key={evt} className="bar-item">
-                <div className="bar-label-row">
-                  <span>{evt}</span>
-                  <span className="font-mono">{cnt}</span>
+          <div className="space-y-3">
+            {[
+              { label: 'Missing Safety Helmet', count: alerts.filter((a) => a.event_type.includes('HELMET')).length },
+              { label: 'Missing Safety Vest', count: alerts.filter((a) => a.event_type.includes('VEST')).length },
+              { label: 'Missing Gloves', count: alerts.filter((a) => a.event_type.includes('GLOVE')).length },
+              { label: 'Missing Footwear', count: alerts.filter((a) => a.event_type.includes('FOOTWEAR')).length },
+              { label: 'Fire Anomaly', count: fireHazards },
+              { label: 'Smoke Plume', count: smokeHazards },
+            ].map((cat, idx) => {
+              const pct = totalAlerts > 0 ? Math.round((cat.count / totalAlerts) * 100) : 0;
+              return (
+                <div key={idx}>
+                  <div className="flex justify-between items-center text-xs mb-1 font-medium">
+                    <span className="text-slate-700">{cat.label}</span>
+                    <span className="font-mono-nums font-bold text-slate-800">{cat.count}</span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-sky-500 h-1.5 rounded-full" style={{ width: `${Math.min(100, pct * 2)}%` }} />
+                  </div>
                 </div>
-                <div className="bar-track">
-                  <div
-                    className="bar-fill bar-event"
-                    style={{ width: `${(cnt / totalAlerts) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Camera Distribution */}
-        <div className="chart-card">
-          <h4 className="chart-title">Alerts by Camera</h4>
-          <div className="bar-chart-wrap">
-            {Object.entries(cameraCounts).map(([cam, cnt]) => (
-              <div key={cam} className="bar-item">
-                <div className="bar-label-row">
-                  <span>{cam}</span>
-                  <span className="font-mono">{cnt}</span>
-                </div>
-                <div className="bar-track">
-                  <div
-                    className="bar-fill bar-camera"
-                    style={{ width: `${(cnt / totalAlerts) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+export default AnalyticsView;

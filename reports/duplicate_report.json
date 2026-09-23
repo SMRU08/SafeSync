@@ -1,0 +1,1271 @@
+{
+  "total_unique_hashes": 52848,
+  "duplicate_clusters_count": 1579,
+  "cross_dataset_duplicates": [
+    {
+      "sha256": "b5b3a08f027af4a137ab61681144cc9fb56e26c6397c11c5990295ea2ef4e75b",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\00000383_jpg.rf.eeadc9dba7768242116230005da25217.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\00000383_jpg.rf.b933adc2fa887828c93e7ecce77d1cb8.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\00000383_jpg.rf.eff1ab339805e95d2807109fd4788b6c.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\00000383_jpg.rf.0e96901e0da57608b2f9b60e6d1b2f7b.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\00000383_jpg.rf.e8b98a4d492991f83c03a5da2a0feb0a.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "d3175e1ba3d78fb9529658b30ebc29c81941e2ffe95c3e1a8cc4593dba90c1cc",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\00004_jpg.rf.356a4a6a35e1db08c0dda666e06ac0d4.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\00004_jpg.rf.1f3b711c28117c8fb265b1d0092e7af9.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "1db5d64d283b16e2ebcdf8854e1d23a7d22a3a0589535b922264a63cdf1a5ef0",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\00100_jpg.rf.73d6d1a3abef0060e5b09af7f0aed258.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\00100_jpg.rf.8b82d5ff6712248cfab473df197c9362.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "5aefb9bc1a5d87619f9491f2bbaf37cfd1f02c54276e52b1bb33adf1656e183a",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\00122_jpg.rf.fe128f13af524b6fdfa56585049fa0d1.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\00122_jpg.rf.a096d4979a4f4950386b11fee360920e.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "82925f43a7b97bbf79d7e5b95dec801bab9261e7a9f42790018559d6146ccc30",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\10_JPG_jpg.rf.368e3741903cb145daac7ffc7b82553c.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\10_JPG_jpg.rf.cd2e7a4feb8865a7dea182407561a95a.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "581f0e70497ad5c855b4a16810da93c4ddf5cad712b6d8cb2c9ab20857287aca",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\20220621_132901_jpg.rf.0d0aeea7fb203dfd021c02d7391f757e.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\20220621_132901_jpg.rf.e3f7bab30cacc2cee7c4e75a2e7af14c.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\20220621_132901_jpg.rf.45eb696982f8d5261f7bcbee5793ce71.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\20220621_132901_jpg.rf.ed9c342912b20d3be06eefaf156c9742.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "val",
+          "file": "datasets\\raw\\ppe_shikk\\valid\\images\\20220621_132901_jpg.rf.bb2c8636560db45973ee5330932e6404.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "270638ca169017c968db3890be21c5d275adf1bae3949f074af963cc052340b3",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\20220721_161927_jpg.rf.0f92b8260bcb064f454cec9a3c244cb1.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\20220721_161927_jpg.rf.0de478bd639498b9371c7e632fba203b.jpg"
+        },
+        {
+          "dataset": "safety_ppe_4",
+          "split": "train",
+          "file": "datasets\\raw\\safety_ppe_4\\train\\images\\20220721_161927_jpg.rf.165c39d35836eb50dfd6141c5563ef63.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "061c05499807a0ec968afb6a7108112e3171048c6f65d16471ec7114f19a28a2",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\20220721_162157_jpg.rf.5e859944b24d483172c9265e38df9907.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\20220721_162157_jpg.rf.0afcd71eda15a95d654c5c13f53b2fe0.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "c0ec8a645150d5d953f17d735683ab170c0c9c1d240f960667ba31377cf9e1c9",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\20220721_162157_jpg.rf.8f92f80c7acbb8830381e64d846721f1.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\20220721_162157_jpg.rf.b442b75aa461659ef8f9451564db7231.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\20220721_162157_jpg.rf.d112c176416de6207da8761687a0cc8b.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "b84bfcdd45273bbd67aa51a904de337672b599984bcc43fc081ee001153da24b",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\20220721_162848_jpg.rf.b82c3e1a8943d7bc652beaf32c95c37b.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\20220721_162848_jpg.rf.133178b05f634bded57479dc9d0375a1.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "3460ec0ebdb14987acccc4d0a8bdd27c01d8ba102b1fadf47ce56515f6b6134e",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\9417812-serious-male-construction-worker-in-safety-vest-and-hard-hat_jpg.rf.a0c6f1379bd5c0193dc333c78bd9012a.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\9417812-serious-male-construction-worker-in-safety-vest-and-hard-hat_jpg.rf.e701a7a5bb7dff7d6b9ac10a18dbc143.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\9417812-serious-male-construction-worker-in-safety-vest-and-hard-hat_jpg.rf.818910428208032a26bf7e01fe734dac.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\9417812-serious-male-construction-worker-in-safety-vest-and-hard-hat_jpg.rf.eb18c1f1237d0a42ab409d968f861931.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "ab048ed9c940939a9fe067dc229ec9131fea55e7637d89359d59d80bd0165f3f",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\AightSird0542_jpg.rf.f9442743841fe5e83ec7afa87ea776de.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\AightSird0542_jpg.rf.7ce126021aeb05777252ed33b5bb683a.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "3d20bef69b159b28baf9b8ccc5b829835c5ec2745b9faabb45d3fef87b375ee7",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\Aitin0586_jpg.rf.ff8884e1a182ed1cb94ed1f35eda1f2d.jpg"
+        },
+        {
+          "dataset": "ultralytics_construction_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\ultralytics_construction_ppe\\images\\train\\image575.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "c34b01db9f44d459dc1bba7615a4122d9a0c6e71ffa87681e674081c6f42de8a",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\Aitin0907_jpg.rf.06541ce6987c54136e04309532c30104.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\Aitin0907_jpg.rf.742fc745bef6cd1f7f13b4243f0ef4b6.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "19bc3773e633a0046f0a957a931da8e6481d78af6607ac657332b38d4597c397",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\Aitin1378_jpg.rf.5fe958bc184e92b9beec51fc768e8900.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\Aitin1378_jpg.rf.f4b9cb869e578456eb78505829c22793.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "a82be9f953d48a1df19ccaddabe76894e22e1ed0a66fd3f3fd99514587a3cc9a",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\Aitin2742_jpg.rf.5c76edebe2c2b2b400440de2e84c23ed.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\Aitin2742_jpg.rf.688b49e2d609d601f0282eb170bfe118.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "00c2648e08d9a4a6aab6d9e347c8d8d81d1d9ff6d4f4da3a257bc1fa7fca922a",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\Aitin3205_jpg.rf.3125139b374a7b58ee49f8b65d91f8b9.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\Aitin3205_jpg.rf.cf5b86f1546df87bfd51da9d56d8db1e.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "74eb58df6815aa9ab9c5457e9570ea4d818f2c9dc7e0f07bb70cb1c3ee98f678",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\Aitin4095_jpg.rf.932067cba8e1046c0cc8ec62561e47a3.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\Aitin4095_jpg.rf.eadfa16227b93931763c1ecacf95c603.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "47041cf96097e5d0f5796d959ce593c756e89686002ad9481f8e094dcfb69053",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\download-27-_jpg.rf.ba9a61eb9872c1d4e0f3e61d81820b88.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\download-27-_jpg.rf.4a14c50f9167cc7bd07c7e2b45c22f2c.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\download-27-_jpg.rf.9f7bd664bb802ebed1fa96b269cfecc3.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\download-27-_jpg.rf.408555da3dc5e550125f28babd997a3e.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\download-27-_jpg.rf.674eabae645eefffb888ede0fc054ff3.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\download-27-_jpg.rf.cff171d86a5f12280324609574992116.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "db885fc767098cf9566304e7c5730ca1e49062b7ba96a8a7a67a0a511aea3332",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\images-2022-07-04T013045_jpg.rf.faf1b3610776dfd7a975fec50b516382.jpg"
+        },
+        {
+          "dataset": "ultralytics_construction_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\ultralytics_construction_ppe\\images\\train\\image752.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "fe23e41cb7993f663a8e534cec9f0db5aa540cb83bca5adf234bf224e2b1f243",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\images-2022-07-04T013058_jpg.rf.c0ae44eab5722b12e36f363b8b5ab768.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\images-2022-07-04T013058_jpg.rf.14399c14342cccddc85380b0b1917ded.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\images-2022-07-04T013058_jpg.rf.2fc30907034a04b2087ffafbf483cb41.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\images-2022-07-04T013058_jpg.rf.349cd6134a0f478160c2aeab003bf516.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\images-2022-07-04T013058_jpg.rf.427e5e9b4b2bf58a5605a3a779a1adf9.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "e9d874fa63be3d929961c2e38eeb38ef77c0a59cf9ccb898acc0ff6f757e8a8d",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\images-2022-07-04T013955_jpg.rf.8cadea36a309aeaf9705aec0e20cf3d8.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\images-2022-07-04T013955_jpg.rf.8249737a4f288f607f9c5fe33a2e8d16.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "7e0332903781d6c5f3c7b06e22cade564a8fb64429150c276b22e1a63ddb5ca9",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\images-34-_jpg.rf.1688cd6b03242e20f744c25b02bbb28b.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\images-34-_jpg.rf.3eb148514b5f13382b80188a49c78ad1.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\images-34-_jpg.rf.9464ebbe469695bc1f2d2ee3b3640d1d.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\images-34-_jpg.rf.daddfab0a07d88e0bdcd4fa396a3f4d6.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "68a2d1d9672fc05e6a9f43a043cdbdcc69c7773610dea618d091b603681f65d7",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\images-34-_jpg.rf.8a1e06d8565ecbe1315bbb82c68b2a8d.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\images-34-_jpg.rf.dbf24bbfa78871e6473b9a2f69c6ca47.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "d5eb58a88a8ee3c13ca66d2c36aa5e64a647171ede49aa8126d72482242220d4",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_108_jpg.rf.c92058c637a96e68d7ab6fc41df7f53f.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_108_jpg.rf.71e459f6543e074513331f2bf5d5fffd.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "b2bcaaf5ee5d6c927f82e19e1c1db98e70aa88288d7bfad8ab23111454622b77",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_150_jpg.rf.03d8b4101dc9c85bf91230a2b8aad56e.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_150_jpg.rf.a4ac76e8f9ac306a9a4fea884de48a14.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_150_jpg.rf.fca287b3404e71a4168be9b0d76431b0.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_150_jpg.rf.c49cb702d7b52bc6421c8597a60b0d00.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_150_jpg.rf.3169933e9f7a513d2141fba5f3ae6eb2.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "a6ac7c9c9bdb39316801c7fa95949eeece2f3ce435a90a86939c609e79534e80",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_150_jpg.rf.598ce028c75e5bd9ae30c3442a67f6b7.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_150_jpg.rf.015bc2ee7272dc407de6a7a41b4f01a3.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_150_jpg.rf.810c19821291233df83a268bb70afb32.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_150_jpg.rf.7e377f26ebc8073af2a1f7c007f926b3.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_150_jpg.rf.d5fa81a96b15d741595a796a7a51ab52.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "e393c9dc1bc10fe54c08da22bf5bfedf31da75c0439df866dac1a866a6f7cb22",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_150_jpg.rf.8545e27d522dfdc8b6b5dddd8c9a6270.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_150_jpg.rf.55af1a564892318fbc1fb647921a2ee6.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_150_jpg.rf.3e342769663a26bd167cacedb07f5aa1.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_150_jpg.rf.5d445816e995dcf9926dda21973df337.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "val",
+          "file": "datasets\\raw\\ppe_shikk\\valid\\images\\image_150_jpg.rf.c82e30898fded656d7733e0f62770499.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "f28e0f1b3981f5f249ef1a1882663b40a637f1f58f681d0547929d4d9839868c",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_150_jpg.rf.b9a523bf1df408c472a7264ded0daef2.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_150_jpg.rf.41626c39d3f072852fb95da98f464c57.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_150_jpg.rf.7a2b404a005f25027229e0d76a93805f.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_150_jpg.rf.d74c6ac999611d75c20e82e8374b2e42.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_150_jpg.rf.9237ccd4d40ef8d34f5a37389dfeacbd.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_150_jpg.rf.af4efd97927d6e17c38a55b0984e3c39.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_150_jpg.rf.ab31c572820fd9c0dd2b75c71f1d9586.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "22cd41817333656163440a148717966ad87119c88acd7963cbdf319a98b593e9",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_153-1-_jpg.rf.1cd910707c0f2527aea5630f33a21ee1.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_153-1-_jpg.rf.20ccadcc96ac67b2c7686e44abf3c6c1.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_153-1-_jpg.rf.1befb79ed8350bc4879083b83a9f84b0.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_153-1-_jpg.rf.f55051e51789e87a951914a03a2448fb.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_153-1-_jpg.rf.606d60f4c2cb03a19f1fd225cdeeb83d.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "8fa77b19982d25db53d5b32d211f930c315eebf35a89e2226ff4bd79f661c124",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_153_jpg.rf.6b3817e8cd8b0b80bff5f4716638a864.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_153_jpg.rf.aea0c4c42a1089cb0560462dfdb107a4.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_153_jpg.rf.b13bef20ca6fc90f20a32ffdc8de6e16.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_153_jpg.rf.13964002d75f744cf8324cd846e098c7.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_153_jpg.rf.986f8feb0c51888d80785948fe21eda3.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "val",
+          "file": "datasets\\raw\\ppe_shikk\\valid\\images\\image_153_jpg.rf.f92680e9137e598d872cb1458633ed26.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "248443061a0e9c923397f98908c33741146a07ec75035b5d39b869e0c69e514a",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_154_jpg.rf.362fb87a2b0da618b8e017c0117e4b6c.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_154_jpg.rf.846a704eecaef9285fe1ced8796cc9dd.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_154_jpg.rf.aa7253263ef6f836d2e34a52a1850850.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_154_jpg.rf.f2649df825000d332ad5878fdbdcad37.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "2e6c0b9d19c85593bad97aea0038612598d19e89e5ae4f56a1e8a56f868929db",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_154_jpg.rf.8b83dc39bc5aea37aa1b3a2e0edfddd8.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_154_jpg.rf.e631dea96897adc22bee4953598baabf.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_154_jpg.rf.e8d954435229f00d1557bcacc7e85ee1.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_154_jpg.rf.aaf139f395553bc01ab6ece7180a1e2a.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_154_jpg.rf.5177723a68c4d37a33db9f58581c9ce2.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "8be53e64f49ff09ecf17524b0f883631269e7e1b62ccca562526f33084f22fc5",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_155_jpg.rf.260662a17709d2ca9efbbc3eced2c1d4.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_155_jpg.rf.50d84a747982bb7476ab02e66c2ba6be.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_155_jpg.rf.5dda140d28b3fbf14535db70be4d3d8d.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_155_jpg.rf.5712bde7b28937613535f73adeb14e5f.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_155_jpg.rf.678cc306372bafef255eafb7816cc2f4.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_155_jpg.rf.a126bd6d31198315e6473211dc45fef7.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "770f5f6e544e1bc3b71bd665cbf1232946922d96f315fd00c80a8f386dece4dc",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_156_jpg.rf.40a545612c7a2328bf65411b7c3cabec.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_156_jpg.rf.6510c0b1c67d0b785ce502eb596d6b74.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_156_jpg.rf.f702deda1a3f8bfc42d19236084c83f3.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_156_jpg.rf.366869c81cc9bc8e142fff539208e682.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_156_jpg.rf.286f43a9a957fa624d3e33c6a196b6b8.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_156_jpg.rf.a421adb2a5b2c767b0ffd75e1afdade6.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "val",
+          "file": "datasets\\raw\\ppe_shikk\\valid\\images\\image_156_jpg.rf.a11bc184e4670c1f7ec02824c11ba3ba.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "d8554de2a180d692815b3f79d528c70918fb3e68d46c0cbb82cc53b8b70846f5",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_156_jpg.rf.e3c7411551b084c9040df75e4de73660.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_156_jpg.rf.0f215cf5cceb86501a8177dd58ddfbf5.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_156_jpg.rf.9f1a8e2e74eb203422c5dddb573f7fc1.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_156_jpg.rf.ce996f46351384eb2ebebfdce9e1ccbb.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "val",
+          "file": "datasets\\raw\\ppe_shikk\\valid\\images\\image_156_jpg.rf.ce682f737c5d9ca01bba08326d3725b0.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "64de9f4f8891f5b19a2a72cfa834e9be0b414c6814cffbfad9e7b31b21968f0c",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_157_jpg.rf.f4c1b341c30a9e9d02caaebd26b6c885.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_157_jpg.rf.7fc4c98d311b5c23243fd0976ec51510.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_157_jpg.rf.b352825a56e12f96c4fc296397fb0985.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_157_jpg.rf.77945ec1bbf9734a46ee472340dca5f4.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_157_jpg.rf.822d65a96126ada938ef6c53df7a4802.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_157_jpg.rf.c5378f58e403207177f4e53f73cc1e60.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_shikk\\train\\images\\image_157_jpg.rf.199501ad2be764f95361357994f8752e.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "9aed02110f9fbd1a3f4da873565429d460b3ee33fb08f3d4eb7c40837a8396f3",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_158_jpg.rf.6ed19d4470f73e88b6766d3495d00d59.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_158_jpg.rf.72f9e7ec2cefc3b9ef6a6ff2f1a924e4.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.d3f71462728e09d36df04f92c028d2cb.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "val",
+          "file": "datasets\\raw\\bangga_ppe\\valid\\images\\image_158_jpg.rf.f259105bbe79016b56d7c8b89e4ee834.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_158_jpg.rf.6137060e2be34eff5dae5d07c8c8d3bd.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_158_jpg.rf.7b21d8998e169ee13a31dc583c1b8b16.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "ea67b74e04b0a623b2bedbc9463cfdd40301cc1a354a3b5a8eff6115c4cea5a5",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_158_jpg.rf.93c3f9282f97d916f8c72bbb80920bdb.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.44f61d952b0f6c50f2f9b57f8f476d69.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.6d8b42a9166bd765fd2668a949265466.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.c7b4d8b5dc076d6f02d1ab88d354dd43.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.f3ef937e08d95522b75793d5ff510c24.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_158_jpg.rf.34ab2670295794c3b54f7fa6c04e677b.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_158_jpg.rf.dd6b203dd528cbb0aeb34bca02c767eb.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "01c8377569e4e86f9855f7bc3347854a722ff9b1556e82fbc78f9062697fdf9a",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_158_jpg.rf.d908b625dfeb08840deca0737a85f160.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_158_jpg.rf.dfdc748d63deeb3147d3612f744d4d33.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.2feaaf1bb054666eac68e9a0c590ea1b.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_158_jpg.rf.b3fdcedaf013864159fec6fe66bdbbd2.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_158_jpg.rf.cca7588c297feef68cc9c96aa63561b3.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_158_jpg.rf.f04da500bbb9285b3f58be4c01c78632.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "b443fd22f630db013f7e71c9d571f50bdaf6f173ea236bcfc056afe71f1fea12",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_161_jpg.rf.5da00845c3c0f33afe93d0580bf436eb.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_161_jpg.rf.adb88a92f37517d442a4e829a998b39e.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_161_jpg.rf.c690277cc3deb96de08cf968adda80ed.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_161_jpg.rf.4a6b285460ca659fa7c3faa85725cbda.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "f262ae5b60c849cdae1ce1a0484c0e3db6cd37d7676ceeebea159308c9db4a8e",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_162_jpg.rf.f310fd1d987a678869a3bfba0f2ff90f.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_162_jpg.rf.3f18025e264c12e532afb3729a89f014.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_162_jpg.rf.804ca00973f7b15e2cf576c2324fa91d.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_162_jpg.rf.1ca9f12a4b18903ed777840ee0c1029a.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "90fcf5c757577470e567830a8a32b000751d8750384b534cd7fd35527098e7af",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_163_jpg.rf.022f3e6ffe88e2e32a75e4668ce694ff.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_163_jpg.rf.27af32ade94aeffe870f6d628f00b179.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "06277cbf1331d1024eedbe752bea8985afa64f40df87d095aa3d853efb1e2b8f",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_163_jpg.rf.838845d5f0f9fdd7314958625eabdcb2.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_163_jpg.rf.2a06a36697f8b5171b5f48377c48f4a2.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_163_jpg.rf.404269894fe91bf22f7ac2bdc1111a4c.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_163_jpg.rf.f7edeccc32bf48c5f409d124e169b215.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_163_jpg.rf.fc7114ea1030e7660fae88abb734f031.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_163_jpg.rf.e19f083e571fb27905f371cfd42662dd.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_163_jpg.rf.cfaef7c54dae89dc6869c1bb2017377c.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "e01efb1efb45a5d8e253536645bf72f507d17cd1e02a8dc0d14ed84d6452551b",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_163_jpg.rf.8f22050c32245936d0338a487497b411.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_163_jpg.rf.209dcbb3b7fbd4c4e549c60706d2e45f.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_163_jpg.rf.3c4620b7183efce28151b734a57a26b2.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "303d8ae40d78f16e7cf09951448d0b6f795de062d10416c4344b303dd20ad1d9",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_164_jpg.rf.2269d3174d78f43b196f683faaaaea8b.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_164_jpg.rf.43b059fa3da799e3e18c774b388bce49.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_164_jpg.rf.661e5b55ae418ffcbe2a1d2f6607d454.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_164_jpg.rf.dbe92c3c1710490e7752eb0c0135e87b.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_164_jpg.rf.d9534b3123456f65f84b6d023f189580.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_164_jpg.rf.90b8fcd712a26dbb57fffd15fdc05117.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "4d1a710ea581972b1fce0edfe541a801e5e604c41af31dbc8c026dcce5ef2a93",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_165_jpg.rf.5a1a9f8262a534967ec9ae6edcd7f122.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_165_jpg.rf.1756207c48a435c1aed26016fecc05b2.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_165_jpg.rf.265e247a795d6ab8e087a053e6a73c92.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_165_jpg.rf.82bbc29a38af2057239b19d0888cee78.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_165_jpg.rf.dc07baa5e91e2879db1f623947a8e02c.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_165_jpg.rf.1d0a4eb01947dcfe9db1c8ad9bcb1073.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "b2a47d38bcba54857e111856683ae62087b2be64f023abbb960063182d999dae",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_166_jpg.rf.4c6d6f99f80c7836edd56a58484a915a.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_166_jpg.rf.f4d11b6d95028cf1364a5af253d12dde.jpg"
+        },
+        {
+          "dataset": "ppe_shikk",
+          "split": "val",
+          "file": "datasets\\raw\\ppe_shikk\\valid\\images\\image_166_jpg.rf.b0c1bcec1d23f320e10253a019b879f3.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "58237a8b5151512f1cda8fac790669dc0b9b36f6657f203d07fa093835690374",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_166_jpg.rf.ccff5b0cd173330710bff2ae07dc6c87.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_166_jpg.rf.8bc2e18806ed8cfaab7d260ec43316ec.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_166_jpg.rf.c92d45fc2b706c27a267eddff5588063.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_166_jpg.rf.f765066b824bcbf8e92bc4d2523ebbd9.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "test",
+          "file": "datasets\\raw\\ppe_safup\\test\\images\\image_166_jpg.rf.bbfc788a8dab0b0c1b13d9d4ead59aa8.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_166_jpg.rf.fa024c5cd5ba6f2b16d3d34d985d63a3.jpg"
+        }
+      ]
+    },
+    {
+      "sha256": "4e9d2bd838902e234e0bc905ff0a2a610c01fb49cef13690c7874b03bcf53f5e",
+      "occurrences": [
+        {
+          "dataset": "bangga_ppe",
+          "split": "test",
+          "file": "datasets\\raw\\bangga_ppe\\test\\images\\image_168_jpg.rf.224caf46ce365ce41b04a648e1b0aa86.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_168_jpg.rf.4a3e3a7719cbc7a02e86790f2d56a6e2.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_168_jpg.rf.564961c62515a800aedf93e942b02d20.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_168_jpg.rf.796d5f31ddba30ec1d45cb7f4857b03c.jpg"
+        },
+        {
+          "dataset": "bangga_ppe",
+          "split": "train",
+          "file": "datasets\\raw\\bangga_ppe\\train\\images\\image_168_jpg.rf.f33a6db9b87c5fff129f179aafd5d0fc.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_168_jpg.rf.3ff2a7484ad297fb225239d139189a71.jpg"
+        },
+        {
+          "dataset": "ppe_safup",
+          "split": "train",
+          "file": "datasets\\raw\\ppe_safup\\train\\images\\image_168_jpg.rf.71c14fe290efa556f165a571014b7425.jpg"
+        }
+      ]
+    }
+  ]
+}

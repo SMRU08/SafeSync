@@ -1,0 +1,357 @@
+# RAKSHYA VISION — Class Normalization & Canonical Mapping Configuration
+# Strict policy:
+# Canonical PPE Classes: 0: person, 1: helmet, 2: safety_vest, 3: gloves, 4: safety_footwear
+# Canonical Hazard Classes: 0: fire, 1: smoke
+# Actions: KEEP, REMAP, IGNORE, HARD_NEGATIVE, MANUAL_REVIEW
+
+version: "2.0.0"
+updated_at: "2026-09-23T19:30:00Z"
+
+canonical_models:
+  ppe:
+    target_classes:
+      0: person
+      1: helmet
+      2: safety_vest
+      3: gloves
+      4: safety_footwear
+  hazards:
+    target_classes:
+      0: fire
+      1: smoke
+
+datasets:
+  ppe_detection_compliance:
+    raw_classes:
+      Boots:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      Gloves:
+        action: REMAP
+        target: gloves
+        target_id: 3
+      Goggles:
+        action: IGNORE
+        target: null
+      Helmet:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      Mask:
+        action: IGNORE
+        target: null
+      NO-Boots:
+        action: HARD_NEGATIVE
+        target: unbooted_foot
+      NO-Gloves:
+        action: HARD_NEGATIVE
+        target: ungloved_hand
+      NO-Goggles:
+        action: IGNORE
+        target: null
+      NO-Helmet:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      NO-Mask:
+        action: IGNORE
+        target: null
+      NO-Vest:
+        action: HARD_NEGATIVE
+        target: unvested_torso
+      Person:
+        action: REMAP
+        target: person
+        target_id: 0
+      Vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+
+  construction_ppe:
+    raw_classes:
+      hat:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      no hat:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      no vest:
+        action: HARD_NEGATIVE
+        target: unvested_torso
+      vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+
+  hard_hat_workers:
+    raw_classes:
+      head:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      helmet:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      person:
+        action: REMAP
+        target: person
+        target_id: 0
+
+  ultralytics_construction_ppe:
+    raw_classes:
+      helmet:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      gloves:
+        action: REMAP
+        target: gloves
+        target_id: 3
+      vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+      boots:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      goggles:
+        action: IGNORE
+        target: null
+      none:
+        action: IGNORE
+        target: null
+      Person:
+        action: REMAP
+        target: person
+        target_id: 0
+      no_helmet:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      no_goggle:
+        action: IGNORE
+        target: null
+      no_gloves:
+        action: HARD_NEGATIVE
+        target: ungloved_hand
+      no_boots:
+        action: HARD_NEGATIVE
+        target: unbooted_foot
+
+  ppe_shikk:
+    raw_classes:
+      Glass:
+        action: IGNORE
+        target: null
+      Glasses:
+        action: IGNORE
+        target: null
+      Gloves:
+        action: REMAP
+        target: gloves
+        target_id: 3
+      Goggles:
+        action: IGNORE
+        target: null
+      Helmet:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      Mask:
+        action: IGNORE
+        target: null
+      No-Helmet:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      No-Vest:
+        action: HARD_NEGATIVE
+        target: unvested_torso
+      Person:
+        action: REMAP
+        target: person
+        target_id: 0
+      Safety-Boot:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      Safety-Vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+      Safety_shoes:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      Vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+      combination:
+        action: IGNORE
+        target: null
+
+  d_fire:
+    raw_classes:
+      Fire:
+        action: REMAP
+        target: fire
+        target_id: 0
+      Smoke:
+        action: REMAP
+        target: smoke
+        target_id: 1
+
+  safety_ppe_4:
+    raw_classes:
+      boots:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      gloves:
+        action: REMAP
+        target: gloves
+        target_id: 3
+      goggles:
+        action: IGNORE
+        target: null
+      helmet:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      no-boots:
+        action: HARD_NEGATIVE
+        target: unbooted_foot
+      no-gloves:
+        action: HARD_NEGATIVE
+        target: ungloved_hand
+      no-goggles:
+        action: IGNORE
+        target: null
+      no-helmet:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      no-vest:
+        action: HARD_NEGATIVE
+        target: unvested_torso
+      vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+
+  safety_ppe:
+    raw_classes:
+      No_BreathingApparatus:
+        action: IGNORE
+        target: null
+      No_Glove:
+        action: HARD_NEGATIVE
+        target: ungloved_hand
+      No_Goggles:
+        action: IGNORE
+        target: null
+      No_Harness:
+        action: IGNORE
+        target: null
+      No_Helmet:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      No_Shoe:
+        action: HARD_NEGATIVE
+        target: unbooted_foot
+      Person:
+        action: REMAP
+        target: person
+        target_id: 0
+
+  ppe_safup:
+    raw_classes:
+      Hardhat:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      NO-Hardhat:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      NO-Safety Vest:
+        action: HARD_NEGATIVE
+        target: unvested_torso
+      Person:
+        action: REMAP
+        target: person
+        target_id: 0
+      Safety Vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+
+  bangga_ppe:
+    raw_classes:
+      Boots:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      Ear Protectors:
+        action: IGNORE
+        target: null
+      Ear-protection:
+        action: IGNORE
+        target: null
+      Glasses:
+        action: IGNORE
+        target: null
+      Glove:
+        action: REMAP
+        target: gloves
+        target_id: 3
+      Gloves:
+        action: REMAP
+        target: gloves
+        target_id: 3
+      Helmet:
+        action: REMAP
+        target: helmet
+        target_id: 1
+      Mask:
+        action: IGNORE
+        target: null
+      Person:
+        action: REMAP
+        target: person
+        target_id: 0
+      Safety_shoes:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      Shoes:
+        action: REMAP
+        target: safety_footwear
+        target_id: 4
+      Vest:
+        action: REMAP
+        target: safety_vest
+        target_id: 2
+      Without Ear Protectors:
+        action: IGNORE
+        target: null
+      Without Glass:
+        action: IGNORE
+        target: null
+      Without Glove:
+        action: HARD_NEGATIVE
+        target: ungloved_hand
+      Without Helmet:
+        action: HARD_NEGATIVE
+        target: unhelmeted_head
+      Without Mask:
+        action: IGNORE
+        target: null
+      Without Shoes:
+        action: HARD_NEGATIVE
+        target: unbooted_foot
+      Without Vest:
+        action: HARD_NEGATIVE
+        target: unvested_torso
+
+

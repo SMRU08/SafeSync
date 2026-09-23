@@ -17,8 +17,12 @@ def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "healthy"
-    assert data["ai_engine"] in ("Connected", "Ready", "Not Connected")
+    assert data["status"] in ("healthy", "degraded")
+    ai_status = data["ai_engine"]["status"] if isinstance(data["ai_engine"], dict) else data["ai_engine"]
+    assert ai_status in ("Connected", "Ready", "Not Connected", "available", "Available")
+    assert "api" in data
+    assert "database" in data
+    assert "websocket" in data
 
 
 def test_invalid_endpoint_returns_404():

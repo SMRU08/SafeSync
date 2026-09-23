@@ -137,7 +137,10 @@ export async function fetchHazardDetail(eventId: string): Promise<any> {
 // ─── Production Multi-Camera Manager ────────────────────────────────────────
 
 export async function fetchCameras(): Promise<any[]> {
-  return request<any[]>('/api/cameras');
+  const res = await request<any>('/api/cameras');
+  if (Array.isArray(res)) return res;
+  if (res && Array.isArray(res.cameras)) return res.cameras;
+  return [];
 }
 
 export async function startCamera(cameraId: string): Promise<any> {
@@ -146,6 +149,48 @@ export async function startCamera(cameraId: string): Promise<any> {
 
 export async function stopCamera(cameraId: string): Promise<any> {
   return request<any>(`/api/cameras/${cameraId}/stop`, { method: 'POST' });
+}
+
+export async function reconnectCamera(cameraId: string): Promise<any> {
+  return request<any>(`/api/cameras/${cameraId}/reconnect`, { method: 'POST' });
+}
+
+export async function createCamera(cameraData: any): Promise<any> {
+  return request<any>('/api/cameras', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cameraData),
+  });
+}
+
+export async function deleteCamera(cameraId: string): Promise<any> {
+  return request<any>(`/api/cameras/${cameraId}`, { method: 'DELETE' });
+}
+
+export async function testCameraSource(source: string, sourceType: string = 'usb'): Promise<any> {
+  return request<any>('/api/cameras/test-source', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source, source_type: sourceType }),
+  });
+}
+
+export async function analyzeCameraLive(cameraId: string): Promise<any> {
+  return request<any>(`/api/cameras/${cameraId}/analyze`, { method: 'POST' });
+}
+
+export async function analyzeCameraUpload(cameraId: string, file: File): Promise<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const url = `${API_BASE_URL}/api/cameras/${cameraId}/analyze`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error(`Analysis failed with status ${response.status}`);
+  }
+  return response.json();
 }
 
 // ─── Evidence Archival ──────────────────────────────────────────────────────

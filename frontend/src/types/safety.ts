@@ -102,6 +102,7 @@ export interface ComplianceSummary {
   non_compliant_workers: number;
   unknown_workers: number;
   compliance_rate_percent: number;
+  itemized_compliance?: any;
 }
 
 export interface HazardEventDetail {
@@ -125,6 +126,10 @@ export interface CameraMetrics {
   last_successful_frame_timestamp?: number | null;
   last_error?: string | null;
   uptime_seconds: number;
+  inference_latency_ms?: number;
+  active_workers?: number;
+  active_violations?: number;
+  active_hazards?: number;
 }
 
 export type RealCameraState =
@@ -139,16 +144,28 @@ export type RealCameraState =
 export interface CameraConfig {
   camera_id: string;
   name: string;
+  location?: string;
   zone_id: string;
-  status: 'ACTIVE' | 'STANDBY' | 'OFFLINE';
+  status: 'ACTIVE' | 'STANDBY' | 'OFFLINE' | 'online' | 'offline' | 'connecting' | 'error';
+  connection_status?: string;
   state?: RealCameraState;
+  source?: string;
   source_type?: string;
   enabled?: boolean;
   resolution: string;
   fps: number;
+  stream_url?: string;
   rtsp_url?: string;
   safe_source?: string;
+  last_seen?: string | null;
   metrics?: CameraMetrics;
+  ai_analysis?: {
+    active_workers?: number;
+    active_violations?: number;
+    active_hazards?: number;
+    latency_ms?: number;
+    summary?: any;
+  };
 }
 
 export interface ZoneConfig {

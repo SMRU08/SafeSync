@@ -96,11 +96,28 @@ def list_alerts(
         query = query.filter(Alert.event_type == event_type.upper())
 
     records = query.order_by(Alert.id.desc()).limit(limit).all()
-    return [
-        {
+    results = []
+    for r in records:
+        ev_upper = str(r.event_type).upper()
+        if "FIRE" in ev_upper or "MULTIPLE" in ev_upper:
+            p = "P0"
+            aud = True
+        elif "SMOKE" in ev_upper:
+            p = "P0" if r.severity == "CRITICAL" else "P1"
+            aud = True
+        elif any(k in ev_upper for k in ["HELMET", "VEST", "GLOVE", "FOOTWEAR", "PPE"]):
+            p = "P2"
+            aud = False
+        else:
+            p = "P3"
+            aud = False
+
+        results.append({
             "alert_id": r.alert_id,
             "incident_id": r.incident_id,
             "severity": r.severity,
+            "priority": p,
+            "is_audible": aud,
             "title": r.title,
             "message": r.message,
             "camera_id": r.camera_id,
@@ -110,9 +127,8 @@ def list_alerts(
             "timestamp": r.created_at.isoformat(),
             "acknowledged_at": r.acknowledged_at.isoformat() if r.acknowledged_at else None,
             "resolved_at": r.resolved_at.isoformat() if r.resolved_at else None,
-        }
-        for r in records
-    ]
+        })
+    return results
 
 
 @router.get("/alerts/{alert_id}")

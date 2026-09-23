@@ -1,0 +1,54 @@
+# datasets/manifests/canonical_classes.yaml — RAKSHYA VISION
+# Canonical class schemas and raw source mapping for decoupled PPE and Hazard models.
+
+ppe_model:
+  target_classes:
+    0: person
+    1: helmet
+    2: safety_vest
+    3: gloves
+    4: safety_footwear
+  strict_negative_policy:
+    derive_absence: true
+    disallowed_classes:
+      - no_helmet
+      - no_vest
+      - no_gloves
+      - no_footwear
+      - no-boots
+      - no-mask
+      - no-goggles
+  source_mappings:
+    ppe_detection_compliance:
+      Person: 0
+      Helmet: 1
+      Vest: 2
+      Gloves: 3
+      Boots: 4
+      # Explicit negative regions to drop from positive annotations (used for hard-negative background)
+      NO-Helmet: ignore_negative
+      NO-Vest: ignore_negative
+      NO-Gloves: ignore_negative
+      NO-Boots: ignore_negative
+      Mask: ignore
+      NO-Mask: ignore
+      Goggles: ignore
+      NO-Goggles: ignore
+    construction_ppe:
+      hat: 1
+      vest: 2
+      no hat: ignore_negative
+      no vest: ignore_negative
+    hard_hat_workers:
+      person: 0
+      helmet: 1
+      head: ignore_negative
+
+hazard_model:
+  target_classes:
+    0: fire
+    1: smoke
+  source_mappings:
+    d_fire:
+      Fire: 0
+      Smoke: 1

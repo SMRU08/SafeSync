@@ -14,6 +14,14 @@ inference:
   device: "auto"        # "auto" | "cpu" | "cuda" | "0"
   max_detections: 300
   half: false           # FP16 (requires GPU)
+  class_confidence_thresholds:
+    person: 0.25
+    helmet: 0.38
+    safety_vest: 0.38
+    gloves: 0.28
+    safety_footwear: 0.28
+    fire: 0.30
+    smoke: 0.30
 
 classes:
   all:

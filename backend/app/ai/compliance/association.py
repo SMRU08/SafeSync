@@ -5,6 +5,7 @@ Resolves multi-worker assignment contention via optimal bipartite matching.
 """
 
 import numpy as np
+import cv2
 from typing import List, Dict, Tuple, Optional, Any
 from scipy.optimize import linear_sum_assignment
 
@@ -12,6 +13,188 @@ try:
     from app.ai.compliance.schemas import PPEItemType, WorkerBoundingBox
 except ImportError:
     from backend.app.ai.compliance.schemas import PPEItemType, WorkerBoundingBox
+
+
+def verify_helmet_features(
+    worker_box: np.ndarray,
+    helmet_box: np.ndarray,
+    frame: Optional[np.ndarray] = None,
+    confidence: float = 0.0,
+    img_shape: Optional[Tuple[int, int]] = None,
+) -> bool:
+    """
+    Validates candidate helmet detection against human cranial anatomy and visual features:
+    1. Relative height ratio: Head/helmet occupies 0.05 to 0.26 of standing person height
+       (or up to 0.42 if the lower body is clipped by the bottom frame boundary).
+    2. Aspect ratio: Helmets are relatively round/compact (0.65 to 1.90 width-to-height).
+    3. Cranium zone: Helmet center must fall in the uppermost cranium region of the worker.
+    4. Relative width ratio: Helmet width occupies 0.18 to 0.90 of worker box width.
+    5. Hair vs Helmet visual verification (when frame is available):
+       Rejects dark/brown hair patches that lack helmet shell colors (yellow, white, red, blue, green).
+    """
+    wx1, wy1, wx2, wy2 = [float(v) for v in worker_box]
+    px1, py1, px2, py2 = [float(v) for v in helmet_box]
+
+    wh = max(1.0, wy2 - wy1)
+    ww = max(1.0, wx2 - wx1)
+    ph = max(1.0, py2 - py1)
+    pw = max(1.0, px2 - px1)
+
+    # Detect if lower body is clipped at the bottom of the frame
+    is_lower_body_clipped = False
+    if img_shape is not None:
+        ih, _ = img_shape[:2]
+        if wy2 >= (ih - 25):
+            is_lower_body_clipped = True
+
+    max_h_ratio = 0.42 if is_lower_body_clipped else 0.26
+    max_yc = 0.35 if is_lower_body_clipped else 0.24
+
+    # 1. Anatomical height ratio
+    h_ratio = ph / wh
+    if h_ratio < 0.05 or h_ratio > max_h_ratio:
+        return False
+
+    # 2. Aspect ratio (width / height)
+    aspect_ratio = pw / ph
+    if aspect_ratio < 0.65 or aspect_ratio > 1.90:
+        return False
+
+    # 3. Cranium zone: helmet center relative to top of worker
+    pyc = (py1 + py2) / 2.0
+    rel_yc = (pyc - wy1) / wh
+    if rel_yc < -0.10 or rel_yc > max_yc:
+        return False
+
+    # 4. Relative width
+    w_ratio = pw / ww
+    if w_ratio < 0.18 or w_ratio > 0.90:
+        return False
+
+    # 5. Visual chromatic & luminance check for hair false positives
+    if frame is not None and frame.size > 0:
+        ih, iw = frame.shape[:2]
+        ix1 = max(0, min(iw - 1, int(px1)))
+        iy1 = max(0, min(ih - 1, int(py1)))
+        ix2 = max(ix1 + 1, min(iw, int(px2)))
+        iy2 = max(iy1 + 1, min(ih, int(py2)))
+
+        crop = frame[iy1:iy2, ix1:ix2]
+        if crop.size >= 36:
+            hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+            h = hsv[:, :, 0]
+            s = hsv[:, :, 1]
+            v = hsv[:, :, 2]
+
+            # Industrial helmet shell colors (EN 397 / ANSI Z89.1):
+            # - Yellow / Lime: H: 20-42, S >= 60, V >= 80
+            # - Red / Orange: (H <= 12 or H >= 168), S >= 80, V >= 95
+            # - White / Silver: S <= 45, V >= 165
+            # - Blue: H: 95-130, S >= 60, V >= 60
+            # - Green: H: 45-85, S >= 60, V >= 60
+            m_yellow = (h >= 20) & (h <= 42) & (s >= 60) & (v >= 80)
+            m_red = ((h <= 12) | (h >= 168)) & (s >= 80) & (v >= 95)
+            m_white = (s <= 45) & (v >= 165)
+            m_blue = (h >= 95) & (h <= 130) & (s >= 60) & (v >= 60)
+            m_green = (h >= 45) & (h <= 85) & (s >= 60) & (v >= 60)
+
+            total = float(crop.shape[0] * crop.shape[1])
+            shell_color_ratio = float(np.count_nonzero(m_yellow | m_red | m_white | m_blue | m_green)) / total
+
+            # Industrial helmets have a distinct uniform shell covering >= 10% of the candidate box
+            # If the crop lacks helmet shell colors, reject natural hair / unhelmeted heads
+            if shell_color_ratio < 0.10:
+                if confidence < 0.85:
+                    return False
+
+    return True
+
+
+def verify_safety_vest_features(
+    worker_box: np.ndarray,
+    vest_box: np.ndarray,
+    frame: Optional[np.ndarray] = None,
+    confidence: float = 0.0,
+    img_shape: Optional[Tuple[int, int]] = None,
+) -> bool:
+    """
+    Validates candidate safety vest detection against thoracic anatomy and high-visibility chromatic requirements:
+    1. Anatomical height ratio: Vest spans 0.14 to 0.65 of standing worker height.
+    2. Vertical placement: Vest center must fall in the thoracic/torso zone (0.12 to 0.68 of worker height).
+    3. Relative width ratio: Vest occupies 0.28 to 1.25 of worker width.
+    4. High-visibility chromatic & reflective verification (when frame is available):
+       Industrial safety vests (EN ISO 20471 / ANSI 107) feature fluorescent lime or fluorescent orange
+       and/or retro-reflective silver bands.
+       Casual clothing (black, navy, grey, brown, white cotton, red shirts, dark green hoodies) lacks
+       fluorescent pigments and retro-reflective tape, rejecting false positives.
+    """
+    wx1, wy1, wx2, wy2 = [float(v) for v in worker_box]
+    px1, py1, px2, py2 = [float(v) for v in vest_box]
+
+    wh = max(1.0, wy2 - wy1)
+    ww = max(1.0, wx2 - wx1)
+    ph = max(1.0, py2 - py1)
+    pw = max(1.0, px2 - px1)
+
+    # 1. Anatomical height ratio
+    h_ratio = ph / wh
+    if h_ratio < 0.14 or h_ratio > 0.65:
+        return False
+
+    # 2. Torso zone: vest center relative to top of worker
+    pyc = (py1 + py2) / 2.0
+    rel_yc = (pyc - wy1) / wh
+    if rel_yc < 0.12 or rel_yc > 0.68:
+        return False
+
+    # 3. Relative width
+    w_ratio = pw / ww
+    if w_ratio < 0.28 or w_ratio > 1.25:
+        return False
+
+    # 4. High-visibility chromatic & reflective tape verification
+    if frame is not None and frame.size > 0:
+        ih, iw = frame.shape[:2]
+        ix1 = max(0, min(iw - 1, int(px1)))
+        iy1 = max(0, min(ih - 1, int(py1)))
+        ix2 = max(ix1 + 1, min(iw, int(px2)))
+        iy2 = max(iy1 + 1, min(ih, int(py2)))
+
+        crop = frame[iy1:iy2, ix1:ix2]
+        if crop.size >= 48:
+            hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+            h = hsv[:, :, 0]
+            s = hsv[:, :, 1]
+            v = hsv[:, :, 2]
+
+            # High-visibility fluorescent lime-yellow: H: 25-45 (S >= 60, V >= 115) or chartreuse H: 45-60 (S >= 60, V >= 135)
+            mask_lime = ((h >= 25) & (h <= 45) & (s >= 60) & (v >= 115)) | ((h > 45) & (h <= 60) & (s >= 60) & (v >= 135))
+
+            # High-visibility fluorescent orange: H: 5-22, S >= 90, V >= 130
+            mask_orange = (h >= 5) & (h <= 22) & (s >= 90) & (v >= 130)
+
+            # Retro-reflective silver strips: high reflectance (V >= 190), low saturation (S <= 60)
+            mask_reflective = (s <= 60) & (v >= 190)
+
+            total = float(crop.shape[0] * crop.shape[1])
+            hivis_ratio = float(np.count_nonzero(mask_lime | mask_orange)) / total
+            refl_ratio = float(np.count_nonzero(mask_reflective)) / total
+
+            # Rejection of plain white/light clothing (e.g. solid white shirt):
+            # Pure white garment without fluorescent background has high refl_ratio (> 0.35) and 0% fluorescent color
+            if hivis_ratio < 0.04 and refl_ratio > 0.35:
+                if confidence < 0.88:
+                    return False
+
+            # An industrial safety vest must exhibit fluorescent color (>= 5%) OR
+            # reflective tape banding (>= 2.5%) supported by fluorescent trim (>= 2%)
+            is_valid_vest = (hivis_ratio >= 0.05) or (refl_ratio >= 0.025 and hivis_ratio >= 0.02)
+            if not is_valid_vest:
+                # Ordinary casual clothing (shirt, t-shirt, suit, dress, hoodie): reject false positive
+                if confidence < 0.85:
+                    return False
+
+    return True
 
 
 class SpatialPPEAssociator:
@@ -86,12 +269,30 @@ class SpatialPPEAssociator:
         return np.array([zx1, zy1, zx2, zy2], dtype=float)
 
     def compute_affinity(
-        self, worker_box: np.ndarray, ppe_box: np.ndarray, item_type: PPEItemType
+        self,
+        worker_box: np.ndarray,
+        ppe_box: np.ndarray,
+        item_type: PPEItemType,
+        frame: Optional[np.ndarray] = None,
+        confidence: float = 0.0,
+        img_shape: Optional[Tuple[int, int]] = None,
     ) -> float:
         """
         Calculates spatial match score between a worker and a candidate PPE item.
         Score ranges from 0.0 (no match / outside anatomical zone) to 1.0+ (perfect match).
         """
+        # First verify anatomical geometry, dimensions, and visual features
+        if item_type == PPEItemType.HELMET:
+            if not verify_helmet_features(
+                worker_box, ppe_box, frame=frame, confidence=confidence, img_shape=img_shape
+            ):
+                return 0.0
+        elif item_type == PPEItemType.SAFETY_VEST:
+            if not verify_safety_vest_features(
+                worker_box, ppe_box, frame=frame, confidence=confidence, img_shape=img_shape
+            ):
+                return 0.0
+
         zone = self.get_body_zone(worker_box, item_type)
         zx1, zy1, zx2, zy2 = zone
         px1, py1, px2, py2 = ppe_box
@@ -110,9 +311,9 @@ class SpatialPPEAssociator:
         containment = inter_area / ppe_area
 
         if item_type == PPEItemType.HELMET:
-            min_cont = self.helmet_params.get("min_containment_ratio", 0.20)
+            min_cont = self.helmet_params.get("min_containment_ratio", 0.35)
         elif item_type == PPEItemType.SAFETY_VEST:
-            min_cont = self.vest_params.get("min_containment_ratio", 0.30)
+            min_cont = self.vest_params.get("min_containment_ratio", 0.40)
         elif item_type == PPEItemType.GLOVES:
             min_cont = self.gloves_params.get("min_containment_ratio", 0.15)
         elif item_type == PPEItemType.SAFETY_FOOTWEAR:
@@ -189,6 +390,7 @@ class SpatialPPEAssociator:
         tracked_workers: List[Tuple[int, np.ndarray, float]],
         ppe_detections: List[Dict[str, Any]],
         img_shape: Tuple[int, int] = (720, 1280),
+        frame: Optional[np.ndarray] = None,
     ) -> Tuple[Dict[int, Dict[str, Optional[Dict[str, Any]]]], List[Dict[str, Any]]]:
         """
         Associates detected PPE items with tracked workers.
@@ -197,6 +399,7 @@ class SpatialPPEAssociator:
             tracked_workers: List of (track_id, bbox_xyxy, confidence)
             ppe_detections: List of dicts with keys 'class_name', 'bbox' [x1, y1, x2, y2], 'confidence'
             img_shape: (height, width) of input image
+            frame: Optional BGR ndarray frame for visual feature and chromatic verification
 
         Returns:
             Tuple of:
@@ -255,7 +458,15 @@ class SpatialPPEAssociator:
             for w_idx, wb in enumerate(worker_boxes):
                 for i_idx, item in enumerate(items):
                     p_box = np.array(item["bbox"], dtype=float)
-                    aff = self.compute_affinity(wb, p_box, item_type)
+                    p_conf = float(item.get("confidence", 0.0))
+                    aff = self.compute_affinity(
+                        wb,
+                        p_box,
+                        item_type,
+                        frame=frame,
+                        confidence=p_conf,
+                        img_shape=img_shape,
+                    )
                     affinity_matrix[w_idx, i_idx] = aff
                     if aff > 0.15:  # Minimum acceptable affinity threshold
                         cost_matrix[w_idx, i_idx] = 1.0 - aff

@@ -66,6 +66,33 @@ class CameraManager:
                 except Exception as val_err:
                     logger.error("Failed to parse camera config for item %s: %s", item, val_err)
 
+            # Also synchronize and load cameras from the SQLite database
+            try:
+                from app.database.session import SessionLocal
+                from app.models.camera import CameraModel
+                with SessionLocal() as db:
+                    db_cameras = db.query(CameraModel).all()
+                    for db_cam in db_cameras:
+                        if db_cam.camera_id not in loaded_configs:
+                            try:
+                                cfg = CameraConfigModel(
+                                    id=db_cam.camera_id,
+                                    name=db_cam.name,
+                                    location=db_cam.location or "",
+                                    zone_id=db_cam.zone_id,
+                                    source=db_cam.source,
+                                    source_type=db_cam.source_type,
+                                    enabled=db_cam.enabled,
+                                    fps_target=db_cam.fps_target,
+                                    resolution=db_cam.resolution,
+                                    timeout_seconds=db_cam.timeout_seconds,
+                                )
+                                loaded_configs[cfg.id] = cfg
+                            except Exception as cfg_err:
+                                logger.error("Failed to parse DB camera %s: %s", db_cam.camera_id, cfg_err)
+            except Exception as db_err:
+                logger.debug("Database camera loading note: %s", db_err)
+
             self.configs = loaded_configs
 
             # Update or create workers
@@ -76,7 +103,7 @@ class CameraManager:
                     # Update config reference
                     self.workers[cid].config = cfg
 
-            logger.info("CameraManager successfully loaded %d cameras from %s", len(self.configs), target_path)
+            logger.info("CameraManager successfully loaded %d cameras from %s and database", len(self.configs), target_path)
         except Exception as e:
             logger.error("Error loading cameras config from %s: %s", target_path, e)
 
@@ -157,12 +184,98 @@ class CameraManager:
 
         return {"camera_id": "none", "workers": [], "summary": None, "annotated_image_base64": None, "timestamp": None}
 
-    def register_camera(self, config: CameraConfigModel, start_immediately: bool = False) -> bool:
-        """Dynamically registers or updates a camera configuration."""
+    def register_camera(self, config: CameraConfigModel, start_immediately: bool = False, persist_db: bool = True) -> bool:
+        """Dynamically registers or updates a camera configuration with DB persistence."""
         self.configs[config.id] = config
         if config.id in self.workers:
             self.workers[config.id].stop()
         self.workers[config.id] = CameraWorker(config)
         if start_immediately and config.enabled:
             self.workers[config.id].start()
+
+        # Persist to database
+        if persist_db:
+            try:
+                from app.database.session import SessionLocal
+                from app.models.camera import CameraModel
+                with SessionLocal() as db:
+                    existing = db.query(CameraModel).filter_by(camera_id=config.id).first()
+                    if existing:
+                        existing.name = config.name
+                        existing.location = getattr(config, "location", "") or ""
+                        existing.zone_id = config.zone_id
+                        existing.source = config.source
+                        existing.source_type = config.source_type.value
+                        existing.enabled = config.enabled
+                        existing.fps_target = config.fps_target
+                        existing.resolution = config.resolution
+                    else:
+                        new_entry = CameraModel(
+                            camera_id=config.id,
+                            name=config.name,
+                            location=getattr(config, "location", "") or "",
+                            zone_id=config.zone_id,
+                            source=config.source,
+                            source_type=config.source_type.value,
+                            enabled=config.enabled,
+                            fps_target=config.fps_target,
+                            resolution=config.resolution,
+                            timeout_seconds=config.timeout_seconds,
+                        )
+                        db.add(new_entry)
+                    db.commit()
+            except Exception as exc:
+                logger.warning("Database persistence error for camera %s: %s", config.id, exc)
+
         return True
+
+    def unregister_camera(self, camera_id: str, delete_db: bool = True) -> bool:
+        """Gracefully removes a camera and deletes it from database."""
+        if camera_id in self.workers:
+            self.workers[camera_id].stop()
+            del self.workers[camera_id]
+        if camera_id in self.configs:
+            del self.configs[camera_id]
+
+        if delete_db:
+            try:
+                from app.database.session import SessionLocal
+                from app.models.camera import CameraModel
+                with SessionLocal() as db:
+                    row = db.query(CameraModel).filter_by(camera_id=camera_id).first()
+                    if row:
+                        db.delete(row)
+                        db.commit()
+            except Exception as exc:
+                logger.warning("Database deletion error for camera %s: %s", camera_id, exc)
+
+        return True
+
+    def test_camera_source(self, source: str, source_type: str = "usb") -> Dict[str, Any]:
+        """Validates if a camera source can be opened and probed."""
+        import cv2
+        st = source_type.lower()
+        if st == "synthetic":
+            return {"reachable": True, "details": "Synthetic stream generator available"}
+
+        try:
+            # Parse integer index for USB devices
+            parsed_src = int(source) if source.isdigit() else source
+            cap = cv2.VideoCapture(parsed_src)
+            if not cap.isOpened():
+                return {"reachable": False, "error": f"Failed to open video capture for: {source}"}
+
+            ret, frame = cap.read()
+            cap.release()
+            if not ret or frame is None:
+                return {"reachable": False, "error": "Source opened but failed to capture test frame."}
+
+            h, w = frame.shape[:2]
+            return {
+                "reachable": True,
+                "resolution": f"{w}x{h}",
+                "fps": 30.0,
+                "details": f"Camera source verified ({w}x{h})"
+            }
+        except Exception as e:
+            return {"reachable": False, "error": str(e)}

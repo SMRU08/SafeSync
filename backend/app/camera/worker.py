@@ -77,8 +77,12 @@ class CameraWorker:
         # AI Pipeline configuration
         self.infer_interval_frames = 2  # Run AI inference every 2 frames for smooth 15 FPS inference on 30 FPS stream
         self._compliance_engine: Optional[Any] = None
+        self._hazard_engine: Optional[Any] = None
+        self._safety_engine: Optional[Any] = None
         self._alert_engine: Optional[Any] = None
         self._event_normalizer: Optional[Any] = None
+        self._latest_hazards: List[Any] = []
+        self._latest_safety_assessment: Optional[Any] = None
 
         # FPS calculation window
         self._fps_window_start = time.time()
@@ -89,66 +93,105 @@ class CameraWorker:
         if self._compliance_engine is None:
             try:
                 from app.ai.compliance.compliance_engine import WorkerComplianceEngine
+                from app.ai.hazards.hazard_engine import HazardAnalysisEngine
                 from app.services.event_normalizer import EventNormalizer
                 from app.services.alert_engine import AlertEngine
+                from app.services.safety_engine import SafetyEngine
                 self._compliance_engine = WorkerComplianceEngine()
+                self._hazard_engine = HazardAnalysisEngine()
                 self._alert_engine = AlertEngine()
+                self._safety_engine = SafetyEngine(alert_engine=self._alert_engine)
                 self._event_normalizer = EventNormalizer()
-                logger.info("Initialized AI compliance engine for camera %s", self.camera_id)
+                logger.info("Initialized AI compliance, hazard, and safety engines for camera %s", self.camera_id)
             except Exception as e:
-                logger.error("Failed to initialize AI compliance engine for %s: %s", self.camera_id, e, exc_info=True)
+                logger.error("Failed to initialize AI engines for %s: %s", self.camera_id, e, exc_info=True)
 
     def _process_frame_ai(self, frame: np.ndarray, frame_time: float):
-        """Runs scheduled live YOLO detection, ByteTrack tracking, PPE association, and alert dispatch."""
+        """Runs scheduled live YOLO detection, ByteTrack tracking, PPE association, hazard analysis, and safety rules."""
         if self._compliance_engine is None:
             return
 
         try:
             t_start = time.perf_counter()
+            # 1. PPE compliance inference
             compliance_resp, annotated_frame, latencies = self._compliance_engine.process_frame(
                 frame,
                 confidence_threshold=0.20,
                 annotate=True,
             )
+
+            # 2. Hazard analysis inference (fire and smoke)
+            hazard_resp = None
+            if self._hazard_engine is not None:
+                try:
+                    hazard_resp, _, _ = self._hazard_engine.process_frame(
+                        frame,
+                        camera_id=self.camera_id,
+                        annotate=False,
+                    )
+                except Exception as h_err:
+                    logger.debug("Hazard engine frame evaluation skipped: %s", h_err)
+
             ai_duration_ms = (time.perf_counter() - t_start) * 1000.0
+
+            # 3. Central Safety Engine Assessment (Rules 1 through 7)
+            safety_assessment = None
+            if self._safety_engine is not None:
+                safety_assessment = self._safety_engine.assess_scene(
+                    camera_id=self.camera_id,
+                    zone_id=self.config.zone_id,
+                    compliance_response=compliance_resp,
+                    hazard_response=hazard_resp,
+                    camera_connected=True,
+                    ai_available=True,
+                )
 
             with self._lock:
                 self._latest_annotated_frame = annotated_frame
                 self._latest_workers = compliance_resp.workers
                 self._latest_compliance_summary = compliance_resp.summary
                 self._latest_annotated_b64 = compliance_resp.annotated_image_base64
+                if hazard_resp:
+                    self._latest_hazards = hazard_resp.hazards
+                    self.metrics.active_hazards = len(hazard_resp.hazards)
+                if safety_assessment:
+                    self._latest_safety_assessment = safety_assessment
                 self.metrics.inference_latency_ms = round(ai_duration_ms, 2)
                 self.metrics.active_workers = len(compliance_resp.workers)
                 self.metrics.active_violations = compliance_resp.summary.non_compliant_workers
 
-            # If safety events were detected, normalize and dispatch
-            if self._event_normalizer and self._alert_engine:
-                events = self._event_normalizer.from_compliance_response(
+            # 4. Dispatch evaluated safety events to AlertEngine
+            events_to_dispatch = []
+            if safety_assessment and safety_assessment.events:
+                events_to_dispatch = safety_assessment.events
+            elif self._event_normalizer:
+                events_to_dispatch = self._event_normalizer.from_compliance_response(
                     compliance_resp,
                     camera_id=self.camera_id,
                     zone_id=self.config.zone_id,
                 )
-                if events:
-                    from app.database.session import SessionLocal
-                    from app.services.evidence_manager import EvidenceManager
-                    with SessionLocal() as db:
-                        for ev in events:
-                            try:
-                                alert, incident, action = self._alert_engine.process_event(ev, db=db)
-                                if action in ("CREATED", "ESCALATED") and incident:
-                                    try:
-                                        EvidenceManager.get_instance().capture_incident_evidence(
-                                            incident_id=incident.incident_id,
-                                            camera_id=self.camera_id,
-                                            frame=annotated_frame,
-                                            annotations=ev.details,
-                                            db=db,
-                                            evidence_type="SNAPSHOT",
-                                        )
-                                    except Exception as ev_err:
-                                        logger.debug("Evidence capture error: %s", ev_err)
-                            except Exception as alert_err:
-                                logger.warning("Alert processing error: %s", alert_err)
+
+            if events_to_dispatch and self._alert_engine:
+                from app.database.session import SessionLocal
+                from app.services.evidence_manager import EvidenceManager
+                with SessionLocal() as db:
+                    for ev in events_to_dispatch:
+                        try:
+                            alert, incident, action = self._alert_engine.process_event(ev, db=db)
+                            if action in ("CREATED", "ESCALATED") and incident:
+                                try:
+                                    EvidenceManager.get_instance().capture_incident_evidence(
+                                        incident_id=incident.incident_id,
+                                        camera_id=self.camera_id,
+                                        frame=annotated_frame,
+                                        annotations=ev.details,
+                                        db=db,
+                                        evidence_type="SNAPSHOT",
+                                    )
+                                except Exception as ev_err:
+                                    logger.debug("Evidence capture error: %s", ev_err)
+                        except Exception as alert_err:
+                            logger.warning("Alert processing error: %s", alert_err)
 
         except Exception as e:
             logger.error("Error in AI frame processing for %s: %s", self.camera_id, e, exc_info=True)
@@ -198,15 +241,61 @@ class CameraWorker:
             if self._start_time and self.state == CameraState.CONNECTED:
                 self.metrics.uptime_seconds = round(time.time() - self._start_time, 1)
 
+            # Determine human-friendly status string
+            if self.state in (CameraState.CONNECTED, CameraState.DEGRADED):
+                status_str = "online"
+            elif self.state in (CameraState.CONNECTING, CameraState.RECONNECTING):
+                status_str = "connecting"
+            elif self.state == CameraState.ERROR:
+                status_str = "error"
+            else:
+                status_str = "offline"
+
+            last_seen_iso = None
+            if self.metrics.last_successful_frame_timestamp:
+                try:
+                    from datetime import datetime, timezone
+                    last_seen_iso = datetime.fromtimestamp(
+                        self.metrics.last_successful_frame_timestamp, tz=timezone.utc
+                    ).isoformat()
+                except Exception:
+                    pass
+
+            ai_summary_dict = None
+            if self._latest_compliance_summary:
+                try:
+                    if hasattr(self._latest_compliance_summary, "model_dump"):
+                        ai_summary_dict = self._latest_compliance_summary.model_dump()
+                    elif isinstance(self._latest_compliance_summary, dict):
+                        ai_summary_dict = self._latest_compliance_summary
+                    else:
+                        ai_summary_dict = vars(self._latest_compliance_summary)
+                except Exception:
+                    pass
+
             return CameraStatus(
                 camera_id=self.camera_id,
                 name=self.config.name,
+                location=getattr(self.config, "location", "") or self.config.zone_id.replace("_", " ").title(),
                 zone_id=self.config.zone_id,
                 source_type=self.config.source_type.value,
                 enabled=self.config.enabled,
                 state=self.state,
+                status=status_str,
+                connection_status=self.state.value.lower(),
+                stream_url=f"/api/cameras/{self.camera_id}/stream",
+                fps=self.metrics.fps,
+                resolution=self.config.resolution or "1280x720",
+                last_seen=last_seen_iso,
                 metrics=self.metrics.model_copy(),
                 safe_source=self.safe_source,
+                ai_analysis={
+                    "active_workers": self.metrics.active_workers,
+                    "active_violations": self.metrics.active_violations,
+                    "active_hazards": self.metrics.active_hazards,
+                    "latency_ms": self.metrics.inference_latency_ms,
+                    "summary": ai_summary_dict,
+                },
             )
 
     def get_latest_frame(self, annotated: bool = True) -> Tuple[Optional[np.ndarray], Optional[float]]:
@@ -277,20 +366,16 @@ class CameraWorker:
             if "nonexistent" in str(source_str).lower():
                 return None
 
-            cap = None
-            # On Windows, try DirectShow (cv2.CAP_DSHOW) for device indices for fast initialization
-            if is_device_index and os.name == "nt":
+            cap = cv2.VideoCapture(target_source)
+
+            # On Windows, if default MSMF backend fails for device index, fallback to DirectShow
+            if (cap is None or not cap.isOpened()) and is_device_index and os.name == "nt":
                 try:
                     cap = cv2.VideoCapture(target_source, cv2.CAP_DSHOW)
-                    if not cap.isOpened():
-                        cap = None
                 except Exception:
                     cap = None
 
-            if cap is None:
-                cap = cv2.VideoCapture(target_source)
-
-            if not cap.isOpened():
+            if cap is None or not cap.isOpened():
                 return None
 
             # Optional: set camera resolution if specified and using physical device
@@ -470,21 +555,39 @@ class CameraWorker:
                         pass
 
                 with self._lock:
+                    self.state = CameraState.CONNECTED
                     if is_shutter_blocked:
-                        self.state = CameraState.DEGRADED
                         self.metrics.last_error = (
                             "Camera privacy shutter closed or disabled via laptop hotkey (e.g. F10 / Fn+F10 on Asus). Physical sensor is blocked."
                         )
+                        # Render helpful diagnostic HUD directly on frame
+                        fh, fw = frame.shape[:2]
+                        cv2.rectangle(frame, (10, fh // 2 - 45), (fw - 10, fh // 2 + 45), (20, 20, 30), -1)
+                        cv2.rectangle(frame, (10, fh // 2 - 45), (fw - 10, fh // 2 + 45), (0, 165, 255), 2)
+                        cv2.putText(
+                            frame,
+                            "CAMERA SENSOR BLOCKED / PITCH BLACK",
+                            (fw // 2 - 220, fh // 2 - 12),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.65,
+                            (0, 165, 255),
+                            2,
+                        )
+                        cv2.putText(
+                            frame,
+                            "Slide open physical privacy cover or press Fn + Camera key (e.g. F10)",
+                            (fw // 2 - 250, fh // 2 + 22),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.50,
+                            (255, 255, 255),
+                            1,
+                        )
                     elif is_severe_dark:
-                        self.state = CameraState.DEGRADED
                         self.metrics.last_error = (
                             "Severe low-light detected (room is too dark). Turn on room lighting and step back so your upper body/torso is visible."
                         )
-                    elif self.state == CameraState.DEGRADED and self.metrics.last_error and ("shutter" in str(self.metrics.last_error) or "low-light" in str(self.metrics.last_error)):
-                        self.state = CameraState.CONNECTED
-                        self.metrics.last_error = None
                     else:
-                        self.state = CameraState.CONNECTED
+                        self.metrics.last_error = None
 
                     self._latest_frame = frame
                     self._latest_frame_time = now

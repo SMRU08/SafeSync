@@ -14,6 +14,7 @@ try:
         AlertHistory,
     )
     from app.models.evidence import EvidenceItem
+    from app.models.camera import CameraModel
 except ImportError:
     from backend.app.models.compliance import (
         WorkerTracking,
@@ -30,6 +31,7 @@ except ImportError:
         AlertHistory,
     )
     from backend.app.models.evidence import EvidenceItem
+    from backend.app.models.camera import CameraModel
 
 __all__ = [
     "WorkerTracking",
@@ -41,4 +43,5 @@ __all__ = [
     "Alert",
     "AlertHistory",
     "EvidenceItem",
+    "CameraModel",
 ]

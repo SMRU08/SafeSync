@@ -61,10 +61,30 @@ export function useSafetyData() {
     // 1. Health check
     try {
       const healthData = await fetchHealth();
+
+      // Determine Database status
+      const dbStatusRaw = typeof healthData.database === 'object' && healthData.database !== null
+        ? (healthData.database as any).status
+        : healthData.database;
+      const isDbConnected = dbStatusRaw === 'connected' || healthData.database_connected === true;
+
+      // Determine AI Engine status
+      const aiStatusRaw = typeof healthData.ai_engine === 'object' && healthData.ai_engine !== null
+        ? (healthData.ai_engine as any).status
+        : (healthData.ai_engine || healthData.ai_status);
+      const isAiAvailable = ['available', 'connected', 'ready', 'loaded'].includes(String(aiStatusRaw || '').toLowerCase()) || healthData.model_loaded === true;
+      const aiLabel = isAiAvailable ? (String(aiStatusRaw || '').toLowerCase() === 'available' ? 'Available' : 'Connected') : 'Unavailable';
+
+      // Determine API status
+      const apiStatusRaw = typeof healthData.api === 'object' && healthData.api !== null
+        ? (healthData.api as any).status
+        : healthData.status;
+      const isApiHealthy = apiStatusRaw === 'online' || healthData.status === 'healthy' || healthData.status === 'running';
+
       setStatus({
-        backend: healthData.status === 'healthy' ? 'healthy' : 'offline',
-        database: healthData.database === 'connected' || healthData.database_connected ? 'connected' : 'disconnected',
-        aiEngine: healthData.ai_engine || (healthData.model_loaded ? 'Connected' : 'Ready'),
+        backend: isApiHealthy ? 'healthy' : 'offline',
+        database: isDbConnected ? 'connected' : 'disconnected',
+        aiEngine: aiLabel,
         lastChecked: nowStr,
       });
     } catch {

@@ -27,12 +27,32 @@ log = logging.getLogger(__name__)
 class Detector:
     """High-level safety object detector using the trained Phase 3 YOLO model."""
 
-    def __init__(self, model_loader: Optional[ModelLoader] = None):
+    def __init__(self, model_loader: Optional[ModelLoader] = None, model_type: str = "ppe"):
+        self.model_type = model_type.lower()
         self.loader = model_loader or ModelLoader.get_instance()
         self.config = self.loader.config.get("inference", {})
         self.default_conf = float(self.config.get("confidence_threshold", 0.20))
         self.default_iou = float(self.config.get("iou_threshold", 0.45))
         self.default_imgsz = int(self.config.get("image_size", 384))
+        raw_class_confs = self.config.get("class_confidence_thresholds", {})
+        self.class_conf_thresholds = {
+            str(k).lower(): float(v) for k, v in raw_class_confs.items()
+        } if isinstance(raw_class_confs, dict) else {}
+
+        # Augment with ModelRegistry operating thresholds
+        try:
+            try:
+                from app.ai.detection.model_registry import ModelRegistry
+            except ImportError:
+                from backend.app.ai.detection.model_registry import ModelRegistry
+            reg_info = ModelRegistry.get_instance().get_model_info(self.model_type)
+            if reg_info and "operating_thresholds" in reg_info:
+                for k, v in reg_info["operating_thresholds"].items():
+                    if k.lower() not in self.class_conf_thresholds:
+                        self.class_conf_thresholds[k.lower()] = float(v)
+        except Exception as e:
+            log.debug("Registry threshold lookup skipped: %s", e)
+
         self._person_model = None
 
     def _get_person_model(self):
@@ -57,6 +77,7 @@ class Detector:
         imgsz: Optional[int] = None,
         classes_filter: Optional[List[str]] = None,
         annotate: bool = False,
+        apply_class_thresholds: bool = True,
     ) -> Tuple[ImageDetectionResponse, Optional[np.ndarray]]:
         """
         Runs object detection on an image input.
@@ -68,6 +89,7 @@ class Detector:
             imgsz: Inference image size.
             classes_filter: Optional list of class names to include.
             annotate: Whether to return an annotated BGR image.
+            apply_class_thresholds: Whether to enforce per-class confidence thresholds.
 
         Returns:
             Tuple of (ImageDetectionResponse, annotated_bgr_image or None)
@@ -86,6 +108,12 @@ class Detector:
 
         filter_set = set(c.lower() for c in classes_filter) if classes_filter else None
 
+        # Determine predict confidence: predict at minimum required confidence
+        pred_conf = conf_thresh
+        if apply_class_thresholds and self.class_conf_thresholds:
+            min_class_conf = min(self.class_conf_thresholds.values())
+            pred_conf = min(conf_thresh, min_class_conf)
+
         # 3. Execute inference
         model = self.loader.model
         device = self.loader.device
@@ -93,7 +121,7 @@ class Detector:
         t0 = time.perf_counter()
         results = model.predict(
             source=frame,
-            conf=conf_thresh,
+            conf=pred_conf,
             iou=iou_thresh,
             imgsz=inference_size,
             device=device,
@@ -113,8 +141,30 @@ class Detector:
                     cls_name = model.names.get(cls_id, f"class_{cls_id}")
                     score = float(box.conf[0].item())
 
+                    # Decoupled model class isolation
+                    low_name = cls_name.lower()
+                    if self.model_type == "ppe" and low_name in ("fire", "smoke"):
+                        continue
+                    if self.model_type == "hazards":
+                        if low_name not in ("fire", "smoke"):
+                            continue
+                        cls_id = 0 if low_name == "fire" else 1
+
+                    # Per-class confidence filtering
+                    req_conf = conf_thresh
+                    if apply_class_thresholds and self.class_conf_thresholds:
+                        class_min = self.class_conf_thresholds.get(low_name)
+                        if class_min is not None:
+                            if conf is None or conf == self.default_conf:
+                                req_conf = class_min
+                            else:
+                                req_conf = max(conf, class_min)
+
+                    if score < req_conf:
+                        continue
+
                     # Optional class filtering
-                    if filter_set and cls_name.lower() not in filter_set:
+                    if filter_set and low_name not in filter_set:
                         continue
 
                     coords = box.xyxy[0].tolist()
@@ -135,9 +185,9 @@ class Detector:
                     class_counts[cls_name] = class_counts.get(cls_name, 0) + 1
 
         # 4b. Ensure person recall for close-up webcam and low-light scenes:
-        # If the fine-tuned model didn't detect any person, run fallback person detector
+        # Only relevant for the PPE pipeline; hazard models do not detect persons.
         has_person = any(d.class_name.lower() == "person" for d in detections)
-        if not has_person and (filter_set is None or "person" in filter_set):
+        if self.model_type == "ppe" and not has_person and (filter_set is None or "person" in filter_set):
             p_model = self._get_person_model()
             if p_model is not None:
                 try:

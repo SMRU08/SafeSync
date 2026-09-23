@@ -1,0 +1,159 @@
+{
+  "suite_name": "RAKSHYA VISION False Positive Benchmark Suite",
+  "overall_status": "PASS",
+  "total_cases_evaluated": 19,
+  "total_false_positives_recorded": 0,
+  "overall_rejection_accuracy": "100.00%",
+  "benchmarks": [
+    {
+      "test_name": "TEST A: Uncovered Hair",
+      "total_cases": 5,
+      "false_positives": 0,
+      "rejection_rate": "100.0%",
+      "status": "PASS",
+      "cases": [
+        {
+          "test_case": "black_hair_low_sat",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: dark natural hair lacking fluorescent/helmet shell pigmentation",
+          "passed": true
+        },
+        {
+          "test_case": "dark_brown_wavy",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: dark natural hair lacking fluorescent/helmet shell pigmentation",
+          "passed": true
+        },
+        {
+          "test_case": "medium_brown_short",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: dark natural hair lacking fluorescent/helmet shell pigmentation",
+          "passed": true
+        },
+        {
+          "test_case": "curly_dark_textured",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: dark natural hair lacking fluorescent/helmet shell pigmentation",
+          "passed": true
+        },
+        {
+          "test_case": "straight_dark_hair",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: dark natural hair lacking fluorescent/helmet shell pigmentation",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "test_name": "TEST B: Normal Casual Shirt/Clothing",
+      "total_cases": 6,
+      "false_positives": 0,
+      "rejection_rate": "100.0%",
+      "status": "PASS",
+      "cases": [
+        {
+          "test_case": "navy_blue_cotton_tshirt",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: ordinary textile lacking EN ISO 20471 fluorescent lime/orange pigments or retro-reflective banding",
+          "passed": true
+        },
+        {
+          "test_case": "black_casual_tshirt",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: ordinary textile lacking EN ISO 20471 fluorescent lime/orange pigments or retro-reflective banding",
+          "passed": true
+        },
+        {
+          "test_case": "white_casual_shirt",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: ordinary textile lacking EN ISO 20471 fluorescent lime/orange pigments or retro-reflective banding",
+          "passed": true
+        },
+        {
+          "test_case": "red_casual_polo",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: ordinary textile lacking EN ISO 20471 fluorescent lime/orange pigments or retro-reflective banding",
+          "passed": true
+        },
+        {
+          "test_case": "grey_office_shirt",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: ordinary textile lacking EN ISO 20471 fluorescent lime/orange pigments or retro-reflective banding",
+          "passed": true
+        },
+        {
+          "test_case": "denim_blue_shirt",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: ordinary textile lacking EN ISO 20471 fluorescent lime/orange pigments or retro-reflective banding",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "test_name": "TEST C: Baseball Cap & Casual Hats",
+      "total_cases": 4,
+      "false_positives": 0,
+      "rejection_rate": "100.0%",
+      "status": "PASS",
+      "cases": [
+        {
+          "test_case": "black_baseball_cap",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: casual cap lacking industrial hard hat polymer shell chromatic profile",
+          "passed": true
+        },
+        {
+          "test_case": "dark_blue_sports_cap",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: casual cap lacking industrial hard hat polymer shell chromatic profile",
+          "passed": true
+        },
+        {
+          "test_case": "grey_knitted_beanie",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: casual cap lacking industrial hard hat polymer shell chromatic profile",
+          "passed": true
+        },
+        {
+          "test_case": "brown_flat_cap",
+          "detected_as_helmet": false,
+          "rejection_reason": "Rejected: casual cap lacking industrial hard hat polymer shell chromatic profile",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "test_name": "TEST D: Casual Hoodie & Sweatshirts",
+      "total_cases": 4,
+      "false_positives": 0,
+      "rejection_rate": "100.0%",
+      "status": "PASS",
+      "cases": [
+        {
+          "test_case": "black_oversized_hoodie",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: non-reflective casual outerwear without hi-vis fluorescent signature",
+          "passed": true
+        },
+        {
+          "test_case": "grey_fleece_hoodie",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: non-reflective casual outerwear without hi-vis fluorescent signature",
+          "passed": true
+        },
+        {
+          "test_case": "dark_green_sweatshirt",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: non-reflective casual outerwear without hi-vis fluorescent signature",
+          "passed": true
+        },
+        {
+          "test_case": "maroon_hooded_jacket",
+          "detected_as_vest": false,
+          "rejection_reason": "Rejected: non-reflective casual outerwear without hi-vis fluorescent signature",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}
