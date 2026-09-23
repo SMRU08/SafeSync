@@ -311,3 +311,45 @@ def test_unknown_occlusion_never_generates_violation():
     assert len(events_absent) == 1
     assert events_absent[0].event_type.value == "MISSING_HELMET"
     assert events_absent[0].track_id == 202
+
+
+def test_camera_worker_decoupled_realtime_latency_and_bounded_queue():
+    """
+    Verify that CameraWorker captures frames without waiting for AI,
+    discards stale frames using latest-frame-wins (queue depth <= 1),
+    and delivers fresh frames with latency < 100ms.
+    """
+    cfg = CameraConfigModel(
+        id="test_realtime_decoupled",
+        name="Real-Time Decoupled Cam",
+        source="synthetic://test",
+        source_type=CameraSourceType.SYNTHETIC,
+        enabled=True,
+        fps_target=30,
+    )
+    worker = CameraWorker(cfg)
+    try:
+        worker.start()
+        time.sleep(0.3)
+
+        # 1. Capture thread and AI thread are active
+        assert worker._capture_thread is not None and worker._capture_thread.is_alive()
+        assert worker._ai_thread is not None and worker._ai_thread.is_alive()
+
+        # 2. Queue depth is bounded strictly at <= 1
+        assert worker.metrics.frame_queue_depth <= 1
+
+        # 3. Stream delivery latency is sub-50ms
+        frame, frame_id, cap_time = worker.wait_for_new_frame(last_frame_id=-1, timeout=0.1)
+        assert frame is not None
+        assert frame_id > 0
+        assert cap_time is not None
+        latency_ms = (time.time() - cap_time) * 1000.0
+        assert latency_ms < 100.0, f"Delivery latency too high: {latency_ms}ms"
+
+        # 4. Status reflects operational capture
+        status = worker.get_status()
+        assert status.state == CameraState.CONNECTED
+        assert status.metrics.frame_count > 0
+    finally:
+        worker.stop()

@@ -49,22 +49,30 @@ class WebSocketManager:
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
-        # Thread-safe enqueue to all client queues
+        # Thread-safe bounded enqueue to all client queues (drops oldest on full)
+        def _safe_put(q: asyncio.Queue, msg: Any):
+            if q.full():
+                try:
+                    q.get_nowait()
+                except Exception:
+                    pass
+            try:
+                q.put_nowait(msg)
+            except Exception as err:
+                logger.debug("Failed to enqueue message to websocket: %s", err)
+
         for ws, queue in list(self._client_queues.items()):
             if self._loop and self._loop.is_running():
-                self._loop.call_soon_threadsafe(queue.put_nowait, message)
+                self._loop.call_soon_threadsafe(_safe_put, queue, message)
             else:
-                try:
-                    queue.put_nowait(message)
-                except Exception as err:
-                    logger.warning("Failed to enqueue message to websocket: %s", err)
+                _safe_put(queue, message)
 
     async def connect(self, websocket: WebSocket) -> asyncio.Queue:
         await websocket.accept()
         self._loop = asyncio.get_running_loop()
         self._ensure_listener()
 
-        queue: asyncio.Queue = asyncio.Queue()
+        queue: asyncio.Queue = asyncio.Queue(maxsize=50)
         self._active_connections.add(websocket)
         self._client_queues[websocket] = queue
 

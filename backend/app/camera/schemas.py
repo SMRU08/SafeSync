@@ -60,6 +60,11 @@ class CameraMetrics(BaseModel):
     active_workers: int = Field(default=0, description="Current number of tracked workers in frame")
     active_violations: int = Field(default=0, description="Current number of workers in violation state")
     active_hazards: int = Field(default=0, description="Current number of confirmed environmental hazards")
+    capture_fps: float = Field(default=0.0, description="Camera capture loop frames per second")
+    stream_latency_ms: float = Field(default=0.0, description="Latency from capture to stream delivery in ms")
+    dropped_ai_frames: int = Field(default=0, description="Frames skipped for AI inference to maintain real-time display")
+    frame_queue_depth: int = Field(default=0, description="Pending frame buffer depth (strictly bounded at 0 or 1)")
+    latest_frame_id: int = Field(default=0, description="Monotonically increasing captured frame counter")
 
 
 class CameraStatus(BaseModel):

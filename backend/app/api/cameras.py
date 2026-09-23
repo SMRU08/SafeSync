@@ -17,7 +17,7 @@ from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File
 from fastapi.responses import StreamingResponse
 
-from app.camera.schemas import CameraConfigModel, CameraStatus
+from app.camera.schemas import CameraConfigModel, CameraStatus, CameraState
 from app.camera.manager import CameraManager
 from app.security.auth import require_role
 from app.models.user import User
@@ -144,18 +144,42 @@ def test_camera_source(payload: Dict[str, Any]):
 
 
 def _generate_mjpeg_stream(camera_id: str, annotated: bool = True):
-    """Generator yielding multipart MJPEG frames for real-time live browser streaming."""
+    """
+    Generator yielding multipart MJPEG frames for real-time live browser streaming.
+    Zero-lag event-driven consumer: always serves the newest captured frame.
+    """
     manager = CameraManager.get_instance()
+    last_frame_id = -1
+    consecutive_timeouts = 0
+
     while True:
-        frame, ts = manager.get_latest_frame(camera_id, annotated=annotated)
-        if frame is not None:
+        frame, frame_id, ts = manager.wait_for_new_frame(
+            camera_id=camera_id,
+            last_frame_id=last_frame_id,
+            annotated=annotated,
+            timeout=0.06,
+        )
+
+        if frame is not None and frame_id > last_frame_id:
+            last_frame_id = frame_id
+            consecutive_timeouts = 0
             ret, jpeg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
             if ret:
-                yield (
-                    b"--frame\r\n"
-                    b"Content-Type: image/jpeg\r\n\r\n" + jpeg.tobytes() + b"\r\n"
-                )
-        time.sleep(0.04)  # ~25 FPS stream rate limit
+                cap_ms = int((ts or time.time()) * 1000)
+                header = (
+                    f"--frame\r\n"
+                    f"Content-Type: image/jpeg\r\n"
+                    f"X-Frame-Id: {frame_id}\r\n"
+                    f"X-Capture-Timestamp: {cap_ms}\r\n\r\n"
+                ).encode("ascii")
+                yield header + jpeg.tobytes() + b"\r\n"
+        else:
+            consecutive_timeouts += 1
+            worker = manager.get_worker(camera_id)
+            if not worker or worker.state in (CameraState.DISCONNECTED, CameraState.DISABLED, CameraState.ERROR):
+                if consecutive_timeouts > 50:  # ~3 seconds offline
+                    break
+            time.sleep(0.01)
 
 
 @router.get("/{camera_id}/stream")

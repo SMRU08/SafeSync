@@ -162,6 +162,19 @@ class CameraManager:
             return None, None
         return self.workers[camera_id].get_latest_frame(annotated=annotated)
 
+    def wait_for_new_frame(
+        self,
+        camera_id: str,
+        last_frame_id: int,
+        annotated: bool = True,
+        timeout: float = 0.06,
+    ) -> Tuple[Optional[np.ndarray], int, Optional[float]]:
+        """Retrieves a new frame as soon as captured, discarding stale frames."""
+        worker = self.workers.get(camera_id)
+        if not worker:
+            return None, last_frame_id, None
+        return worker.wait_for_new_frame(last_frame_id, annotated=annotated, timeout=timeout)
+
     def get_live_compliance(self, camera_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Retrieves the latest active worker tracking and compliance data.

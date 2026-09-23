@@ -58,13 +58,26 @@ class CameraWorker:
 
         # Threading state
         self._thread: Optional[threading.Thread] = None
+        self._capture_thread: Optional[threading.Thread] = None
+        self._ai_thread: Optional[threading.Thread] = None
         self._stop_event = threading.Event()
         self._lock = threading.Lock()
+        self._frame_cv = threading.Condition(self._lock)
+
+        # AI Worker queue/slot (strictly bounded: size 1, latest-frame-wins)
+        self._ai_slot: Optional[Tuple[int, float, np.ndarray]] = None
+        self._ai_lock = threading.Lock()
+        self._ai_event = threading.Event()
+        self._ai_busy = False
+
+        # Monotonic frame tracking
+        self._frame_id = 0
 
         # Operational state & metrics
         self.state: CameraState = CameraState.DISABLED if not config.enabled else CameraState.DISCONNECTED
         self.metrics = CameraMetrics()
         self._start_time: Optional[float] = None
+        self.validation_mode: bool = True  # Real-time frame-id and capture-timestamp HUD
 
         # Frame buffers
         self._latest_frame: Optional[np.ndarray] = None
@@ -75,7 +88,7 @@ class CameraWorker:
         self._latest_annotated_b64: Optional[str] = None
 
         # AI Pipeline configuration
-        self.infer_interval_frames = 2  # Run AI inference every 2 frames for smooth 15 FPS inference on 30 FPS stream
+        self.infer_interval_frames = 2  # Run AI inference every 2 frames
         self._compliance_engine: Optional[Any] = None
         self._hazard_engine: Optional[Any] = None
         self._safety_engine: Optional[Any] = None
@@ -106,8 +119,8 @@ class CameraWorker:
             except Exception as e:
                 logger.error("Failed to initialize AI engines for %s: %s", self.camera_id, e, exc_info=True)
 
-    def _process_frame_ai(self, frame: np.ndarray, frame_time: float):
-        """Runs scheduled live YOLO detection, ByteTrack tracking, PPE association, hazard analysis, and safety rules."""
+    def _process_frame_ai(self, frame: np.ndarray, frame_time: float, frame_id: Optional[int] = None):
+        """Runs live YOLO detection, ByteTrack tracking, PPE association, hazard analysis, and safety rules."""
         if self._compliance_engine is None:
             return
 
@@ -196,35 +209,94 @@ class CameraWorker:
         except Exception as e:
             logger.error("Error in AI frame processing for %s: %s", self.camera_id, e, exc_info=True)
 
+    def _dispatch_frame_to_ai(self, frame_id: int, frame_time: float, frame: np.ndarray):
+        """Passes the newest frame to the AI worker thread via 1-slot latest-frame-wins buffer."""
+        with self._ai_lock:
+            if self._ai_busy or self._ai_slot is not None:
+                self.metrics.dropped_ai_frames += 1
+            # Latest-frame-wins: always overwrite with newest frame
+            self._ai_slot = (frame_id, frame_time, frame)
+            self.metrics.frame_queue_depth = 1
+            self._ai_event.set()
+
+    def _ai_worker_loop(self):
+        """Dedicated background thread executing AI inference asynchronously without blocking capture."""
+        logger.info("Started AI worker thread for camera %s", self.camera_id)
+        while not self._stop_event.is_set():
+            if not self._ai_event.wait(timeout=0.1):
+                continue
+
+            item = None
+            with self._ai_lock:
+                self._ai_event.clear()
+                if self._ai_slot is not None:
+                    item = self._ai_slot
+                    self._ai_slot = None
+                    self._ai_busy = True
+                    self.metrics.frame_queue_depth = 0
+
+            if item is None:
+                continue
+
+            frame_id, frame_time, frame = item
+            try:
+                self._process_frame_ai(frame, frame_time, frame_id)
+            except Exception as e:
+                logger.error("AI worker error in %s: %s", self.camera_id, e)
+            finally:
+                with self._ai_lock:
+                    self._ai_busy = False
+
+        logger.info("AI worker thread exited for camera %s", self.camera_id)
+
     def start(self):
-        """Starts the camera capture worker thread if enabled."""
+        """Starts the camera capture worker thread and asynchronous AI worker thread if enabled."""
         with self._lock:
             if not self.config.enabled:
                 self.state = CameraState.DISABLED
                 logger.info("Camera %s is disabled in config. Not starting.", self.camera_id)
                 return
 
-            if self._thread is not None and self._thread.is_alive():
+            if self._capture_thread is not None and self._capture_thread.is_alive():
                 logger.warning("CameraWorker %s is already running.", self.camera_id)
                 return
 
             self._stop_event.clear()
+            self._ai_event.clear()
             self.state = CameraState.CONNECTING
             self._start_time = time.time()
             self._init_ai_engines()
-            self._thread = threading.Thread(
+
+            # Start AI inference thread first
+            self._ai_thread = threading.Thread(
+                target=self._ai_worker_loop,
+                name=f"CameraWorker-AI-{self.camera_id}",
+                daemon=True,
+            )
+            self._ai_thread.start()
+
+            # Start dedicated capture thread
+            self._capture_thread = threading.Thread(
                 target=self._run_loop,
                 name=f"CameraWorker-{self.camera_id}",
-                daemon=True
+                daemon=True,
             )
-            self._thread.start()
-            logger.info("Started CameraWorker thread for %s (%s)", self.camera_id, self.safe_source)
+            self._thread = self._capture_thread  # Backward-compatibility alias
+            self._capture_thread.start()
+            logger.info("Started CameraWorker capture & AI threads for %s (%s)", self.camera_id, self.safe_source)
 
     def stop(self, timeout: float = 3.0):
-        """Gracefully stops the worker thread and releases resources."""
+        """Gracefully stops the worker threads and releases resources."""
         self._stop_event.set()
-        if self._thread is not None and self._thread.is_alive():
-            self._thread.join(timeout=timeout)
+        self._ai_event.set()
+        with self._frame_cv:
+            self._frame_cv.notify_all()
+
+        if self._capture_thread is not None and self._capture_thread.is_alive():
+            self._capture_thread.join(timeout=timeout)
+        if self._ai_thread is not None and self._ai_thread.is_alive():
+            self._ai_thread.join(timeout=timeout)
+
         with self._lock:
             self.state = CameraState.DISCONNECTED
             self._latest_frame = None
@@ -232,6 +304,9 @@ class CameraWorker:
             self._latest_workers = []
             self._latest_compliance_summary = None
             self._latest_annotated_b64 = None
+            with self._ai_lock:
+                self._ai_slot = None
+                self._ai_busy = False
             logger.info("Stopped CameraWorker for %s", self.camera_id)
 
     def get_status(self) -> CameraStatus:
@@ -299,13 +374,74 @@ class CameraWorker:
             )
 
     def get_latest_frame(self, annotated: bool = True) -> Tuple[Optional[np.ndarray], Optional[float]]:
-        """Returns the most recent captured frame (copy) and timestamp."""
+        """Returns the most recent captured frame (copy) and timestamp with fast non-blocking overlay."""
         with self._lock:
-            if annotated and self._latest_annotated_frame is not None:
-                return self._latest_annotated_frame.copy(), self._latest_frame_time
             if self._latest_frame is None:
+                if annotated and self._latest_annotated_frame is not None:
+                    return self._latest_annotated_frame.copy(), self._latest_frame_time
                 return None, None
-            return self._latest_frame.copy(), self._latest_frame_time
+            raw = self._latest_frame.copy()
+            ts = self._latest_frame_time
+            annotated_cache = self._latest_annotated_frame
+            workers = list(self._latest_workers)
+            hazards = list(self._latest_hazards)
+            visualizer = getattr(self._compliance_engine, "visualizer", None) if self._compliance_engine else None
+
+        if not annotated:
+            return raw, ts
+
+        # Fast non-blocking overlay: render newest AI detections on newest camera frame
+        if visualizer and (workers or hazards):
+            try:
+                annotated_fresh = visualizer.draw_frame(raw, workers, unassociated_ppe=None, hazards=hazards)
+                return annotated_fresh, ts
+            except Exception:
+                pass
+
+        if annotated_cache is not None:
+            return annotated_cache.copy(), ts
+
+        return raw, ts
+
+    def wait_for_new_frame(
+        self,
+        last_frame_id: int,
+        annotated: bool = True,
+        timeout: float = 0.06,
+    ) -> Tuple[Optional[np.ndarray], int, Optional[float]]:
+        """
+        Event-driven wait for a newly captured frame with monotonic frame_id.
+        Discards stale frames and immediately delivers the newest frame.
+        """
+        with self._frame_cv:
+            if self._frame_id <= last_frame_id and not self._stop_event.is_set():
+                self._frame_cv.wait(timeout=timeout)
+
+            if self._latest_frame is None or self._frame_id <= last_frame_id:
+                return None, last_frame_id, None
+
+            raw = self._latest_frame.copy()
+            fid = self._frame_id
+            fts = self._latest_frame_time
+            annotated_cache = self._latest_annotated_frame
+            workers = list(self._latest_workers)
+            hazards = list(self._latest_hazards)
+            visualizer = getattr(self._compliance_engine, "visualizer", None) if self._compliance_engine else None
+
+        if not annotated:
+            return raw, fid, fts
+
+        if visualizer and (workers or hazards):
+            try:
+                annotated_fresh = visualizer.draw_frame(raw, workers, unassociated_ppe=None, hazards=hazards)
+                return annotated_fresh, fid, fts
+            except Exception:
+                pass
+
+        if annotated_cache is not None:
+            return annotated_cache.copy(), fid, fts
+
+        return raw, fid, fts
 
     def get_live_compliance(self) -> Dict[str, Any]:
         """Returns the latest active worker tracking and compliance data."""
@@ -378,6 +514,19 @@ class CameraWorker:
             if cap is None or not cap.isOpened():
                 return None
 
+            # Buffer flush optimization: set driver buffer size to 1 where supported
+            try:
+                cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            except Exception:
+                pass
+
+            # Flush any stale initial driver frames
+            try:
+                for _ in range(2):
+                    cap.grab()
+            except Exception:
+                pass
+
             # Optional: set camera resolution if specified and using physical device
             if is_device_index and self.config.resolution and "x" in self.config.resolution:
                 try:
@@ -394,8 +543,16 @@ class CameraWorker:
 
     def _generate_synthetic_frame(self, frame_idx: int) -> np.ndarray:
         """Generates a clean synthetic frame for testing without hardware dependencies."""
-        # 640x480 test image with moving marker
-        frame = np.zeros((480, 640, 3), dtype=np.uint8)
+        width, height = 640, 480
+        if self.config.resolution and "x" in self.config.resolution and self.config.resolution != "1280x720":
+            try:
+                rw, rh = [int(v) for v in self.config.resolution.split("x")]
+                if rw > 0 and rh > 0:
+                    width, height = rw, rh
+            except Exception:
+                pass
+
+        frame = np.zeros((height, width, 3), dtype=np.uint8)
         # Background gradient
         frame[:, :] = (35, 30, 30)
         # Draw camera metadata
@@ -418,12 +575,13 @@ class CameraWorker:
             1,
         )
         # Moving indicator
-        x = int(100 + (frame_idx * 5) % 440)
-        cv2.circle(frame, (x, 240), 20, (0, 165, 255), -1)
+        x = int(100 + (frame_idx * 8) % max(1, width - 200))
+        y = height // 2
+        cv2.circle(frame, (x, y), 20, (0, 165, 255), -1)
         return frame
 
     def _run_loop(self):
-        """Main camera worker execution loop."""
+        """Main camera worker capture execution loop (dedicated thread - never blocks for AI)."""
         reconnect_attempts = 0
         policy = self.config.reconnect_policy
         cap: Optional[cv2.VideoCapture] = None
@@ -439,17 +597,33 @@ class CameraWorker:
                         self.state = CameraState.CONNECTED
                     while not self._stop_event.is_set():
                         t0 = time.time()
-                        frame = self._generate_synthetic_frame(self.metrics.frame_count)
+                        frame = self._generate_synthetic_frame(self._frame_id)
                         now = time.time()
 
-                        with self._lock:
+                        if self.validation_mode and frame is not None and frame.size > 0:
+                            cv2.rectangle(frame, (6, 6), (285, 32), (10, 10, 15), -1)
+                            cv2.rectangle(frame, (6, 6), (285, 32), (0, 255, 255), 1)
+                            cv2.putText(
+                                frame,
+                                f"ID:{self._frame_id} | CAP:{int(now * 1000)}ms",
+                                (12, 24),
+                                cv2.FONT_HERSHEY_SIMPLEX,
+                                0.45,
+                                (0, 255, 255),
+                                1,
+                                cv2.LINE_AA,
+                            )
+
+                        with self._frame_cv:
+                            self._frame_id += 1
                             self._latest_frame = frame
                             self._latest_frame_time = now
-                            self.metrics.frame_count += 1
+                            self.metrics.frame_count = self._frame_id
+                            self.metrics.latest_frame_id = self._frame_id
                             self.metrics.last_successful_frame_timestamp = now
+                            self._frame_cv.notify_all()
 
-                        if self.metrics.frame_count % self.infer_interval_frames == 0:
-                            self._process_frame_ai(frame, now)
+                        self._dispatch_frame_to_ai(self._frame_id, now, frame)
 
                         try:
                             from app.services.metrics import MetricsCollector
@@ -503,7 +677,7 @@ class CameraWorker:
                             policy.max_retries,
                             backoff
                         )
-                        time.sleep(backoff)
+                        self._stop_event.wait(timeout=backoff)
                         continue
                     else:
                         # Connected successfully
@@ -513,7 +687,7 @@ class CameraWorker:
                             self.metrics.last_error = None
                         logger.info("Camera %s successfully connected.", self.camera_id)
 
-                # 3. Read loop
+                # 3. Dedicated Read loop (runs at maximum camera FPS, never blocks for AI)
                 t_frame_start = time.time()
                 ret, frame = cap.read()
 
@@ -538,8 +712,6 @@ class CameraWorker:
                 now = time.time()
 
                 # Hardware privacy shutter / disabled camera sensor check:
-                # When laptop webcam shutter is closed or toggled off via hotkey (e.g. F10 / Fn+F10 on Asus),
-                # OpenCV receives solid color/near-zero variance frames with the crossed-out camera logo.
                 is_shutter_blocked = False
                 is_severe_dark = False
                 if frame is not None and frame.size > 0:
@@ -554,13 +726,13 @@ class CameraWorker:
                     except Exception:
                         pass
 
-                with self._lock:
+                with self._frame_cv:
                     self.state = CameraState.CONNECTED
                     if is_shutter_blocked:
                         self.metrics.last_error = (
                             "Camera privacy shutter closed or disabled via laptop hotkey (e.g. F10 / Fn+F10 on Asus). Physical sensor is blocked."
                         )
-                        # Render helpful diagnostic HUD directly on frame
+                        # Render diagnostic HUD directly on frame
                         fh, fw = frame.shape[:2]
                         cv2.rectangle(frame, (10, fh // 2 - 45), (fw - 10, fh // 2 + 45), (20, 20, 30), -1)
                         cv2.rectangle(frame, (10, fh // 2 - 45), (fw - 10, fh // 2 + 45), (0, 165, 255), 2)
@@ -589,14 +761,30 @@ class CameraWorker:
                     else:
                         self.metrics.last_error = None
 
+                    if self.validation_mode and frame is not None and frame.size > 0:
+                        cv2.rectangle(frame, (6, 6), (285, 32), (10, 10, 15), -1)
+                        cv2.rectangle(frame, (6, 6), (285, 32), (0, 255, 255), 1)
+                        cv2.putText(
+                            frame,
+                            f"ID:{self._frame_id + 1} | CAP:{int(now * 1000)}ms",
+                            (12, 24),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.45,
+                            (0, 255, 255),
+                            1,
+                            cv2.LINE_AA,
+                        )
+
+                    self._frame_id += 1
                     self._latest_frame = frame
                     self._latest_frame_time = now
-                    self.metrics.frame_count += 1
+                    self.metrics.frame_count = self._frame_id
+                    self.metrics.latest_frame_id = self._frame_id
                     self.metrics.last_successful_frame_timestamp = now
+                    self._frame_cv.notify_all()
 
-                # Run AI pipeline on scheduled frames
-                if self.metrics.frame_count % self.infer_interval_frames == 0:
-                    self._process_frame_ai(frame, now)
+                # Dispatch frame to asynchronous AI thread (strictly non-blocking)
+                self._dispatch_frame_to_ai(self._frame_id, now, frame)
 
                 try:
                     from app.services.metrics import MetricsCollector
@@ -609,10 +797,12 @@ class CameraWorker:
 
                 self._update_fps()
 
-                # Rate control
+                # Rate control: for hardware webcam cap.read() blocks naturally at hardware FPS (~30 FPS).
+                # Only sleep if elapsed time is less than target frame interval.
                 elapsed = time.time() - t_frame_start
-                sleep_time = max(0.001, frame_delay - elapsed)
-                time.sleep(sleep_time)
+                sleep_time = max(0.0005, frame_delay - elapsed)
+                if sleep_time > 0.001:
+                    time.sleep(sleep_time)
 
         except Exception as e:
             logger.error("Unhandled exception in CameraWorker %s: %s", self.camera_id, e, exc_info=True)
@@ -628,7 +818,7 @@ class CameraWorker:
             with self._lock:
                 if self.state not in (CameraState.ERROR, CameraState.DISABLED):
                     self.state = CameraState.DISCONNECTED
-            logger.info("CameraWorker loop exited for %s", self.camera_id)
+            logger.info("CameraWorker capture loop exited for %s", self.camera_id)
 
     def _update_fps(self):
         """Calculates rolling FPS every 1.0 second."""
@@ -637,6 +827,8 @@ class CameraWorker:
         elapsed = now - self._fps_window_start
         if elapsed >= 1.0:
             with self._lock:
-                self.metrics.fps = round(self._fps_window_frames / elapsed, 1)
+                calc_fps = round(self._fps_window_frames / elapsed, 1)
+                self.metrics.fps = calc_fps
+                self.metrics.capture_fps = calc_fps
             self._fps_window_frames = 0
             self._fps_window_start = now
