@@ -23,9 +23,12 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
   const [sourceType, setSourceType] = useState<'usb' | 'rtsp' | 'http' | 'synthetic'>('usb');
   const [source, setSource] = useState('0');
   const [location, setLocation] = useState('');
-  const [zoneId, setZoneId] = useState('production_floor');
+  const [selectedZone, setSelectedZone] = useState('production_floor');
+  const [customZone, setCustomZone] = useState('');
   const [fpsTarget, setFpsTarget] = useState(30);
   const [resolution, setResolution] = useState('1280x720');
+
+  const isCustomZone = selectedZone === 'custom';
 
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
@@ -75,6 +78,17 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
       return;
     }
 
+    const finalZone = isCustomZone ? customZone.trim() : selectedZone.trim();
+    if (isCustomZone && !customZone.trim()) {
+      setSubmitError('Please enter a custom Facility Zone name.');
+      return;
+    }
+
+    if (!finalZone) {
+      setSubmitError('Please select or specify a Facility Zone.');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -82,7 +96,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
       id: cameraId.trim(),
       name: name.trim(),
       location: location.trim(),
-      zone_id: zoneId,
+      zone_id: finalZone,
       source: source.trim(),
       source_type: sourceType,
       enabled: true,
@@ -181,17 +195,50 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Facility Zone</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-slate-700 font-semibold">Facility Zone</label>
+                {isCustomZone && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedZone('production_floor');
+                      setCustomZone('');
+                    }}
+                    className="text-[10px] text-sky-600 hover:text-sky-700 font-medium underline cursor-pointer"
+                  >
+                    Choose preset
+                  </button>
+                )}
+              </div>
               <select
-                value={zoneId}
-                onChange={(e) => setZoneId(e.target.value)}
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                value={selectedZone}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedZone(val);
+                  if (val !== 'custom') setCustomZone('');
+                }}
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white"
               >
                 <option value="production_floor">Production Floor</option>
                 <option value="storage_area">Storage Area</option>
                 <option value="loading_dock">Loading Dock</option>
                 <option value="electrical_room">Electrical Room</option>
+                <option value="custom">Other (Custom)...</option>
               </select>
+
+              {isCustomZone && (
+                <div className="mt-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <input
+                    type="text"
+                    value={customZone}
+                    onChange={(e) => setCustomZone(e.target.value)}
+                    placeholder="e.g. West Staging Bay or Enter custom zone"
+                    required={isCustomZone}
+                    autoFocus
+                    className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500 placeholder-slate-400 text-xs font-medium"
+                  />
+                </div>
+              )}
             </div>
           </div>
 
