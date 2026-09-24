@@ -17,6 +17,8 @@ import {
   Users,
   VideoOff,
   MapPin,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { API_BASE_URL } from '../utils/constants';
@@ -27,6 +29,7 @@ interface CameraLiveCardProps {
   onDelete?: (cameraId: string) => void;
   onAnalyzeLive?: (camera: CameraConfig) => void;
   onUploadAnalyze?: (camera: CameraConfig, file: File) => void;
+  onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
 }
 
 export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
@@ -35,6 +38,7 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
   onDelete,
   onAnalyzeLive,
   onUploadAnalyze,
+  onToggleSpeaker,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [streamKey, setStreamKey] = useState(Date.now());
@@ -140,6 +144,30 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
           >
             {isLive ? '🟢 LIVE' : isConnecting ? '🟡 CONNECTING' : isError ? '⚠️ ERROR' : '🔴 OFFLINE'}
           </span>
+
+          {onToggleSpeaker && (
+            <button
+              onClick={() => onToggleSpeaker(camera.camera_id, camera.speaker_enabled === false)}
+              title={`Camera Speaker is ${camera.speaker_enabled !== false ? 'ON (Speech Alerts Enabled)' : 'OFF (Audio Alerts Suppressed)'}`}
+              className={`p-1 rounded transition cursor-pointer flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 ${
+                camera.speaker_enabled !== false
+                  ? 'text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100'
+                  : 'text-slate-500 bg-slate-100 border border-slate-200 hover:bg-slate-200'
+              }`}
+            >
+              {camera.speaker_enabled !== false ? (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>SPEAKER ON</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-rose-500" />
+                  <span>SPEAKER OFF</span>
+                </>
+              )}
+            </button>
+          )}
 
           <button
             onClick={toggleFullscreen}

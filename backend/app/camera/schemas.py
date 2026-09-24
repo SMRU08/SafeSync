@@ -45,6 +45,7 @@ class CameraConfigModel(BaseModel):
     fps_target: int = Field(default=30, ge=1, le=120)
     resolution: Optional[str] = Field(default="1280x720")
     timeout_seconds: float = Field(default=5.0, ge=0.5)
+    speaker_enabled: bool = Field(default=True, description="Speaker audio alert status (ON/OFF)")
     reconnect_policy: ReconnectPolicy = Field(default_factory=ReconnectPolicy)
 
 
@@ -74,6 +75,7 @@ class CameraStatus(BaseModel):
     zone_id: str
     source_type: str
     enabled: bool
+    speaker_enabled: bool = Field(default=True, description="Camera speaker audio alert status (ON/OFF)")
     state: CameraState
     status: str = Field(default="offline", description="online, offline, connecting, error")
     connection_status: str = Field(default="offline")

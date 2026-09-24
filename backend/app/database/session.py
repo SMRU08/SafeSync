@@ -102,12 +102,29 @@ def get_sqlite_pragmas(engine_instance=None) -> Dict[str, Any]:
         return {"error": str(e)}
 
 
+def ensure_schema_migrations(engine_instance=None):
+    """Safely adds missing columns to existing SQLite tables if not present."""
+    eng = engine_instance or engine
+    try:
+        insp = inspect(eng)
+        if "cameras" in insp.get_table_names():
+            columns = [c["name"] for c in insp.get_columns("cameras")]
+            if "speaker_enabled" not in columns:
+                with eng.connect() as conn:
+                    conn.execute(text("ALTER TABLE cameras ADD COLUMN speaker_enabled BOOLEAN DEFAULT 1;"))
+                    conn.commit()
+                logger.info("Migrated SQLite schema: added 'speaker_enabled' column to cameras table.")
+    except Exception as exc:
+        logger.debug("Schema migration notice: %s", exc)
+
+
 def check_database_connection(engine_instance=None) -> bool:
     """Simple query probe checking basic database reachability."""
     eng = engine_instance or engine
     try:
         with eng.connect() as connection:
             connection.execute(text("SELECT 1;"))
+        ensure_schema_migrations(eng)
         return True
     except Exception as exc:
         logger.error("Database connection check failed: %s", exc)

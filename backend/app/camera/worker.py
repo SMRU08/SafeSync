@@ -55,6 +55,7 @@ class CameraWorker:
         self.config = config
         self.camera_id = config.id
         self.safe_source = mask_camera_source(config.source)
+        self.speaker_enabled: bool = bool(getattr(config, "speaker_enabled", True))
 
         # Threading state
         self._thread: Optional[threading.Thread] = None
@@ -206,6 +207,18 @@ class CameraWorker:
                         except Exception as alert_err:
                             logger.warning("Alert processing error: %s", alert_err)
 
+            # 5. Core AI Audio-Alert Engine (Worker PPE Speech Alerts)
+            if compliance_resp and compliance_resp.workers:
+                try:
+                    from app.services.audio_alert_engine import AudioAlertEngine
+                    AudioAlertEngine.get_instance().evaluate_frame_workers(
+                        camera_id=self.camera_id,
+                        speaker_enabled=self.speaker_enabled,
+                        workers=compliance_resp.workers,
+                    )
+                except Exception as audio_err:
+                    logger.debug("Audio alert evaluation notice for %s: %s", self.camera_id, audio_err)
+
         except Exception as e:
             logger.error("Error in AI frame processing for %s: %s", self.camera_id, e, exc_info=True)
 
@@ -248,6 +261,14 @@ class CameraWorker:
                     self._ai_busy = False
 
         logger.info("AI worker thread exited for camera %s", self.camera_id)
+
+    def set_speaker(self, enabled: bool) -> bool:
+        """Dynamically enables or disables localized speaker audio alerts for this camera."""
+        with self._lock:
+            self.speaker_enabled = bool(enabled)
+            self.config.speaker_enabled = bool(enabled)
+        logger.info("Camera %s speaker status set to: %s", self.camera_id, "ON" if enabled else "OFF")
+        return self.speaker_enabled
 
     def start(self):
         """Starts the camera capture worker thread and asynchronous AI worker thread if enabled."""
@@ -355,6 +376,7 @@ class CameraWorker:
                 zone_id=self.config.zone_id,
                 source_type=self.config.source_type.value,
                 enabled=self.config.enabled,
+                speaker_enabled=self.speaker_enabled,
                 state=self.state,
                 status=status_str,
                 connection_status=self.state.value.lower(),
@@ -489,6 +511,7 @@ class CameraWorker:
 
             return {
                 "camera_id": self.camera_id,
+                "speaker_enabled": self.speaker_enabled,
                 "frame_width": fw,
                 "frame_height": fh,
                 "workers": workers_out,

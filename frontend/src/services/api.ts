@@ -214,3 +214,18 @@ export async function fetchIncidentEvidence(incidentId: string): Promise<Evidenc
 export async function fetchEvidenceDetail(evidenceId: string): Promise<EvidenceItem> {
   return request<EvidenceItem>(`/api/evidence/${evidenceId}`);
 }
+
+// ─── Camera Speaker & Audio Alerts ──────────────────────────────────────────
+
+export async function toggleCameraSpeaker(cameraId: string, enabled: boolean): Promise<any> {
+  return request<any>(`/api/cameras/${cameraId}/speaker`, {
+    method: 'POST',
+    body: JSON.stringify({ enabled }),
+  });
+}
+
+export async function fetchAudioAlerts(cameraId?: string, limit: number = 50): Promise<any[]> {
+  const qs = cameraId ? `?camera_id=${cameraId}&limit=${limit}` : `?limit=${limit}`;
+  return request<any[]>(`/api/audio/alerts${qs}`);
+}
+

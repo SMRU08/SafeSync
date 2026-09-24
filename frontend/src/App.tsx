@@ -51,6 +51,7 @@ export const App: React.FC = () => {
     handleDismiss,
     handleAcknowledgeIncident,
     handleResolveIncident,
+    handleToggleSpeaker,
   } = useSafetyData();
 
   const { status: wsStatus } = useWebSocket(handleWebSocketMessage);
@@ -163,6 +164,7 @@ export const App: React.FC = () => {
               onResolve={handleResolve}
               onDismiss={handleDismiss}
               onRefresh={refreshAll}
+              onToggleSpeaker={handleToggleSpeaker}
             />
           )}
 
@@ -175,6 +177,7 @@ export const App: React.FC = () => {
               cameras={cameras}
               hazardConfig={hazardConfig}
               onRefreshCameras={refreshAll}
+              onToggleSpeaker={handleToggleSpeaker}
             />
           )}
 

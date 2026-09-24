@@ -40,6 +40,7 @@ interface OverviewViewProps {
   onResolve: (alertId: string) => Promise<void>;
   onDismiss: (alertId: string) => Promise<void>;
   onRefresh?: () => void | Promise<void>;
+  onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
 }
 
 export const OverviewView: React.FC<OverviewViewProps> = ({
@@ -52,6 +53,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   onAcknowledge,
   onResolve,
   onRefresh,
+  onToggleSpeaker,
 }) => {
   const [selectedCameraId, setSelectedCameraId] = useState<string>(
     cameras[0]?.camera_id || 'camera_01'
@@ -371,6 +373,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                   camera={camera}
                   isSelected={camera.camera_id === selectedCameraId}
                   onSelect={setSelectedCameraId}
+                  onToggleSpeaker={onToggleSpeaker}
                 />
               ))}
             </div>

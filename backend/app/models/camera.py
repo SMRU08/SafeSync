@@ -30,5 +30,6 @@ class CameraModel(Base):
     fps_target = Column(Integer, default=30, nullable=False)
     resolution = Column(String(32), default="1280x720", nullable=True)
     timeout_seconds = Column(Float, default=5.0, nullable=False)
+    speaker_enabled = Column(Boolean, default=True, nullable=False, doc="Camera speaker audio alert status (ON/OFF)")
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

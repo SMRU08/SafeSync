@@ -27,6 +27,7 @@ import {
   dismissAlert,
   acknowledgeIncident,
   resolveIncident,
+  toggleCameraSpeaker,
 } from '../services/api';
 
 export interface SystemStatusState {
@@ -204,6 +205,27 @@ export function useSafetyData() {
   const handleWebSocketMessage = useCallback(
     (msg: WebSocketMessage) => {
       if (msg.type === 'event' && msg.event) {
+        // Handle dynamic AudioAlert voice synthesis
+        if (msg.event === 'AudioAlert' && msg.payload) {
+          const payload = msg.payload;
+          if (
+            payload.speaker_enabled &&
+            payload.message &&
+            typeof window !== 'undefined' &&
+            'speechSynthesis' in window
+          ) {
+            try {
+              window.speechSynthesis.cancel(); // Cancel any ongoing stutter
+              const utterance = new SpeechSynthesisUtterance(payload.message);
+              utterance.rate = 1.0;
+              utterance.pitch = 1.0;
+              window.speechSynthesis.speak(utterance);
+            } catch {
+              // Ignore browser audio restrictions
+            }
+          }
+        }
+
         // Refresh alerts and summary immediately
         fetchRiskSummary().then(setSummary).catch(() => {});
         fetchAlerts({ limit: 100 }).then(setAlerts).catch(() => {});
@@ -295,6 +317,18 @@ export function useSafetyData() {
     }
   };
 
+  const handleToggleSpeaker = async (cameraId: string, enabled: boolean) => {
+    try {
+      await toggleCameraSpeaker(cameraId, enabled);
+      setCameras((prev) =>
+        prev.map((c) => (c.camera_id === cameraId ? { ...c, speaker_enabled: enabled } : c))
+      );
+      setActionSuccess(`Camera ${cameraId} speaker set to ${enabled ? 'ON' : 'OFF'}.`);
+    } catch (err: any) {
+      setActionError(`Failed to toggle camera speaker: ${err.message}`);
+    }
+  };
+
   return {
     status,
     summary,
@@ -318,5 +352,6 @@ export function useSafetyData() {
     handleDismiss,
     handleAcknowledgeIncident,
     handleResolveIncident,
+    handleToggleSpeaker,
   };
 }

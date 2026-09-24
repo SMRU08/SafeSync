@@ -336,3 +336,20 @@ def get_alert_providers_status():
     """
     from app.services.alert_providers.registry import ProviderRegistry
     return ProviderRegistry.get_instance().get_all_statuses()
+
+
+@router.get("/audio/alerts", response_model=List[dict])
+def get_recent_audio_alerts(
+    camera_id: Optional[str] = Query(None, description="Optional camera ID filter"),
+    limit: int = Query(50, ge=1, le=200),
+):
+    """
+    Returns recent dynamic audio compliance alerts triggered or suppressed per camera.
+    """
+    try:
+        from app.services.audio_alert_engine import AudioAlertEngine
+        return AudioAlertEngine.get_instance().get_recent_alerts(limit=limit, camera_id=camera_id)
+    except Exception as e:
+        logger.error("Error retrieving audio alerts: %s", e)
+        return []
+

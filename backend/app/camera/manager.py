@@ -83,6 +83,7 @@ class CameraManager:
                                     source=db_cam.source,
                                     source_type=db_cam.source_type,
                                     enabled=db_cam.enabled,
+                                    speaker_enabled=getattr(db_cam, "speaker_enabled", True),
                                     fps_target=db_cam.fps_target,
                                     resolution=db_cam.resolution,
                                     timeout_seconds=db_cam.timeout_seconds,
@@ -220,6 +221,7 @@ class CameraManager:
                         existing.source = config.source
                         existing.source_type = config.source_type.value
                         existing.enabled = config.enabled
+                        existing.speaker_enabled = getattr(config, "speaker_enabled", True)
                         existing.fps_target = config.fps_target
                         existing.resolution = config.resolution
                     else:
@@ -231,6 +233,7 @@ class CameraManager:
                             source=config.source,
                             source_type=config.source_type.value,
                             enabled=config.enabled,
+                            speaker_enabled=getattr(config, "speaker_enabled", True),
                             fps_target=config.fps_target,
                             resolution=config.resolution,
                             timeout_seconds=config.timeout_seconds,
@@ -239,6 +242,26 @@ class CameraManager:
                     db.commit()
             except Exception as exc:
                 logger.warning("Database persistence error for camera %s: %s", config.id, exc)
+
+        return True
+
+    def set_camera_speaker(self, camera_id: str, enabled: bool) -> bool:
+        """Sets the speaker status for a camera worker and persists to database."""
+        if camera_id in self.configs:
+            self.configs[camera_id].speaker_enabled = enabled
+        if camera_id in self.workers:
+            self.workers[camera_id].set_speaker(enabled)
+
+        try:
+            from app.database.session import SessionLocal
+            from app.models.camera import CameraModel
+            with SessionLocal() as db:
+                cam = db.query(CameraModel).filter_by(camera_id=camera_id).first()
+                if cam:
+                    cam.speaker_enabled = enabled
+                    db.commit()
+        except Exception as e:
+            logger.warning("Failed to persist speaker status for %s: %s", camera_id, e)
 
         return True
 

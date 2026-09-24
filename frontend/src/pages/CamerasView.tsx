@@ -16,6 +16,8 @@ import {
   AlertTriangle,
   Cpu,
   X,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { CameraLiveCard } from '../components/CameraLiveCard';
@@ -26,12 +28,14 @@ import {
   reconnectCamera,
   analyzeCameraLive,
   analyzeCameraUpload,
+  toggleCameraSpeaker,
 } from '../services/api';
 
 interface CamerasViewProps {
   cameras: CameraConfig[];
   hazardConfig?: any;
   onRefreshCameras?: () => void;
+  onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
 }
 
 type FilterTab = 'all' | 'online' | 'offline' | 'alerts';
@@ -41,6 +45,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
   cameras: initialCameras,
   hazardConfig: _hazardConfig,
   onRefreshCameras,
+  onToggleSpeaker,
 }) => {
   const [cameraList, setCameraList] = useState<CameraConfig[]>(initialCameras);
   const [filterTab, setFilterTab] = useState<FilterTab>('all');
@@ -118,6 +123,21 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
       return true;
     });
   }, [cameraList, filterTab]);
+
+  const handleToggleSpeaker = async (cameraId: string, enabled: boolean) => {
+    if (onToggleSpeaker) {
+      onToggleSpeaker(cameraId, enabled);
+    } else {
+      try {
+        await toggleCameraSpeaker(cameraId, enabled);
+      } catch {
+        // Silently tolerate
+      }
+    }
+    setCameraList((prev) =>
+      prev.map((c) => (c.camera_id === cameraId ? { ...c, speaker_enabled: enabled } : c))
+    );
+  };
 
   const handleDeleteCamera = async (cameraId: string) => {
     try {
@@ -355,6 +375,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
               onDelete={handleDeleteCamera}
               onAnalyzeLive={handleAnalyzeLive}
               onUploadAnalyze={handleUploadAnalyze}
+              onToggleSpeaker={handleToggleSpeaker}
             />
           ))}
         </div>
@@ -403,6 +424,27 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggleSpeaker(camera.camera_id, camera.speaker_enabled === false)}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      camera.speaker_enabled !== false
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                        : 'bg-slate-100 border-slate-200 text-slate-500 hover:bg-slate-200'
+                    }`}
+                    title={`Toggle Speaker (Currently ${camera.speaker_enabled !== false ? 'ON' : 'OFF'})`}
+                  >
+                    {camera.speaker_enabled !== false ? (
+                      <>
+                        <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Speaker ON</span>
+                      </>
+                    ) : (
+                      <>
+                        <VolumeX className="w-3.5 h-3.5 text-rose-500" />
+                        <span>Speaker OFF</span>
+                      </>
+                    )}
+                  </button>
                   <button
                     onClick={() => handleAnalyzeLive(camera)}
                     className="px-3 py-1.5 rounded-lg bg-sky-50 border border-sky-200 hover:bg-sky-100 text-sky-800 text-xs font-bold transition flex items-center gap-1.5"

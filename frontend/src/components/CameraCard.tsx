@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Camera, AlertTriangle, Users, VideoOff } from 'lucide-react';
+import { Camera, AlertTriangle, Users, VideoOff, Volume2, VolumeX } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { API_BASE_URL } from '../utils/constants';
 
@@ -13,12 +13,14 @@ interface CameraCardProps {
   camera: CameraConfig;
   isSelected?: boolean;
   onSelect?: (cameraId: string) => void;
+  onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
 }
 
 export const CameraCard: React.FC<CameraCardProps> = ({
   camera,
   isSelected = false,
   onSelect,
+  onToggleSpeaker,
 }) => {
   const isOnline =
     camera.state === 'CONNECTED' || camera.state === 'DEGRADED' || camera.status === 'ACTIVE';
@@ -44,9 +46,31 @@ export const CameraCard: React.FC<CameraCardProps> = ({
     >
       {/* Card Header */}
       <div className="px-2.5 py-1.5 bg-white border-b border-slate-200 flex items-center justify-between">
-        <span className="font-bold text-[10px] text-slate-800 tracking-tight">
-          {camera.camera_id.toUpperCase().replace('_', '-')}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="font-bold text-[10px] text-slate-800 tracking-tight">
+            {camera.camera_id.toUpperCase().replace('_', '-')}
+          </span>
+          {onToggleSpeaker && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSpeaker(camera.camera_id, camera.speaker_enabled === false);
+              }}
+              title={`Camera Speaker is ${camera.speaker_enabled !== false ? 'ON (Localized Audio Active)' : 'OFF (Audio Suppressed)'}`}
+              className={`p-0.5 rounded transition cursor-pointer ${
+                camera.speaker_enabled !== false
+                  ? 'text-emerald-600 hover:bg-emerald-50'
+                  : 'text-slate-400 hover:bg-slate-100'
+              }`}
+            >
+              {camera.speaker_enabled !== false ? (
+                <Volume2 className="w-3 h-3" />
+              ) : (
+                <VolumeX className="w-3 h-3 text-rose-400" />
+              )}
+            </button>
+          )}
+        </div>
         <span
           className={`text-[8px] ${badgeConfig.bg} ${badgeConfig.text} font-bold px-1.5 py-0.5 rounded tracking-wide`}
         >

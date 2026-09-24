@@ -289,3 +289,44 @@ async def analyze_camera_frame(
             detail=f"AI analysis failed: {str(exc)}",
         )
 
+
+@router.get("/{camera_id}/speaker")
+def get_camera_speaker_status(camera_id: str):
+    """Returns whether the camera speaker is ON or OFF."""
+    manager = CameraManager.get_instance()
+    cam_status = manager.get_camera_status(camera_id)
+    if not cam_status:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Camera with ID '{camera_id}' not found.",
+        )
+    return {
+        "camera_id": camera_id,
+        "speaker_enabled": cam_status.speaker_enabled,
+        "speaker_status": "ON" if cam_status.speaker_enabled else "OFF",
+    }
+
+
+@router.post("/{camera_id}/speaker")
+def set_camera_speaker_status(
+    camera_id: str,
+    payload: Dict[str, Any],
+    current_user: User = Depends(require_role(["ADMIN", "OPERATOR"])),
+):
+    """Enables or disables localized audio alerts for this camera (Requires ADMIN or OPERATOR role)."""
+    manager = CameraManager.get_instance()
+    if camera_id not in manager.workers and camera_id not in manager.configs:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Camera with ID '{camera_id}' not found.",
+        )
+    enabled = bool(payload.get("enabled", True))
+    manager.set_camera_speaker(camera_id, enabled)
+    return {
+        "camera_id": camera_id,
+        "speaker_enabled": enabled,
+        "speaker_status": "ON" if enabled else "OFF",
+        "message": f"Camera {camera_id} speaker turned {'ON' if enabled else 'OFF'}.",
+    }
+
+

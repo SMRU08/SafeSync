@@ -156,6 +156,7 @@ export interface CameraConfig {
   source?: string;
   source_type?: string;
   enabled?: boolean;
+  speaker_enabled?: boolean;
   resolution: string;
   fps: number;
   stream_url?: string;
@@ -182,7 +183,7 @@ export interface ZoneConfig {
 export interface WebSocketMessage {
   type: 'connected' | 'event' | 'pong';
   message?: string;
-  event?: 'AlertCreated' | 'AlertUpdated' | 'AlertEscalated' | 'IncidentCreated' | 'IncidentResolved';
+  event?: 'AlertCreated' | 'AlertUpdated' | 'AlertEscalated' | 'IncidentCreated' | 'IncidentResolved' | 'AudioAlert';
   payload?: any;
   active_connections?: number;
   timestamp: string;
