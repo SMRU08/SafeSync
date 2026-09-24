@@ -321,12 +321,30 @@ class SpatialPPEAssociator:
         else:
             min_cont = 0.20
 
-        if containment < min_cont:
-            return 0.0
-
-        # Normalized horizontal and vertical alignment penalty
+        # Normalized centers for horizontal and vertical checks
         p_xc = (px1 + px2) / 2.0
         p_yc = (py1 + py2) / 2.0
+
+        # Strict horizontal anchoring: center of PPE must be within worker box horizontal bounds
+        wx1, wy1, wx2, wy2 = worker_box
+        worker_w = max(1.0, float(wx2 - wx1))
+        worker_h = max(1.0, float(wy2 - wy1))
+        max_lat_margin = 0.20 * worker_w
+        if p_xc < (wx1 - max_lat_margin) or p_xc > (wx2 + max_lat_margin):
+            return 0.0
+
+        # Strict vertical anatomical zone checks
+        rel_yc = (p_yc - wy1) / worker_h
+        if item_type == PPEItemType.HELMET:
+            if rel_yc < -0.15 or rel_yc > 0.32:
+                return 0.0
+        elif item_type == PPEItemType.SAFETY_VEST:
+            if rel_yc < 0.12 or rel_yc > 0.70:
+                return 0.0
+        elif item_type == PPEItemType.SAFETY_FOOTWEAR:
+            if rel_yc < 0.60 or rel_yc > 1.15:
+                return 0.0
+
         z_xc = (zx1 + zx2) / 2.0
         z_yc = (zy1 + zy2) / 2.0
 
@@ -476,12 +494,22 @@ class SpatialPPEAssociator:
 
             matched_items_indices = set()
             for r, c in zip(row_ind, col_ind):
-                if cost_matrix[r, c] < 0.85 and affinity_matrix[r, c] >= 0.15:
-                    tid = worker_ids[r]
-                    matched_item = items[c].copy()
-                    matched_item["association_score"] = round(float(affinity_matrix[r, c]), 3)
-                    result[tid][item_type.value] = matched_item
-                    matched_items_indices.add(c)
+                aff = affinity_matrix[r, c]
+                if cost_matrix[r, c] < 0.85 and aff >= 0.15:
+                    # Check for ambiguity with other workers (prevent cross-contamination)
+                    ambiguous = False
+                    if num_workers > 1:
+                        other_affs = [affinity_matrix[other_r, c] for other_r in range(num_workers) if other_r != r]
+                        max_other = max(other_affs) if other_affs else 0.0
+                        if max_other > 0.20 and (aff - max_other) < 0.08:
+                            ambiguous = True
+
+                    if not ambiguous:
+                        tid = worker_ids[r]
+                        matched_item = items[c].copy()
+                        matched_item["association_score"] = round(float(aff), 3)
+                        result[tid][item_type.value] = matched_item
+                        matched_items_indices.add(c)
 
             for i_idx, item in enumerate(items):
                 if i_idx not in matched_items_indices:

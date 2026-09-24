@@ -84,6 +84,7 @@ export interface EvidenceItem {
 export interface WorkerTrack {
   track_id: number;
   bbox: [number, number, number, number];
+  normalized_bbox?: [number, number, number, number];
   ppe_status: {
     helmet: PPEPresence;
     safety_vest: PPEPresence;

@@ -80,11 +80,13 @@ class WorkerComplianceEngine:
         # Initialize ByteTrack
         track_cfg = self.config.get("tracking", {})
         self.tracker = ByteTrack(
-            track_high_thresh=track_cfg.get("track_high_thresh", 0.30),
+            track_high_thresh=track_cfg.get("track_high_thresh", 0.25),
             track_low_thresh=track_cfg.get("track_low_thresh", 0.10),
-            new_track_thresh=track_cfg.get("new_track_thresh", 0.40),
+            new_track_thresh=track_cfg.get("new_track_thresh", 0.35),
             track_buffer=track_cfg.get("track_buffer", 30),
-            match_thresh=track_cfg.get("match_thresh", 0.80),
+            match_thresh=track_cfg.get("match_thresh", 0.70),
+            confirmation_frames=track_cfg.get("confirmation_frames", 2),
+            lost_tolerance_frames=track_cfg.get("lost_tolerance_frames", 15),
         )
 
         # Initialize spatial associator
@@ -137,11 +139,15 @@ class WorkerComplianceEngine:
         ppe_dets = []
         hazards = []
 
+        min_area = self.config.get("tracking", {}).get("min_box_area", 400)
         for obj in det_response.detections:
             cname = obj.class_name.lower()
             b = [obj.bbox.x1, obj.bbox.y1, obj.bbox.x2, obj.bbox.y2]
             if cname == "person":
-                person_dets.append([b[0], b[1], b[2], b[3], obj.confidence])
+                box_w = max(0.0, b[2] - b[0])
+                box_h = max(0.0, b[3] - b[1])
+                if (box_w * box_h) >= min_area:
+                    person_dets.append([b[0], b[1], b[2], b[3], obj.confidence])
             elif cname in ["helmet", "safety_vest", "gloves", "safety_footwear"]:
                 ppe_dets.append({
                     "class_name": cname,

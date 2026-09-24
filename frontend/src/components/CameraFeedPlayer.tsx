@@ -4,7 +4,7 @@
  * real-time ByteTrack worker PPE detection HUD, telemetry bar, and stream controls.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Maximize2,
   Minimize2,
@@ -43,6 +43,54 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   const [streamType, setStreamType] = useState<'mjpeg' | 'snapshot'>('mjpeg');
   const [snapshotTimestamp, setSnapshotTimestamp] = useState<number>(Date.now());
   const containerRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const videoImgRef = useRef<HTMLImageElement>(null);
+  const [videoBounds, setVideoBounds] = useState<{
+    width: number;
+    height: number;
+    offsetX: number;
+    offsetY: number;
+  }>({ width: 0, height: 0, offsetX: 0, offsetY: 0 });
+
+  const updateVideoBounds = useCallback(() => {
+    if (!viewportRef.current || !videoImgRef.current) return;
+    const container = viewportRef.current.getBoundingClientRect();
+    const img = videoImgRef.current;
+    const nw = img.naturalWidth || 1280;
+    const nh = img.naturalHeight || 720;
+    if (container.width === 0 || container.height === 0) return;
+
+    const containerAspect = container.width / container.height;
+    const videoAspect = nw / (nh || 1);
+
+    let renderW = container.width;
+    let renderH = container.height;
+    let offX = 0;
+    let offY = 0;
+
+    if (containerAspect > videoAspect) {
+      renderH = container.height;
+      renderW = renderH * videoAspect;
+      offX = (container.width - renderW) / 2;
+    } else {
+      renderW = container.width;
+      renderH = renderW / videoAspect;
+      offY = (container.height - renderH) / 2;
+    }
+
+    setVideoBounds({
+      width: renderW,
+      height: renderH,
+      offsetX: offX,
+      offsetY: offY,
+    });
+  }, []);
+
+  useEffect(() => {
+    updateVideoBounds();
+    window.addEventListener('resize', updateVideoBounds);
+    return () => window.removeEventListener('resize', updateVideoBounds);
+  }, [updateVideoBounds]);
 
   useEffect(() => {
     if (selectedCameraId && selectedCameraId !== activeCamId) {
@@ -206,7 +254,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
       </div>
 
       {/* Feed Viewport */}
-      <div className="relative bg-slate-950 aspect-[16/9] w-full overflow-hidden select-none group flex items-center justify-center">
+      <div ref={viewportRef} className="relative bg-slate-950 aspect-[16/9] w-full overflow-hidden select-none group flex items-center justify-center">
         {hasStreamError || !isCameraOnline ? (
           <div className="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
             <AlertTriangle className="w-10 h-10 text-amber-500 mb-2" />
@@ -229,8 +277,10 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           </div>
         ) : (
           <img
+            ref={videoImgRef}
             alt={activeCamera.name}
             src={streamUrl}
+            onLoad={updateVideoBounds}
             onError={() => {
               if (streamType === 'mjpeg') {
                 // Fallback to snapshot polling
@@ -248,16 +298,29 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           {new Date().toISOString().replace('T', ' ').substring(0, 19)}
         </div>
 
-        {/* Real Dynamic Worker Bounding Box Overlays */}
+        {/* Dynamic Worker Inspection HUD Overlays */}
         {isCameraOnline &&
           workers.map((worker) => {
             if (!worker.bbox || worker.bbox.length < 4) return null;
             const [x1, y1, x2, y2] = worker.bbox;
-            // Normalize assuming 1280x720 canvas
-            const leftPct = x1 > 1 ? (x1 / 1280) * 100 : x1 * 100;
-            const topPct = y1 > 1 ? (y1 / 720) * 100 : y1 * 100;
-            const widthPct = x2 > 1 ? ((x2 - x1) / 1280) * 100 : (x2 - x1) * 100;
-            const heightPct = y2 > 1 ? ((y2 - y1) / 720) * 100 : (y2 - y1) * 100;
+            const nw = videoImgRef.current?.naturalWidth || 1280;
+            const nh = videoImgRef.current?.naturalHeight || 720;
+
+            let nx1 = worker.normalized_bbox ? worker.normalized_bbox[0] : (x1 > 1 ? x1 / nw : x1);
+            let ny1 = worker.normalized_bbox ? worker.normalized_bbox[1] : (y1 > 1 ? y1 / nh : y1);
+            let nx2 = worker.normalized_bbox ? worker.normalized_bbox[2] : (x2 > 1 ? x2 / nw : x2);
+            let ny2 = worker.normalized_bbox ? worker.normalized_bbox[3] : (y2 > 1 ? y2 / nh : y2);
+
+            nx1 = Math.max(0, Math.min(1, nx1));
+            ny1 = Math.max(0, Math.min(1, ny1));
+            nx2 = Math.max(nx1 + 0.02, Math.min(1, nx2));
+            ny2 = Math.max(ny1 + 0.03, Math.min(1, ny2));
+
+            const hasBounds = videoBounds.width > 0 && videoBounds.height > 0;
+            const leftPx = hasBounds ? videoBounds.offsetX + nx1 * videoBounds.width : nx1 * 100;
+            const topPx = hasBounds ? videoBounds.offsetY + ny1 * videoBounds.height : ny1 * 100;
+            const widthPx = hasBounds ? (nx2 - nx1) * videoBounds.width : (nx2 - nx1) * 100;
+            const heightPx = hasBounds ? (ny2 - ny1) * videoBounds.height : (ny2 - ny1) * 100;
 
             const isCompliant = worker.overall_compliant;
             const borderColor = isCompliant ? 'border-emerald-500' : 'border-rose-500';
@@ -266,12 +329,12 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
             return (
               <div
                 key={worker.track_id}
-                className="absolute pointer-events-none transition-all duration-300"
+                className="absolute pointer-events-none transition-all duration-150"
                 style={{
-                  left: `${Math.max(1, leftPct)}%`,
-                  top: `${Math.max(1, topPct)}%`,
-                  width: `${Math.max(3, widthPct)}%`,
-                  height: `${Math.max(5, heightPct)}%`,
+                  left: hasBounds ? `${leftPx}px` : `${leftPx}%`,
+                  top: hasBounds ? `${topPx}px` : `${topPx}%`,
+                  width: hasBounds ? `${widthPx}px` : `${widthPx}%`,
+                  height: hasBounds ? `${heightPx}px` : `${heightPx}%`,
                 }}
               >
                 <div className={`w-full h-full border-2 ${borderColor} relative shadow-sm`}>

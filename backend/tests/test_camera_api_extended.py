@@ -106,12 +106,15 @@ def test_mjpeg_stream_endpoint():
         source_type=CameraSourceType.SYNTHETIC,
         enabled=True,
     )
-    manager.register_camera(cfg, start_immediately=True)
+    try:
+        manager.register_camera(cfg, start_immediately=True, persist_db=False)
 
-    import time
-    time.sleep(0.1)
-    from app.api.cameras import _generate_mjpeg_stream
-    gen = _generate_mjpeg_stream("test_stream_cam")
-    first_chunk = next(gen)
-    assert b"--frame\r\n" in first_chunk
-    assert b"Content-Type: image/jpeg\r\n" in first_chunk
+        import time
+        time.sleep(0.1)
+        from app.api.cameras import _generate_mjpeg_stream
+        gen = _generate_mjpeg_stream("test_stream_cam")
+        first_chunk = next(gen)
+        assert b"--frame\r\n" in first_chunk
+        assert b"Content-Type: image/jpeg\r\n" in first_chunk
+    finally:
+        manager.unregister_camera("test_stream_cam", delete_db=True)

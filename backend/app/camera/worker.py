@@ -446,6 +446,8 @@ class CameraWorker:
     def get_live_compliance(self) -> Dict[str, Any]:
         """Returns the latest active worker tracking and compliance data."""
         with self._lock:
+            fw = int(self._latest_frame.shape[1]) if self._latest_frame is not None else 1280
+            fh = int(self._latest_frame.shape[0]) if self._latest_frame is not None else 720
             workers_out = []
             for w in self._latest_workers:
                 try:
@@ -466,13 +468,31 @@ class CameraWorker:
                                 float(b.get("x2", 0)),
                                 float(b.get("y2", 0)),
                             ]
+                        if isinstance(wd["bbox"], list) and len(wd["bbox"]) >= 4:
+                            bx1, by1, bx2, by2 = wd["bbox"][:4]
+                            wd["normalized_bbox"] = [
+                                round(bx1 / max(1, fw), 4),
+                                round(by1 / max(1, fh), 4),
+                                round(bx2 / max(1, fw), 4),
+                                round(by2 / max(1, fh), 4),
+                            ]
                     workers_out.append(wd)
                 except Exception as e:
                     logger.debug("Error serializing worker in get_live_compliance: %s", e)
 
+            track_telemetry = []
+            if self._compliance_engine and hasattr(self._compliance_engine.tracker, "get_track_telemetry"):
+                try:
+                    track_telemetry = self._compliance_engine.tracker.get_track_telemetry()
+                except Exception:
+                    pass
+
             return {
                 "camera_id": self.camera_id,
+                "frame_width": fw,
+                "frame_height": fh,
                 "workers": workers_out,
+                "track_telemetry": track_telemetry,
                 "summary": self._latest_compliance_summary.model_dump() if hasattr(self._latest_compliance_summary, "model_dump") else self._latest_compliance_summary,
                 "annotated_image_base64": self._latest_annotated_b64,
                 "timestamp": self._latest_frame_time,

@@ -69,6 +69,62 @@ class Detector:
                 log.debug("Base person detector unavailable: %s", e)
         return self._person_model
 
+    @staticmethod
+    def _calc_iou(b1: List[float], b2: List[float]) -> float:
+        """Calculates Intersection-over-Union between two [x1, y1, x2, y2] boxes."""
+        xA = max(b1[0], b2[0])
+        yA = max(b1[1], b2[1])
+        xB = min(b1[2], b2[2])
+        yB = min(b1[3], b2[3])
+        inter_area = max(0.0, xB - xA) * max(0.0, yB - yA)
+        a1 = (b1[2] - b1[0]) * (b1[3] - b1[1])
+        a2 = (b2[2] - b2[0]) * (b2[3] - b2[1])
+        union_area = a1 + a2 - inter_area
+        return inter_area / max(1e-6, union_area)
+
+    @staticmethod
+    def _validate_and_clamp_bbox(
+        coords: List[float],
+        img_w: int,
+        img_h: int,
+        class_name: str = "",
+    ) -> Optional[BoundingBox]:
+        """
+        Clamps bounding box to frame boundaries and rejects invalid/degenerate boxes.
+        Applies geometric constraints (minimum size and aspect ratios) tailored to class.
+        """
+        if len(coords) < 4:
+            return None
+
+        x1 = max(0.0, min(float(coords[0]), float(img_w - 1)))
+        y1 = max(0.0, min(float(coords[1]), float(img_h - 1)))
+        x2 = max(x1 + 1.0, min(float(coords[2]), float(img_w)))
+        y2 = max(y1 + 1.0, min(float(coords[3]), float(img_h)))
+
+        box_w = x2 - x1
+        box_h = y2 - y1
+
+        low_name = class_name.lower()
+        if low_name == "person":
+            # Person boxes: min width 15px, min height 25px, area >= 375px
+            if box_w < 15.0 or box_h < 25.0:
+                return None
+            # Reject extreme degenerate aspect ratios (e.g. razor-thin horizontal or vertical artifacts)
+            aspect = box_w / max(1.0, box_h)
+            if aspect > 3.0 or aspect < 0.12:
+                return None
+        else:
+            # PPE items: min width 8px, min height 8px
+            if box_w < 8.0 or box_h < 8.0:
+                return None
+
+        return BoundingBox(
+            x1=round(x1, 2),
+            y1=round(y1, 2),
+            x2=round(x2, 2),
+            y2=round(y2, 2),
+        )
+
     def detect_image(
         self,
         image_input: Union[str, np.ndarray, bytes],
@@ -168,32 +224,28 @@ class Detector:
                         continue
 
                     coords = box.xyxy[0].tolist()
-                    bbox = BoundingBox(
-                        x1=round(float(coords[0]), 2),
-                        y1=round(float(coords[1]), 2),
-                        x2=round(float(coords[2]), 2),
-                        y2=round(float(coords[3]), 2),
-                    )
+                    clamped_bbox = self._validate_and_clamp_bbox(coords, w, h, low_name)
+                    if clamped_bbox is None:
+                        continue
 
                     det = DetectionObject(
                         class_id=cls_id,
                         class_name=cls_name,
                         confidence=round(score, 4),
-                        bbox=bbox,
+                        bbox=clamped_bbox,
                     )
                     detections.append(det)
                     class_counts[cls_name] = class_counts.get(cls_name, 0) + 1
 
-        # 4b. Ensure person recall for close-up webcam and low-light scenes:
-        # Only relevant for the PPE pipeline; hazard models do not detect persons.
-        has_person = any(d.class_name.lower() == "person" for d in detections)
-        if self.model_type == "ppe" and not has_person and (filter_set is None or "person" in filter_set):
+        # 4b. Ensure person recall for walking, multi-person, close-up, and non-standard silhouettes:
+        # Only relevant for the PPE pipeline; merges primary PPE detections with COCO person detector via IoU NMS
+        if self.model_type == "ppe" and (filter_set is None or "person" in filter_set):
             p_model = self._get_person_model()
             if p_model is not None:
                 try:
                     p_results = p_model.predict(
                         source=frame,
-                        conf=max(0.18, conf_thresh),
+                        conf=max(0.20, conf_thresh),
                         iou=iou_thresh,
                         imgsz=inference_size,
                         device=device,
@@ -204,22 +256,38 @@ class Detector:
                             if int(box.cls[0].item()) == 0:  # Class 0 in COCO is 'person'
                                 score = float(box.conf[0].item())
                                 coords = box.xyxy[0].tolist()
-                                bbox = BoundingBox(
-                                    x1=round(float(coords[0]), 2),
-                                    y1=round(float(coords[1]), 2),
-                                    x2=round(float(coords[2]), 2),
-                                    y2=round(float(coords[3]), 2),
-                                )
-                                det = DetectionObject(
-                                    class_id=0,
-                                    class_name="person",
-                                    confidence=round(score, 4),
-                                    bbox=bbox,
-                                )
-                                detections.append(det)
-                                class_counts["person"] = class_counts.get("person", 0) + 1
+                                clamped_bbox = self._validate_and_clamp_bbox(coords, w, h, "person")
+                                if clamped_bbox is None:
+                                    continue
+
+                                # Check overlap with already detected persons (IoU NMS merge)
+                                p_box_arr = [clamped_bbox.x1, clamped_bbox.y1, clamped_bbox.x2, clamped_bbox.y2]
+                                matched_idx = -1
+                                for idx, existing_det in enumerate(detections):
+                                    if existing_det.class_name.lower() == "person":
+                                        eb = existing_det.bbox
+                                        e_arr = [eb.x1, eb.y1, eb.x2, eb.y2]
+                                        if self._calc_iou(p_box_arr, e_arr) >= 0.45:
+                                            matched_idx = idx
+                                            break
+
+                                if matched_idx >= 0:
+                                    # If the base COCO model has higher confidence or better coverage, update
+                                    if score > detections[matched_idx].confidence:
+                                        detections[matched_idx].confidence = round(score, 4)
+                                        detections[matched_idx].bbox = clamped_bbox
+                                else:
+                                    # New person detected (e.g. walking worker or second person missed by primary model)
+                                    det = DetectionObject(
+                                        class_id=0,
+                                        class_name="person",
+                                        confidence=round(score, 4),
+                                        bbox=clamped_bbox,
+                                    )
+                                    detections.append(det)
+                                    class_counts["person"] = class_counts.get("person", 0) + 1
                 except Exception as p_err:
-                    log.debug("Fallback person detection error: %s", p_err)
+                    log.debug("Multi-person recall detection error: %s", p_err)
 
         # 5. Build response
         response = ImageDetectionResponse(
