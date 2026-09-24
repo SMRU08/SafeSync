@@ -93,6 +93,9 @@ export interface WorkerTrack {
   };
   overall_compliant: boolean;
   active_frames: number;
+  dwell_seconds?: number;
+  confidence?: number;
+  first_seen?: string;
   zone_id?: string;
   missing_items?: string[];
 }

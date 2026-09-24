@@ -12,6 +12,7 @@ import {
   Filter,
   CheckCircle2,
   RefreshCw,
+  Eye,
 } from 'lucide-react';
 import { Alert, Incident, RiskSummary, RiskLevel, AlertStatus } from '../types';
 
@@ -23,14 +24,19 @@ interface AlertsViewProps {
   onResolve: (alertId: string) => Promise<void>;
   onDismiss: (alertId: string) => Promise<void>;
   onRefresh?: () => void;
+  onSelectAlert?: (alert: Alert) => void;
+  onSelectIncident?: (incidentId: string) => void;
 }
 
 export const AlertsView: React.FC<AlertsViewProps> = ({
   alerts,
+  incidents: _incidents,
   onAcknowledge,
   onResolve,
   onDismiss,
   onRefresh,
+  onSelectAlert,
+  onSelectIncident,
 }) => {
   const [activeTab, setActiveTab] = useState<AlertStatus>('ACTIVE');
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,10 +219,23 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
                         </span>
                       </td>
                       <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
-                        {a.alert_id}
+                        {onSelectAlert ? (
+                          <button
+                            onClick={() => onSelectAlert(a)}
+                            className="hover:text-indigo-600 hover:underline text-left cursor-pointer"
+                            title="Click to view alert details"
+                          >
+                            {a.alert_id}
+                          </button>
+                        ) : (
+                          a.alert_id
+                        )}
                       </td>
                       <td className="py-2.5 px-3">
-                        <div className="font-semibold text-slate-800">
+                        <div
+                          className={`font-semibold text-slate-800 ${onSelectAlert ? 'cursor-pointer hover:text-indigo-600' : ''}`}
+                          onClick={() => onSelectAlert && onSelectAlert(a)}
+                        >
                           {a.title || a.event_type.replace(/_/g, ' ')}
                         </div>
                         <p className="text-[10px] text-slate-500 truncate max-w-xs">{a.message}</p>
@@ -233,6 +252,22 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
                       </td>
                       <td className="py-2.5 px-3 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {(onSelectIncident || onSelectAlert) && (
+                            <button
+                              onClick={() => {
+                                if (onSelectIncident && a.incident_id) {
+                                  onSelectIncident(a.incident_id);
+                                } else if (onSelectAlert) {
+                                  onSelectAlert(a);
+                                }
+                              }}
+                              className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-[10px] font-semibold transition cursor-pointer flex items-center gap-1 shadow-xs"
+                              title="Forensic Snapshot & Incident Evidence"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>Inspect</span>
+                            </button>
+                          )}
                           {a.status === 'ACTIVE' && (
                             <button
                               disabled={isBusy}

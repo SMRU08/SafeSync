@@ -116,6 +116,18 @@ export async function fetchIncidentDetail(incidentId: string): Promise<Incident>
   return request<Incident>(`/api/incidents/${incidentId}`);
 }
 
+export async function acknowledgeIncident(incidentId: string): Promise<any> {
+  return request<any>(`/api/incidents/${incidentId}/acknowledge`, {
+    method: 'POST',
+  });
+}
+
+export async function resolveIncident(incidentId: string): Promise<any> {
+  return request<any>(`/api/incidents/${incidentId}/resolve`, {
+    method: 'POST',
+  });
+}
+
 // ─── Compliance & Hazards Configuration ─────────────────────────────────────
 
 export async function fetchComplianceConfig(): Promise<any> {

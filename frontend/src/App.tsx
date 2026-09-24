@@ -18,15 +18,17 @@ import { AnalyticsView } from './pages/AnalyticsView';
 import { SystemHealthView } from './pages/SystemHealthView';
 import { SettingsView } from './pages/SettingsView';
 import { AlertDetailModal } from './components/AlertDetailModal';
+import { IncidentDetailModal } from './components/IncidentDetailModal';
 import { useSafetyData } from './hooks/useSafetyData';
 import { useWebSocket } from './hooks/useWebSocket';
-import { Alert } from './types';
+import { Alert, Incident } from './types';
 import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 import './styles/custom-theme.css';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
 
   // Real-time backend data & WebSocket hooks
   const {
@@ -47,6 +49,8 @@ export const App: React.FC = () => {
     handleAcknowledge,
     handleResolve,
     handleDismiss,
+    handleAcknowledgeIncident,
+    handleResolveIncident,
   } = useSafetyData();
 
   const { status: wsStatus } = useWebSocket(handleWebSocketMessage);
@@ -82,6 +86,25 @@ export const App: React.FC = () => {
 
   const activeAlertsCount =
     summary?.active_alerts ?? alerts.filter((a) => a.status === 'ACTIVE').length;
+
+  const handleOpenIncident = (incidentId: string) => {
+    const found = incidents.find((inc) => inc.incident_id === incidentId);
+    if (found) {
+      setSelectedIncident(found);
+    } else {
+      setSelectedIncident({
+        incident_id: incidentId,
+        status: 'OPEN',
+        event_types: [],
+        camera_id: '',
+        zone_id: '',
+        risk_score: 0,
+        risk_level: 'MEDIUM',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as Incident);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden bg-[#eef3f9] text-slate-800 antialiased font-sans">
@@ -172,6 +195,8 @@ export const App: React.FC = () => {
               onResolve={handleResolve}
               onDismiss={handleDismiss}
               onRefresh={refreshAll}
+              onSelectAlert={(a) => setSelectedAlert(a)}
+              onSelectIncident={handleOpenIncident}
             />
           )}
 
@@ -197,6 +222,22 @@ export const App: React.FC = () => {
         onAcknowledge={handleAcknowledge}
         onResolve={handleResolve}
         onDismiss={handleDismiss}
+        onSelectIncident={handleOpenIncident}
+      />
+
+      {/* ─── Global Incident Investigation & Snapshot Evidence Modal ───────── */}
+      <IncidentDetailModal
+        incident={selectedIncident}
+        onClose={() => setSelectedIncident(null)}
+        onSelectAlert={(alertId) => {
+          const found = alerts.find((a) => a.alert_id === alertId);
+          if (found) {
+            setSelectedIncident(null);
+            setSelectedAlert(found);
+          }
+        }}
+        onAcknowledgeIncident={handleAcknowledgeIncident}
+        onResolveIncident={handleResolveIncident}
       />
     </div>
   );

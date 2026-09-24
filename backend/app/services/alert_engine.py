@@ -670,6 +670,67 @@ class AlertEngine:
             pass
         return result
 
+    def acknowledge_incident(self, incident_id: str, db: Session) -> dict:
+        now = datetime.now(timezone.utc)
+        db_incident = db.query(Incident).filter(Incident.incident_id == incident_id).first()
+        if not db_incident:
+            raise ValueError(f"Incident '{incident_id}' not found")
+
+        db_incident.status = IncidentStatus.ACKNOWLEDGED.value
+        db_incident.updated_at = now
+
+        for alert in db_incident.alerts:
+            if alert.status == AlertStatus.ACTIVE.value:
+                alert.status = AlertStatus.ACKNOWLEDGED.value
+                alert.acknowledged_at = now
+                hist = AlertHistory(
+                    alert_id=alert.alert_id,
+                    incident_id=incident_id,
+                    action="ACKNOWLEDGED",
+                    previous_level=alert.severity,
+                    new_level=alert.severity,
+                    reason="Incident acknowledged by operator",
+                    timestamp=now,
+                )
+                db.add(hist)
+
+        db.commit()
+        broadcaster.broadcast("IncidentUpdated", {"incident_id": incident_id, "status": "ACKNOWLEDGED"})
+        return {"status": "success", "incident_id": incident_id, "incident_status": "ACKNOWLEDGED"}
+
+    def resolve_incident(self, incident_id: str, db: Session) -> dict:
+        now = datetime.now(timezone.utc)
+        db_incident = db.query(Incident).filter(Incident.incident_id == incident_id).first()
+        if not db_incident:
+            raise ValueError(f"Incident '{incident_id}' not found")
+
+        db_incident.status = IncidentStatus.RESOLVED.value
+        db_incident.resolved_at = now
+        db_incident.updated_at = now
+
+        for k, v in list(self._active_alerts_cache.items()):
+            if v.get("incident_id") == incident_id:
+                del self._active_alerts_cache[k]
+
+        for alert in db_incident.alerts:
+            if alert.status != AlertStatus.RESOLVED.value:
+                alert.status = AlertStatus.RESOLVED.value
+                alert.resolved_at = now
+                hist = AlertHistory(
+                    alert_id=alert.alert_id,
+                    incident_id=incident_id,
+                    action="RESOLVED",
+                    previous_level=alert.severity,
+                    new_level=alert.severity,
+                    reason="Incident resolved by operator",
+                    timestamp=now,
+                )
+                db.add(hist)
+
+        db.commit()
+        broadcaster.broadcast("IncidentResolved", {"incident_id": incident_id})
+        return {"status": "success", "incident_id": incident_id, "incident_status": "RESOLVED"}
+
     def get_risk_summary(self, db: Session) -> RiskSummaryResponse:
         active_alerts_count = db.query(Alert).filter(Alert.status == AlertStatus.ACTIVE.value).count()
         critical_count = db.query(Alert).filter(

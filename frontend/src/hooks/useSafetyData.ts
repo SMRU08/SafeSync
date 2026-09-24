@@ -25,6 +25,8 @@ import {
   acknowledgeAlert,
   resolveAlert,
   dismissAlert,
+  acknowledgeIncident,
+  resolveIncident,
 } from '../services/api';
 
 export interface SystemStatusState {
@@ -261,6 +263,38 @@ export function useSafetyData() {
     }
   };
 
+  const handleAcknowledgeIncident = async (incidentId: string) => {
+    setActionError(null);
+    setActionSuccess(null);
+    try {
+      await acknowledgeIncident(incidentId);
+      setActionSuccess(`Incident ${incidentId} acknowledged.`);
+      setIncidents((prev) =>
+        prev.map((inc) => (inc.incident_id === incidentId ? { ...inc, status: 'ACKNOWLEDGED' } : inc))
+      );
+      fetchAlerts({ limit: 100 }).then(setAlerts).catch(() => {});
+      fetchRiskSummary().then(setSummary).catch(() => {});
+    } catch (err: any) {
+      setActionError(`Failed to acknowledge incident: ${err.message}`);
+    }
+  };
+
+  const handleResolveIncident = async (incidentId: string) => {
+    setActionError(null);
+    setActionSuccess(null);
+    try {
+      await resolveIncident(incidentId);
+      setActionSuccess(`Incident ${incidentId} resolved.`);
+      setIncidents((prev) =>
+        prev.map((inc) => (inc.incident_id === incidentId ? { ...inc, status: 'RESOLVED' } : inc))
+      );
+      fetchAlerts({ limit: 100 }).then(setAlerts).catch(() => {});
+      fetchRiskSummary().then(setSummary).catch(() => {});
+    } catch (err: any) {
+      setActionError(`Failed to resolve incident: ${err.message}`);
+    }
+  };
+
   return {
     status,
     summary,
@@ -282,5 +316,7 @@ export function useSafetyData() {
     handleAcknowledge,
     handleResolve,
     handleDismiss,
+    handleAcknowledgeIncident,
+    handleResolveIncident,
   };
 }

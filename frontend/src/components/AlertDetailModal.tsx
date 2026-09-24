@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   Download,
   Image as ImageIcon,
+  Eye,
 } from 'lucide-react';
 import { Alert, EvidenceItem } from '../types';
 import { fetchAlertDetail, fetchIncidentEvidence } from '../services/api';
@@ -28,6 +29,7 @@ interface AlertDetailModalProps {
   onAcknowledge: (alertId: string) => Promise<void>;
   onResolve: (alertId: string) => Promise<void>;
   onDismiss: (alertId: string) => Promise<void>;
+  onSelectIncident?: (incidentId: string) => void;
 }
 
 export const AlertDetailModal: React.FC<AlertDetailModalProps> = ({
@@ -36,6 +38,7 @@ export const AlertDetailModal: React.FC<AlertDetailModalProps> = ({
   onAcknowledge,
   onResolve,
   onDismiss,
+  onSelectIncident,
 }) => {
   const [fullAlert, setFullAlert] = useState<Alert | null>(alert);
   const [evidenceList, setEvidenceList] = useState<EvidenceItem[]>([]);
@@ -163,7 +166,32 @@ export const AlertDetailModal: React.FC<AlertDetailModalProps> = ({
             </div>
             <div className="meta-item">
               <span className="meta-label">Parent Incident</span>
-              <span className="meta-value font-mono">{fullAlert.incident_id}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <span className="meta-value font-mono">{fullAlert.incident_id}</span>
+                {onSelectIncident && fullAlert.incident_id && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onSelectIncident(fullAlert.incident_id);
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 8px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: '#fff',
+                      backgroundColor: '#4f46e5',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Eye size={12} /> Inspect Evidence
+                  </button>
+                )}
+              </div>
             </div>
             <div className="meta-item">
               <span className="meta-label">Resolution Time</span>

@@ -293,6 +293,41 @@ def get_incident_detail(
     }
 
 
+@router.post("/incidents/{incident_id}/acknowledge")
+def acknowledge_incident(
+    incident_id: str = Path(..., description="Incident UUID"),
+    db: Session = Depends(get_db),
+    engine: AlertEngine = Depends(get_alert_engine),
+    current_user=Depends(require_role(["ADMIN", "OPERATOR"])),
+):
+    """
+    Acknowledges an incident and all associated active alerts.
+    Requires ADMIN or OPERATOR role.
+    """
+    try:
+        return engine.acknowledge_incident(incident_id, db)
+    except ValueError as err:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err))
+
+
+@router.post("/incidents/{incident_id}/resolve")
+def resolve_incident(
+    incident_id: str = Path(..., description="Incident UUID"),
+    db: Session = Depends(get_db),
+    engine: AlertEngine = Depends(get_alert_engine),
+    current_user=Depends(require_role(["ADMIN", "OPERATOR"])),
+):
+    """
+    Resolves an incident and all associated alerts.
+    Requires ADMIN or OPERATOR role.
+    """
+    try:
+        return engine.resolve_incident(incident_id, db)
+    except ValueError as err:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(err))
+
+
+
 @router.get("/alerts/providers/status")
 def get_alert_providers_status():
     """
