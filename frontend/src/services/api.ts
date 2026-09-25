@@ -16,10 +16,14 @@ import {
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  const headers = {
+  const headers: Record<string, string> = {
     Accept: 'application/json',
-    ...(options.headers || {}),
+    ...((options.headers as Record<string, string>) || {}),
   };
+
+  if (options.body && typeof options.body === 'string' && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   const response = await fetch(url, {
     ...options,
@@ -220,6 +224,7 @@ export async function fetchEvidenceDetail(evidenceId: string): Promise<EvidenceI
 export async function toggleCameraSpeaker(cameraId: string, enabled: boolean): Promise<any> {
   return request<any>(`/api/cameras/${cameraId}/speaker`, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ enabled }),
   });
 }

@@ -13,11 +13,11 @@ import io
 import time
 import cv2
 import logging
-from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File
+from typing import List, Dict, Any, Optional, Union
+from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File, Request, Body
 from fastapi.responses import StreamingResponse
 
-from app.camera.schemas import CameraConfigModel, CameraStatus, CameraState
+from app.camera.schemas import CameraConfigModel, CameraStatus, CameraState, CameraSpeakerToggleRequest
 from app.camera.manager import CameraManager
 from app.security.auth import require_role
 from app.models.user import User
@@ -308,9 +308,10 @@ def get_camera_speaker_status(camera_id: str):
 
 
 @router.post("/{camera_id}/speaker")
-def set_camera_speaker_status(
+async def set_camera_speaker_status(
     camera_id: str,
-    payload: Dict[str, Any],
+    request: Request,
+    payload: Optional[Union[CameraSpeakerToggleRequest, Dict[str, Any], str]] = Body(default=None),
     current_user: User = Depends(require_role(["ADMIN", "OPERATOR"])),
 ):
     """Enables or disables localized audio alerts for this camera (Requires ADMIN or OPERATOR role)."""
@@ -320,7 +321,41 @@ def set_camera_speaker_status(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Camera with ID '{camera_id}' not found.",
         )
-    enabled = bool(payload.get("enabled", True))
+    
+    # Robustly parse enabled status from schema, dict, string, or raw request body
+    enabled = True
+    if isinstance(payload, CameraSpeakerToggleRequest):
+        enabled = payload.enabled
+    elif isinstance(payload, dict):
+        enabled = bool(payload.get("enabled", True))
+    elif isinstance(payload, str):
+        try:
+            import json
+            parsed = json.loads(payload)
+            if isinstance(parsed, dict):
+                enabled = bool(parsed.get("enabled", True))
+            else:
+                enabled = payload.strip().lower() not in ("false", "0", "off", "no")
+        except Exception:
+            enabled = payload.strip().lower() not in ("false", "0", "off", "no")
+    else:
+        try:
+            body_bytes = await request.body()
+            if body_bytes:
+                import json
+                body_str = body_bytes.decode("utf-8").strip()
+                if body_str:
+                    try:
+                        parsed = json.loads(body_str)
+                        if isinstance(parsed, dict):
+                            enabled = bool(parsed.get("enabled", True))
+                        else:
+                            enabled = body_str.lower() not in ("false", "0", "off", "no")
+                    except Exception:
+                        enabled = body_str.lower() not in ("false", "0", "off", "no")
+        except Exception:
+            pass
+
     manager.set_camera_speaker(camera_id, enabled)
     return {
         "camera_id": camera_id,

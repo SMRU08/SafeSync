@@ -118,3 +118,52 @@ def test_mjpeg_stream_endpoint():
         assert b"Content-Type: image/jpeg\r\n" in first_chunk
     finally:
         manager.unregister_camera("test_stream_cam", delete_db=True)
+
+
+def test_camera_speaker_toggle_json_and_raw_string():
+    """Verifies POST /api/cameras/{id}/speaker works with JSON dict, raw string, and text/plain headers."""
+    manager = CameraManager.get_instance()
+    from app.camera.schemas import CameraConfigModel, CameraSourceType
+    cfg = CameraConfigModel(
+        id="test_speaker_cam",
+        name="Speaker Test",
+        source="synthetic://speaker",
+        source_type=CameraSourceType.SYNTHETIC,
+        enabled=True,
+        speaker_enabled=True,
+    )
+    try:
+        manager.register_camera(cfg, start_immediately=False, persist_db=False)
+
+        # 1. Turn OFF via standard JSON
+        resp1 = client.post("/api/cameras/test_speaker_cam/speaker", json={"enabled": False})
+        assert resp1.status_code == 200
+        assert resp1.json()["speaker_enabled"] is False
+        assert resp1.json()["speaker_status"] == "OFF"
+
+        # 2. Turn ON via raw text/plain string (simulating frontend fetch without Content-Type header)
+        resp2 = client.post(
+            "/api/cameras/test_speaker_cam/speaker",
+            content='{"enabled":true}',
+            headers={"Content-Type": "text/plain"},
+        )
+        assert resp2.status_code == 200
+        assert resp2.json()["speaker_enabled"] is True
+        assert resp2.json()["speaker_status"] == "ON"
+
+        # 3. Turn OFF via raw string with quotes
+        resp3 = client.post(
+            "/api/cameras/test_speaker_cam/speaker",
+            content='{"enabled":false}',
+            headers={"Content-Type": "text/plain"},
+        )
+        assert resp3.status_code == 200
+        assert resp3.json()["speaker_enabled"] is False
+        assert resp3.json()["speaker_status"] == "OFF"
+
+        # 4. Check GET /api/cameras/{id}/speaker
+        get_resp = client.get("/api/cameras/test_speaker_cam/speaker")
+        assert get_resp.status_code == 200
+        assert get_resp.json()["speaker_enabled"] is False
+    finally:
+        manager.unregister_camera("test_speaker_cam", delete_db=True)

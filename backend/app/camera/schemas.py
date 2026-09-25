@@ -5,7 +5,7 @@ Camera models, lifecycle states, and operational metrics schemas.
 
 from enum import Enum
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class CameraState(str, Enum):
@@ -86,3 +86,20 @@ class CameraStatus(BaseModel):
     metrics: CameraMetrics
     safe_source: str = Field(..., description="Sanitized source with passwords and credentials masked")
     ai_analysis: Optional[Dict[str, Any]] = Field(default=None)
+
+
+class CameraSpeakerToggleRequest(BaseModel):
+    enabled: bool = Field(default=True, description="Camera speaker audio alert status (ON/OFF)")
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_input(cls, data: Any) -> Any:
+        if isinstance(data, str):
+            try:
+                import json
+                parsed = json.loads(data)
+                if isinstance(parsed, dict):
+                    return parsed
+            except Exception:
+                pass
+        return data
