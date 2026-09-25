@@ -205,11 +205,16 @@ export function useSafetyData() {
   const handleWebSocketMessage = useCallback(
     (msg: WebSocketMessage) => {
       if (msg.type === 'event' && msg.event) {
-        // Handle dynamic AudioAlert voice synthesis
+        // Handle dynamic AudioAlert voice synthesis (Strictly Hindi Voice)
         if (msg.event === 'AudioAlert' && msg.payload) {
           const payload = msg.payload;
+          const shouldSpeak =
+            Boolean(payload.speaker_enabled) ||
+            Boolean(payload.bypass_speaker) ||
+            payload.action === 'CRITICAL_HAZARD_TRIGGERED';
+
           if (
-            payload.speaker_enabled &&
+            shouldSpeak &&
             payload.message &&
             typeof window !== 'undefined' &&
             'speechSynthesis' in window
@@ -217,8 +222,19 @@ export function useSafetyData() {
             try {
               window.speechSynthesis.cancel(); // Cancel any ongoing stutter
               const utterance = new SpeechSynthesisUtterance(payload.message);
-              utterance.rate = 1.0;
+              utterance.lang = 'hi-IN'; // Strictly Hindi voice format
+              utterance.rate = 0.95;
               utterance.pitch = 1.0;
+
+              // If browser provides native Hindi voice, attach it
+              const voices = window.speechSynthesis.getVoices();
+              const hindiVoice = voices.find(
+                (v) => v.lang.startsWith('hi') || v.name.toLowerCase().includes('hindi')
+              );
+              if (hindiVoice) {
+                utterance.voice = hindiVoice;
+              }
+
               window.speechSynthesis.speak(utterance);
             } catch {
               // Ignore browser audio restrictions

@@ -1,41 +1,72 @@
-# Environments
+# ==========================================
+# RAKSHYA VISION — Production .gitignore
+# ==========================================
+
+# Virtual Environments
 .venv/
+backend/.venv/
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
 
-# Python
+# Python & Caches
 __pycache__/
+backend/**/__pycache__/
 *.py[cod]
 *$py.class
 *.pytest_cache/
+backend/.pytest_cache/
 .coverage
 htmlcov/
+*.log
+backend/*.log
 
 # Node & Frontend
 node_modules/
+frontend/node_modules/
 dist/
+frontend/dist/
 build/
 .vite/
+frontend/.vite/
+*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment and secrets
+# Environment and Secrets
 .env
 .env.*
 !.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
 .env.local
 .env.*.local
 
-# Databases
+# Databases & Biometric Face Stores
 *.db
 *.db-shm
 *.db-wal
 *.sqlite
 *.sqlite3
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+data/
+backend/data/
+data/face_images/*
+backend/data/face_images/*
+!data/face_images/.gitkeep
+!backend/data/face_images/.gitkeep
 
-# Datasets (Raw, normalized, and processed binary images/labels)
+# Datasets
 datasets/raw/*
 !datasets/raw/.gitkeep
 datasets/normalized/*
@@ -44,9 +75,9 @@ datasets/processed/images/
 datasets/processed/labels/
 datasets/staging/
 
-# Models & Weights
-*.pt
+# Training artifacts & runs
 runs/
+*.pt
 models/**/*.pt
 models/**/*.pth
 models/**/*.onnx

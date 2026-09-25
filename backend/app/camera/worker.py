@@ -207,17 +207,29 @@ class CameraWorker:
                         except Exception as alert_err:
                             logger.warning("Alert processing error: %s", alert_err)
 
-            # 5. Core AI Audio-Alert Engine (Worker PPE Speech Alerts)
-            if compliance_resp and compliance_resp.workers:
-                try:
-                    from app.services.audio_alert_engine import AudioAlertEngine
+            # 5. Core AI Audio-Alert Engine (Fire/Smoke Critical Hazards & Worker PPE Alerts)
+            try:
+                from app.services.audio_alert_engine import AudioAlertEngine
+                # A. Critical Hazards (Fire & Smoke) -> Mandatory Speaker Bypass
+                if hazard_resp and hazard_resp.hazards:
+                    AudioAlertEngine.get_instance().evaluate_hazard(
+                        camera_id=self.camera_id,
+                        camera_name=self.config.name,
+                        speaker_enabled=self.speaker_enabled,
+                        hazards=hazard_resp.hazards,
+                    )
+
+                # B. Worker PPE Compliance Speech Alerts (Conditional on Speaker Status)
+                if compliance_resp and compliance_resp.workers:
                     AudioAlertEngine.get_instance().evaluate_frame_workers(
                         camera_id=self.camera_id,
+                        camera_name=self.config.name,
                         speaker_enabled=self.speaker_enabled,
                         workers=compliance_resp.workers,
+                        lang="hi",
                     )
-                except Exception as audio_err:
-                    logger.debug("Audio alert evaluation notice for %s: %s", self.camera_id, audio_err)
+            except Exception as audio_err:
+                logger.debug("Audio alert evaluation notice for %s: %s", self.camera_id, audio_err)
 
         except Exception as e:
             logger.error("Error in AI frame processing for %s: %s", self.camera_id, e, exc_info=True)
