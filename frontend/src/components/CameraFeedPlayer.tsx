@@ -27,6 +27,19 @@ interface CameraFeedPlayerProps {
   onRefresh?: () => void;
 }
 
+const getCameraShortTag = (camera?: CameraConfig | null): string => {
+  if (!camera) return 'C1';
+  const name = camera.name || camera.camera_id || '1';
+  const match = name.match(/camera[_\s]*([0-9a-zA-Z]+)/i) || (camera.camera_id && camera.camera_id.match(/camera_?([0-9a-zA-Z]+)/i));
+  if (match) {
+    const rawId = match[1].replace(/^0+/, '') || '1';
+    return `C${rawId.toUpperCase()}`;
+  }
+  const clean = name.trim();
+  if (/^[0-9]+$/.test(clean)) return `C${parseInt(clean, 10)}`;
+  return `C${clean.charAt(0).toUpperCase()}`;
+};
+
 export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   cameras,
   selectedCameraId,
@@ -171,17 +184,26 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   return (
     <div
       ref={containerRef}
-      className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col"
+      className="bg-[#0c1a2e] rounded-xl border border-slate-700 shadow-xl overflow-hidden flex flex-col"
     >
-      {/* Feed Header */}
-      <div className="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between bg-white">
+      {/* Feed Header — Dark Industrial SOC Style */}
+      <div className="px-4 py-2.5 border-b border-slate-700/80 flex items-center justify-between bg-[#111f35]">
         <div className="flex items-center gap-3">
           <span
-            className={`w-2.5 h-2.5 rounded-full ${
-              isCameraOnline ? 'bg-sky-500' : 'bg-rose-500'
+            className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+              isCameraOnline ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'
             }`}
           />
-          <span className="font-bold text-slate-800 text-xs tracking-tight">Live Camera Feed</span>
+          <div>
+            <span className="font-bold text-white text-xs tracking-tight">
+              {activeCamera.name || 'Live Camera Feed'}
+            </span>
+            {activeCamera.zone_id && (
+              <span className="ml-2 text-[9px] font-semibold text-sky-300 bg-sky-900/50 border border-sky-700/50 px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                {activeCamera.zone_id.replace(/_/g, ' ')}
+              </span>
+            )}
+          </div>
 
           {/* Camera Selector Dropdown */}
           <div className="relative">
@@ -193,7 +215,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                 onSelectCamera?.(newId);
                 setHasStreamError(false);
               }}
-              className="text-xs bg-slate-50 border border-slate-200 rounded-md py-1 pl-2.5 pr-7 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
+              className="text-xs bg-slate-800 border border-slate-600 text-slate-300 rounded-md py-1 pl-2.5 pr-7 font-medium focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
             >
               {cameras.length > 0 ? (
                 cameras.map((c) => (
@@ -215,7 +237,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> LIVE
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500 text-white tracking-wide">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-600 text-white tracking-wide">
               STANDBY
             </span>
           )}
@@ -223,7 +245,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           {/* Pause / Resume */}
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100 transition"
+            className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-700 transition"
             title={isPaused ? 'Resume Stream' : 'Pause Stream'}
           >
             {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
@@ -232,7 +254,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           {/* Manual Snapshot Trigger */}
           <button
             onClick={() => setSnapshotTimestamp(Date.now())}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100 transition"
+            className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-700 transition"
             title="Refresh Frame"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -241,7 +263,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           {/* Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100 transition"
+            className="p-1 text-slate-400 hover:text-white rounded hover:bg-slate-700 transition"
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
             {isFullscreen ? (
@@ -338,11 +360,11 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                 }}
               >
                 <div className={`w-full h-full border-2 ${borderColor} relative shadow-sm`}>
-                  {/* Worker ID Tag */}
+                  {/* Worker ID Tag — Shortened minimal format [Camera Initial]-[W][Worker_Number] */}
                   <div
                     className={`absolute -top-4 left-0 ${badgeBg} text-white text-[8px] font-bold px-1 rounded-t whitespace-nowrap`}
                   >
-                    Worker #{worker.track_id}
+                    {getCameraShortTag(activeCamera)}-W{worker.track_id}
                   </div>
 
                   {/* Itemized PPE Inspection Box */}
