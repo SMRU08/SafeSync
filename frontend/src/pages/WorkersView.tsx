@@ -25,6 +25,7 @@ import {
   Footprints,
   Download,
   Activity,
+  UserPlus,
 } from 'lucide-react';
 import { WorkerTrack, ComplianceSummary, PPEPresence } from '../types';
 import { API_BASE_URL } from '../utils/constants';
@@ -32,9 +33,10 @@ import { WorkerComplianceCard } from '../components/WorkerComplianceCard';
 
 interface WorkersViewProps {
   complianceConfig?: any;
+  onOpenEnrollModal?: () => void;
 }
 
-export const WorkersView: React.FC<WorkersViewProps> = () => {
+export const WorkersView: React.FC<WorkersViewProps> = ({ onOpenEnrollModal }) => {
   const [workers, setWorkers] = useState<WorkerTrack[]>([]);
   const [summary, setSummary] = useState<ComplianceSummary | null>(null);
   const [selectedWorker, setSelectedWorker] = useState<WorkerTrack | null>(null);
@@ -181,6 +183,16 @@ export const WorkersView: React.FC<WorkersViewProps> = () => {
             <RefreshCw className={`w-3.5 h-3.5 text-sky-600 ${isLoading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
+
+          {onOpenEnrollModal && (
+            <button
+              onClick={onOpenEnrollModal}
+              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 border border-emerald-700 text-xs font-bold text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>Enroll Worker</span>
+            </button>
+          )}
         </div>
       </div>
 

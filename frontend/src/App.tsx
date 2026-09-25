@@ -12,6 +12,7 @@ import { OverviewView } from './pages/OverviewView';
 import { LiveMonitoringView } from './pages/LiveMonitoringView';
 import { CamerasView } from './pages/CamerasView';
 import { WorkersView } from './pages/WorkersView';
+import { AttendanceView } from './pages/AttendanceView';
 import { HazardsView } from './pages/HazardsView';
 import { AlertsView } from './pages/AlertsView';
 import { AnalyticsView } from './pages/AnalyticsView';
@@ -19,6 +20,7 @@ import { SystemHealthView } from './pages/SystemHealthView';
 import { SettingsView } from './pages/SettingsView';
 import { AlertDetailModal } from './components/AlertDetailModal';
 import { IncidentDetailModal } from './components/IncidentDetailModal';
+import { WorkerRegistrationModal } from './components/WorkerRegistrationModal';
 import { useSafetyData } from './hooks/useSafetyData';
 import { useWebSocket } from './hooks/useWebSocket';
 import { Alert, Incident } from './types';
@@ -29,6 +31,7 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
 
   // Real-time backend data & WebSocket hooks
   const {
@@ -233,9 +236,15 @@ export const App: React.FC = () => {
           )}
 
           {activeTab === 'workers' && (
-            <WorkersView complianceConfig={complianceConfig} />
+            <WorkersView
+              complianceConfig={complianceConfig}
+              onOpenEnrollModal={() => setIsEnrollModalOpen(true)}
+            />
           )}
 
+          {activeTab === 'attendance' && (
+            <AttendanceView cameras={cameras} />
+          )}
           {activeTab === 'hazards' && (
             <HazardsView hazards={hazards} hazardConfig={hazardConfig} />
           )}
@@ -292,6 +301,14 @@ export const App: React.FC = () => {
         }}
         onAcknowledgeIncident={handleAcknowledgeIncident}
         onResolveIncident={handleResolveIncident}
+      />
+      {/* ─── Worker Biometric Enrollment Modal ───────────────────────────── */}
+      <WorkerRegistrationModal
+        isOpen={isEnrollModalOpen}
+        onClose={() => setIsEnrollModalOpen(false)}
+        onSuccess={() => {
+          setIsEnrollModalOpen(false);
+        }}
       />
     </div>
   );

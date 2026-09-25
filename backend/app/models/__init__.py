@@ -15,6 +15,7 @@ try:
     )
     from app.models.evidence import EvidenceItem
     from app.models.camera import CameraModel
+    from app.models.worker_face import RegisteredWorker, AttendanceLog
 except ImportError:
     from backend.app.models.compliance import (
         WorkerTracking,
@@ -32,6 +33,7 @@ except ImportError:
     )
     from backend.app.models.evidence import EvidenceItem
     from backend.app.models.camera import CameraModel
+    from backend.app.models.worker_face import RegisteredWorker, AttendanceLog
 
 __all__ = [
     "WorkerTracking",
@@ -44,4 +46,6 @@ __all__ = [
     "AlertHistory",
     "EvidenceItem",
     "CameraModel",
+    "RegisteredWorker",
+    "AttendanceLog",
 ]

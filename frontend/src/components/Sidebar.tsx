@@ -16,6 +16,7 @@ import {
   Activity,
   Settings,
   Shield,
+  UserCheck,
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -23,6 +24,7 @@ export type ActiveTab =
   | 'live-monitor'
   | 'cameras'
   | 'workers'
+  | 'attendance'
   | 'hazards'
   | 'alerts'
   | 'analytics'
@@ -87,7 +89,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span>Workers &amp; PPE</span>
         </button>
 
-        {/* 5. Fire & Smoke */}
+        {/* 5. Attendance & Face Recognition */}
+        <button
+          onClick={() => onTabChange('attendance')}
+          className={`w-full text-left ${getNavClass('attendance')}`}
+        >
+          <UserCheck className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+          <span>Attendance</span>
+        </button>
+
+        {/* 6. Fire & Smoke */}
         <button
           onClick={() => onTabChange('hazards')}
           className={`w-full text-left ${getNavClass('hazards')}`}
@@ -96,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span>Fire &amp; Smoke</span>
         </button>
 
-        {/* 6. Alerts & Incidents */}
+        {/* 7. Alerts & Incidents */}
         <button
           onClick={() => onTabChange('alerts')}
           className={`w-full text-left justify-between ${getNavClass('alerts')}`}
