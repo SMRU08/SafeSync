@@ -306,6 +306,7 @@ export const App: React.FC = () => {
       <WorkerRegistrationModal
         isOpen={isEnrollModalOpen}
         onClose={() => setIsEnrollModalOpen(false)}
+        cameras={cameras}
         onSuccess={() => {
           setIsEnrollModalOpen(false);
         }}

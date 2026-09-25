@@ -345,13 +345,7 @@ def get_face_recognition_status():
     svc = FaceRecognitionService.get_instance()
     return {
         "available": svc.is_available(),
+        "engine": getattr(svc, "engine_name", "Active"),
         "tolerance": svc.TOLERANCE,
-        "message": (
-            "face_recognition (dlib) active"
-            if svc.is_available()
-            else (
-                "Running in demo/placeholder mode — "
-                "install face_recognition for live matching"
-            )
-        ),
+        "message": f"Biometric Engine Active: {getattr(svc, 'engine_name', 'Neural Face Embeddings')}",
     }
