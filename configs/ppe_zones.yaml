@@ -1,0 +1,101 @@
+# configs/ppe_zones.yaml — RAKSHYA VISION PS06 Compliance
+# Zone-Specific PPE Policy Configuration
+# ──────────────────────────────────────────────────────────────────
+# PS06 Requirement: "gloves where applicable"
+# Each camera zone can independently define which PPE items are:
+#   required  → ABSENT state generates a P2 violation alert
+#   optional  → monitored and displayed but ABSENT state does NOT generate violation
+#   disabled  → not monitored for this zone
+#
+# If a camera_id has no entry here, the global compliance.yaml policy applies.
+# ──────────────────────────────────────────────────────────────────
+
+zones:
+  # Production Floor — Full PPE required including gloves (heavy machinery)
+  production_floor:
+    zone_name: "Production Floor"
+    required_ppe:
+      helmet: true
+      safety_vest: true
+      gloves: true
+      safety_footwear: true
+    optional_ppe: []
+    disabled_ppe: []
+    notes: "Full PPE mandatory. Heavy machinery operation zone."
+
+  # Storage Area — Gloves optional (administrative handling, no chemical/machinery risk)
+  storage_area:
+    zone_name: "Storage Area"
+    required_ppe:
+      helmet: true
+      safety_vest: true
+      gloves: false       # optional in this zone
+      safety_footwear: true
+    optional_ppe:
+      - gloves
+    disabled_ppe: []
+    notes: "Gloves optional — standard warehouse storage, no heavy machinery."
+
+  # Electrical Room — All PPE required (high-voltage hazard, arc flash risk)
+  electrical_room:
+    zone_name: "Electrical Room"
+    required_ppe:
+      helmet: true
+      safety_vest: true
+      gloves: true
+      safety_footwear: true
+    optional_ppe: []
+    disabled_ppe: []
+    notes: "High-voltage zone. All PPE mandatory. Arc flash risk."
+
+  # Loading Dock — Gloves optional (outdoor logistics, no chemical contact)
+  loading_dock:
+    zone_name: "Loading Dock"
+    required_ppe:
+      helmet: true
+      safety_vest: true
+      gloves: false
+      safety_footwear: true
+    optional_ppe:
+      - gloves
+    disabled_ppe: []
+    notes: "Outer logistics bay. Gloves optional unless handling hazardous materials."
+
+  # Welding Area — All PPE required (heat, sparks, UV radiation)
+  welding_area:
+    zone_name: "Welding Area"
+    required_ppe:
+      helmet: true
+      safety_vest: true
+      gloves: true
+      safety_footwear: true
+    optional_ppe: []
+    disabled_ppe: []
+    notes: "Welding zone. Heat and UV risk. Full PPE mandatory."
+
+  # Administrative / Office — Safety footwear optional
+  office:
+    zone_name: "Administrative Area"
+    required_ppe:
+      helmet: false
+      safety_vest: false
+      gloves: false
+      safety_footwear: false
+    optional_ppe:
+      - safety_footwear
+    disabled_ppe:
+      - helmet
+      - safety_vest
+      - gloves
+    notes: "Office/admin area. No industrial PPE required."
+
+# Default fallback policy (used when zone_id is not found in the above map)
+default_policy:
+  required_ppe:
+    helmet: true
+    safety_vest: true
+    gloves: true
+    safety_footwear: true
+  optional_ppe: []
+  disabled_ppe: []
+  notes: "Default: all PPE required when zone is not specifically configured."

@@ -157,3 +157,43 @@ async def analyze_video(
     finally:
         if os.path.exists(temp_input_path):
             os.remove(temp_input_path)
+
+
+@router.get(
+    "/ppe-zones",
+    tags=["Worker Tracking & PPE Compliance"],
+    summary="Zone-Specific PPE Policy",
+    description=(
+        "Returns the configured PPE requirements per factory zone. "
+        "Implements PS06 'gloves where applicable' requirement. "
+        "Each zone lists PPE items as: required (generates violation), "
+        "optional (monitored but no violation), or disabled (not monitored)."
+    ),
+)
+def get_ppe_zone_policies():
+    """
+    Returns all zone-specific PPE requirement configurations.
+    Use this to understand which PPE items are required, optional, or disabled per zone.
+    """
+    try:
+        try:
+            from app.ai.compliance.ppe_policy import ZonePPEPolicyEngine
+        except ImportError:
+            from backend.app.ai.compliance.ppe_policy import ZonePPEPolicyEngine
+
+        engine = ZonePPEPolicyEngine.get_instance()
+        zones = engine.list_all_zones()
+        return {
+            "total_zones": len([z for z in zones if z.get("zone_id") != "default"]),
+            "zones": zones,
+            "ps06_note": (
+                "Zone-specific PPE policy implements PS06 'gloves where applicable' requirement. "
+                "Only REQUIRED PPE items generate P2 violation alerts when ABSENT."
+            ),
+        }
+    except Exception as exc:
+        logger.error("Failed to load zone PPE policy: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to load zone PPE policy: {exc}",
+        )

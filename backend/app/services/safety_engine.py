@@ -45,6 +45,7 @@ try:
     from app.services.alert_engine import AlertEngine
     from app.services.event_normalizer import EventNormalizer
     from app.services.event_broadcaster import broadcaster
+    from app.ai.compliance.ppe_policy import ZonePPEPolicyEngine
 except ImportError:
     from backend.app.ai.risk.schemas import (
         EventType,
@@ -71,6 +72,7 @@ except ImportError:
     from backend.app.services.alert_engine import AlertEngine
     from backend.app.services.event_normalizer import EventNormalizer
     from backend.app.services.event_broadcaster import broadcaster
+    from backend.app.ai.compliance.ppe_policy import ZonePPEPolicyEngine
 
 logger = logging.getLogger("safety_engine")
 
@@ -207,25 +209,44 @@ class SafetyEngine:
         zone_id: str,
     ) -> List[NormalizedSafetyEvent]:
         """
-        Rule 4: Confirmed PPE Violation -> SAFETY_VIOLATION (P2, Visual Dashboard Alert, NO Audible Siren).
-        Rule 5: Unknown PPE State -> Strictly NO violation generated for UNKNOWN state (UNKNOWN != ABSENT).
+        Rule 4: Confirmed PPE Violation → SAFETY_VIOLATION (P2, Visual Dashboard Alert, NO Audible Siren).
+        Rule 5: Unknown PPE State → Strictly NO violation generated for UNKNOWN state (UNKNOWN != ABSENT).
+
+        Zone-aware: Only PPE items that are REQUIRED in the worker's zone generate violations.
+        Optional PPE (e.g., gloves in storage_area) are monitored but do NOT generate violations.
+        Disabled PPE items are silently ignored.
         """
         events: List[NormalizedSafetyEvent] = []
         now_iso = datetime.now(timezone.utc).isoformat()
+
+        # Resolve zone-specific PPE policy (PS06: "gloves where applicable")
+        try:
+            zone_policy = ZonePPEPolicyEngine.get_instance().get_policy_for_zone(zone_id)
+        except Exception:
+            zone_policy = None
 
         for worker in workers:
             for item_name, obs in worker.ppe_details.items():
                 # Rule 5: UNKNOWN state NEVER generates a violation
                 if obs.state == PPEState.UNKNOWN:
-                    logger.debug("Rule 5: Worker %s item %s is UNKNOWN -> No violation.", worker.track_id, item_name)
+                    logger.debug("Rule 5: Worker %s item %s is UNKNOWN → No violation.", worker.track_id, item_name)
                     continue
 
-                # Present state also never generates a violation
+                # Present state never generates a violation
                 if obs.state == PPEState.PRESENT:
                     continue
 
-                # Rule 4: Confirmed ABSENT state generates visual P2 violation
+                # Rule 4: Confirmed ABSENT state — check zone policy before generating violation
                 if obs.state == PPEState.ABSENT:
+                    # Zone-aware policy check (PS06 §7: "gloves where applicable")
+                    if zone_policy is not None and not zone_policy.is_required(item_name):
+                        logger.debug(
+                            "Rule 4 Zone-Policy: Worker %s item %s is ABSENT in zone '%s' "
+                            "but policy=%s → No violation generated.",
+                            worker.track_id, item_name, zone_id, zone_policy.get_policy(item_name)
+                        )
+                        continue  # Optional or disabled PPE: no violation
+
                     ev_type = EventType.PPE_VIOLATION
                     if obs.item_type == PPEItemType.HELMET:
                         ev_type = EventType.MISSING_HELMET
@@ -254,12 +275,14 @@ class SafetyEngine:
                             "audible": False,  # Visual alert only, avoiding siren fatigue
                             "consecutive_missed": obs.consecutive_missed,
                             "worker_bbox": [worker.bbox.x1, worker.bbox.y1, worker.bbox.x2, worker.bbox.y2],
+                            "zone_policy": zone_policy.get_policy(item_name) if zone_policy else "required",
                         },
                         source="safety_engine_rule_4",
                     )
                     events.append(ev)
 
         return events
+
 
     def enforce_rule_6_camera_offline(
         self,
