@@ -15,7 +15,6 @@ import {
   BarChart3,
   Activity,
   Settings,
-  Shield,
   UserCheck,
 } from 'lucide-react';
 
@@ -151,13 +150,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </nav>
 
-      {/* Sidebar Footer Safety Card */}
       <div className="p-3">
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-b from-[#162744] to-[#0f1c30] p-3 border border-slate-700/60 shadow-lg">
           <div className="relative z-10 flex flex-col gap-2">
-            <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-400/20 flex items-center justify-center text-sky-400">
-              <Shield className="w-4 h-4" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="RAKSHYA VISION"
+              className="w-12 h-12 object-contain rounded-lg"
+            />
             <div>
               <p className="text-[10px] font-semibold text-slate-200 leading-snug">
                 Safer People<br />
@@ -166,11 +166,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </p>
             </div>
             <div className="pt-2 border-t border-slate-700/50 flex items-center gap-2">
-              <div className="w-4 h-4 rounded text-sky-400 flex items-center justify-center">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-                </svg>
-              </div>
               <div>
                 <p className="text-[9px] font-bold text-slate-300">RAKSHYA VISION</p>
                 <p className="text-[8px] text-slate-500">v1.0.0 Team XERSES</p>

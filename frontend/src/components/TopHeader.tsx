@@ -68,12 +68,11 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
       {/* Brand / Logo Area */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-700 to-cyan-500 flex items-center justify-center text-white shadow-sm shadow-cyan-500/20">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 9.07-7 10.18-3.87-1.11-7-5.51-7-10.18V6.3l7-3.12z" />
-              <path d="M12 6a4 4 0 100 8 4 4 0 000-8zm0 6a2 2 0 110-4 2 2 0 010 4z" />
-            </svg>
-          </div>
+          <img
+            src="/logo.png"
+            alt="RAKSHYA VISION Logo"
+            className="w-10 h-10 object-contain rounded-lg drop-shadow-md"
+          />
           <div>
             <h1 className="text-sm font-extrabold tracking-tight text-slate-900 leading-none flex items-center gap-1">
               RAKSHYA <span className="text-sky-600">VISION</span>
