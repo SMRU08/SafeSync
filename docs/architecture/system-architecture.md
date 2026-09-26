@@ -119,3 +119,21 @@ The Ingestion Layer manages video inputs across heterogeneous protocols and phys
 - **WebSocket Broadcast Channel:** Bi-directional WebSocket stream (`/ws/alerts`, `/ws/events`) providing live incident feeds and health heartbeats.
 - **React 18 SOC Dashboard:** Modern Security Operations Center dashboard built with TypeScript, Vite, and Tailwind CSS. Displays real-time camera grids, worker compliance cards, thermal/hazard indicators, and administrative audit views.
 - **External Notification Providers:** Non-blocking dispatch via HTTP Webhooks (with HMAC-SHA256 signatures) and SMTP Email notifications.
+
+---
+
+## 3. System Role Clarification — Visual Intelligence Complement
+
+> **SafeSync is a visual intelligence layer that complements conventional safety infrastructure. It does NOT replace physical fire alarms, smoke detectors, ionization sensors, or sprinkler systems.**
+
+SafeSync adds capabilities that conventional alarm systems cannot provide:
+
+| Conventional Alarm | SafeSync Addition |
+|---|---|
+| Detects fire/smoke via thermal or ionization | **Visual confirmation** — identifies the precise camera zone where fire/smoke appears |
+| Binary alarm output (on/off) | **Contextual intelligence** — which workers are in the affected area, how many, and their PPE status |
+| Activates after ceiling-level smoke reaches sensor | **Early visual detection** — identifies smoke plumes at camera field-of-view level |
+| No PPE monitoring | **Continuous PPE compliance** — real-time per-worker helmet, vest, gloves, footwear tracking |
+| No incident timeline | **Auditable evidence** — SHA-256-verified annotated snapshot archive with incident lifecycle |
+
+**Deployment principle:** SafeSync must always be deployed *alongside* existing certified safety infrastructure. Its alerts complement operator awareness; evacuation and suppression procedures must follow established emergency response protocols.

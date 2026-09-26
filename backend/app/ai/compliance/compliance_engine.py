@@ -111,6 +111,7 @@ class WorkerComplianceEngine:
         frame: np.ndarray,
         confidence_threshold: float = 0.20,
         annotate: bool = True,
+        zone_id: str = "UNKNOWN",
     ) -> Tuple[ComplianceAnalysisResponse, np.ndarray, Dict[str, float]]:
         """
         Processes a single video or camera frame.
@@ -196,6 +197,7 @@ class WorkerComplianceEngine:
                 confidence=conf,
                 associations=associations.get(tid, {}),
                 is_occluded_flags=occl_flags,
+                zone_id=zone_id,
             )
             worker_tracks.append(worker_obj)
 

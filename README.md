@@ -51,6 +51,8 @@ In industrial operations, manufacturing sites, and construction zones, personal 
 
 **SafeSync** bridges this gap by providing an intelligent, automated visual monitoring layer that operates continuously across multi-camera streams with deterministic governance.
 
+> **⚠️ System Role Clarification:** SafeSync is a **visual intelligence complement** to — not a replacement for — conventional fire alarms, smoke detectors, and physical safety systems. SafeSync adds visual context (worker identities, exact locations, annotated incident frames, and risk scores) that conventional alarm systems cannot provide, enabling faster and better-informed emergency response. Physical safety infrastructure must always remain in place alongside this platform.
+
 ---
 
 ## 3. Key Features

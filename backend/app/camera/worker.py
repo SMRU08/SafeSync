@@ -132,6 +132,7 @@ class CameraWorker:
                 frame,
                 confidence_threshold=0.20,
                 annotate=True,
+                zone_id=self.config.zone_id or "UNKNOWN",
             )
 
             # 2. Hazard analysis inference (fire and smoke)

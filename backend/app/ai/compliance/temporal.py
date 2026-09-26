@@ -93,9 +93,11 @@ class TemporalComplianceTracker:
         confidence: float,
         associations: Dict[str, Optional[Dict[str, Any]]],
         is_occluded_flags: Dict[PPEItemType, bool],
+        zone_id: Optional[str] = None,
     ) -> WorkerTrack:
         """
         Updates temporal state for a single tracked worker.
+        Zone-aware: respects zone-specific required/optional/disabled PPE policies.
         """
         self._init_track_if_needed(track_id)
         self._last_seen_frame[track_id] = self.current_frame
@@ -203,12 +205,29 @@ class TemporalComplianceTracker:
         # 1. NON_COMPLIANT if ANY required PPE is confirmed ABSENT with temporal evidence
         # 2. COMPLIANT if ALL required PPE are confirmed PRESENT
         # 3. UNKNOWN if any required PPE is UNKNOWN and no item is confirmed ABSENT
+        # Optional/Disabled PPE in this zone does NOT trigger NON_COMPLIANT.
         overall_status = OverallComplianceState.COMPLIANT
 
         has_absent = False
         has_unknown = False
 
-        for item_type, is_req in self.required_ppe.items():
+        # Resolve active required policy per zone (PS06: "gloves where applicable")
+        active_required = dict(self.required_ppe)
+        if zone_id:
+            try:
+                try:
+                    from app.ai.compliance.ppe_policy import ZonePPEPolicyEngine
+                except ImportError:
+                    from backend.app.ai.compliance.ppe_policy import ZonePPEPolicyEngine
+                policy = ZonePPEPolicyEngine.get_instance().get_policy_for_zone(zone_id)
+                active_required = {
+                    item_type: policy.is_required(item_type.value)
+                    for item_type in PPEItemType
+                }
+            except Exception:
+                active_required = dict(self.required_ppe)
+
+        for item_type, is_req in active_required.items():
             if not is_req:
                 continue
             item_state = ppe_summary[item_type.value]
