@@ -1,0 +1,83 @@
+{
+  "datasets": [
+    {
+      "name": "D-Fire",
+      "source_url": "https://github.com/gaia-solutions-on-demand/DFireDataset",
+      "license": "CC0 1.0 Universal (Public Domain)",
+      "commercial_use_allowed": true,
+      "hackathon_use_allowed": true,
+      "status": "LOCAL_VERIFIED",
+      "format": "YOLO format (normalized cx, cy, w, h)",
+      "raw_dir": "datasets/raw/d_fire/fire_smoke",
+      "classes": {
+        "0": "fire",
+        "1": "smoke"
+      },
+      "total_images": 4631,
+      "train_images": 4175,
+      "val_images": 354,
+      "test_images": 102,
+      "fire_boxes": 5333,
+      "smoke_boxes": 5373,
+      "total_boxes": 10706,
+      "negative_images_present": 0
+    },
+    {
+      "name": "DataCluster Fire & Smoke Dataset",
+      "source_url": "https://github.com/datacluster-labs/Fire-and-Smoke-Dataset",
+      "kaggle_url": "https://www.kaggle.com/dataclusterlabs/fire-and-smoke-dataset",
+      "license": "Proprietary / Commercial Inquiry required",
+      "commercial_use_allowed": false,
+      "hackathon_use_allowed": false,
+      "status": "BLOCKED_COMMERCIAL_INQUIRY",
+      "notes": "GitHub repository contains only README.md pointing to sales@datacluster.ai. Kaggle mirror requires authentication keys.",
+      "download_failure_reason": "No public download without commercial sales approval or authenticated Kaggle credentials."
+    },
+    {
+      "name": "DFS Fire/Smoke Dataset",
+      "source_url": "https://github.com/siyuanwu/DFS-FIRE-SMOKE-Dataset",
+      "license": "Academic research citation requested",
+      "commercial_use_allowed": false,
+      "hackathon_use_allowed": false,
+      "status": "MANUAL_AUTH_REQUIRED",
+      "notes": "Hosted on Baidu Pan (pass: pnxx) and Microsoft OneDrive requiring interactive web login and manual CAPTCHA.",
+      "download_failure_reason": "Automated download failed due to interactive Baidu/OneDrive authentication barriers."
+    },
+    {
+      "name": "DeepQuestAI Fire-Smoke Dataset",
+      "source_url": "https://github.com/DeepQuestAI/Fire-Smoke-Dataset",
+      "license": "Unspecified / Missing LICENSE file",
+      "commercial_use_allowed": false,
+      "hackathon_use_allowed": false,
+      "status": "LICENSE_UNSPECIFIED",
+      "notes": "Dataset is classification-only (ResNet-50) without bounding box annotations, lacking explicit LICENSE.",
+      "download_failure_reason": "No bounding box annotations available; classification folders only; license unspecified."
+    },
+    {
+      "name": "UFSC Computer Vision Fire/Smoke",
+      "source_url": "https://github.com/weslleyskah/computer_vision_ufsc",
+      "license": "Unknown",
+      "commercial_use_allowed": false,
+      "hackathon_use_allowed": false,
+      "status": "NOT_FOUND_404",
+      "notes": "Repository returns HTTP 404. Author repository was deleted, privatized, or relocated.",
+      "download_failure_reason": "HTTP 404: Repository does not exist."
+    },
+    {
+      "name": "SafeSync Industrial Hard Negatives (Curated)",
+      "source_url": "Local Industrial & Construction Datasets (SafeSync)",
+      "license": "CC BY 4.0 / Public Domain (internal source datasets)",
+      "commercial_use_allowed": true,
+      "hackathon_use_allowed": true,
+      "status": "LOCAL_VERIFIED",
+      "format": "YOLO format (empty .txt labels)",
+      "notes": "Hard negatives: orange/red safety clothing, welding light, dust, steam, white walls, and bright industrial lighting with ZERO fire/smoke.",
+      "target_curation": {
+        "train": 500,
+        "val": 70,
+        "test": 30,
+        "total": 600
+      }
+    }
+  ]
+}

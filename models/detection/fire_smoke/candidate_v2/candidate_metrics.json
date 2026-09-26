@@ -1,0 +1,46 @@
+{
+  "experiment": "hazard_candidate_v2",
+  "evaluated_utc": "2026-09-26T17:15:24.736700+00:00",
+  "sha256": "8b4034368a90fcafc5efb3b3c591c854bea4b5de3d8e843524e4b9acce832e13",
+  "training_time_seconds": 543.98,
+  "val": {
+    "all": {
+      "precision": 0.5281,
+      "recall": 0.0599,
+      "mAP50": 0.0123,
+      "mAP50_95": 0.0033
+    },
+    "fire": {
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.001,
+      "mAP50_95": 0.0002
+    },
+    "smoke": {
+      "precision": 0.0561,
+      "recall": 0.1197,
+      "mAP50": 0.0235,
+      "mAP50_95": 0.0063
+    }
+  },
+  "test": {
+    "all": {
+      "precision": 0.5616,
+      "recall": 0.1444,
+      "mAP50": 0.0365,
+      "mAP50_95": 0.012
+    },
+    "fire": {
+      "precision": 1.0,
+      "recall": 0.0,
+      "mAP50": 0.0022,
+      "mAP50_95": 0.0006
+    },
+    "smoke": {
+      "precision": 0.1232,
+      "recall": 0.2889,
+      "mAP50": 0.0708,
+      "mAP50_95": 0.0234
+    }
+  }
+}

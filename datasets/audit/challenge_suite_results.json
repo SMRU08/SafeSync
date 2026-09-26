@@ -1,0 +1,190 @@
+{
+  "baseline": {
+    "steam": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "dust": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "fog": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "vehicle_exhaust": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "welding": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "sunlight": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "reflections": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "white_walls": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "orange_red_clothing": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "industrial_lighting": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "cctv_compression": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "motion_blur": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "small_distant_smoke": {
+      "is_positive_scenario": true,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "small_distant_fire": {
+      "is_positive_scenario": true,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "real_industrial_scene": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    }
+  },
+  "candidate": {
+    "steam": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 69,
+      "false_positive": true
+    },
+    "dust": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "fog": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "vehicle_exhaust": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 16,
+      "false_positive": true
+    },
+    "welding": {
+      "is_positive_scenario": false,
+      "fire_detections": 1,
+      "smoke_detections": 0,
+      "false_positive": true
+    },
+    "sunlight": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "reflections": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 34,
+      "false_positive": true
+    },
+    "white_walls": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "orange_red_clothing": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 79,
+      "false_positive": true
+    },
+    "industrial_lighting": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 79,
+      "false_positive": true
+    },
+    "cctv_compression": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 89,
+      "false_positive": true
+    },
+    "motion_blur": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 0,
+      "false_positive": false
+    },
+    "small_distant_smoke": {
+      "is_positive_scenario": true,
+      "fire_detections": 0,
+      "smoke_detections": 22,
+      "false_positive": false
+    },
+    "small_distant_fire": {
+      "is_positive_scenario": true,
+      "fire_detections": 0,
+      "smoke_detections": 101,
+      "false_positive": false
+    },
+    "real_industrial_scene": {
+      "is_positive_scenario": false,
+      "fire_detections": 0,
+      "smoke_detections": 20,
+      "false_positive": true
+    }
+  },
+  "summary": {
+    "baseline_false_positives": 0,
+    "candidate_false_positives": 8
+  }
+}
