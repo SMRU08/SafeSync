@@ -8,8 +8,8 @@ export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type AlertStatus = 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED' | 'DISMISSED';
 export type IncidentStatus = 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED' | 'DISMISSED';
 export type PPEPresence = 'PRESENT' | 'ABSENT' | 'UNKNOWN';
-export type HazardState = 'NO_HAZARD' | 'SUSPECTED' | 'CONFIRMED' | 'CLEARED';
-export type HazardRelationship = 'NO_HAZARD' | 'ISOLATED_FIRE' | 'ISOLATED_SMOKE' | 'FIRE_WITH_SMOKE_PLUME' | 'SMOKE_PRECEDING_FIRE';
+export type HazardState = 'NO_HAZARD' | 'CANDIDATE' | 'DETECTING' | 'CONFIRMED' | 'ACTIVE' | 'CLEARING' | 'CLEARED' | 'SUSPECTED';
+export type HazardRelationship = 'NO_HAZARD' | 'ISOLATED_FIRE' | 'ISOLATED_SMOKE' | 'FIRE_WITH_SMOKE_PLUME' | 'SMOKE_PRECEDING_FIRE' | 'FIRE_ONLY' | 'SMOKE_ONLY' | 'FIRE_AND_SMOKE';
 
 export interface RiskSummary {
   active_alerts: number;

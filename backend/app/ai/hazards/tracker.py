@@ -53,6 +53,7 @@ def compute_center_distance_norm(
 class HazardTrack:
     """
     State container for an individual hazard event.
+    Tracks detection history, normalized centroid trajectory, and spatial stability.
     """
 
     def __init__(
@@ -64,6 +65,7 @@ class HazardTrack:
         frame_idx: int,
         camera_id: str,
         zone_id: str,
+        frame_shape: Tuple[int, int] = (480, 640),
     ):
         self.event_id = event_id
         self.hazard_type = hazard_type
@@ -72,6 +74,7 @@ class HazardTrack:
 
         self.last_bbox = bbox.copy()
         self.last_confidence = float(confidence)
+        self.raw_model_confidence = float(confidence)
         self.confidences: List[float] = [float(confidence)]
 
         now = datetime.now(timezone.utc)
@@ -87,9 +90,23 @@ class HazardTrack:
         self.unseen_streak = 0
         self.is_active = True
 
-    def update(self, bbox: np.ndarray, confidence: float, frame_idx: int, zone_id: str):
+        # Normalized centroid history [cx_norm, cy_norm] in [0.0, 1.0]
+        frame_h, frame_w = frame_shape[:2]
+        cx = ((bbox[0] + bbox[2]) / 2.0) / max(1.0, float(frame_w))
+        cy = ((bbox[1] + bbox[3]) / 2.0) / max(1.0, float(frame_h))
+        self.centroid_history: List[Tuple[float, float]] = [(cx, cy)]
+
+    def update(
+        self,
+        bbox: np.ndarray,
+        confidence: float,
+        frame_idx: int,
+        zone_id: str,
+        frame_shape: Tuple[int, int] = (480, 640),
+    ):
         self.last_bbox = bbox.copy()
         self.last_confidence = float(confidence)
+        self.raw_model_confidence = float(confidence)
         self.confidences.append(float(confidence))
         self.last_seen = datetime.now(timezone.utc)
         self.last_frame = frame_idx
@@ -97,6 +114,14 @@ class HazardTrack:
         self.unseen_streak = 0
         if zone_id and zone_id != "UNKNOWN":
             self.zone_id = zone_id
+
+        # Update normalized centroid history
+        frame_h, frame_w = frame_shape[:2]
+        cx = ((bbox[0] + bbox[2]) / 2.0) / max(1.0, float(frame_w))
+        cy = ((bbox[1] + bbox[3]) / 2.0) / max(1.0, float(frame_h))
+        self.centroid_history.append((cx, cy))
+        if len(self.centroid_history) > 60:
+            self.centroid_history.pop(0)
 
     def mark_missed(self):
         self.missed_frames += 1
@@ -126,6 +151,33 @@ class HazardTrack:
     def duration_seconds(self) -> float:
         delta = (self.last_seen - self.first_seen).total_seconds()
         return max(0.0, float(delta))
+
+    @property
+    def spatial_consistency_score(self) -> float:
+        """
+        Computes spatial stability score between 0.0 (random jumps) and 1.0 (stable).
+        Evaluates inter-frame centroid displacement.
+        """
+        if len(self.centroid_history) < 2:
+            return 1.0
+        jumps = []
+        for i in range(1, len(self.centroid_history)):
+            p0 = self.centroid_history[i - 1]
+            p1 = self.centroid_history[i]
+            dist = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+            jumps.append(dist)
+        avg_jump = float(np.mean(jumps))
+        # Exponential decay: avg_jump=0.0 -> 1.0; avg_jump=0.15 -> 0.47; avg_jump=0.30 -> 0.22
+        score = math.exp(-avg_jump * 5.0)
+        return float(np.clip(score, 0.0, 1.0))
+
+    @property
+    def validated_confidence(self) -> float:
+        """
+        Calculates confirmation-weighted confidence score.
+        Combines model confidence, temporal persistence, and spatial coherence.
+        """
+        return float(self.average_confidence * self.persistence_ratio * self.spatial_consistency_score)
 
 
 class SpatialHazardTracker:
@@ -199,6 +251,7 @@ class SpatialHazardTracker:
                         frame_idx=frame_idx,
                         camera_id=camera_id,
                         zone_id=d.get("zone_id", "UNKNOWN"),
+                        frame_shape=(frame_h, frame_w),
                     )
                     self.active_tracks.append(new_track)
                 continue
@@ -234,6 +287,7 @@ class SpatialHazardTracker:
                         confidence=det["confidence"],
                         frame_idx=frame_idx,
                         zone_id=det.get("zone_id", "UNKNOWN"),
+                        frame_shape=(frame_h, frame_w),
                     )
                     matched_track_indices.add(r)
                     matched_det_indices.add(c)
@@ -255,6 +309,7 @@ class SpatialHazardTracker:
                         frame_idx=frame_idx,
                         camera_id=camera_id,
                         zone_id=det.get("zone_id", "UNKNOWN"),
+                        frame_shape=(frame_h, frame_w),
                     )
                     self.active_tracks.append(new_track)
 

@@ -182,7 +182,15 @@ export const HazardsView: React.FC<HazardsViewProps> = ({ hazards, hazardConfig:
                       <div className="text-xs text-muted">{h.camera_id}</div>
                     </td>
                     <td>
-                      <span className={`badge ${h.state === 'CONFIRMED' ? 'badge-error' : 'badge-warning'}`}>
+                      <span className={`badge ${
+                        h.state === 'CONFIRMED' || h.state === 'ACTIVE'
+                          ? 'badge-error'
+                          : h.state === 'DETECTING' || h.state === 'SUSPECTED'
+                          ? 'badge-warning'
+                          : h.state === 'CANDIDATE'
+                          ? 'badge-info'
+                          : 'badge-neutral'
+                      }`}>
                         {h.state}
                       </span>
                     </td>

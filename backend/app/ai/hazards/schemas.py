@@ -1,7 +1,12 @@
 """
-schemas.py — SafeSync Phase 6
+schemas.py — SafeSync Phase 6 v2
 Pydantic schemas for Fire & Smoke Hazard Analysis.
-Strictly decoupled from PPE compliance and risk scoring.
+
+Extended HazardState with a 7-state pipeline:
+  NO_HAZARD → CANDIDATE → DETECTING → CONFIRMED → ACTIVE → CLEARING → CLEARED
+
+Only CONFIRMED / ACTIVE states generate emergency incidents.
+CANDIDATE and DETECTING are internal validation stages — no alerts.
 """
 
 from enum import Enum
@@ -15,10 +20,35 @@ class HazardType(str, Enum):
 
 
 class HazardState(str, Enum):
+    """
+    Seven-stage temporal hazard state machine with backward compatibility for SUSPECTED.
+    """
     NO_HAZARD = "NO_HAZARD"
-    SUSPECTED = "SUSPECTED"
+    CANDIDATE = "CANDIDATE"
+    SUSPECTED = "SUSPECTED"  # Backward compatibility alias for CANDIDATE/DETECTING
+    DETECTING = "DETECTING"
     CONFIRMED = "CONFIRMED"
+    ACTIVE = "ACTIVE"
+    CLEARING = "CLEARING"
     CLEARED = "CLEARED"
+
+
+# ── State ordering for severity comparison ──────────────────────────────────
+HAZARD_STATE_SEVERITY: Dict[str, int] = {
+    HazardState.CONFIRMED: 7,
+    HazardState.ACTIVE: 6,
+    HazardState.CLEARING: 5,
+    HazardState.DETECTING: 4,
+    HazardState.SUSPECTED: 4,
+    HazardState.CANDIDATE: 3,
+    HazardState.CLEARED: 2,
+    HazardState.NO_HAZARD: 1,
+}
+
+
+def is_alert_state(state: HazardState) -> bool:
+    """True only for states that should trigger emergency alerts."""
+    return state in (HazardState.CONFIRMED, HazardState.ACTIVE)
 
 
 class HazardRelationship(str, Enum):
@@ -70,17 +100,38 @@ class HazardEventDetail(BaseModel):
     state: HazardState
     camera_id: str = "camera_01"
     zone_id: str = "UNKNOWN"
-    confidence: float = Field(..., description="Current/latest confidence score")
+    confidence: float = Field(..., description="Current/latest detection confidence")
+    average_confidence: float
+    max_confidence: float
+    validated_confidence: float = Field(
+        default=0.0,
+        description="Confirmation-weighted confidence: average_confidence * persistence_ratio"
+    )
     bbox: HazardBoundingBox
     first_seen: str
     last_seen: str
     duration_seconds: float = 0.0
     detection_count: int = 1
-    average_confidence: float
-    max_confidence: float
     persistence_ratio: float = Field(..., description="Ratio of detected frames to total observed frames")
     frames_detected: int
     frames_missed: int
+    spatial_consistency_score: float = Field(
+        default=1.0,
+        description="0-1 score of spatial coherence across frames (1=perfectly stable, 0=random)"
+    )
+    # Raw fields for diagnostics
+    raw_model_confidence: float = Field(
+        default=0.0,
+        description="Raw latest YOLO model confidence (unfiltered)"
+    )
+    temporal_score: float = Field(
+        default=0.0,
+        description="persistence_ratio used in temporal validation"
+    )
+    final_hazard_state: str = Field(
+        default="",
+        description="String value of the resolved state for API consumers"
+    )
 
 
 class HazardAnalysisResponse(BaseModel):
@@ -90,7 +141,7 @@ class HazardAnalysisResponse(BaseModel):
     camera_id: str
     zone_id: str
     scene_hazard_state: HazardState = Field(
-        ..., description="Overall scene state: NO_HAZARD, SUSPECTED, CONFIRMED, CLEARED"
+        ..., description="Overall scene state across all active tracks"
     )
     relationship: HazardRelationship = Field(
         ..., description="Observation category: NO_HAZARD, FIRE_ONLY, SMOKE_ONLY, FIRE_AND_SMOKE"

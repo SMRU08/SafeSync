@@ -79,11 +79,16 @@ class HazardAnalysisEngine:
         # Detection thresholds
         h_cfg = self.config.get("hazard", {})
         self.default_conf = float(h_cfg.get("confidence_threshold", 0.25))
-        self.fire_conf = float(h_cfg.get("fire_confidence", self.default_conf))
-        self.smoke_conf = float(h_cfg.get("smoke_confidence", self.default_conf))
+        self.fire_candidate_conf = float(h_cfg.get("fire_candidate_confidence", h_cfg.get("fire_confidence", 0.30)))
+        self.smoke_candidate_conf = float(h_cfg.get("smoke_candidate_confidence", h_cfg.get("smoke_confidence", 0.35)))
+        self.min_area_fraction = float(h_cfg.get("min_area_fraction", 0.0010))
+
+        # Backward compatibility aliases
+        self.fire_conf = self.fire_candidate_conf
+        self.smoke_conf = self.smoke_candidate_conf
 
         # Initialize subcomponents
-        self.zone_manager = ZoneManager(camera_config_path)
+        self.zone_manager = ZoneManager(camera_config_path, hazard_config_path)
         self.tracker = SpatialHazardTracker(self.config)
         self.state_machine = TemporalHazardStateMachine(self.config)
         self.visualizer = HazardVisualizer(show_hud=True)
@@ -114,10 +119,11 @@ class HazardAnalysisEngine:
         t_start = time.perf_counter()
         self.frame_counter += 1
         h, w = frame.shape[:2]
+        total_frame_area = max(1.0, float(h * w))
 
         # 1. Detection Stage
         t0 = time.perf_counter()
-        min_conf = confidence_override or min(self.fire_conf, self.smoke_conf)
+        min_conf = confidence_override or min(self.fire_candidate_conf, self.smoke_candidate_conf)
         det_response, _ = self.detector.detect_image(
             frame,
             conf=min_conf,
@@ -133,12 +139,31 @@ class HazardAnalysisEngine:
                 continue
 
             htype = HazardType.FIRE if cname == "fire" else HazardType.SMOKE
-            req_conf = confidence_override or (self.fire_conf if htype == HazardType.FIRE else self.smoke_conf)
+            req_conf = confidence_override or (
+                self.fire_candidate_conf if htype == HazardType.FIRE else self.smoke_candidate_conf
+            )
             if obj.confidence < req_conf:
+                continue
+
+            box_w = max(0.0, obj.bbox.x2 - obj.bbox.x1)
+            box_h = max(0.0, obj.bbox.y2 - obj.bbox.y1)
+            box_area = box_w * box_h
+
+            # Filter out tiny sub-pixel artifacts / compression noise
+            if (box_area / total_frame_area) < self.min_area_fraction:
                 continue
 
             cx = (obj.bbox.x1 + obj.bbox.x2) / 2.0
             cy = (obj.bbox.y1 + obj.bbox.y2) / 2.0
+
+            # Filter out detections in camera exclusion ROIs (windows, lights, reflections)
+            if self.zone_manager.is_in_exclusion_roi(camera_id, cx, cy, w, h):
+                continue
+
+            # Verify inclusion in hazard ROI if configured
+            if not self.zone_manager.is_in_hazard_roi(camera_id, cx, cy, w, h):
+                continue
+
             zone_id = self.zone_manager.resolve_zone(
                 camera_id=camera_id,
                 center_x=cx,
@@ -179,17 +204,22 @@ class HazardAnalysisEngine:
                 state=state,
                 camera_id=trk.camera_id,
                 zone_id=trk.zone_id,
-                confidence=trk.last_confidence,
+                confidence=round(trk.last_confidence, 4),
+                raw_model_confidence=round(getattr(trk, "raw_model_confidence", trk.last_confidence), 4),
+                average_confidence=round(trk.average_confidence, 4),
+                max_confidence=round(trk.max_confidence, 4),
+                validated_confidence=round(getattr(trk, "validated_confidence", trk.average_confidence), 4),
                 bbox=bbox_schema,
                 first_seen=trk.first_seen.isoformat(),
                 last_seen=trk.last_seen.isoformat(),
-                duration_seconds=trk.duration_seconds,
+                duration_seconds=round(trk.duration_seconds, 2),
                 detection_count=trk.detection_count,
-                average_confidence=round(trk.average_confidence, 4),
-                max_confidence=round(trk.max_confidence, 4),
                 persistence_ratio=round(trk.persistence_ratio, 4),
                 frames_detected=trk.detection_count,
                 frames_missed=trk.missed_frames,
+                spatial_consistency_score=round(getattr(trk, "spatial_consistency_score", 1.0), 4),
+                temporal_score=round(trk.persistence_ratio, 4),
+                final_hazard_state=state.value,
             )
             hazard_details.append(detail)
 

@@ -13,12 +13,17 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..",
 DEFAULT_CAMERAS_CONFIG = os.path.join(ROOT, "configs", "cameras.yaml")
 
 
+DEFAULT_HAZARD_CONFIG = os.path.join(ROOT, "configs", "hazard.yaml")
+
+
 def point_in_polygon(x: float, y: float, polygon: List[List[float]]) -> bool:
     """
     Standard Ray-Casting algorithm to check if (x, y) is inside a polygon.
     Polygon is a list of [x, y] vertices.
     """
     n = len(polygon)
+    if n < 3:
+        return False
     inside = False
     p1x, p1y = polygon[0]
     for i in range(1, n + 1):
@@ -36,37 +41,107 @@ def point_in_polygon(x: float, y: float, polygon: List[List[float]]) -> bool:
 
 class ZoneManager:
     """
-    Manages camera metadata and spatial zone associations.
+    Manages camera metadata, spatial zone associations, and hazard exclusion/inclusion ROIs.
     """
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(
+        self,
+        config_path: Optional[str] = None,
+        hazard_config_path: Optional[str] = None,
+    ):
         self.config_path = config_path or DEFAULT_CAMERAS_CONFIG
+        self.hazard_config_path = hazard_config_path or DEFAULT_HAZARD_CONFIG
         self.cameras: Dict[str, Dict[str, Any]] = {}
         self.zones: Dict[str, Dict[str, Any]] = {}
+        self.exclusion_rois: Dict[str, List[Dict[str, Any]]] = {}
+        self.inclusion_rois: Dict[str, List[List[float]]] = {}
         self.load_config()
 
     def load_config(self):
-        if not os.path.isfile(self.config_path):
+        # 1. Load cameras and zones from cameras.yaml
+        if os.path.isfile(self.config_path):
+            try:
+                with open(self.config_path, "r", encoding="utf-8") as f:
+                    data = yaml.safe_load(f) or {}
+
+                for cam in data.get("cameras", []):
+                    cid = str(cam.get("id", ""))
+                    if cid:
+                        self.cameras[cid] = cam
+                        # Check if camera has hazard_roi configured directly
+                        h_roi = cam.get("hazard_roi")
+                        if h_roi and len(h_roi) >= 3:
+                            self.inclusion_rois[cid] = h_roi
+
+                for z in data.get("zones", []):
+                    zid = str(z.get("id", ""))
+                    if zid:
+                        self.zones[zid] = z
+
+                log.info("ZoneManager loaded %d cameras and %d zones from %s", len(self.cameras), len(self.zones), self.config_path)
+            except Exception as e:
+                log.error("Failed to load cameras config: %s", e)
+        else:
             log.warning("Cameras config not found at %s. Using fallback.", self.config_path)
-            return
 
-        try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
-                data = yaml.safe_load(f) or {}
+        # 2. Load exclusion ROIs from hazard.yaml
+        if os.path.isfile(self.hazard_config_path):
+            try:
+                with open(self.hazard_config_path, "r", encoding="utf-8") as f:
+                    h_data = yaml.safe_load(f) or {}
+                zones_cfg = h_data.get("zones", {})
+                self.exclusion_rois = zones_cfg.get("exclusion_rois", {}) or {}
+                log.info("ZoneManager loaded exclusion ROIs for cameras: %s", list(self.exclusion_rois.keys()))
+            except Exception as e:
+                log.error("Failed to load hazard config for exclusion ROIs: %s", e)
 
-            for cam in data.get("cameras", []):
-                cid = str(cam.get("id", ""))
-                if cid:
-                    self.cameras[cid] = cam
+    def is_in_exclusion_roi(
+        self,
+        camera_id: str,
+        center_x: float,
+        center_y: float,
+        frame_width: int = 640,
+        frame_height: int = 480,
+    ) -> bool:
+        """
+        Returns True if the coordinate falls inside any configured exclusion ROI
+        for this camera (e.g. windows, bright ceiling lights, steam exhaust).
+        Detections in exclusion ROIs should be filtered out.
+        """
+        if not camera_id or camera_id not in self.exclusion_rois:
+            return False
 
-            for z in data.get("zones", []):
-                zid = str(z.get("id", ""))
-                if zid:
-                    self.zones[zid] = z
+        norm_x = center_x / max(1.0, float(frame_width))
+        norm_y = center_y / max(1.0, float(frame_height))
 
-            log.info("ZoneManager loaded %d cameras and %d zones from %s", len(self.cameras), len(self.zones), self.config_path)
-        except Exception as e:
-            log.error("Failed to load cameras config: %s", e)
+        rois = self.exclusion_rois[camera_id]
+        for roi in rois:
+            polygon = roi.get("polygon")
+            if polygon and len(polygon) >= 3:
+                if point_in_polygon(norm_x, norm_y, polygon):
+                    log.debug("Coordinate (%f, %f) falls inside exclusion ROI '%s'", norm_x, norm_y, roi.get("name", "unnamed"))
+                    return True
+        return False
+
+    def is_in_hazard_roi(
+        self,
+        camera_id: str,
+        center_x: float,
+        center_y: float,
+        frame_width: int = 640,
+        frame_height: int = 480,
+    ) -> bool:
+        """
+        If camera has a configured inclusion hazard_roi, returns True if inside it.
+        If no inclusion hazard_roi is configured, returns True (all regions monitored).
+        """
+        if not camera_id or camera_id not in self.inclusion_rois:
+            return True
+
+        norm_x = center_x / max(1.0, float(frame_width))
+        norm_y = center_y / max(1.0, float(frame_height))
+        polygon = self.inclusion_rois[camera_id]
+        return point_in_polygon(norm_x, norm_y, polygon)
 
     def resolve_zone(
         self,

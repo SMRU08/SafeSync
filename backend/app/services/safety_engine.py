@@ -115,8 +115,9 @@ class SafetyEngine:
     def enforce_rule_1_fire(self, hazard: HazardEventDetail) -> Optional[NormalizedSafetyEvent]:
         """
         Rule 1: Confirmed Fire -> CRITICAL (P0 Emergency, Audible Siren).
+        Requires state to be CONFIRMED or ACTIVE. CANDIDATE/DETECTING do NOT trigger.
         """
-        if hazard.hazard_type == HazardType.FIRE and hazard.state == HazardState.CONFIRMED:
+        if hazard.hazard_type == HazardType.FIRE and hazard.state in (HazardState.CONFIRMED, HazardState.ACTIVE):
             return NormalizedSafetyEvent(
                 event_id=str(uuid.uuid4()),
                 event_type=EventType.FIRE_DETECTED,
@@ -140,8 +141,9 @@ class SafetyEngine:
     def enforce_rule_2_smoke(self, hazard: HazardEventDetail) -> Optional[NormalizedSafetyEvent]:
         """
         Rule 2: Confirmed Smoke -> HIGH / CRITICAL (P0/P1 Hazard, Audible Siren).
+        Requires state to be CONFIRMED or ACTIVE. CANDIDATE/DETECTING do NOT trigger.
         """
-        if hazard.hazard_type == HazardType.SMOKE and hazard.state == HazardState.CONFIRMED:
+        if hazard.hazard_type == HazardType.SMOKE and hazard.state in (HazardState.CONFIRMED, HazardState.ACTIVE):
             # Escalate persistent smoke (> 10s) to P0, otherwise P1
             priority = AlarmPriority.P0 if hazard.duration_seconds >= 10.0 else AlarmPriority.P1
             return NormalizedSafetyEvent(
@@ -172,10 +174,11 @@ class SafetyEngine:
     ) -> Optional[NormalizedSafetyEvent]:
         """
         Rule 3: Multi-Hazard Escalation -> Dual fire/smoke or multiple concurrent hazards escalate to P0 CRITICAL.
+        Requires states to be CONFIRMED or ACTIVE.
         """
         active_hazards = [
             h for h in hazards
-            if h.state == HazardState.CONFIRMED
+            if h.state in (HazardState.CONFIRMED, HazardState.ACTIVE)
         ]
         has_fire = any(h.hazard_type == HazardType.FIRE for h in active_hazards)
         has_smoke = any(h.hazard_type == HazardType.SMOKE for h in active_hazards)

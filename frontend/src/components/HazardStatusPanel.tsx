@@ -29,10 +29,18 @@ export const HazardStatusPanel: React.FC<HazardStatusPanelProps> = ({
     switch (state) {
       case 'CONFIRMED':
         return <span className="badge badge-error">CONFIRMED HAZARD</span>;
-      case 'SUSPECTED':
-        return <span className="badge badge-warning">SUSPECTED (VERIFYING)</span>;
+      case 'ACTIVE':
+        return <span className="badge badge-error">ACTIVE HAZARD</span>;
+      case 'DETECTING':
+        return <span className="badge badge-warning">DETECTING (CONFIRMING)</span>;
+      case 'CANDIDATE':
+        return <span className="badge badge-info">CANDIDATE (EVALUATING)</span>;
+      case 'CLEARING':
+        return <span className="badge badge-neutral">CLEARING</span>;
       case 'CLEARED':
         return <span className="badge badge-info">RECENTLY CLEARED</span>;
+      case 'SUSPECTED':
+        return <span className="badge badge-warning">SUSPECTED (VERIFYING)</span>;
       default:
         return <span className="badge badge-success">ZONE CLEAR</span>;
     }
@@ -44,14 +52,15 @@ export const HazardStatusPanel: React.FC<HazardStatusPanelProps> = ({
         {monitoredZones.map((z) => {
           const hazard = getZoneHazard(z.zone_id);
           const state: HazardState = hazard ? hazard.state : 'NO_HAZARD';
-          const isCritical = state === 'CONFIRMED';
-          const isWarning = state === 'SUSPECTED';
+          const isCritical = state === 'CONFIRMED' || state === 'ACTIVE';
+          const isWarning = state === 'DETECTING' || state === 'SUSPECTED';
+          const isCandidate = state === 'CANDIDATE';
 
           return (
             <div
               key={z.zone_id}
               className={`hazard-zone-card ${
-                isCritical ? 'hazard-critical' : isWarning ? 'hazard-warning' : 'hazard-clear'
+                isCritical ? 'hazard-critical' : isWarning ? 'hazard-warning' : isCandidate ? 'hazard-evaluating' : 'hazard-clear'
               }`}
             >
               <div className="zone-card-header">

@@ -1,28 +1,111 @@
-# configs/hazard.yaml — SafeSync Phase 6
-# Fire and Smoke Hazard Analysis Configuration
-# All parameters are configurable and decouple from PPE compliance.
+# configs/hazard.yaml — SafeSync v2 Robust Hazard Detection Configuration
+# ============================================================================
+# FIRE / SMOKE VALIDATION PIPELINE CONFIGURATION
+# ============================================================================
+#
+# Design principle:
+#   A single-frame detection is a CANDIDATE only.
+#   CANDIDATE → DETECTING → CONFIRMED requires temporal persistence + spatial coherence.
+#   Only CONFIRMED hazards generate P0/P1 emergency incidents.
+#
+# Do NOT solve false positives by blindly increasing confidence_threshold alone.
+# This config implements a multi-stage validation pipeline.
+# ============================================================================
 
 hazard:
-  # Minimum confidence required for initial detection consideration
-  confidence_threshold: 0.25
+  # ── Stage 1: Candidate Detection Confidence ──────────────────────────────
+  # Minimum confidence to even enter the tracking pipeline as a CANDIDATE.
+  # Below this threshold, detections are silently discarded before tracking.
+  fire_candidate_confidence: 0.30
+  smoke_candidate_confidence: 0.35
 
-  # Specific thresholds (based on Phase 3.1 measured performance:
-  # fire precision=41.99%, smoke precision=57.74%)
-  fire_confidence: 0.25
-  smoke_confidence: 0.25
+  # ── Stage 2: Confirmation Confidence ─────────────────────────────────────
+  # A track must have AVERAGE confidence >= this threshold AND be temporally
+  # confirmed before transitioning to CONFIRMED state.
+  # This prevents lucky high-confidence single-frame detections from
+  # immediately creating emergency incidents.
+  fire_confirmation_confidence: 0.40
+  smoke_confirmation_confidence: 0.45
 
-  # Temporal validation parameters
-  confirmation_frames: 5            # Frames of consistent detection required to transition SUSPECTED -> CONFIRMED
-  minimum_observation_ratio: 0.60   # Minimum ratio of frames detected in the sliding window to maintain CONFIRMED
-  clear_frames: 10                  # Consecutive missed frames before transitioning CONFIRMED -> CLEARED
-  max_gap_frames: 5                 # Maximum transient flicker tolerance frames before SUSPECTED decays
+  # ── Temporal Confirmation Parameters ─────────────────────────────────────
+  # Frames of consistent DETECTING-state detection required before CONFIRMED.
+  # At 15 FPS, 8 frames = ~0.5s minimum evidence window.
+  # At 30 FPS, 8 frames = ~0.27s minimum evidence window.
+  confirmation_frames: 8
+
+  # Minimum ratio of detected frames in the confirmation window.
+  # 0.65 = smoke must appear in ≥65% of candidate frames (not just 1 flash).
+  minimum_observation_ratio: 0.65
+
+  # ── Gap Tolerance ─────────────────────────────────────────────────────────
+  # Frames a DETECTING track can be missed before decaying back to CANDIDATE.
+  # Prevents transient occlusion from restarting the whole confirmation window.
+  smoke_max_gap_frames: 4
+  fire_max_gap_frames: 3
+
+  # ── Clearing Parameters ───────────────────────────────────────────────────
+  # Consecutive frames a CONFIRMED track must be absent before transitioning
+  # to CLEARING → CLEARED. Prevents flickering clear/re-alert cycles.
+  smoke_clear_frames: 15
+  fire_clear_frames: 10
+
+  # ── Spatial Consistency Validation ───────────────────────────────────────
+  # Maximum normalized centroid displacement allowed across consecutive frames.
+  # 0.15 = centroid may not jump more than 15% of frame diagonal between frames.
+  # Rejects random "teleporting" detections from reflections or artifacts.
+  max_centroid_jump_normalized: 0.18
+
+  # Minimum IoU for a detection to be matched as spatially consistent with
+  # the previous bbox. Used alongside centroid check.
+  spatial_iou_min: 0.12
+
+  # Minimum number of spatially CONSISTENT detections before state can
+  # advance beyond CANDIDATE. Requires at least 2 consistent observations.
+  min_consistent_detections: 2
+
+  # ── Minimum Area Threshold ────────────────────────────────────────────────
+  # Minimum bounding box area (pixels²) for a detection to be considered.
+  # Rejects sub-pixel artifacts and compression noise.
+  # At 640×480: 30×30 px = 900 px² minimum
+  # At 1280×720: adjust accordingly — use relative threshold:
+  #   min_area_fraction of total frame area.
+  min_area_fraction: 0.0010   # 0.10% of frame area minimum (e.g., 614 px² at 640×480)
 
 tracking:
   tracker: "spatial_centroid"
-  iou_threshold: 0.20               # IoU threshold for associating bounding boxes across adjacent frames
-  center_distance_threshold: 0.25   # Relative frame distance threshold for tracking smoke/fire expansion
-  max_unseen_frames: 15             # Frames to retain an unobserved hazard event before archiving
+  # IoU threshold for matching detections to existing tracks.
+  # Increased from 0.20 to avoid matching detections in completely different
+  # regions of the frame (e.g., sunlight in one corner, real smoke in another).
+  iou_threshold: 0.25
+  # Relative centroid distance threshold for accepting a match when IoU is low.
+  # 0.18 = centroid must be within 18% of frame diagonal for distance-based match.
+  center_distance_threshold: 0.18
+  # Frames before archiving an unmatched track.
+  max_unseen_frames: 12
 
 zones:
   enabled: true
   default_zone_id: "UNKNOWN"
+
+  # ── Per-Camera Hazard Exclusion ROIs ─────────────────────────────────────
+  # Optional normalized polygon ROIs per camera to EXCLUDE known
+  # false-positive regions (windows, lights, reflective surfaces).
+  #
+  # Coordinates are normalized [0.0, 1.0] relative to frame dimensions.
+  # Detections whose centroid falls INSIDE an exclusion_roi polygon are
+  # discarded before entering the tracking pipeline.
+  #
+  # Format:
+  #   exclusion_rois:
+  #     camera_id:
+  #       - name: "description"
+  #         polygon: [[x1,y1], [x2,y2], [x3,y3], [x4,y4]]
+  #
+  # Example: exclude the top-right window region of camera_01:
+  # exclusion_rois:
+  #   camera_01:
+  #     - name: "office_window"
+  #       polygon: [[0.75, 0.0], [1.0, 0.0], [1.0, 0.30], [0.75, 0.30]]
+  #     - name: "overhead_light"
+  #       polygon: [[0.40, 0.0], [0.60, 0.0], [0.60, 0.15], [0.40, 0.15]]
+  exclusion_rois: {}

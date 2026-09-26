@@ -125,25 +125,37 @@ export const App: React.FC = () => {
 
       {/* ─── CRITICAL ALERT BANNER (Sticky, pulsing red) ─────────────────────── */}
       {(() => {
-        const fireHazard = hazards.find((h) => h.hazard_type === 'fire');
-        const smokeHazard = hazards.find((h) => h.hazard_type === 'smoke');
+        const fireHazard = hazards.find(
+          (h) => h.hazard_type === 'fire' && (h.state === 'CONFIRMED' || h.state === 'ACTIVE')
+        );
+        const smokeHazard = hazards.find(
+          (h) => h.hazard_type === 'smoke' && (h.state === 'CONFIRMED' || h.state === 'ACTIVE')
+        );
+        const evaluatingHazard = hazards.find(
+          (h) => h.state === 'CANDIDATE' || h.state === 'DETECTING'
+        );
         const criticalAlert = alerts.find(
           (a) => a.status === 'ACTIVE' && (a.severity === 'CRITICAL' || a.severity === 'HIGH')
         );
         const bannerText = fireHazard
-          ? `🔥 CRITICAL: Fire Detected — ${fireHazard.camera_id?.toUpperCase() ?? 'Unknown Camera'}! Evacuate immediately.`
+          ? `🔥 CRITICAL: Fire Confirmed — ${fireHazard.camera_id?.toUpperCase() ?? 'Unknown Camera'}! Evacuate immediately.`
           : smokeHazard
-          ? `💨 WARNING: Smoke Detected — ${smokeHazard.camera_id?.toUpperCase() ?? 'Unknown Camera'}! Investigate now.`
+          ? `💨 WARNING: Smoke Confirmed — ${smokeHazard.camera_id?.toUpperCase() ?? 'Unknown Camera'}! Investigate now.`
+          : evaluatingHazard
+          ? `🔍 NOTICE: Hazard candidate under temporal evaluation (${evaluatingHazard.hazard_type?.toUpperCase()} - ${evaluatingHazard.state}) — ${evaluatingHazard.camera_id}`
           : criticalAlert
           ? `⚠️ ALERT: ${criticalAlert.title || criticalAlert.event_type.replace(/_/g, ' ')} — ${criticalAlert.camera_id}`
           : null;
         const isFireOrSmoke = !!(fireHazard || smokeHazard);
+        const isEval = !isFireOrSmoke && !!evaluatingHazard;
         if (!bannerText) return null;
         return (
           <div
             className={`sticky top-0 z-[60] flex items-center justify-between gap-3 px-5 py-2.5 text-white text-sm font-bold shadow-lg select-none ${
               isFireOrSmoke
                 ? 'bg-red-600 animate-pulse'
+                : isEval
+                ? 'bg-amber-600'
                 : 'bg-rose-500'
             }`}
             style={isFireOrSmoke ? { animationDuration: '1s' } : {}}

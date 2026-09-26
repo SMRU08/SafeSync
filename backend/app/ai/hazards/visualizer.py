@@ -20,8 +20,11 @@ COLOR_SMOKE = (169, 169, 169)  # Slate Gray for Smoke
 
 STATE_COLORS = {
     HazardState.CONFIRMED: (0, 0, 230),     # Vivid Red
-    HazardState.SUSPECTED: (0, 165, 255),   # Orange-Amber
-    HazardState.CLEARED: (128, 128, 128),   # Muted Gray
+    HazardState.ACTIVE: (0, 0, 255),        # Bright Red
+    HazardState.DETECTING: (0, 140, 255),   # Orange
+    HazardState.CANDIDATE: (0, 215, 255),   # Amber/Yellow
+    HazardState.CLEARING: (160, 160, 160),  # Muted Gray
+    HazardState.CLEARED: (100, 100, 100),   # Dark Muted Gray
     HazardState.NO_HAZARD: (0, 200, 0),     # Green
 }
 
@@ -29,6 +32,7 @@ STATE_COLORS = {
 class HazardVisualizer:
     """
     Renders non-destructive bounding boxes, HUD status badges, and scene banners.
+    Displays clear visual distinction between candidate/detecting and confirmed hazards.
     """
 
     def __init__(self, show_hud: bool = True):
@@ -78,7 +82,7 @@ class HazardVisualizer:
 
         # 2. Draw each hazard event
         for ev in hazard_events:
-            if ev.state == HazardState.CLEARED:
+            if ev.state in (HazardState.CLEARED, HazardState.NO_HAZARD):
                 continue
 
             base_color = COLOR_FIRE if ev.hazard_type == HazardType.FIRE else COLOR_SMOKE
@@ -89,16 +93,32 @@ class HazardVisualizer:
             x2 = max(0, min(int(round(ev.bbox.x2)), w - 1))
             y2 = max(0, min(int(round(ev.bbox.y2)), h - 1))
 
-            # Bounding box thickness based on state
-            thickness = 3 if ev.state == HazardState.CONFIRMED else 2
+            # Bounding box thickness based on state: bold for confirmed/active, thin for candidate
+            if ev.state in (HazardState.CONFIRMED, HazardState.ACTIVE):
+                thickness = 3
+            elif ev.state == HazardState.DETECTING:
+                thickness = 2
+            else:
+                thickness = 1
+
             cv2.rectangle(canvas, (x1, y1), (x2, y2), st_color, thickness)
 
-            # Header Badge: "[EVENT_ID] FIRE/SMOKE 0.82 | State: CONFIRMED | Zone: Floor"
+            # Header Badge with state explanation
+            state_prefix = ""
+            if ev.state == HazardState.CANDIDATE:
+                state_prefix = " [CANDIDATE - EVAL]"
+            elif ev.state == HazardState.DETECTING:
+                state_prefix = " [DETECTING - CONFIRMING]"
+            elif ev.state in (HazardState.CONFIRMED, HazardState.ACTIVE):
+                state_prefix = " [CONFIRMED]"
+            elif ev.state == HazardState.CLEARING:
+                state_prefix = " [CLEARING]"
+
             label = (
-                f"{ev.event_id} {ev.hazard_type.value.upper()} {ev.confidence:.2f} | "
-                f"State: {ev.state.value} | Zone: {ev.zone_id}"
+                f"{ev.event_id} {ev.hazard_type.value.upper()} {ev.confidence:.2f}"
+                f"{state_prefix} | Zone: {ev.zone_id}"
             )
-            font_scale = 0.45
+            font_scale = 0.42
             font_thickness = 1
             text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
             tag_w = text_size[0] + 10
