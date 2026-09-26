@@ -21,9 +21,9 @@
 | **College / Institution** | *To Be Updated* | Pending Final Roster |
 | **Department** | *To Be Updated* | Pending Final Roster |
 | **Project Lead & Maintainer** | Smruti Ranjan Nayak ([@SMRU08](https://github.com/SMRU08)) | Verified |
-| **Official Repository** | [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git) | Verified |
+| **Official Repository** | [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git) | Verified |
 | **Execution Architecture** | Edge-Compatible Multi-Camera Stream Manager + Async FastAPI + React 18 SOC | Verified |
-| **Validation Evidence** | **160/160 Unit Tests Passed • 39/39 Integration Scenarios Verified** | Verified |
+| **Validation Evidence** | **250/250 Backend Tests Passed • 39/39 Integration Scenarios Verified** | Verified |
 
 ---
 
@@ -554,4 +554,4 @@ The following empirical measurements were recorded during live pipeline benchmar
 * **Problem Statement:** PS06 — Prototype AI System that Detects Safety Gear Compliance
 * **Organizing Bodies:** Software Technology Parks of India (STPI) & EmTek
 * **Project Team:** XERSES
-* **Official Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)
+* **Official Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)

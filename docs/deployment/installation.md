@@ -24,8 +24,8 @@ This guide details the prerequisites, environment setup, dependency installation
 
 ### 2.1 Clone the Repository
 ```bash
-git clone https://github.com/SMRU08/SafeSync.git
-cd SafeSync
+git clone https://github.com/SMRU08/RAKSHYA-VISION.git
+cd RAKSHYA-VISION
 ```
 
 ### 2.2 Environment Configuration

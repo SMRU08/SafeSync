@@ -64,7 +64,7 @@ Establishes project identity, competitive domain, organizing bodies, and core pr
   - **Organizers:** Software Technology Parks of India (STPI) & EmTek
   - **Hackathon:** BPUT Hackathon 2026
   - **Problem Statement:** PS06 — Vision-Based Industrial Safety Gear Compliance
-  - **Repository:** `https://github.com/SMRU08/SafeSync.git`
+  - **Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
 
 #### 4. High-Level System Context Diagram
 ```mermaid
@@ -787,7 +787,7 @@ Provides a dignified closing slide summarizing project credentials, submission d
   - Explainable 0–100 Risk Engine
   - Tamper-Evident SHA-256 Evidence
   - React 18 Real-Time SOC Dashboard
-- **Official GitHub Repository:** `https://github.com/SMRU08/SafeSync.git`
+- **Official GitHub Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
 
 #### 4. Final Submission Architectural Invariant Diagram
 ```mermaid

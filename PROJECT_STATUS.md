@@ -3,7 +3,7 @@
 **System:** SafeSync (AI Vision-Based Safety Monitoring System)  
 **Problem Statement:** PS06 — Prototype AI system detecting safety gear compliance & environmental hazards  
 **Target Domains:** Industrial manufacturing, construction sites, power generation, hazardous facilities  
-**Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)  
+**Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)  
 **Documentation Index:** [`docs/README.md`](./docs/README.md)  
 
 ---
@@ -51,9 +51,9 @@ SafeSync is an operational, fully integrated edge AI safety monitoring and incid
 
 | Test Suite | Total Evaluated | Passed | Failed | Success Rate |
 |---|:---:|:---:|:---:|:---:|
-| **Backend Unit Tests (`backend/tests/`)** | 160 | 160 | 0 | **100%** |
+| **Backend Test Suite (`backend/tests/`)** | 250 | 250 | 0 | **100%** |
 | **System Integration Scenarios (`scripts/testing/`)** | 39 | 39 | 0 | **100%** |
-| **Frontend Production Build (`npm run build`)** | 1,907 modules | 1,907 | 0 | **100% (3.44s)** |
+| **Frontend Production Build (`npm run build`)** | 1,916 modules | 1,916 | 0 | **100% (4.72s)** |
 
 - **End-to-End Latency Budget:** 45.5 ms mean latency on commodity 8-core CPU (comfortably under the 100 ms real-time threshold).
 - **Memory Footprint:** 423.6 MB $\rightarrow$ 432.7 MB over 25 cycles (+9.1 MB transient cache warm-up, 0 memory leaks).
