@@ -1,5 +1,5 @@
 """
-run_webcam.py — RAKSHYA VISION Phase 4
+run_webcam.py — SafeSync Phase 4
 Live webcam safety detection runner.
 Usage:
     python scripts/inference/run_webcam.py --camera 0 [options]
@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Live Webcam Detection")
+    parser = argparse.ArgumentParser(description="SafeSync — Live Webcam Detection")
     parser.add_argument("--camera", "-c", type=int, default=0, help="Camera index (default: 0)")
     parser.add_argument("--confidence", type=float, default=0.25, help="Confidence threshold")
     parser.add_argument("--device", "-d", type=str, default="auto", help="Inference device")
@@ -43,7 +43,7 @@ def main():
     args = parse_args()
 
     print("=" * 65)
-    print("  RAKSHYA VISION — Live Webcam Detection")
+    print("  SafeSync — Live Webcam Detection")
     print("=" * 65)
     print(f"  Camera Index : {args.camera}")
     print(f"  Confidence   : {args.confidence}")
@@ -74,7 +74,7 @@ def main():
     actual_h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     log.info(f"Webcam stream initialized at {actual_w}x{actual_h}")
 
-    window_name = "RAKSHYA VISION — Real-Time Safety Monitor (Press 'q' to exit)"
+    window_name = "SafeSync — Real-Time Safety Monitor (Press 'q' to exit)"
     frame_count = 0
 
     try:

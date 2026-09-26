@@ -1,5 +1,5 @@
 """
-association.py — RAKSHYA VISION Phase 5
+association.py — SafeSync Phase 5
 Spatial anatomy-aware association between detected PPE items and tracked workers.
 Resolves multi-worker assignment contention via optimal bipartite matching.
 """

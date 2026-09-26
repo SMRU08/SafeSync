@@ -1,5 +1,5 @@
 """
-alert_engine.py — RAKSHYA VISION Phase 7
+alert_engine.py — SafeSync Phase 7
 Smart Alert Management, Incident Generation, Deduplication, Cooldown, and Escalation Engine.
 Integrates RiskEngine and EventBroadcaster with database persistence.
 """
@@ -279,7 +279,7 @@ class AlertEngine:
 
                 try:
                     MetricsCollector.get_instance().increment_counter(
-                        "rakshya_incidents_total",
+                        "safesync_incidents_total",
                         labels={"risk_level": risk.risk_level.value, "camera_id": event.camera_id},
                     )
                 except Exception:
@@ -389,7 +389,7 @@ class AlertEngine:
 
                 try:
                     MetricsCollector.get_instance().increment_counter(
-                        "rakshya_alert_actions_total",
+                        "safesync_alert_actions_total",
                         labels={"action": "ESCALATED"},
                     )
                 except Exception:
@@ -499,11 +499,11 @@ class AlertEngine:
 
         try:
             MetricsCollector.get_instance().increment_counter(
-                "rakshya_alerts_total",
+                "safesync_alerts_total",
                 labels={"severity": risk.risk_level.value, "event_type": event.event_type.value},
             )
             MetricsCollector.get_instance().increment_counter(
-                "rakshya_alert_actions_total",
+                "safesync_alert_actions_total",
                 labels={"action": "CREATED"},
             )
         except Exception:
@@ -553,7 +553,7 @@ class AlertEngine:
         broadcaster.broadcast("AlertUpdated", result.model_dump())
         try:
             MetricsCollector.get_instance().increment_counter(
-                "rakshya_alert_actions_total",
+                "safesync_alert_actions_total",
                 labels={"action": "ACKNOWLEDGED"}
             )
         except Exception:
@@ -609,7 +609,7 @@ class AlertEngine:
         broadcaster.broadcast("IncidentResolved", {"incident_id": db_alert.incident_id})
         try:
             MetricsCollector.get_instance().increment_counter(
-                "rakshya_alert_actions_total",
+                "safesync_alert_actions_total",
                 labels={"action": "RESOLVED"},
             )
         except Exception:
@@ -663,7 +663,7 @@ class AlertEngine:
         broadcaster.broadcast("AlertUpdated", result.model_dump())
         try:
             MetricsCollector.get_instance().increment_counter(
-                "rakshya_alert_actions_total",
+                "safesync_alert_actions_total",
                 labels={"action": "DISMISSED"},
             )
         except Exception:

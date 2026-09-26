@@ -1,5 +1,5 @@
 """
-evidence_manager.py — RAKSHYA VISION Phase 10 Step 9
+evidence_manager.py — SafeSync Phase 10 Step 9
 Core Service for Incident Visual Evidence Archival, SHA-256 Tamper Verification,
 Storage Quota Enforcement, and Fault-Isolated Evidence Capture.
 """

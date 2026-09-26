@@ -1,5 +1,5 @@
 """
-normalize_and_curate.py — RAKSHYA VISION Normalization & Hard-Negative Curator
+normalize_and_curate.py — SafeSync Normalization & Hard-Negative Curator
 Normalizes raw datasets into canonical YOLO representations and curates dedicated hard negatives:
 - Target PPE: 0: person, 1: helmet, 2: safety_vest, 3: gloves, 4: safety_footwear
 - Target Hazard: 0: fire, 1: smoke

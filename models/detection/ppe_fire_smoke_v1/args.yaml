@@ -1,7 +1,7 @@
 task: detect
 mode: train
 model: yolov8n.pt
-data: D:\Additional\PROJECT\RAKSHYA-VISION\datasets\processed\data.yaml
+data: D:\Additional\PROJECT\SafeSync\datasets\processed\data.yaml
 epochs: 1
 time: null
 patience: 10
@@ -12,7 +12,7 @@ save_period: 1
 cache: false
 device: cpu
 workers: 0
-project: D:\Additional\PROJECT\RAKSHYA-VISION\models\detection
+project: D:\Additional\PROJECT\SafeSync\models\detection
 name: ppe_fire_smoke_v1
 exist_ok: true
 pretrained: true
@@ -112,4 +112,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: tracktrack.yaml
-save_dir: D:\Additional\PROJECT\RAKSHYA-VISION\models\detection\ppe_fire_smoke_v1
+save_dir: D:\Additional\PROJECT\SafeSync\models\detection\ppe_fire_smoke_v1

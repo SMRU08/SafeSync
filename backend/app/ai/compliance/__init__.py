@@ -1,5 +1,5 @@
 """
-RAKSHYA VISION — AI Vision-Based Safety Monitoring
+SafeSync — AI Vision-Based Safety Monitoring
 Phase 5: Worker Tracking, PPE Spatial Association & Temporal Compliance Module
 """
 

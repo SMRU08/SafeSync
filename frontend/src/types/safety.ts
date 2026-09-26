@@ -1,5 +1,5 @@
 /**
- * safety.ts — RAKSHYA VISION Phase 8
+ * safety.ts — SafeSync Phase 8
  * Centralized TypeScript type definitions for Safety Monitoring Dashboard.
  * Accurately mirrors backend Pydantic schemas without fabricated structures.
  */

@@ -1,5 +1,5 @@
 """
-evidence.py — RAKSHYA VISION Phase 10 Step 9
+evidence.py — SafeSync Phase 10 Step 9
 FastAPI Router for Tamper-Evident Incident Evidence Archival and Secure Retrieval.
 Includes strict path-traversal prevention, RBAC authorization, and SHA-256 integrity verification.
 """

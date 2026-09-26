@@ -1,5 +1,5 @@
 """
-check_environment.py — RAKSHYA VISION Phase 3
+check_environment.py — SafeSync Phase 3
 Reports Python, PyTorch, Ultralytics, CUDA, GPU, RAM, disk,
 and dataset image/label counts for all 3 splits.
 """

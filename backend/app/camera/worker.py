@@ -1,5 +1,5 @@
 """
-worker.py — RAKSHYA VISION Phase 10 Step 5
+worker.py — SafeSync Phase 10 Step 5
 Thread-isolated Camera Worker managing independent capture lifecycle,
 bounded exponential backoff reconnection, metric tracking, and safe frame buffering.
 """
@@ -613,7 +613,7 @@ class CameraWorker:
         # Draw camera metadata
         cv2.putText(
             frame,
-            f"RAKSHYA VISION SYNTHETIC CAM: {self.camera_id}",
+            f"SafeSync SYNTHETIC CAM: {self.camera_id}",
             (30, 50),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.7,
@@ -683,7 +683,7 @@ class CameraWorker:
                         try:
                             from app.services.metrics import MetricsCollector
                             MetricsCollector.get_instance().increment_counter(
-                                "rakshya_pipeline_frames_total",
+                                "safesync_pipeline_frames_total",
                                 labels={"camera_id": self.camera_id},
                             )
                         except Exception:
@@ -754,7 +754,7 @@ class CameraWorker:
                     try:
                         from app.services.metrics import MetricsCollector
                         MetricsCollector.get_instance().increment_counter(
-                            "rakshya_pipeline_dropped_frames_total",
+                            "safesync_pipeline_dropped_frames_total",
                             labels={"camera_id": self.camera_id},
                         )
                     except Exception:
@@ -844,7 +844,7 @@ class CameraWorker:
                 try:
                     from app.services.metrics import MetricsCollector
                     MetricsCollector.get_instance().increment_counter(
-                        "rakshya_pipeline_frames_total",
+                        "safesync_pipeline_frames_total",
                         labels={"camera_id": self.camera_id},
                     )
                 except Exception:

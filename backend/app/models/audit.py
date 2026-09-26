@@ -1,5 +1,5 @@
 """
-audit.py — RAKSHYA VISION Phase 10 Step 7
+audit.py — SafeSync Phase 10 Step 7
 SQLAlchemy Model for Security and Operational Audit Logs.
 """
 

@@ -1,5 +1,5 @@
 """
-visualizer.py — RAKSHYA VISION Phase 6
+visualizer.py — SafeSync Phase 6
 Visualizer for Fire and Smoke Hazards with State Badges and Camera/Zone Metadata.
 Strictly decoupled from risk scoring (no CRITICAL/HIGH/MEDIUM/LOW).
 """
@@ -59,7 +59,7 @@ class HazardVisualizer:
             cv2.addWeighted(overlay, 0.75, canvas, 0.25, 0, canvas)
 
             # Title
-            title_text = f"RAKSHYA VISION — HAZARD MONITOR | {camera_name} ({zone_name})"
+            title_text = f"SafeSync — HAZARD MONITOR | {camera_name} ({zone_name})"
             cv2.putText(
                 canvas, title_text, (12, 23),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.55, (240, 240, 240), 1, cv2.LINE_AA

@@ -1,5 +1,5 @@
 """
-model_loader.py — RAKSHYA VISION Phase 10
+model_loader.py — SafeSync Phase 10
 Production Model Loader with Model Registry & Immutable SHA-256 Checksum Enforcement.
 Supports 'production', 'candidate', and 'archived' model states.
 """

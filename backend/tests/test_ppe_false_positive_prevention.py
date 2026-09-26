@@ -1,5 +1,5 @@
 """
-test_ppe_false_positive_prevention.py — RAKSHYA VISION
+test_ppe_false_positive_prevention.py — SafeSync
 Verifies suppression of PPE false positives:
 - Normal hair is NOT detected/confirmed as helmet.
 - Normal casual shirts/dresses are NOT detected/confirmed as safety vest.

@@ -1,5 +1,5 @@
 """
-risk_alert.py — RAKSHYA VISION Phase 7
+risk_alert.py — SafeSync Phase 7
 SQLAlchemy Database Models for Safety Incidents, Smart Alerts, and Audit History.
 Stores anonymized incident lifecycles without any PII.
 """

@@ -1,5 +1,5 @@
 /**
- * HazardsView.tsx — RAKSHYA VISION Phase 8
+ * HazardsView.tsx — SafeSync Phase 8
  * Fire & Smoke Hazard Analysis view with zone monitoring, spatial relationships, and frame testing.
  */
 

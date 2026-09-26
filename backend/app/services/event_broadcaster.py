@@ -1,5 +1,5 @@
 """
-event_broadcaster.py — RAKSHYA VISION Phase 7
+event_broadcaster.py — SafeSync Phase 7
 In-Memory Event Broadcaster for WebSocket-Ready Architecture.
 Allows internal subscribers to listen for safety incidents, alerts, and escalations.
 Ready for Phase 8 dashboard connection without implementing frontend UI in Phase 7.

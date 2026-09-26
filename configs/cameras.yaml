@@ -1,4 +1,4 @@
-# configs/cameras.yaml — RAKSHYA VISION Phase 10 Step 5
+# configs/cameras.yaml — SafeSync Phase 10 Step 5
 # Camera and Zone Metadata Configuration
 # Supports RTSP, USB webcams, recorded video files, and synthetic streams.
 # Passwords must be referenced via environment variables, never hardcoded in plaintext.

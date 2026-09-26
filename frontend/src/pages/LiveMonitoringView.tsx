@@ -1,5 +1,5 @@
 /**
- * LiveMonitoringView.tsx — RAKSHYA VISION Professional SOC
+ * LiveMonitoringView.tsx — SafeSync Professional SOC
  * High-performance multi-camera monitoring wall with 1x1, 2x2, and 3x3 grid layouts,
  * real-time MJPEG streams, and hardware PTZ/snapshot controls.
  */

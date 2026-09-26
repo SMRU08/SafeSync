@@ -1,6 +1,6 @@
 # Configuration Management
 
-RAKSHYA VISION implements a multi-tier configuration architecture combining declarative YAML specification files with runtime environment variable overrides.
+SafeSync implements a multi-tier configuration architecture combining declarative YAML specification files with runtime environment variable overrides.
 
 ---
 
@@ -73,7 +73,7 @@ All primary configuration files reside in `configs/`:
 | `ENVIRONMENT` | string | `development` | Profile: `development` or `production` |
 | `SECRET_KEY` | string | *required in prod* | Secret key for session security & HMAC hashing |
 | `JWT_SECRET_KEY` | string | *required in prod* | Secret key for signing JWT authentication tokens |
-| `DATABASE_URL` | string | `sqlite:///./rakshya_vision.db` | SQLAlchemy database connection string |
+| `DATABASE_URL` | string | `sqlite:///./safesync.db` | SQLAlchemy database connection string |
 | `HOST` | string | `0.0.0.0` | Bind host address |
 | `PORT` | int | `8000` | Bind port number |
 | `CORS_ORIGINS` | string | `http://localhost:5173` | Comma-separated list of allowed web origins |

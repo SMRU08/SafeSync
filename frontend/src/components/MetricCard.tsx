@@ -1,5 +1,5 @@
 /**
- * MetricCard.tsx — RAKSHYA VISION Phase 8
+ * MetricCard.tsx — SafeSync Phase 8
  * High-visibility metric card with cyber-industrial styling and status variants.
  */
 

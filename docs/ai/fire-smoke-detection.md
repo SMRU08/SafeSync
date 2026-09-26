@@ -1,6 +1,6 @@
 # Fire & Smoke Hazard Detection
 
-RAKSHYA VISION integrates environmental hazard detection for open flames and smoke plumes. By processing hazard detections through spatial tracking and temporal state machines, the system confirms real combustion events while filtering out industrial false alarms.
+SafeSync integrates environmental hazard detection for open flames and smoke plumes. By processing hazard detections through spatial tracking and temporal state machines, the system confirms real combustion events while filtering out industrial false alarms.
 
 ---
 
@@ -60,7 +60,7 @@ The engine evaluates spatial overlap and co-occurrence between fire and smoke ob
 
 ## 4. Industrial False Positive Mitigation
 
-Industrial environments present numerous visual phenomena that mimic fire or smoke. RAKSHYA VISION implements explicit mitigations:
+Industrial environments present numerous visual phenomena that mimic fire or smoke. SafeSync implements explicit mitigations:
 
 1. **Welding Flashes & Electrical Arcs:**
    - *Characteristic:* High-intensity flicker lasting 1–3 frames.

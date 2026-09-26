@@ -1,6 +1,6 @@
 # Model Registry & Checksum Verification
 
-RAKSHYA VISION implements an explicit model governance and registry subsystem to ensure that the production inference pipeline only loads verified, untampered neural network weights.
+SafeSync implements an explicit model governance and registry subsystem to ensure that the production inference pipeline only loads verified, untampered neural network weights.
 
 ---
 

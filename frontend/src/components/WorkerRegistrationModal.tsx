@@ -1,5 +1,5 @@
 /**
- * WorkerRegistrationModal.tsx — RAKSHYA VISION
+ * WorkerRegistrationModal.tsx — SafeSync
  * Worker facial biometric enrollment modal.
  * Supports:
  * 1. Live Webcam (with helpful permission recovery & retry)

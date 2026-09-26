@@ -1,6 +1,6 @@
 # Performance & Benchmark Analysis
 
-This document details measured computational benchmarks, inference latency budgets, and memory consumption characteristics for RAKSHYA VISION.
+This document details measured computational benchmarks, inference latency budgets, and memory consumption characteristics for SafeSync.
 
 ---
 

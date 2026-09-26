@@ -1,6 +1,6 @@
 # Data Flow & System Contracts
 
-This document formalizes the internal data schemas, interface boundaries, and data flow contracts between all subsystems of RAKSHYA VISION.
+This document formalizes the internal data schemas, interface boundaries, and data flow contracts between all subsystems of SafeSync.
 
 ---
 

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This guide details resolutions for common operational, hardware, and configuration issues encountered when running RAKSHYA VISION.
+This guide details resolutions for common operational, hardware, and configuration issues encountered when running SafeSync.
 
 ---
 

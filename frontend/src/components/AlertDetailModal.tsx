@@ -1,5 +1,5 @@
 /**
- * AlertDetailModal.tsx — RAKSHYA VISION Phase 8
+ * AlertDetailModal.tsx — SafeSync Phase 8
  * Detailed audit view for a safety alert including lifecycle actions and history trail.
  */
 

@@ -1,6 +1,6 @@
 # 1. TITLE PAGE
 
-# RAKSHYA VISION
+# SafeSync
 ## AI Vision-Based Safety Monitoring System
 ### BPUT HACKATHON 2026
 
@@ -21,7 +21,7 @@
 | **College / Institution** | *To Be Updated* | Pending Final Roster |
 | **Department** | *To Be Updated* | Pending Final Roster |
 | **Project Lead & Maintainer** | Smruti Ranjan Nayak ([@SMRU08](https://github.com/SMRU08)) | Verified |
-| **Official Repository** | [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git) | Verified |
+| **Official Repository** | [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git) | Verified |
 | **Execution Architecture** | Edge-Compatible Multi-Camera Stream Manager + Async FastAPI + React 18 SOC | Verified |
 | **Validation Evidence** | **160/160 Unit Tests Passed • 39/39 Integration Scenarios Verified** | Verified |
 
@@ -29,7 +29,7 @@
 
 # 2. IDEA TITLE
 
-# IDEA TITLE: RAKSHYA VISION
+# IDEA TITLE: SafeSync
 ## Autonomous AI Vision Platform for Industrial Safety & Hazard Governance
 ### Proposed Solution
 
@@ -52,8 +52,8 @@ In conventional industrial facilities, optical CCTV surveillance remains fundame
 4. **Delayed Combustion Alarm:** Conventional physical ionization or optical ceiling sensors require combustion products to physically migrate to the ceiling (often 2 to 5 minutes), forfeiting critical early containment seconds.
 5. **Lack of Centralized, Defensible Audit Records:** Incident post-mortems frequently suffer from disputed timelines, unauthenticated video clips, and missing contextual evidence.
 
-### 2.3 Proposed Solution: RAKSHYA VISION
-**RAKSHYA VISION** transforms standard CCTV and edge video feeds into an intelligent, active safety monitoring layer. Instead of acting as a passive recorder, the platform continuously inspects multi-camera video streams, detects workers and protective equipment, associates safety gear to individual worker bodies, validates compliance over sliding temporal windows, identifies fire and smoke, calculates an explainable mathematical risk score (0–100), archives tamper-evident visual evidence, and delivers real-time notifications to control room personnel.
+### 2.3 Proposed Solution: SafeSync
+**SafeSync** transforms standard CCTV and edge video feeds into an intelligent, active safety monitoring layer. Instead of acting as a passive recorder, the platform continuously inspects multi-camera video streams, detects workers and protective equipment, associates safety gear to individual worker bodies, validates compliance over sliding temporal windows, identifies fire and smoke, calculates an explainable mathematical risk score (0–100), archives tamper-evident visual evidence, and delivers real-time notifications to control room personnel.
 
 ```
 Camera / CCTV Feed
@@ -96,7 +96,7 @@ Operator Dashboard & Evidence Inspection
 ```
 
 ### 2.4 Core Innovation & Differentiating Value
-1. **Canonical Positive Detection & Derived Absence:** RAKSHYA VISION does **not** train noisy negative detectors (e.g., `no_helmet`). Absence is computed mathematically by verifying whether a detected PPE item belongs to a worker's visible anatomical region.
+1. **Canonical Positive Detection & Derived Absence:** SafeSync does **not** train noisy negative detectors (e.g., `no_helmet`). Absence is computed mathematically by verifying whether a detected PPE item belongs to a worker's visible anatomical region.
 2. **Strict Safety Invariant (`UNKNOWN != VIOLATION`):** Temporary camera clipping, distant workers, or partial occlusions place items into an `UNKNOWN` state. The platform **never** flags an unknown state as a violation, virtually eliminating false-positive alarm fatigue.
 3. **Sliding-Window Temporal Hysteresis:** Single-frame flickers or detection dropouts are smoothed across temporal windows ($N_{\text{confirm}} = 3$ frames for PPE; $N_{\text{confirm}} = 5$ frames for combustion hazards).
 4. **Explainable Mathematical Risk Scoring:** Rather than opaque neural confidence scores, risks are quantified using a transparent formula combining hazard base weights, persistence duration, worker exposure density, and facility zone risk multipliers.
@@ -186,7 +186,7 @@ The single-stage convolutional detector operates strictly on 7 physical canonica
 | `6` | `smoke` | Industrial Smoke Plumes / Particulate | `0.35` |
 
 > [!IMPORTANT]
-> **Absence Derivation Invariant:** The model explicitly excludes synthetic negative classes (`no_helmet`, `no_vest`, `no_gloves`, `no_footwear`). Negative classes degrade detector generalization due to wide variations in clothing and hair. In RAKSHYA VISION, non-compliance is derived through:
+> **Absence Derivation Invariant:** The model explicitly excludes synthetic negative classes (`no_helmet`, `no_vest`, `no_gloves`, `no_footwear`). Negative classes degrade detector generalization due to wide variations in clothing and hair. In SafeSync, non-compliance is derived through:
 > $$\text{Absence} = \text{Visible Person Bounding Box} + \text{Visible Body Zone} - \text{Associated PPE Detection} \quad [\text{Sustained over } N_{\text{confirm}} \ge 3 \text{ frames}]$$
 
 ---
@@ -411,7 +411,7 @@ The following empirical measurements were recorded during live pipeline benchmar
 * **Modular Decoupling:** AI inference, database persistence, and WebSocket broadcasting run asynchronously, ensuring that a database disk write never blocks video processing.
 
 ### 4.2 Financial Feasibility
-* **Zero Infrastructure Overhaul:** Organizations can deploy RAKSHYA VISION on top of their existing CCTV camera networks, eliminating the need to replace optical hardware.
+* **Zero Infrastructure Overhaul:** Organizations can deploy SafeSync on top of their existing CCTV camera networks, eliminating the need to replace optical hardware.
 * **Edge-Native Savings:** Processing video locally on edge workstations eliminates recurring cloud bandwidth, API inference, and cloud storage subscription fees.
 * **Open-Source Core:** Built on top of production open-source software (Python, FastAPI, PyTorch, React, SQLite), avoiding costly proprietary platform licenses.
 
@@ -422,7 +422,7 @@ The following empirical measurements were recorded during live pipeline benchmar
 
 ### 4.4 Technical Challenges & Mitigation Strategies
 
-| Technical Challenge | Root Operational Cause | RAKSHYA VISION Implemented Mitigation |
+| Technical Challenge | Root Operational Cause | SafeSync Implemented Mitigation |
 |---|---|---|
 | **Occlusion & Clipping** | Worker limbs hidden behind machines or edge of camera frame. | **Strict Invariant:** Occluded regions marked `UNKNOWN`; violations are strictly never generated without visible absence. |
 | **Transient False Positives** | Brief motion blur, light reflections, or sensor noise. | **Temporal Validation:** Requires $N=3$ consecutive frames for PPE violations and $N=5$ frames for combustion hazards. |
@@ -471,7 +471,7 @@ The following empirical measurements were recorded during live pipeline benchmar
 
 ### 5.4 Industry-Specific Benefits
 
-| Industry / Environment | Core Safety Challenge | RAKSHYA VISION Contribution | Potential Operational Benefit |
+| Industry / Environment | Core Safety Challenge | SafeSync Contribution | Potential Operational Benefit |
 |---|---|---|---|
 | **Construction & Infrastructure** | Falling debris, moving cranes, workers at height missing helmets or high-visibility vests. | Continuous cranial and thoracic compliance verification across wide outdoor camera feeds. | Enhanced safety visibility for ground workers operating near heavy machinery. |
 | **Heavy Manufacturing & Metal Fabrication** | High ambient noise masking verbal alarms; molten metal and welding fire hazards. | Optical flame detection combined with high-priority dashboard takeovers and visual warnings. | Visual combustion awareness before localized heat reaches distant ceiling alarms. |
@@ -512,7 +512,7 @@ The following empirical measurements were recorded during live pipeline benchmar
 
 ### 6.2 Standardized Datasets & Open Registries
 
-| Dataset Name | Primary Purpose in RAKSHYA VISION | Official Source / Origin | Verified License |
+| Dataset Name | Primary Purpose in SafeSync | Official Source / Origin | Verified License |
 |---|---|---|:---:|
 | **PPE Detection & Compliance** | Multi-class training for helmets, vests, gloves, and footwear. | [Roboflow Universe (Izanagi)](https://universe.roboflow.com/izanagi/ppe-detection-and-compliance) | CC BY 4.0 |
 | **Construction PPE Dataset** | Supplementary real-world construction background diversity. | [Roboflow Universe (SKCET)](https://universe.roboflow.com/skcet-g4h72/construction-ppe-rdhzo) | CC BY 4.0 |
@@ -554,4 +554,4 @@ The following empirical measurements were recorded during live pipeline benchmar
 * **Problem Statement:** PS06 — Prototype AI System that Detects Safety Gear Compliance
 * **Organizing Bodies:** Software Technology Parks of India (STPI) & EmTek
 * **Project Team:** XERSES
-* **Official Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)
+* **Official Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)

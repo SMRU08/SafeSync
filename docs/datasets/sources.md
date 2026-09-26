@@ -1,6 +1,6 @@
 # Dataset Sources & Distribution
 
-This document details the public datasets ingested, split distributions, and licensing metadata supporting RAKSHYA VISION.
+This document details the public datasets ingested, split distributions, and licensing metadata supporting SafeSync.
 
 ---
 

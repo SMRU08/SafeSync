@@ -1,4 +1,4 @@
-# RAKSHYA VISION — Safety Intelligence Pipeline & Alarm System
+# SafeSync — Safety Intelligence Pipeline & Alarm System
 ## Master Engineering Acceptance Report
 
 **Date:** 2026-09-23  
@@ -9,7 +9,7 @@
 
 ### Executive Summary
 
-The RAKSHYA VISION system has been upgraded from a basic object detection prototype into an industrial-grade, multi-stage Safety Intelligence Pipeline. The upgrade addresses the core challenges of computer-vision false positives, architectural entanglement, and alarm fatigue:
+The SafeSync system has been upgraded from a basic object detection prototype into an industrial-grade, multi-stage Safety Intelligence Pipeline. The upgrade addresses the core challenges of computer-vision false positives, architectural entanglement, and alarm fatigue:
 1. **False-Positive Elimination:** Natural hair is no longer falsely recognized as a helmet; ordinary everyday shirts and dresses are no longer falsely recognized as safety vests. Spatial cranial/thoracic anatomical anchoring, HSV fluorescent chromatic verification, and multi-frame temporal confirmation enforce strict verification.
 2. **Decoupled AI Architecture:** PPE detection (`models/ppe/`) is strictly decoupled from Environmental Hazard detection (`models/hazards/`). Model weights and versions are managed via `MODEL_REGISTRY.json` and verified with immutable SHA-256 cryptographic checksums.
 3. **Safety Engine & Priority Alarm System:** A centralized `SafetyEngine` enforces Rules 1 through 7, routing observations through a prioritized `AlarmEngine` ($P_0$ Emergency, $P_1$ Hazard, $P_2$ PPE Violation, $P_3$ System Advisory). Emergency fire and smoke hazards immediately trigger audible sirens, while PPE compliance infractions display clearly on the operator dashboard without triggering loud sirens.
@@ -66,7 +66,7 @@ backend/tests/test_model_registry_phase10.py ......... [7/7 PASSED]
 ### Architectural Layout
 
 ```
-RAKSHYA VISION
+SafeSync
 ├── configs/
 │   ├── detection.yaml            <-- Class confidence thresholds (helmet: 0.38, vest: 0.38)
 │   ├── hazard.yaml               <-- Hazard thresholds & temporal parameters

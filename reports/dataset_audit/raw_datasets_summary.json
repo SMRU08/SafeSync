@@ -1,7 +1,7 @@
 {
   "ppe_detection_compliance": {
     "dataset_name": "ppe_detection_compliance",
-    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance",
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance",
     "exists": true,
     "yaml_files": {
       "data.yaml": {
@@ -35,8 +35,8 @@
     },
     "splits": {
       "train": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance\\train\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance\\train\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\train\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\train\\labels",
         "num_images": 7721,
         "num_labels": 7721,
         "num_annotations": 31678,
@@ -57,8 +57,8 @@
         }
       },
       "valid": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance\\valid\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance\\valid\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\valid\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\valid\\labels",
         "num_images": 1460,
         "num_labels": 1460,
         "num_annotations": 5854,
@@ -79,8 +79,8 @@
         }
       },
       "test": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance\\test\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\ppe_detection_compliance\\test\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\test\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\test\\labels",
         "num_images": 482,
         "num_labels": 482,
         "num_annotations": 1978,
@@ -122,7 +122,7 @@
   },
   "construction_ppe": {
     "dataset_name": "construction_ppe",
-    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe",
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe",
     "exists": true,
     "yaml_files": {
       "data.yaml": {
@@ -147,8 +147,8 @@
     },
     "splits": {
       "train": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe\\train\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe\\train\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\train\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\train\\labels",
         "num_images": 928,
         "num_labels": 928,
         "num_annotations": 4296,
@@ -160,8 +160,8 @@
         }
       },
       "valid": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe\\valid\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe\\valid\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\valid\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\valid\\labels",
         "num_images": 133,
         "num_labels": 133,
         "num_annotations": 680,
@@ -173,8 +173,8 @@
         }
       },
       "test": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe\\test\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\construction_ppe\\test\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\test\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\test\\labels",
         "num_images": 63,
         "num_labels": 63,
         "num_annotations": 349,
@@ -198,7 +198,7 @@
   },
   "hard_hat_workers": {
     "dataset_name": "hard_hat_workers",
-    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers",
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers",
     "exists": true,
     "yaml_files": {
       "data.yaml": {
@@ -222,8 +222,8 @@
     },
     "splits": {
       "train": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers\\train\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers\\train\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\train\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\train\\labels",
         "num_images": 4916,
         "num_labels": 4916,
         "num_annotations": 18981,
@@ -234,8 +234,8 @@
         }
       },
       "valid": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers\\valid\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers\\valid\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\valid\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\valid\\labels",
         "num_images": 1413,
         "num_labels": 1413,
         "num_annotations": 5353,
@@ -246,8 +246,8 @@
         }
       },
       "test": {
-        "image_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers\\test\\images",
-        "label_dir": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\hard_hat_workers\\test\\labels",
+        "image_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\test\\images",
+        "label_dir": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\test\\labels",
         "num_images": 706,
         "num_labels": 706,
         "num_annotations": 2705,
@@ -269,7 +269,7 @@
   },
   "d_fire": {
     "dataset_name": "d_fire",
-    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\raw\\d_fire",
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\d_fire",
     "exists": true,
     "yaml_files": {},
     "splits": {},

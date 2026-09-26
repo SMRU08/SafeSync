@@ -1,6 +1,6 @@
 # Dataset Strategy & Class Normalization
 
-This document details the dataset engineering strategy, class normalization philosophy, and annotation policies adopted by RAKSHYA VISION.
+This document details the dataset engineering strategy, class normalization philosophy, and annotation policies adopted by SafeSync.
 
 ---
 
@@ -13,7 +13,7 @@ In vision-based industrial safety systems, attempting to detect the absence of g
 3. **Occlusion Sensitivity:** If a worker turns away or steps behind equipment, absence-based models frequently generate false positive alarms.
 
 ### 1.1 Decoupled Compliance Formula
-RAKSHYA VISION decouples physical object detection from operational safety rules:
+SafeSync decouples physical object detection from operational safety rules:
 
 $$\text{Person Detected} + \text{PPE Associated to Anatomy} = \text{Compliant}$$
 

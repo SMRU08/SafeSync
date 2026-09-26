@@ -1,5 +1,5 @@
 """
-test_risk_alerts.py — RAKSHYA VISION Phase 7 Tests
+test_risk_alerts.py — SafeSync Phase 7 Tests
 Comprehensive automated test suite for Safety Risk Analysis and Smart Alerts.
 Covers:
   - Event normalizer (confirmed vs UNKNOWN PPE states)

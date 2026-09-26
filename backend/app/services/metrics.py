@@ -1,5 +1,5 @@
 """
-metrics.py — RAKSHYA VISION Phase 10 Step 10
+metrics.py — SafeSync Phase 10 Step 10
 Operational Metrics Collector & Prometheus Exposition Engine.
 Provides high-performance, thread-safe metric counters, gauges, histograms,
 and standardized Prometheus 0.0.4 text / JSON exports.
@@ -14,7 +14,7 @@ from typing import Dict, Any, List, Optional, Tuple
 
 class MetricsCollector:
     """
-    Thread-safe operational telemetry collector for RAKSHYA VISION.
+    Thread-safe operational telemetry collector for SafeSync.
     Tracks frame throughput, detections, incidents, smart alerts,
     evidence archival, and system resource utilization.
     """
@@ -26,32 +26,32 @@ class MetricsCollector:
         self._counters: Dict[str, Dict[Tuple[Tuple[str, str], ...], float]] = {}
         self._gauges: Dict[str, Dict[Tuple[Tuple[str, str], ...], float]] = {}
         self._metric_help: Dict[str, str] = {
-            "rakshya_pipeline_frames_total": "Total video frames ingested and processed by camera workers",
-            "rakshya_pipeline_dropped_frames_total": "Total video frames dropped due to queue congestion or slow inference",
-            "rakshya_detections_total": "Total AI object and hazard detections categorized by class",
-            "rakshya_incidents_total": "Total safety incidents created categorized by risk level and camera",
-            "rakshya_alerts_total": "Total smart alerts generated categorized by severity and event type",
-            "rakshya_alert_actions_total": "Total lifecycle actions taken on alerts (CREATED, ACKNOWLEDGED, RESOLVED, DISMISSED)",
-            "rakshya_alert_dispatches_total": "Total external alert notifications sent categorized by provider and status",
-            "rakshya_camera_workers_active": "Current count of active camera capture worker threads",
-            "rakshya_evidence_storage_bytes": "Total filesystem storage consumed by visual evidence artifacts",
-            "rakshya_uptime_seconds": "Total running time of RAKSHYA VISION service in seconds",
-            "rakshya_process_cpu_percent": "Current process CPU utilization percentage",
-            "rakshya_process_memory_rss_bytes": "Resident Set Size (RSS) memory consumption in bytes",
+            "safesync_pipeline_frames_total": "Total video frames ingested and processed by camera workers",
+            "safesync_pipeline_dropped_frames_total": "Total video frames dropped due to queue congestion or slow inference",
+            "safesync_detections_total": "Total AI object and hazard detections categorized by class",
+            "safesync_incidents_total": "Total safety incidents created categorized by risk level and camera",
+            "safesync_alerts_total": "Total smart alerts generated categorized by severity and event type",
+            "safesync_alert_actions_total": "Total lifecycle actions taken on alerts (CREATED, ACKNOWLEDGED, RESOLVED, DISMISSED)",
+            "safesync_alert_dispatches_total": "Total external alert notifications sent categorized by provider and status",
+            "safesync_camera_workers_active": "Current count of active camera capture worker threads",
+            "safesync_evidence_storage_bytes": "Total filesystem storage consumed by visual evidence artifacts",
+            "safesync_uptime_seconds": "Total running time of SafeSync service in seconds",
+            "safesync_process_cpu_percent": "Current process CPU utilization percentage",
+            "safesync_process_memory_rss_bytes": "Resident Set Size (RSS) memory consumption in bytes",
         }
         self._metric_types: Dict[str, str] = {
-            "rakshya_pipeline_frames_total": "counter",
-            "rakshya_pipeline_dropped_frames_total": "counter",
-            "rakshya_detections_total": "counter",
-            "rakshya_incidents_total": "counter",
-            "rakshya_alerts_total": "counter",
-            "rakshya_alert_actions_total": "counter",
-            "rakshya_alert_dispatches_total": "counter",
-            "rakshya_camera_workers_active": "gauge",
-            "rakshya_evidence_storage_bytes": "gauge",
-            "rakshya_uptime_seconds": "gauge",
-            "rakshya_process_cpu_percent": "gauge",
-            "rakshya_process_memory_rss_bytes": "gauge",
+            "safesync_pipeline_frames_total": "counter",
+            "safesync_pipeline_dropped_frames_total": "counter",
+            "safesync_detections_total": "counter",
+            "safesync_incidents_total": "counter",
+            "safesync_alerts_total": "counter",
+            "safesync_alert_actions_total": "counter",
+            "safesync_alert_dispatches_total": "counter",
+            "safesync_camera_workers_active": "gauge",
+            "safesync_evidence_storage_bytes": "gauge",
+            "safesync_uptime_seconds": "gauge",
+            "safesync_process_cpu_percent": "gauge",
+            "safesync_process_memory_rss_bytes": "gauge",
         }
 
     @classmethod
@@ -107,19 +107,19 @@ class MetricsCollector:
 
         # Refresh dynamic system gauges
         uptime = self.get_uptime_seconds()
-        self.set_gauge("rakshya_uptime_seconds", uptime)
+        self.set_gauge("safesync_uptime_seconds", uptime)
 
         try:
             proc = psutil.Process(os.getpid())
-            self.set_gauge("rakshya_process_cpu_percent", proc.cpu_percent(interval=None))
-            self.set_gauge("rakshya_process_memory_rss_bytes", proc.memory_info().rss)
+            self.set_gauge("safesync_process_cpu_percent", proc.cpu_percent(interval=None))
+            self.set_gauge("safesync_process_memory_rss_bytes", proc.memory_info().rss)
         except Exception:
             pass
 
         # Update evidence storage gauge if service available
         try:
             from app.services.evidence_manager import EvidenceManager
-            self.set_gauge("rakshya_evidence_storage_bytes", EvidenceManager.get_instance().get_total_storage_usage())
+            self.set_gauge("safesync_evidence_storage_bytes", EvidenceManager.get_instance().get_total_storage_usage())
         except Exception:
             pass
 
@@ -127,14 +127,14 @@ class MetricsCollector:
         try:
             from app.camera.manager import CameraManager
             active_cams = sum(1 for s in CameraManager.get_instance().get_all_statuses() if s.state.value == "CONNECTED")
-            self.set_gauge("rakshya_camera_workers_active", active_cams)
+            self.set_gauge("safesync_camera_workers_active", active_cams)
         except Exception:
             pass
 
         with self._lock:
             # Format counters
             for name, entries in self._counters.items():
-                help_text = self._metric_help.get(name, "Rakshya Vision counter metric")
+                help_text = self._metric_help.get(name, "SafeSync counter metric")
                 metric_type = self._metric_types.get(name, "counter")
                 lines.append(f"# HELP {name} {help_text}")
                 lines.append(f"# TYPE {name} {metric_type}")
@@ -144,7 +144,7 @@ class MetricsCollector:
 
             # Format gauges
             for name, entries in self._gauges.items():
-                help_text = self._metric_help.get(name, "Rakshya Vision gauge metric")
+                help_text = self._metric_help.get(name, "SafeSync gauge metric")
                 metric_type = self._metric_types.get(name, "gauge")
                 lines.append(f"# HELP {name} {help_text}")
                 lines.append(f"# TYPE {name} {metric_type}")
@@ -160,7 +160,7 @@ class MetricsCollector:
         Exports a consolidated JSON telemetry report for dashboards and UI widgets.
         """
         uptime = self.get_uptime_seconds()
-        self.set_gauge("rakshya_uptime_seconds", uptime)
+        self.set_gauge("safesync_uptime_seconds", uptime)
 
         # Build counters summary
         counters_summary: Dict[str, Any] = {}

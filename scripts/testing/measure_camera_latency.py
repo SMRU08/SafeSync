@@ -1,5 +1,5 @@
 """
-measure_camera_latency.py — RAKSHYA VISION Real-Time Latency Verification
+measure_camera_latency.py — SafeSync Real-Time Latency Verification
 Benchmark measuring:
 1. Capture loop FPS and throughput
 2. AI inference decoupling & execution latency

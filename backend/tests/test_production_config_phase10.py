@@ -1,5 +1,5 @@
 """
-test_production_config_phase10.py — RAKSHYA VISION Phase 10 Step 3
+test_production_config_phase10.py — SafeSync Phase 10 Step 3
 Automated tests for Centralized Production Configuration, Secret Safety, and CORS Validation.
 """
 

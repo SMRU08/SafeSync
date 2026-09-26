@@ -1,6 +1,6 @@
 # PPE Compliance & Anatomical Association
 
-In industrial safety monitoring, determining personal protective equipment (PPE) compliance directly through neural classification often results in false alarms caused by partial occlusions, camera angles, and overlapping workers. RAKSHYA VISION avoids these failure modes through an anatomy-aware spatial association engine combined with a multi-frame temporal state machine.
+In industrial safety monitoring, determining personal protective equipment (PPE) compliance directly through neural classification often results in false alarms caused by partial occlusions, camera angles, and overlapping workers. SafeSync avoids these failure modes through an anatomy-aware spatial association engine combined with a multi-frame temporal state machine.
 
 ---
 
@@ -61,7 +61,7 @@ stateDiagram-v2
 
 ## 3. Strict Safety Rule: `UNKNOWN != VIOLATION`
 
-A foundational architectural invariant in RAKSHYA VISION is that **ambiguity is not non-compliance**:
+A foundational architectural invariant in SafeSync is that **ambiguity is not non-compliance**:
 
 $$\text{UNKNOWN} \neq \text{VIOLATION}$$
 

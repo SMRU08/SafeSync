@@ -1,5 +1,5 @@
 """
-schemas.py — RAKSHYA VISION Phase 6
+schemas.py — SafeSync Phase 6
 Pydantic schemas for Fire & Smoke Hazard Analysis.
 Strictly decoupled from PPE compliance and risk scoring.
 """

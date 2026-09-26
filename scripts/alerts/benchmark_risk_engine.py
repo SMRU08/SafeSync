@@ -1,5 +1,5 @@
 """
-benchmark_risk_engine.py — RAKSHYA VISION Phase 7
+benchmark_risk_engine.py — SafeSync Phase 7
 Measures actual execution latencies for Risk Analysis, Event Normalization,
 Alert Deduplication, Cooldown, and Database Persistence.
 Exports results to outputs/alerts/alert_benchmark.json.

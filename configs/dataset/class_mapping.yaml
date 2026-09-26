@@ -1,4 +1,4 @@
-# RAKSHYA VISION — Class Normalization & Canonical Mapping Configuration
+# SafeSync — Class Normalization & Canonical Mapping Configuration
 # Strict policy:
 # Canonical PPE Classes: 0: person, 1: helmet, 2: safety_vest, 3: gloves, 4: safety_footwear
 # Canonical Hazard Classes: 0: fire, 1: smoke

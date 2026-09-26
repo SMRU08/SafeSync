@@ -1,5 +1,5 @@
 /**
- * AnalyticsView.tsx — RAKSHYA VISION Professional SOC
+ * AnalyticsView.tsx — SafeSync Professional SOC
  * Safety & Compliance Analytics, Incident Distribution, and Temporal Trends.
  * Displays real-time aggregations with clean industrial visualizations.
  */

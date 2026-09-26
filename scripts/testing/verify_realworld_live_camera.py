@@ -1,5 +1,5 @@
 """
-verify_realworld_live_camera.py — RAKSHYA VISION Comprehensive End-to-End Real-World Live Camera Verification
+verify_realworld_live_camera.py — SafeSync Comprehensive End-to-End Real-World Live Camera Verification
 
 Measures the complete path:
 PHYSICAL/SYNTHETIC CAMERA SENSOR
@@ -384,7 +384,7 @@ def test_multi_camera_isolation():
 
 if __name__ == "__main__":
     print("=" * 75)
-    print("RAKSHYA VISION — REAL-WORLD LIVE CAMERA END-TO-END VALIDATION SUITE")
+    print("SafeSync — REAL-WORLD LIVE CAMERA END-TO-END VALIDATION SUITE")
     print("=" * 75)
 
     # 1. Benchmark 640x360 / 640x480

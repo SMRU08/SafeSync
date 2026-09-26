@@ -1,5 +1,5 @@
 """
-comprehensive_audit.py — RAKSHYA VISION Quality & Leakage Audit Engine
+comprehensive_audit.py — SafeSync Quality & Leakage Audit Engine
 Performs rigorous inspection across all raw datasets in datasets/raw/:
 1. Inventory audit: image count, label count, resolution ranges, split breakdown.
 2. Quality audit: corrupted images, empty labels, missing labels, invalid bboxes, tiny bboxes, invalid class IDs.

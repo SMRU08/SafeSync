@@ -9,7 +9,7 @@ def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
     data = response.json()
-    assert data["project"] == "RAKSHYA VISION"
+    assert data["project"] == "SafeSync"
     assert data["status"] == "running"
 
 

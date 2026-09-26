@@ -24,7 +24,7 @@ export const Dashboard: React.FC = () => {
     <main className="dashboard-container">
       <header className="dashboard-header">
         <div className="logo-badge">PHASE 1 FOUNDATION</div>
-        <h1 className="main-title">RAKSHYA VISION</h1>
+        <h1 className="main-title">SafeSync</h1>
         <p className="subtitle">AI Vision-Based Safety Monitoring</p>
       </header>
 
@@ -53,7 +53,7 @@ export const Dashboard: React.FC = () => {
             title="Database"
             status={dbInfo.label}
             variant={dbInfo.variant}
-            detail={health.database === 'connected' ? 'SQLite rakshya_vision.db ready' : 'Database unreachable'}
+            detail={health.database === 'connected' ? 'SQLite safesync.db ready' : 'Database unreachable'}
           />
         </div>
 

@@ -1,5 +1,5 @@
 """
-registry.py — RAKSHYA VISION Phase 10 Step 8
+registry.py — SafeSync Phase 10 Step 8
 Central Provider Registry managing external alert notifications concurrently
 with complete fault isolation and honest status aggregation.
 """
@@ -81,7 +81,7 @@ class ProviderRegistry:
                 try:
                     from app.services.metrics import MetricsCollector
                     MetricsCollector.get_instance().increment_counter(
-                        "rakshya_alert_dispatches_total",
+                        "safesync_alert_dispatches_total",
                         labels={"provider": p_name, "status": status_str}
                     )
                 except Exception:
@@ -92,7 +92,7 @@ class ProviderRegistry:
                 try:
                     from app.services.metrics import MetricsCollector
                     MetricsCollector.get_instance().increment_counter(
-                        "rakshya_alert_dispatches_total",
+                        "safesync_alert_dispatches_total",
                         labels={"provider": p_name, "status": "error"}
                     )
                 except Exception:

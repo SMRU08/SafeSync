@@ -1,5 +1,5 @@
 """
-temporal.py — RAKSHYA VISION Phase 6
+temporal.py — SafeSync Phase 6
 Temporal Hazard State Machine.
 Evaluates state transitions: NO_HAZARD -> SUSPECTED -> CONFIRMED -> CLEARED -> NO_HAZARD.
 Implements temporal evidence accumulation, gap tolerance, clearing rules, and

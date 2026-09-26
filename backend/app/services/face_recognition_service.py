@@ -1,5 +1,5 @@
 """
-face_recognition_service.py — RAKSHYA VISION
+face_recognition_service.py — SafeSync
 Biometric Face Recognition & Embedding Engine.
 Supports dlib face_recognition if installed, or high-performance PyTorch Neural
 Biometric Embeddings (MobileNetV3) with deterministic orthogonal projection.

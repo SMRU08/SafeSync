@@ -1,5 +1,5 @@
 """
-safety_engine.py — RAKSHYA VISION Safety Intelligence Pipeline
+safety_engine.py — SafeSync Safety Intelligence Pipeline
 Centralized Safety Engine orchestrating decoupled PPE, Hazard, and System Health observations.
 
 Enforces 7 Core Safety Rules:
@@ -95,7 +95,7 @@ class SafetyAssessment:
 
 class SafetyEngine:
     """
-    Central Safety Intelligence Engine for RAKSHYA VISION.
+    Central Safety Intelligence Engine for SafeSync.
     Combines verified worker PPE compliance and fire/smoke hazards into actionable safety evaluations.
     """
 

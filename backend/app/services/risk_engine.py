@@ -1,5 +1,5 @@
 """
-risk_engine.py — RAKSHYA VISION Phase 7
+risk_engine.py — SafeSync Phase 7
 Safety Risk Analysis Engine.
 Computes explainable, deterministic numerical risk scores (0-100) and maps them to
 categorical risk levels (LOW, MEDIUM, HIGH, CRITICAL) using configurable policy rules.

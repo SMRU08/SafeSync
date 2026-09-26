@@ -1,5 +1,5 @@
 """
-websocket.py — RAKSHYA VISION Phase 8
+websocket.py — SafeSync Phase 8
 FastAPI WebSocket Router for Real-Time Safety Alerts & Live Event Broadcasting.
 Bridges the Phase 7 EventBroadcaster singleton with connected frontend clients.
 """
@@ -84,7 +84,7 @@ class WebSocketManager:
         # Send initial welcome / handshake payload
         await websocket.send_json({
             "type": "connected",
-            "message": "Connected to RAKSHYA VISION Live Event Stream",
+            "message": "Connected to SafeSync Live Event Stream",
             "active_connections": len(self._active_connections),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         })

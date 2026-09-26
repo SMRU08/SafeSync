@@ -1,6 +1,6 @@
 # System Monitoring & Observability
 
-RAKSHYA VISION exposes comprehensive health checks, real-time performance telemetry, Prometheus scrape endpoints, and structured logging for production operations and container orchestration.
+SafeSync exposes comprehensive health checks, real-time performance telemetry, Prometheus scrape endpoints, and structured logging for production operations and container orchestration.
 
 ---
 
@@ -41,7 +41,7 @@ RAKSHYA VISION exposes comprehensive health checks, real-time performance teleme
 ```json
 {
   "status": "ready",
-  "service": "RAKSHYA VISION",
+  "service": "SafeSync",
   "checks": {
     "database": "connected",
     "ai_model": "loaded",
@@ -59,26 +59,26 @@ RAKSHYA VISION exposes comprehensive health checks, real-time performance teleme
 The system exports standard Prometheus text format metrics:
 
 ```prometheus
-# HELP rakshya_pipeline_frames_total Total video frames processed by camera
-# TYPE rakshya_pipeline_frames_total counter
-rakshya_pipeline_frames_total{camera_id="camera_01"} 14250.0
+# HELP safesync_pipeline_frames_total Total video frames processed by camera
+# TYPE safesync_pipeline_frames_total counter
+safesync_pipeline_frames_total{camera_id="camera_01"} 14250.0
 
-# HELP rakshya_pipeline_dropped_frames_total Total corrupted or dropped frames
-# TYPE rakshya_pipeline_dropped_frames_total counter
-rakshya_pipeline_dropped_frames_total{camera_id="camera_01"} 3.0
+# HELP safesync_pipeline_dropped_frames_total Total corrupted or dropped frames
+# TYPE safesync_pipeline_dropped_frames_total counter
+safesync_pipeline_dropped_frames_total{camera_id="camera_01"} 3.0
 
-# HELP rakshya_inference_latency_seconds Latency of neural detection pass
-# TYPE rakshya_inference_latency_seconds gauge
-rakshya_inference_latency_seconds{model="ppe_fire_smoke_v2"} 0.0382
+# HELP safesync_inference_latency_seconds Latency of neural detection pass
+# TYPE safesync_inference_latency_seconds gauge
+safesync_inference_latency_seconds{model="ppe_fire_smoke_v2"} 0.0382
 
-# HELP rakshya_active_workers Current detected workers tracked across cameras
-# TYPE rakshya_active_workers gauge
-rakshya_active_workers{zone="zone_a"} 4.0
+# HELP safesync_active_workers Current detected workers tracked across cameras
+# TYPE safesync_active_workers gauge
+safesync_active_workers{zone="zone_a"} 4.0
 
-# HELP rakshya_incidents_total Total safety incidents created by event type
-# TYPE rakshya_incidents_total counter
-rakshya_incidents_total{event_type="MISSING_HELMET"} 12.0
-rakshya_incidents_total{event_type="FIRE_DETECTED"} 0.0
+# HELP safesync_incidents_total Total safety incidents created by event type
+# TYPE safesync_incidents_total counter
+safesync_incidents_total{event_type="MISSING_HELMET"} 12.0
+safesync_incidents_total{event_type="FIRE_DETECTED"} 0.0
 ```
 
 ---
@@ -87,5 +87,5 @@ rakshya_incidents_total{event_type="FIRE_DETECTED"} 0.0
 
 - **Format:** Structured JSON logging in production mode (`configs/production.yaml`).
 - **Rotation Policy:** 50 MB max file size with 5 backup generations (`RotatingFileHandler`).
-- **Log Location:** `logs/rakshya_vision.log`.
+- **Log Location:** `logs/safesync.log`.
 - **Sensitive Data Redaction:** URL credentials and auth tokens are stripped prior to writing to disk.

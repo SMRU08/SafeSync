@@ -1,5 +1,5 @@
 """
-base.py — RAKSHYA VISION Phase 10 Step 8
+base.py — SafeSync Phase 10 Step 8
 Abstract Base Class, Data Models, and Status Enums for External Alert Providers.
 """
 
@@ -29,7 +29,7 @@ class AlertNotificationPayload(BaseModel):
     timestamp: str
     affected_workers_count: int = 0
     evidence_reference: Optional[str] = None
-    system_version: str = "RAKSHYA VISION 2.0 (Phase 10)"
+    system_version: str = "SafeSync 2.0 (Phase 10)"
 
 
 class BaseAlertProvider(ABC):

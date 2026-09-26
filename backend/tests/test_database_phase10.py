@@ -1,10 +1,10 @@
 """
-test_database_phase10.py — RAKSHYA VISION Phase 10 Step 4
+test_database_phase10.py — SafeSync Phase 10 Step 4
 Automated Test Suite for SQLite WAL Mode, Pragmas, Health Checks,
 and Retention Cleanup Logic.
 
 Uses isolated, temporary SQLite test databases and ensures no corruption or leakage
-to production `rakshya_vision.db`.
+to production `safesync.db`.
 """
 
 import os

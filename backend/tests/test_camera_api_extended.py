@@ -1,5 +1,5 @@
 """
-test_camera_api_extended.py — RAKSHYA VISION
+test_camera_api_extended.py — SafeSync
 Unit and integration tests for multi-camera surveillance endpoints:
 - GET /api/cameras (multi-camera list with operational metrics)
 - POST /api/cameras (dynamic registration & DB persistence)

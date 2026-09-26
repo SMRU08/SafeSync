@@ -1,5 +1,5 @@
 {
-  "suite_name": "RAKSHYA VISION False Positive Benchmark Suite",
+  "suite_name": "SafeSync False Positive Benchmark Suite",
   "overall_status": "PASS",
   "total_cases_evaluated": 19,
   "total_false_positives_recorded": 0,

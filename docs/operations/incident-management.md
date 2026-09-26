@@ -1,6 +1,6 @@
 # Incident Management & Operational Governance
 
-RAKSHYA VISION manages confirmed safety violations and environmental hazards as structured, auditable incident records. Each incident follows a strict lifecycle governed by human-in-the-loop operator actions.
+SafeSync manages confirmed safety violations and environmental hazards as structured, auditable incident records. Each incident follows a strict lifecycle governed by human-in-the-loop operator actions.
 
 ---
 

@@ -1,5 +1,5 @@
 /**
- * CameraFeedPlayer.tsx — RAKSHYA VISION Professional SOC
+ * CameraFeedPlayer.tsx — SafeSync Professional SOC
  * High-performance live camera monitor with dynamic camera switcher,
  * real-time ByteTrack worker PPE detection HUD, telemetry bar, and stream controls.
  */

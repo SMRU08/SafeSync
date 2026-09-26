@@ -1,5 +1,5 @@
 """
-__init__.py — RAKSHYA VISION Detection Subsystem (Phase 4)
+__init__.py — SafeSync Detection Subsystem (Phase 4)
 Exposes the public interfaces: Detector, ModelLoader, FrameProcessor, VideoProcessor, schemas.
 """
 

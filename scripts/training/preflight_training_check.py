@@ -1,5 +1,5 @@
 """
-preflight_training_check.py — RAKSHYA VISION Phase 3
+preflight_training_check.py — SafeSync Phase 3
 Validates data.yaml, all 3 splits (images + labels), label integrity,
 and verifies the 7 canonical class IDs before training begins.
 Exits with code 0 on success, 1 on any failure.
@@ -145,7 +145,7 @@ def check_model_output_dir():
 
 def main():
     print("=" * 60)
-    print("  RAKSHYA VISION — Phase 3 Pre-flight Training Check")
+    print("  SafeSync — Phase 3 Pre-flight Training Check")
     print("=" * 60)
 
     cfg = check_data_yaml()

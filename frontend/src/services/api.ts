@@ -1,5 +1,5 @@
 /**
- * api.ts — RAKSHYA VISION Phase 8
+ * api.ts — SafeSync Phase 8
  * Fully typed REST API client for backend communication.
  * Connects directly to FastAPI endpoints for health, compliance, hazards, and smart alerts.
  */

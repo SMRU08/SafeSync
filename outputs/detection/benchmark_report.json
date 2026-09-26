@@ -1,5 +1,5 @@
 {
-  "video": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\test_safety_video.mp4",
+  "video": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\test_safety_video.mp4",
   "resolution": "640x480",
   "frames_tested": 120,
   "input_fps": 15.0,

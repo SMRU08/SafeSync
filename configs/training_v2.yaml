@@ -1,4 +1,4 @@
-# configs/training_v2.yaml — RAKSHYA VISION Phase 3.1
+# configs/training_v2.yaml — SafeSync Phase 3.1
 # Controlled experiment v2: Balanced training manifest, multi-epoch convergence, higher cls loss weight
 # Architecture: YOLOv8n (same as v1 for controlled comparison)
 # Resolution: 384x384 (same as v1 for controlled comparison)
@@ -49,7 +49,7 @@ erasing: 0.0
 # ─── Experiment Metadata ─────────────────────────────────────────────────────
 experiment: ppe_fire_smoke_v2
 phase: "Phase 3.1 — Model Diagnosis, Correction & Retraining"
-project: "RAKSHYA VISION"
+project: "SafeSync"
 notes: >
   Controlled experiment v2. Resolves root causes RC-01 (dataset prefix slicing via fraction=0.25)
   and RC-02 (under-convergence). Uses balanced training manifest with 100% representation for

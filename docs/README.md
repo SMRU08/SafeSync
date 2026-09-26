@@ -1,6 +1,6 @@
-# RAKSHYA VISION Documentation Index
+# SafeSync Documentation Index
 
-Welcome to the technical documentation for **RAKSHYA VISION**, an automated edge AI safety monitoring system for industrial facilities.
+Welcome to the technical documentation for **SafeSync**, an automated edge AI safety monitoring system for industrial facilities.
 
 ---
 

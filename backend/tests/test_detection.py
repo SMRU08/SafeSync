@@ -1,5 +1,5 @@
 """
-test_detection.py — RAKSHYA VISION Phase 4 Unit & Integration Tests
+test_detection.py — SafeSync Phase 4 Unit & Integration Tests
 Tests:
 - ModelLoader: checkpoint loading, device resolution, class exposure
 - Detector: image inference, bounding boxes, schema validation, confidence filtering

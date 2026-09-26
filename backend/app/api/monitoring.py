@@ -1,5 +1,5 @@
 """
-monitoring.py — RAKSHYA VISION Phase 10 Step 10
+monitoring.py — SafeSync Phase 10 Step 10
 FastAPI Router for System Observability, Liveness/Readiness Probes,
 Prometheus Metrics Exposition, and Deep Health Telemetry.
 """
@@ -39,7 +39,7 @@ def liveness_probe():
     collector = MetricsCollector.get_instance()
     return {
         "status": "alive",
-        "service": "RAKSHYA VISION",
+        "service": "SafeSync",
         "uptime_seconds": collector.get_uptime_seconds(),
         "timestamp": _utc_now_iso(),
     }
@@ -88,7 +88,7 @@ def readiness_probe():
 
     result_payload = {
         "status": "ready" if is_ready else "not_ready",
-        "service": "RAKSHYA VISION",
+        "service": "SafeSync",
         "checks": checks,
         "timestamp": _utc_now_iso(),
     }

@@ -1,5 +1,5 @@
 """
-run_rtsp.py — RAKSHYA VISION Phase 4
+run_rtsp.py — SafeSync Phase 4
 RTSP / IP camera stream safety detection runner.
 Credentials are NEVER stored in source code; passed via CLI or RTSP_URL env var.
 Implements bounded exponential backoff reconnection logic.
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — RTSP Stream Detection")
+    parser = argparse.ArgumentParser(description="SafeSync — RTSP Stream Detection")
     parser.add_argument("--url", "-u", type=str, default=None, help="RTSP stream URL (or set RTSP_URL env var)")
     parser.add_argument("--confidence", type=float, default=0.25, help="Confidence threshold")
     parser.add_argument("--device", "-d", type=str, default="auto", help="Inference device")
@@ -67,7 +67,7 @@ def main():
 
     clean_url = sanitize_url(rtsp_url)
     print("=" * 65)
-    print("  RAKSHYA VISION — RTSP / IP Camera Detection")
+    print("  SafeSync — RTSP / IP Camera Detection")
     print("=" * 65)
     print(f"  Stream URL   : {clean_url}")
     print(f"  Confidence   : {args.confidence}")
@@ -83,7 +83,7 @@ def main():
 
     attempts = 0
     total_frames = 0
-    window_name = f"RAKSHYA VISION RTSP — {clean_url}"
+    window_name = f"SafeSync RTSP — {clean_url}"
 
     while attempts < args.max_retries:
         log.info(f"Connecting to RTSP stream: {clean_url} (Attempt {attempts + 1}/{args.max_retries})...")

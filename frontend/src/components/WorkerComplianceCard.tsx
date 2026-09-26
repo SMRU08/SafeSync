@@ -1,5 +1,5 @@
 /**
- * WorkerComplianceCard.tsx — RAKSHYA VISION Professional SOC
+ * WorkerComplianceCard.tsx — SafeSync Professional SOC
  * Enhanced Worker Profile Card with Itemized PPE Status, Dwell Time,
  * Compliance Health Score, and Detailed Inspection Trigger.
  */

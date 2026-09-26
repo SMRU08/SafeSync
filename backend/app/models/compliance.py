@@ -1,5 +1,5 @@
 """
-compliance.py — RAKSHYA VISION Phase 5
+compliance.py — SafeSync Phase 5
 SQLAlchemy Database Models for Worker Tracking and Anonymous Compliance Observations.
 Strictly stores temporary anonymous track IDs without any Personally Identifiable Information (PII).
 """

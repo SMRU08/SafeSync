@@ -1,5 +1,5 @@
 """
-test_auth_rbac_phase10.py — RAKSHYA VISION Phase 10 Step 7
+test_auth_rbac_phase10.py — SafeSync Phase 10 Step 7
 Automated test suite for Authentication and Role-Based Access Control (RBAC):
 - Cryptographic password hashing and constant-time verification
 - JWT generation, validation, expiration, and invalid signature rejection

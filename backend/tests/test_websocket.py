@@ -1,5 +1,5 @@
 """
-test_websocket.py — RAKSHYA VISION Phase 8
+test_websocket.py — SafeSync Phase 8
 Unit tests for the live WebSocket alert and event broadcaster router.
 """
 
@@ -21,7 +21,7 @@ def test_websocket_connect_and_welcome(client):
     with client.websocket_connect("/ws/alerts") as ws:
         data = ws.receive_json()
         assert data["type"] == "connected"
-        assert "RAKSHYA VISION" in data["message"]
+        assert "SafeSync" in data["message"]
         assert data["active_connections"] >= 1
         assert "timestamp" in data
 

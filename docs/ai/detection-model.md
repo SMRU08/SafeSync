@@ -1,6 +1,6 @@
 # AI Detection Model
 
-RAKSHYA VISION uses a customized single-stage multi-task object detector based on Ultralytics YOLOv8n to identify people, personal protective equipment (PPE), and early-stage combustion hazards in video streams.
+SafeSync uses a customized single-stage multi-task object detector based on Ultralytics YOLOv8n to identify people, personal protective equipment (PPE), and early-stage combustion hazards in video streams.
 
 ---
 

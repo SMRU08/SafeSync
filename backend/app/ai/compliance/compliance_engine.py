@@ -1,5 +1,5 @@
 """
-compliance_engine.py — RAKSHYA VISION Phase 5
+compliance_engine.py — SafeSync Phase 5
 Integrated Worker Tracking, Spatial PPE Association, and Compliance Engine.
 """
 

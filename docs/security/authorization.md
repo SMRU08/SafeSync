@@ -1,6 +1,6 @@
 # Role-Based Access Control (RBAC)
 
-RAKSHYA VISION enforces strict Role-Based Access Control (RBAC) to ensure that users only possess the permissions necessary for their operational duties.
+SafeSync enforces strict Role-Based Access Control (RBAC) to ensure that users only possess the permissions necessary for their operational duties.
 
 ---
 

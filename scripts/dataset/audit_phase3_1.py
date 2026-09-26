@@ -18,7 +18,7 @@ import glob
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path("D:/Additional/PROJECT/RAKSHYA-VISION")
+ROOT = Path("D:/Additional/PROJECT/SafeSync")
 PROCESSED_DIR = ROOT / "datasets" / "processed"
 CANONICAL_CLASSES = {
     0: "person",
@@ -194,7 +194,7 @@ def audit_dataset():
     # Write class_analysis.md
     out_md = ROOT / "models" / "detection" / "ppe_fire_smoke_v1" / "class_analysis.md"
     with open(out_md, "w", encoding="utf-8") as f:
-        f.write("# Class Distribution Analysis — RAKSHYA VISION\n\n")
+        f.write("# Class Distribution Analysis — SafeSync\n\n")
         f.write(f"**Total Processed Images**: {sum(total_images.values())} (Train: {total_images['train']}, Val: {total_images['val']}, Test: {total_images['test']})\n")
         f.write(f"**Total Annotated Bounding Boxes**: {total_annotations}\n\n")
         f.write("## 1. Instance Distribution by Split\n\n")

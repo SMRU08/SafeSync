@@ -1,5 +1,5 @@
 """
-run_integration_tests.py — RAKSHYA VISION Phase 9
+run_integration_tests.py — SafeSync Phase 9
 Comprehensive System Integration Test Runner & Performance Benchmarking Suite.
 Executes end-to-end verification across Model, Video Pipeline, Worker Tracking,
 PPE Association, Fire/Smoke Hazards, Risk Engine, Alert Engine, Database, WebSocket,
@@ -500,7 +500,7 @@ class IntegrationTestRunner:
         try:
             with self.client.websocket_connect("/ws/alerts") as ws:
                 welcome = ws.receive_json()
-                ws_ok = welcome["type"] == "connected" and "RAKSHYA VISION" in welcome["message"]
+                ws_ok = welcome["type"] == "connected" and "SafeSync" in welcome["message"]
 
                 ws.send_json({"type": "ping"})
                 pong = ws.receive_json()

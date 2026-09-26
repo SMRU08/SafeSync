@@ -1,16 +1,16 @@
-# 🛡️ RAKSHYA VISION
+# 🛡️ SafeSync
 
 ### AI Vision-Based Safety Monitoring System
 
 > **"Real-time computer vision for workplace safety, PPE compliance, fire and smoke detection, intelligent risk assessment, and rapid incident response."**
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)](https://github.com/SMRU08/RAKSHYA-VISION)
-[![Unit Tests](https://img.shields.io/badge/Unit%20Tests-160%2F160%20Passing-success?style=flat-square)](https://github.com/SMRU08/RAKSHYA-VISION)
-[![Integration Scenarios](https://img.shields.io/badge/Integration-39%2F39%20Verified-blue?style=flat-square)](https://github.com/SMRU08/RAKSHYA-VISION)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)](https://github.com/SMRU08/SafeSync)
+[![Unit Tests](https://img.shields.io/badge/Unit%20Tests-160%2F160%20Passing-success?style=flat-square)](https://github.com/SMRU08/SafeSync)
+[![Integration Scenarios](https://img.shields.io/badge/Integration-39%2F39%20Verified-blue?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-informational?style=flat-square)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript%20%2B%20Vite-61DAFB?style=flat-square&logo=react)](https://react.dev)
-[![Hackathon](https://img.shields.io/badge/Hackathon-BPUT%20Hackathon%202026-orange?style=flat-square)](https://github.com/SMRU08/RAKSHYA-VISION)
+[![Hackathon](https://img.shields.io/badge/Hackathon-BPUT%20Hackathon%202026-orange?style=flat-square)](https://github.com/SMRU08/SafeSync)
 
 ---
 
@@ -24,7 +24,7 @@
 
 ## 1. Project Overview
 
-**RAKSHYA VISION** is an automated, real-time safety governance and hazard-monitoring platform. Utilizing high-performance convolutional vision models coupled with multi-object motion tracking, the system continuously analyzes video streams to observe:
+**SafeSync** is an automated, real-time safety governance and hazard-monitoring platform. Utilizing high-performance convolutional vision models coupled with multi-object motion tracking, the system continuously analyzes video streams to observe:
 
 * 👷 **Workers / Personnel:** Continuous spatial localization and tracking.
 * ⛑️ **Helmet Compliance:** Spatial head-zone association and hard hat verification.
@@ -49,7 +49,7 @@ In industrial operations, manufacturing sites, and construction zones, personal 
 * **Multi-Camera Bottlenecks:** Safety officers struggle to coordinate concurrent feeds across loading bays, production floors, and electrical rooms.
 * **Slow Incident Escalation:** Manual alerting delays evacuation procedures and emergency response teams.
 
-**RAKSHYA VISION** bridges this gap by providing an intelligent, automated visual monitoring layer that operates continuously across multi-camera streams with deterministic governance.
+**SafeSync** bridges this gap by providing an intelligent, automated visual monitoring layer that operates continuously across multi-camera streams with deterministic governance.
 
 ---
 
@@ -122,7 +122,7 @@ flowchart TD
     end
 
     subgraph PERSISTENCE["5. Persistence & Evidence Storage"]
-        DB[("SQLite WAL Database (rakshya_vision.db)")]
+        DB[("SQLite WAL Database (safesync.db)")]
         EVID["EvidenceManager (SHA-256 Hashed Frames)"]
         INC --> DB
         ALERT --> DB
@@ -208,7 +208,7 @@ The single-stage convolutional detector operates exclusively on canonical physic
 | `6` | `smoke` | Industrial Smoke Plume | `0.35` |
 
 > [!IMPORTANT]
-> **No Synthetic Absence Classes:** The model does **not** contain classes such as `no_helmet`, `no_vest`, `no_gloves`, or `no_footwear`. Training detectors on negative/empty space causes severe false positives. In RAKSHYA VISION, non-compliance is derived through anatomical spatial association and temporal confirmation.
+> **No Synthetic Absence Classes:** The model does **not** contain classes such as `no_helmet`, `no_vest`, `no_gloves`, or `no_footwear`. Training detectors on negative/empty space causes severe false positives. In SafeSync, non-compliance is derived through anatomical spatial association and temporal confirmation.
 
 ---
 
@@ -345,7 +345,7 @@ To evaluate detection reliability in industrial settings, the model and associat
 The repository is organized into clearly decoupled architectural modules:
 
 ```
-RAKSHYA-VISION/
+SafeSync/
 ├── backend/
 │   ├── app/
 │   │   ├── ai/
@@ -583,17 +583,17 @@ pytest backend/tests -v
 
 ## 17. Operational Monitoring & Health Probes
 
-RAKSHYA VISION exposes standardized health endpoints for container environments:
+SafeSync exposes standardized health endpoints for container environments:
 
 * `GET /health/live` — Lightweight container liveness probe (`HTTP 200 OK`).
 * `GET /health/ready` — Deep readiness probe validating database connectivity, AI model presence, and storage volume write access.
 * `GET /health/database` — Direct verification of SQLite WAL mode, foreign keys, and write locks.
 * `GET /metrics` — Prometheus metrics exposition reporting:
-  * `rakshya_frames_processed_total` — Total frames ingested per camera.
-  * `rakshya_pipeline_latency_seconds` — Histogram of end-to-end processing latencies.
-  * `rakshya_active_workers` — Current tracked worker count.
-  * `rakshya_ppe_violations_total` — Cumulative PPE violation counter by item.
-  * `rakshya_hazards_confirmed_total` — Confirmed fire and smoke detections.
+  * `safesync_frames_processed_total` — Total frames ingested per camera.
+  * `safesync_pipeline_latency_seconds` — Histogram of end-to-end processing latencies.
+  * `safesync_active_workers` — Current tracked worker count.
+  * `safesync_ppe_violations_total` — Cumulative PPE violation counter by item.
+  * `safesync_hazards_confirmed_total` — Confirmed fire and smoke detections.
 
 ---
 
@@ -624,8 +624,8 @@ RAKSHYA VISION exposes standardized health endpoints for container environments:
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/SMRU08/RAKSHYA-VISION.git
-cd RAKSHYA-VISION
+git clone https://github.com/SMRU08/SafeSync.git
+cd SafeSync
 ```
 
 ---
@@ -740,7 +740,7 @@ flowchart TD
 
 | Deployment Tier | Frontend Host | Backend Host | Database | Camera Feeds |
 |---|---|---|---|---|
-| **Local Development** | Vite Dev (`localhost:5173`) | Uvicorn (`localhost:8000`) | SQLite WAL (`rakshya_vision.db`) | Local USB Webcams / Files |
+| **Local Development** | Vite Dev (`localhost:5173`) | Uvicorn (`localhost:8000`) | SQLite WAL (`safesync.db`) | Local USB Webcams / Files |
 | **Cloud Web Demo** | Vercel / Netlify (`dist/`) | Render Web Service | Persistent SQLite / Postgres | Synthetic Streams / Pre-recorded video |
 | **On-Premise Industrial** | Local NGINX Server | High-Performance Edge Gateway | SQLite WAL / PostgreSQL | Multi-Camera RTSP Network Feeds |
 
@@ -806,9 +806,9 @@ flowchart TD
 
 ## 25. Project Metadata & Team
 
-* **Project:** RAKSHYA VISION — AI Vision-Based Safety Monitoring System
+* **Project:** SafeSync — AI-Powered Safety Monitoring System
 * **Hackathon:** BPUT Hackathon 2026
 * **Problem Statement:** PS06 — Prototype AI System that Detects Safety Gear Compliance
 * **Organized By:** Software Technology Parks of India (STPI) & EmTek
 * **Lead Engineer & Maintainer:** Smruti Ranjan Nayak ([@SMRU08](https://github.com/SMRU08))
-* **Official Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)
+* **Official Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)

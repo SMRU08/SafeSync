@@ -1,5 +1,5 @@
 """
-create_test_video.py — RAKSHYA VISION Phase 4
+create_test_video.py — SafeSync Phase 4
 Generates a realistic test video from the held-out test split images.
 Includes scenes with helmets, vests, workers, and fire/smoke.
 """

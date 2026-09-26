@@ -1,5 +1,5 @@
 """
-test_camera_api_phase10.py — RAKSHYA VISION Phase 10 Step 6
+test_camera_api_phase10.py — SafeSync Phase 10 Step 6
 Automated test suite for Multi-Camera REST API endpoints:
 - GET /api/cameras (list real-time camera operational statuses)
 - GET /api/cameras/{camera_id} (single camera telemetry)

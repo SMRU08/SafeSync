@@ -1,5 +1,5 @@
 """
-test_observability_phase10.py — RAKSHYA VISION Phase 10 Step 10
+test_observability_phase10.py — SafeSync Phase 10 Step 10
 Unit & Integration Test Suite for Observability, Liveness/Readiness Probes,
 Prometheus Metrics, JSON Telemetry, and Structured Logging.
 """
@@ -29,7 +29,7 @@ def test_liveness_probe():
     assert resp.status_code == 200
     data = resp.json()
     assert data["status"] == "alive"
-    assert data["service"] == "RAKSHYA VISION"
+    assert data["service"] == "SafeSync"
     assert isinstance(data["uptime_seconds"], (int, float))
     assert "timestamp" in data
 
@@ -59,8 +59,8 @@ def test_readiness_probe_unhealthy():
 def test_prometheus_metrics_format():
     """Verifies GET /metrics outputs compliant Prometheus 0.0.4 text format with help/type annotations."""
     collector = MetricsCollector.get_instance()
-    collector.increment_counter("rakshya_pipeline_frames_total", value=5, labels={"camera_id": "CAM_01"})
-    collector.increment_counter("rakshya_incidents_total", value=1, labels={"risk_level": "HIGH", "camera_id": "CAM_01"})
+    collector.increment_counter("safesync_pipeline_frames_total", value=5, labels={"camera_id": "CAM_01"})
+    collector.increment_counter("safesync_incidents_total", value=1, labels={"risk_level": "HIGH", "camera_id": "CAM_01"})
 
     resp = client.get("/metrics")
     assert resp.status_code == 200
@@ -68,17 +68,17 @@ def test_prometheus_metrics_format():
     text = resp.text
 
     # Verify standard Prometheus header formatting
-    assert "# HELP rakshya_pipeline_frames_total" in text
-    assert "# TYPE rakshya_pipeline_frames_total counter" in text
-    assert 'rakshya_pipeline_frames_total{camera_id="CAM_01"} 5' in text
-    assert "# HELP rakshya_uptime_seconds" in text
-    assert "# TYPE rakshya_uptime_seconds gauge" in text
+    assert "# HELP safesync_pipeline_frames_total" in text
+    assert "# TYPE safesync_pipeline_frames_total counter" in text
+    assert 'safesync_pipeline_frames_total{camera_id="CAM_01"} 5' in text
+    assert "# HELP safesync_uptime_seconds" in text
+    assert "# TYPE safesync_uptime_seconds gauge" in text
 
 
 def test_json_telemetry_metrics():
     """Verifies GET /api/monitoring/metrics returns clean structured operational telemetry."""
     collector = MetricsCollector.get_instance()
-    collector.increment_counter("rakshya_alerts_total", value=2, labels={"severity": "CRITICAL", "event_type": "FIRE_DETECTED"})
+    collector.increment_counter("safesync_alerts_total", value=2, labels={"severity": "CRITICAL", "event_type": "FIRE_DETECTED"})
 
     resp = client.get("/api/monitoring/metrics")
     assert resp.status_code == 200
@@ -87,8 +87,8 @@ def test_json_telemetry_metrics():
     assert "system_resources" in data
     assert "counters" in data
     assert "gauges" in data
-    assert "rakshya_alerts_total" in data["counters"]
-    entry = data["counters"]["rakshya_alerts_total"][0]
+    assert "safesync_alerts_total" in data["counters"]
+    entry = data["counters"]["safesync_alerts_total"][0]
     assert entry["labels"]["severity"] == "CRITICAL"
     assert entry["value"] == 2.0
 

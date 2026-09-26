@@ -1,5 +1,5 @@
 """
-test_compliance.py — RAKSHYA VISION Phase 5 Test Suite
+test_compliance.py — SafeSync Phase 5 Test Suite
 Automated pytest suite testing:
 - Tracker initialization & track ID stability
 - PPE spatial association across anatomical zones

@@ -1,5 +1,5 @@
 """
-auth.py — RAKSHYA VISION Phase 10 Step 7
+auth.py — SafeSync Phase 10 Step 7
 Cryptographic password hashing (PBKDF2-HMAC-SHA256), PyJWT token management,
 and Role-Based Access Control (RBAC) FastAPI dependencies.
 """
@@ -74,7 +74,7 @@ def get_jwt_secret() -> str:
     secret = settings.JWT_SECRET_KEY or settings.SECRET_KEY
     if not secret:
         # Development fallback secret
-        secret = "rakshya-vision-dev-secret-key-32bytes-long"
+        secret = "safesync-dev-secret-key-32bytes-long"
     return secret
 
 

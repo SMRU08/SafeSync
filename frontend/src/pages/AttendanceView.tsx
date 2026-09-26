@@ -1,5 +1,5 @@
 /**
- * AttendanceView.tsx — RAKSHYA VISION
+ * AttendanceView.tsx — SafeSync
  * Real-time daily attendance log with biometric face recognition check-ins.
  * Supports:
  * - Webcam facial check-in

@@ -1,5 +1,5 @@
 """
-visualizer.py — RAKSHYA VISION Phase 5
+visualizer.py — SafeSync Phase 5
 Non-destructive visualization of tracked workers, spatial PPE checklist HUD,
 and overall compliance status badges.
 """

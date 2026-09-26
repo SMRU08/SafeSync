@@ -1,5 +1,5 @@
 """
-schemas.py — RAKSHYA VISION Phase 7
+schemas.py — SafeSync Phase 7
 Pydantic Schemas for Safety Risk Analysis and Smart Alerts.
 Defines normalized safety events, transparent risk scores, incidents, and alert lifecycles.
 """

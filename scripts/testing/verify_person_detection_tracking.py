@@ -1,5 +1,5 @@
 """
-verify_person_detection_tracking.py — RAKSHYA VISION Test Matrix Verification
+verify_person_detection_tracking.py — SafeSync Test Matrix Verification
 Automated test suite verifying:
 1. Person detection & bounding box accuracy
 2. Walking person recall & continuous tracking
@@ -114,7 +114,7 @@ def test_05_ppe_association_non_interference():
 
 def test_06_database_test_stream_cam_purged():
     print("[TEST 06] Verifying TEST_STREAM_CAM is Purged from SQLite DB and Manager...")
-    db_path = os.path.join(ROOT, "backend", "rakshya_vision.db")
+    db_path = os.path.join(ROOT, "backend", "safesync.db")
     if os.path.isfile(db_path):
         conn = sqlite3.connect(db_path)
         c = conn.cursor()
@@ -132,7 +132,7 @@ def test_06_database_test_stream_cam_purged():
 
 if __name__ == "__main__":
     print("=" * 70)
-    print("RAKSHYA VISION — PERSON DETECTION, TRACKING & PPE INTEGRITY MATRIX")
+    print("SafeSync — PERSON DETECTION, TRACKING & PPE INTEGRITY MATRIX")
     print("=" * 70)
     test_01_stationary_person_fit()
     test_02_walking_person_recall()

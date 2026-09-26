@@ -1,12 +1,12 @@
 # Production Deployment Guide
 
-This guide details best practices for deploying RAKSHYA VISION in enterprise and industrial edge environments.
+This guide details best practices for deploying SafeSync in enterprise and industrial edge environments.
 
 ---
 
 ## 1. Production Architecture
 
-In production, RAKSHYA VISION typically runs on an industrial edge server (e.g. Advantech, Dell Edge, or custom x86/ARM rack units) located on the same local area network as the facility's CCTV and IP cameras:
+In production, SafeSync typically runs on an industrial edge server (e.g. Advantech, Dell Edge, or custom x86/ARM rack units) located on the same local area network as the facility's CCTV and IP cameras:
 
 ```
 [ IP Cameras / CCTV ]
@@ -36,21 +36,21 @@ In production, RAKSHYA VISION typically runs on an industrial edge server (e.g. 
 ## 2. Process Supervision with Systemd
 
 Create a dedicated systemd service for the backend API:
-`/etc/systemd/system/rakshya-backend.service`
+`/etc/systemd/system/safesync-backend.service`
 
 ```ini
 [Unit]
-Description=RAKSHYA VISION AI Safety Backend Service
+Description=SafeSync AI Safety Backend Service
 After=network.target
 
 [Service]
 Type=simple
 User=safetyapp
 Group=safetyapp
-WorkingDirectory=/opt/rakshya-vision/backend
-Environment="PATH=/opt/rakshya-vision/backend/.venv/bin"
-EnvironmentFile=/opt/rakshya-vision/.env
-ExecStart=/opt/rakshya-vision/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1 --log-config /opt/rakshya-vision/configs/logging.yaml
+WorkingDirectory=/opt/safesync/backend
+Environment="PATH=/opt/safesync/backend/.venv/bin"
+EnvironmentFile=/opt/safesync/.env
+ExecStart=/opt/safesync/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1 --log-config /opt/safesync/configs/logging.yaml
 Restart=always
 RestartSec=5
 LimitNOFILE=65535
@@ -67,7 +67,7 @@ WantedBy=multi-user.target
 ## 3. Reverse Proxy Configuration (Nginx)
 
 Nginx handles HTTPS termination, serves static frontend assets, and proxies WebSocket connections:
-`/etc/nginx/sites-available/rakshya-vision.conf`
+`/etc/nginx/sites-available/safesync.conf`
 
 ```nginx
 server {
@@ -80,12 +80,12 @@ server {
     listen 443 ssl http2;
     server_name safety.internal.plant;
 
-    ssl_certificate /etc/ssl/certs/rakshya.crt;
-    ssl_certificate_key /etc/ssl/private/rakshya.key;
+    ssl_certificate /etc/ssl/certs/safesync.crt;
+    ssl_certificate_key /etc/ssl/private/safesync.key;
     ssl_protocols TLSv1.2 TLSv1.3;
 
     # Static Frontend Assets
-    root /opt/rakshya-vision/frontend/dist;
+    root /opt/safesync/frontend/dist;
     index index.html;
 
     location / {
@@ -122,5 +122,5 @@ Add daily maintenance to the server's crontab (`crontab -e`):
 
 ```bash
 # Prune resolved incidents older than 30 days and evidence exceeding quota daily at 02:00
-0 2 * * * /opt/rakshya-vision/backend/.venv/bin/python /opt/rakshya-vision/scripts/cleanup_retention.py --retention-days 30 --mode prune >> /var/log/rakshya-retention.log 2>&1
+0 2 * * * /opt/safesync/backend/.venv/bin/python /opt/safesync/scripts/cleanup_retention.py --retention-days 30 --mode prune >> /var/log/safesync-retention.log 2>&1
 ```

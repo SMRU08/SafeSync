@@ -1,5 +1,5 @@
 """
-hazard.py — RAKSHYA VISION Phase 6
+hazard.py — SafeSync Phase 6
 SQLAlchemy Database Models for Fire and Smoke Hazard Analysis.
 Stores persistent hazard events and individual frame observations.
 """

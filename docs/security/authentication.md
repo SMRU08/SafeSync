@@ -1,6 +1,6 @@
 # Authentication Architecture
 
-RAKSHYA VISION implements an enterprise-grade authentication subsystem to prevent unauthorized access to safety operations, camera controls, and incident management functions.
+SafeSync implements an enterprise-grade authentication subsystem to prevent unauthorized access to safety operations, camera controls, and incident management functions.
 
 ---
 

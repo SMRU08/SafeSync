@@ -1,16 +1,16 @@
-# RAKSHYA VISION — Project Status
+# SafeSync — Project Status
 
-**System:** RAKSHYA VISION (AI Vision-Based Safety Monitoring System)  
+**System:** SafeSync (AI Vision-Based Safety Monitoring System)  
 **Problem Statement:** PS06 — Prototype AI system detecting safety gear compliance & environmental hazards  
 **Target Domains:** Industrial manufacturing, construction sites, power generation, hazardous facilities  
-**Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)  
+**Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)  
 **Documentation Index:** [`docs/README.md`](./docs/README.md)  
 
 ---
 
 ## 1. Current System Status
 
-RAKSHYA VISION is an operational, fully integrated edge AI safety monitoring and incident governance platform. The core pipeline continuously processes multi-stream video feeds, performs multi-task detection, tracks workers anonymously, evaluates anatomical personal protective equipment (PPE) compliance, confirms combustion hazards (fire and smoke), computes deterministic risk scores, archives tamper-evident visual evidence, and broadcasts real-time alerts to a Security Operations Center (SOC) dashboard.
+SafeSync is an operational, fully integrated edge AI safety monitoring and incident governance platform. The core pipeline continuously processes multi-stream video feeds, performs multi-task detection, tracks workers anonymously, evaluates anatomical personal protective equipment (PPE) compliance, confirms combustion hazards (fire and smoke), computes deterministic risk scores, archives tamper-evident visual evidence, and broadcasts real-time alerts to a Security Operations Center (SOC) dashboard.
 
 ---
 

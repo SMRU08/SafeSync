@@ -1,5 +1,5 @@
 """
-manager.py — RAKSHYA VISION Phase 10 Step 5
+manager.py — SafeSync Phase 10 Step 5
 Production Multi-Camera Manager orchestrating independent camera worker threads,
 configuration loading, dynamic start/stop, state querying, and graceful shutdown.
 """

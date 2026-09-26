@@ -1,5 +1,5 @@
 /**
- * HazardStatusPanel.tsx — RAKSHYA VISION Phase 8
+ * HazardStatusPanel.tsx — SafeSync Phase 8
  * Real-time Fire & Smoke hazard monitoring panel for configured zones.
  */
 

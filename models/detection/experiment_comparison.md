@@ -1,5 +1,5 @@
 # Experiment Comparison: `ppe_fire_smoke_v1` vs `ppe_fire_smoke_v2`
-**Project:** RAKSHYA VISION — AI Vision-Based Safety Monitoring  
+**Project:** SafeSync — AI Vision-Based Safety Monitoring  
 **Phase:** Phase 3.1 — Model Diagnosis, Correction & Retraining  
 **Date:** 2026-09-20  
 

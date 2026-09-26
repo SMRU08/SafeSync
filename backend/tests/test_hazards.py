@@ -1,5 +1,5 @@
 """
-test_hazards.py — RAKSHYA VISION Phase 6 Tests
+test_hazards.py — SafeSync Phase 6 Tests
 Comprehensive test suite for Fire & Smoke Hazard Analysis.
 Covers:
   - Spatial hazard tracker (association, distinct event IDs, separate streams)

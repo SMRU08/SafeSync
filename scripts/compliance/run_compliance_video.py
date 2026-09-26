@@ -1,5 +1,5 @@
 """
-run_compliance_video.py — RAKSHYA VISION Phase 5
+run_compliance_video.py — SafeSync Phase 5
 CLI runner for Worker Tracking, Spatial PPE Association & Compliance Video Analysis.
 Processes video through the complete ByteTrack + Spatial Association + Temporal State Machine pipeline.
 Outputs annotated video with checklist HUD overlay and exports tracking stability metrics.
@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="RAKSHYA VISION Phase 5 — Worker Tracking & PPE Compliance Video CLI"
+        description="SafeSync Phase 5 — Worker Tracking & PPE Compliance Video CLI"
     )
     parser.add_argument(
         "--input", "-i",
@@ -75,7 +75,7 @@ def main():
         sys.exit(1)
 
     print("=" * 70)
-    print("  RAKSHYA VISION — Phase 5: Worker Tracking & PPE Compliance Engine")
+    print("  SafeSync — Phase 5: Worker Tracking & PPE Compliance Engine")
     print("=" * 70)
     print(f"  Input Video   : {input_file}")
     print(f"  Confidence    : {args.confidence}")

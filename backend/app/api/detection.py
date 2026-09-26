@@ -1,5 +1,5 @@
 """
-detection.py — RAKSHYA VISION Phase 4 API Router
+detection.py — SafeSync Phase 4 API Router
 Endpoints:
   GET  /api/detection/health
   POST /api/detection/image
@@ -23,7 +23,7 @@ from app.ai.detection.schemas import (
     DetectionHealthResponse,
 )
 
-logger = logging.getLogger("rakshya_vision.api.detection")
+logger = logging.getLogger("safesync.api.detection")
 
 router = APIRouter(prefix="/api/detection", tags=["Detection"])
 
@@ -164,7 +164,7 @@ async def detect_video(
     class_filter_list = [c.strip().lower() for c in classes.split(",") if c.strip()] if classes else None
 
     # Save to a temporary file
-    temp_dir = tempfile.mkdtemp(prefix="rakshya_upload_")
+    temp_dir = tempfile.mkdtemp(prefix="safesync_upload_")
     temp_input_path = os.path.join(temp_dir, f"input{ext}")
 
     try:

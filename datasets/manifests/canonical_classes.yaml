@@ -1,4 +1,4 @@
-# datasets/manifests/canonical_classes.yaml — RAKSHYA VISION
+# datasets/manifests/canonical_classes.yaml — SafeSync
 # Canonical class schemas and raw source mapping for decoupled PPE and Hazard models.
 
 ppe_model:

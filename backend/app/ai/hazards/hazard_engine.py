@@ -1,5 +1,5 @@
 """
-hazard_engine.py — RAKSHYA VISION Phase 6
+hazard_engine.py — SafeSync Phase 6
 Integrated Fire and Smoke Hazard Analysis Engine.
 Extracts fire and smoke detections, tracks spatial hazard events, evaluates temporal states,
 associates camera/zone metadata, and renders visual annotations.

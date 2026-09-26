@@ -1,5 +1,5 @@
 """
-model_registry.py — RAKSHYA VISION
+model_registry.py — SafeSync
 Central registry and lifecycle manager for decoupled AI models:
 - Dedicated PPE models (Person, Helmet, Safety Vest, Gloves, Safety Footwear)
 - Dedicated Hazard models (Fire, Smoke)

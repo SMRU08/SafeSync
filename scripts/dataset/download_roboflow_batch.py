@@ -1,5 +1,5 @@
 """
-download_roboflow_batch.py — RAKSHYA VISION
+download_roboflow_batch.py — SafeSync
 Downloads remaining Roboflow datasets into datasets/raw/ using the provided API key.
 """
 

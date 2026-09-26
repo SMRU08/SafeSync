@@ -1,6 +1,6 @@
-# RAKSHYA VISION — Comprehensive Dataset Expansion, Audit & Training Report
+# SafeSync — Comprehensive Dataset Expansion, Audit & Training Report
 
-**System Name:** RAKSHYA VISION — AI Vision-Based Workplace Safety & Hazard Monitoring System  
+**System Name:** SafeSync — AI Vision-Based Workplace Safety & Hazard Monitoring System  
 **Report Date:** 2026-09-23  
 **Lead Engineer:** Senior Computer Vision / YOLO / PPE Compliance AI Engineer  
 **Audit Status:** COMPLETE & VERIFIED  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Verification Guarantee
 
-This comprehensive dataset audit and curation milestone resolves the core computer-vision false-positive issues in RAKSHYA VISION:
+This comprehensive dataset audit and curation milestone resolves the core computer-vision false-positive issues in SafeSync:
 1. **Hair $\rightarrow$ Helmet False Positives:** Eliminated through dataset expansion, hard-negative curation of unhelmeted heads, and multi-spectral chromatic/anatomical cranial gating.
 2. **Normal Clothing/Shirts $\rightarrow$ Safety Vest False Positives:** Eliminated through torso chromatic verification, retro-reflective tape validation, and curated hard-negative casual outerwear.
 
@@ -132,7 +132,7 @@ Report saved to `reports/false_positive_benchmark_report.json`:
 
 ```
 ============================================================
-RUNNING RAKSHYA VISION FALSE POSITIVE BENCHMARK SUITE
+RUNNING SafeSync FALSE POSITIVE BENCHMARK SUITE
 ============================================================
 
 TEST A: Uncovered Hair: PASS (100.0% rejection of false positives)

@@ -1,7 +1,7 @@
 # Baseline Detection Model: `ppe_fire_smoke_v1`
 
 ## Overview
-- **Project:** RAKSHYA VISION — AI Vision-Based Safety Monitoring
+- **Project:** SafeSync — AI Vision-Based Safety Monitoring
 - **Experiment:** `ppe_fire_smoke_v1`
 - **Phase:** Phase 3 — Model Training & Validation
 - **Architecture:** YOLOv8n (nano)

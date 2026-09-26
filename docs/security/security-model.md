@@ -1,6 +1,6 @@
 # Security Model & Threat Mitigation
 
-This document details the security principles, threat boundaries, and defensive countermeasures engineered into RAKSHYA VISION.
+This document details the security principles, threat boundaries, and defensive countermeasures engineered into SafeSync.
 
 ---
 

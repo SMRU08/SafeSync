@@ -1,5 +1,5 @@
 """
-test_integration_phase9.py — RAKSHYA VISION Phase 9
+test_integration_phase9.py — SafeSync Phase 9
 Full end-to-end integration and system verification test suite.
 """
 

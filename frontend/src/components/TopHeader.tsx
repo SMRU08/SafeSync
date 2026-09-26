@@ -1,5 +1,5 @@
 /**
- * TopHeader.tsx — RAKSHYA VISION Professional SOC
+ * TopHeader.tsx — SafeSync Professional SOC
  * Clean enterprise top header with real-time backend indicators, search, notifications,
  * operator profile, and live UTC/Local clock.
  */
@@ -70,12 +70,12 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         <div className="flex items-center gap-2.5">
           <img
             src="/logo.png"
-            alt="RAKSHYA VISION Logo"
+            alt="SafeSync Logo"
             className="w-10 h-10 object-contain rounded-lg drop-shadow-md"
           />
           <div>
             <h1 className="text-sm font-extrabold tracking-tight text-slate-900 leading-none flex items-center gap-1">
-              RAKSHYA <span className="text-sky-600">VISION</span>
+              Safe<span className="text-sky-600">Sync</span>
             </h1>
             <p className="text-[9px] text-slate-400 font-medium tracking-wide mt-0.5">
               AI-Powered Safety &amp; Hazard Monitoring System

@@ -1,10 +1,10 @@
 # BPUT Hackathon 2026 — Presentation Slide Deck Architecture & Reference Guide
 
-> **System:** RAKSHYA VISION — AI-Powered Workplace Safety Monitoring System  
+> **System:** SafeSync — AI-Powered Workplace Safety Monitoring System  
 > **Problem Statement:** PS06 — Build a prototype AI system that detects safety gear compliance  
 > **Organizers:** Software Technology Parks of India (STPI) & EmTek  
 > **Team:** XERSES  
-> **Presentation File:** [`RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx`](./RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx)  
+> **Presentation File:** [`SafeSync-BPUT-HACKATHON-2026.pptx`](./SafeSync-BPUT-HACKATHON-2026.pptx)  
 > **Final 10-Slide Executive Structure:** [**BPUT-HACKATHON-2026/README2.md**](./README2.md)  
 > **Full Architecture & Layout Breakdown:** 13 Comprehensive Slide Specifications below  
 
@@ -12,13 +12,13 @@
 
 ## Executive Summary of the Presentation
 
-The presentation deck [`RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx`](./RAKSHYA-VISION-BPUT-HACKATHON-2026.pptx) translates the RAKSHYA VISION engineering codebase into a professional, visual-first presentation for the BPUT Hackathon 2026 jury. It strictly follows the real project implementation, verified test data, and architectural guarantees without artificial marketing claims or AI development chronology.
+The presentation deck [`SafeSync-BPUT-HACKATHON-2026.pptx`](./SafeSync-BPUT-HACKATHON-2026.pptx) translates the SafeSync engineering codebase into a professional, visual-first presentation for the BPUT Hackathon 2026 jury. It strictly follows the real project implementation, verified test data, and architectural guarantees without artificial marketing claims or AI development chronology.
 
 ```
 Slide Structure Overview:
 ├── Slide 01: Title & Hackathon Context
 ├── Slide 02: The Industrial Challenge (Problem Statement PS06)
-├── Slide 03: The Solution — RAKSHYA VISION Overview
+├── Slide 03: The Solution — SafeSync Overview
 ├── Slide 04: End-to-End System Architecture Pipeline
 ├── Slide 05: AI Detection Model & Canonical 7-Class Ontology
 ├── Slide 06: PPE Compliance & Anatomical Spatial Association
@@ -47,7 +47,7 @@ Establishes project identity, competitive domain, organizing bodies, and core pr
 - **Accent Strip:** Left vertical glowing emerald bar (`#10B981`)
 - **Header Badge:** Pill container in dark navy with cyan text (`#38BDF8`): `BPUT HACKATHON 2026 • PROBLEM STATEMENT PS06`
 - **Typography:**
-  - Main Title: `RAKSHYA VISION` in 46pt Bold White (`#F8FAFC`)
+  - Main Title: `SafeSync` in 46pt Bold White (`#F8FAFC`)
   - Subtitle: `AI-Powered Workplace Safety Monitoring & Compliance Platform` in 18pt Emerald Green (`#10B981`)
   - Tagline Pill: `Detect • Understand • Alert • Protect` in dark green container with safety green text
 
@@ -64,7 +64,7 @@ Establishes project identity, competitive domain, organizing bodies, and core pr
   - **Organizers:** Software Technology Parks of India (STPI) & EmTek
   - **Hackathon:** BPUT Hackathon 2026
   - **Problem Statement:** PS06 — Vision-Based Industrial Safety Gear Compliance
-  - **Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
+  - **Repository:** `https://github.com/SMRU08/SafeSync.git`
 
 #### 4. High-Level System Context Diagram
 ```mermaid
@@ -73,7 +73,7 @@ flowchart LR
         CAM["Industrial CCTV / RTSP / Integrated Webcam"]
     end
 
-    subgraph EDGE["RAKSHYA VISION Core Engine (Edge-First)"]
+    subgraph EDGE["SafeSync Core Engine (Edge-First)"]
         DET["YOLOv8n Single-Stage Detection<br/>(45.5ms CPU)"]
         TRK["ByteTrack Kalman Filter<br/>(Zero Biometrics)"]
         CMP["Temporal Hysteresis & Zoning<br/>(N_confirm=3)"]
@@ -126,25 +126,25 @@ flowchart TD
         A4["Unverified Incident Logs"] -->|"Missing Cryptographic Proof"| B4["Disputed Regulatory Liability"]
     end
 
-    subgraph RAKSHYA["RAKSHYA VISION Autonomous Closed-Loop Solution"]
+    subgraph SafeSync["SafeSync Autonomous Closed-Loop Solution"]
         R1["Continuous Real-Time Video Ingestion"] --> R2["YOLOv8n + ByteTrack Multi-Worker Tracking"]
         R2 --> R3["Anatomical Spatial Association & Temporal Hysteresis"]
         R3 --> R4["Sub-Second Detection & Dual Fire/Smoke Trigger"]
         R4 --> R5["SHA-256 Tamper-Evident Visual Evidence Logging"]
     end
 
-    FAILURES -.->|"Completely Replaced By"| RAKSHYA
+    FAILURES -.->|"Completely Replaced By"| SafeSync
 ```
 
 ---
 
-### Slide 3: The Solution — RAKSHYA VISION Overview
+### Slide 3: The Solution — SafeSync Overview
 
 #### 1. Purpose & Strategic Focus
-Presents RAKSHYA VISION's architectural philosophy, demonstrating how the platform addresses each challenge through decoupled vision, privacy by design, and strict ambiguity tolerance.
+Presents SafeSync's architectural philosophy, demonstrating how the platform addresses each challenge through decoupled vision, privacy by design, and strict ambiguity tolerance.
 
 #### 2. Visual Layout & Composition
-- **Header:** Category Pill `[SYSTEM OVERVIEW]`, Title: *RAKSHYA VISION: Continuous, Edge-Intelligent Safety Governance*
+- **Header:** Category Pill `[SYSTEM OVERVIEW]`, Title: *SafeSync: Continuous, Edge-Intelligent Safety Governance*
 - **Top Section:** 3 large feature pillar cards ($270 \times 250$ pt).
 - **Bottom Section:** 4 high-contrast KPI metric callout tiles ($200 \times 120$ pt) featuring large 28pt numbers.
 
@@ -498,7 +498,7 @@ Covers the mathematical risk scoring formula, anti-flood alert deduplication rul
   - Verification API (`GET /api/evidence/{id}`) streams file and recomputes hash to detect unauthorized alterations.
   - Rolling 10 GB storage quota with automatic oldest-first pruning; path traversal defense blocks directory escapes.
 - **External Alert Providers:**
-  - Webhook Provider: JSON POST with HMAC-SHA256 signature in `X-Rakshya-Signature` header.
+  - Webhook Provider: JSON POST with HMAC-SHA256 signature in `X-SafeSync-Signature` header.
   - Email Provider: Plain text alerts via `smtplib` with STARTTLS encryption.
   - Zero fake claims: strictly reports `NOT_CONFIGURED` unless verified endpoints exist.
 
@@ -769,7 +769,7 @@ Provides a dignified closing slide summarizing project credentials, submission d
 - **Header Badge:** Pill container in dark navy with cyan text: `BPUT HACKATHON 2026 • PROBLEM STATEMENT PS06`
 - **Vertical Accent:** Left vertical glowing emerald bar (`#10B981`)
 - **Title Block:**
-  - `RAKSHYA VISION` in 44pt Bold White
+  - `SafeSync` in 44pt Bold White
   - `Detect • Understand • Alert • Protect` in 20pt Emerald Green
 - **Central Showcase Container:** Large bordered card ($730 \times 220$ pt) presenting complete submission details.
 
@@ -787,12 +787,12 @@ Provides a dignified closing slide summarizing project credentials, submission d
   - Explainable 0–100 Risk Engine
   - Tamper-Evident SHA-256 Evidence
   - React 18 Real-Time SOC Dashboard
-- **Official GitHub Repository:** `https://github.com/SMRU08/RAKSHYA-VISION.git`
+- **Official GitHub Repository:** `https://github.com/SMRU08/SafeSync.git`
 
 #### 4. Final Submission Architectural Invariant Diagram
 ```mermaid
 flowchart TD
-    subgraph INVARIANTS["Architectural Invariants of RAKSHYA VISION"]
+    subgraph INVARIANTS["Architectural Invariants of SafeSync"]
         INV1["Zero-Biometric Privacy: Anonymous Kalman Integer IDs (No Facial Rec)"]
         INV2["Ambiguity Invariant: UNKNOWN != VIOLATION (Zero False Alarms)"]
         INV3["Temporal Debouncing: N_confirm = 3 Frames Required to Declare Absence"]

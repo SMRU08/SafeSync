@@ -1,5 +1,5 @@
 """
-test_audio_alert_engine.py — Comprehensive tests for Rakshya Vision AI Audio-Alert Engine
+test_audio_alert_engine.py — Comprehensive tests for SafeSync AI Audio-Alert Engine
 Validates:
 - Precise grammatical formatting for missing PPE items (Oxford comma, singular articles).
 - User Scenario A: Worker #11 without helmet, vest, and gloves. Speaker ON -> Triggered.

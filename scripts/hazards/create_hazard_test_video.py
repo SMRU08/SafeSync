@@ -1,5 +1,5 @@
 """
-create_hazard_test_video.py — RAKSHYA VISION Phase 6
+create_hazard_test_video.py — SafeSync Phase 6
 Creates a multi-scene realistic CCTV hazard test video (test_hazard_video.mp4)
 combining real held-out test frames of:
   - Active industrial fire

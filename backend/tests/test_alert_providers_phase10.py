@@ -1,5 +1,5 @@
 """
-test_alert_providers_phase10.py — RAKSHYA VISION Phase 10 Step 8
+test_alert_providers_phase10.py — SafeSync Phase 10 Step 8
 Automated test suite for External Alert Provider Architecture:
 - Strict status evaluation (ENABLED, DISABLED, NOT_CONFIGURED, ERROR)
 - Webhook HMAC signature generation and timeout handling

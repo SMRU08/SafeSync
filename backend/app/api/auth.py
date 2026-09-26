@@ -1,5 +1,5 @@
 """
-auth.py — RAKSHYA VISION Phase 10 Step 7
+auth.py — SafeSync Phase 10 Step 7
 FastAPI Router for User Authentication, User Provisioning, and Audit Trail Inspection.
 """
 

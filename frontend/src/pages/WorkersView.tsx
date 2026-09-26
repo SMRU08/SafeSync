@@ -1,5 +1,5 @@
 /**
- * WorkersView.tsx — RAKSHYA VISION Professional SOC
+ * WorkersView.tsx — SafeSync Professional SOC
  * Enhanced Real-Time Worker Tracking, PPE Compliance & Incident Management.
  * Features dual Grid/Ledger view modes, itemized compliance checklist,
  * temporal tracking analytics, and forensic slide-over profile drawer.

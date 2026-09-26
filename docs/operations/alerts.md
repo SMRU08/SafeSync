@@ -1,6 +1,6 @@
 # Alerts & External Notification Providers
 
-RAKSHYA VISION couples intelligent local alert deduplication with an extensible external notification architecture to dispatch safety alerts to enterprise channels without overwhelming operators.
+SafeSync couples intelligent local alert deduplication with an extensible external notification architecture to dispatch safety alerts to enterprise channels without overwhelming operators.
 
 ---
 
@@ -74,7 +74,7 @@ External dispatches are decoupled from the core vision pipeline via a background
 
 ### 3.1 Webhook Provider (`WebhookProvider`)
 - Dispatches HTTP POST JSON requests to `WEBHOOK_URL`.
-- Includes cryptographic HMAC-SHA256 signature in the `X-Rakshya-Signature` header computed using `WEBHOOK_SECRET`.
+- Includes cryptographic HMAC-SHA256 signature in the `X-SafeSync-Signature` header computed using `WEBHOOK_SECRET`.
 - Enforces a strict 3.0-second network timeout with up to 2 retries.
 
 ### 3.2 Email Provider (`EmailProvider`)

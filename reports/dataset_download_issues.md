@@ -1,4 +1,4 @@
-# RAKSHYA VISION — Dataset Download Issues & Manual Action Guide
+# SafeSync — Dataset Download Issues & Manual Action Guide
 
 This document records datasets requiring manual download or special authentication, exact reasons for manual action, and step-by-step instructions for Sahil.
 
@@ -17,7 +17,7 @@ This document records datasets requiring manual download or special authenticati
   1. Open https://www.kaggle.com/datasets/mugheesahmad/sh17-dataset-for-ppe-detection in your web browser.
   2. Log into your Kaggle account.
   3. Click **Download** (archive zip file).
-  4. Extract the contents directly into: `D:\Additional\PROJECT\RAKSHYA-VISION\datasets\raw\sh17\`
+  4. Extract the contents directly into: `D:\Additional\PROJECT\SafeSync\datasets\raw\sh17\`
 - **EXPECTED LOCAL DIRECTORY:** `datasets/raw/sh17/`
 - **REQUIRED FORMAT:** YOLO format (images in `images/` or `train/val/test`, labels in `labels/` matching `sh17.yaml`).
 

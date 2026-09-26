@@ -1,5 +1,5 @@
 """
-video_processor.py — RAKSHYA VISION Phase 4
+video_processor.py — SafeSync Phase 4
 Video file inference engine using OpenCV VideoCapture & VideoWriter.
 Supports frame skipping, codec negotiation, corrupted frame recovery, and latency tracking.
 """

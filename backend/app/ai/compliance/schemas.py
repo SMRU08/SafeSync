@@ -1,5 +1,5 @@
 """
-schemas.py — RAKSHYA VISION Phase 5
+schemas.py — SafeSync Phase 5
 Pydantic v2 schemas for Worker Tracking, Spatial PPE Association, and Compliance Evaluation.
 """
 

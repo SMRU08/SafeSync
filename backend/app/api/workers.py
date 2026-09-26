@@ -1,5 +1,5 @@
 """
-workers.py — RAKSHYA VISION Facial Recognition & Attendance API
+workers.py — SafeSync Facial Recognition & Attendance API
 Endpoints for worker registration, face enrollment, attendance tracking.
 """
 

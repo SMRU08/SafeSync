@@ -1,6 +1,6 @@
 # Known Limitations & Operating Boundaries
 
-This document outlines the known physical, computational, and environmental limitations of RAKSHYA VISION.
+This document outlines the known physical, computational, and environmental limitations of SafeSync.
 
 ---
 

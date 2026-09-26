@@ -1,6 +1,6 @@
 # Installation & Quickstart Guide
 
-This guide details the prerequisites, environment setup, dependency installation, and initial verification steps required to deploy RAKSHYA VISION.
+This guide details the prerequisites, environment setup, dependency installation, and initial verification steps required to deploy SafeSync.
 
 ---
 
@@ -24,8 +24,8 @@ This guide details the prerequisites, environment setup, dependency installation
 
 ### 2.1 Clone the Repository
 ```bash
-git clone https://github.com/SMRU08/RAKSHYA-VISION.git
-cd RAKSHYA-VISION
+git clone https://github.com/SMRU08/SafeSync.git
+cd SafeSync
 ```
 
 ### 2.2 Environment Configuration

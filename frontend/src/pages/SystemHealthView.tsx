@@ -1,5 +1,5 @@
 /**
- * SystemHealthView.tsx — RAKSHYA VISION Professional SOC
+ * SystemHealthView.tsx — SafeSync Professional SOC
  * Real-Time Infrastructure Diagnostics, Edge Performance & System Telemetry.
  * Queries /health and /health/database to display true status of API, Database,
  * AI Engine, Camera Manager, and WebSocket connectivity.

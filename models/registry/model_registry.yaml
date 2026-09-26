@@ -1,4 +1,4 @@
-# models/registry/model_registry.yaml — RAKSHYA VISION Model Registry
+# models/registry/model_registry.yaml — SafeSync Model Registry
 # Centralized production model catalog with immutable SHA-256 checksum verification.
 
 active_production_model: "ppe_fire_smoke_v2"

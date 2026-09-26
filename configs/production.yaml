@@ -1,11 +1,11 @@
-# configs/production.yaml — RAKSHYA VISION Centralized Production Configuration
+# configs/production.yaml — SafeSync Centralized Production Configuration
 # Safe defaults for real-world edge and facility deployments.
 # Sensitive secrets (passwords, JWT secret keys, RTSP credentials) MUST be set via environment variables.
 
 environment: "production"
 
 application:
-  name: "RAKSHYA VISION"
+  name: "SafeSync"
   version: "1.0.0"
   description: "AI Vision-Based Safety Monitoring System"
 
@@ -21,7 +21,7 @@ server:
 
 database:
   dialect: "sqlite"  # "sqlite" for edge gateway, "postgresql" for centralized enterprise
-  url: "sqlite:///./rakshya_vision.db"
+  url: "sqlite:///./safesync.db"
   pool_size: 5
   max_overflow: 10
   pool_timeout_seconds: 30
@@ -86,7 +86,7 @@ alerts:
 logging:
   level: "INFO"
   format: "text"
-  log_file: "outputs/logs/rakshya_vision.log"
+  log_file: "outputs/logs/safesync.log"
   max_bytes: 10485760  # 10 MB
   backup_count: 5
 

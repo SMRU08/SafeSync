@@ -1,5 +1,5 @@
 """
-test_live_camera_pipeline.py — RAKSHYA VISION Live Camera AI Pipeline Tests
+test_live_camera_pipeline.py — SafeSync Live Camera AI Pipeline Tests
 Tests:
 - CameraWorker AI engine initialization & thread-local safety
 - Frame inference scheduling (infer_interval_frames)

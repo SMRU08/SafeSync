@@ -1,5 +1,5 @@
 """
-hazards.py — RAKSHYA VISION Phase 6
+hazards.py — SafeSync Phase 6
 FastAPI Router for Fire and Smoke Hazard Analysis.
 Exposes endpoints for frame analysis, event history, and hazard configuration.
 Strictly decoupled from notifications, alerts, and risk scoring.

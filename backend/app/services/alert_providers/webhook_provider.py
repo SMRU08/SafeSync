@@ -1,5 +1,5 @@
 """
-webhook_provider.py — RAKSHYA VISION Phase 10 Step 8
+webhook_provider.py — SafeSync Phase 10 Step 8
 Production Webhook Alert Provider with HMAC-SHA256 Signatures,
 bounded timeout (3.0s), and bounded retries.
 """
@@ -67,12 +67,12 @@ class WebhookProvider(BaseAlertProvider):
         payload_json = json.dumps(payload.model_dump()).encode("utf-8")
         headers = {
             "Content-Type": "application/json",
-            "User-Agent": "RAKSHYA-VISION-ALERT-SYSTEM/2.0",
+            "User-Agent": "SafeSync-ALERT-SYSTEM/2.0",
         }
 
         signature = self._generate_signature(payload_json)
         if signature:
-            headers["X-Rakshya-Signature"] = signature
+            headers["X-SafeSync-Signature"] = signature
 
         req = urllib.request.Request(self.url, data=payload_json, headers=headers, method="POST")
 

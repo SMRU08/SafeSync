@@ -1,5 +1,5 @@
 """
-schemas.py — RAKSHYA VISION Phase 10 Step 5
+schemas.py — SafeSync Phase 10 Step 5
 Camera models, lifecycle states, and operational metrics schemas.
 """
 

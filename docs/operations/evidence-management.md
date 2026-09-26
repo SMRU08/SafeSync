@@ -1,6 +1,6 @@
 # Incident Evidence Management
 
-RAKSHYA VISION implements a tamper-evident visual evidence archival engine (`EvidenceManager`) to securely preserve visual records and detection telemetry for safety incident investigations.
+SafeSync implements a tamper-evident visual evidence archival engine (`EvidenceManager`) to securely preserve visual records and detection telemetry for safety incident investigations.
 
 ---
 

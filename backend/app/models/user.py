@@ -1,5 +1,5 @@
 """
-user.py — RAKSHYA VISION Phase 10 Step 7
+user.py — SafeSync Phase 10 Step 7
 SQLAlchemy Model for Users and Role-Based Access Control (RBAC).
 """
 

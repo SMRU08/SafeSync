@@ -1,5 +1,5 @@
 """
-zones.py — RAKSHYA VISION Phase 6
+zones.py — SafeSync Phase 6
 Camera and Zone Metadata Manager with optional ROI Polygon containment.
 """
 

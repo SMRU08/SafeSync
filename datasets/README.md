@@ -1,6 +1,6 @@
-# Datasets Directory — RAKSHYA VISION
+# Datasets Directory — SafeSync
 
-This directory manages training, validation, testing, and hard-negative data for the **RAKSHYA VISION Safety & Hazard Monitoring System**.
+This directory manages training, validation, testing, and hard-negative data for the **SafeSync Safety & Hazard Monitoring System**.
 
 ## Directory Structure
 

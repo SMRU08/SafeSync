@@ -1,6 +1,6 @@
 # Processing Pipeline
 
-The RAKSHYA VISION processing pipeline is a deterministic, multi-stage dataflow designed to convert continuous optical video streams into verified safety intelligence and actionable operator alerts.
+The SafeSync processing pipeline is a deterministic, multi-stage dataflow designed to convert continuous optical video streams into verified safety intelligence and actionable operator alerts.
 
 ---
 

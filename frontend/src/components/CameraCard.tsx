@@ -1,5 +1,5 @@
 /**
- * CameraCard.tsx — RAKSHYA VISION Professional SOC
+ * CameraCard.tsx — SafeSync Professional SOC
  * Compact camera hardware card for multi-camera fleet grids.
  * Clearly differentiates LIVE, OFFLINE, STANDBY, and DEGRADED states.
  */

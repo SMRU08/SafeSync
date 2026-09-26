@@ -1,5 +1,5 @@
 """
-config.py — RAKSHYA VISION Phase 10 Step 3
+config.py — SafeSync Phase 10 Step 3
 Centralized, Typed Production Configuration System with Strict Secret Protection,
 Environment Precedence, and CORS Validation.
 
@@ -41,7 +41,7 @@ INSECURE_PLACEHOLDER_PREFIXES = (
     "placeholder",
     "default",
     "dev-secret",
-    "rakshya-vision-dev",
+    "safesync-dev",
 )
 
 
@@ -114,14 +114,14 @@ def _load_yaml_config(config_path: Optional[str] = None) -> Dict[str, Any]:
 
 class Settings(BaseSettings):
     # Core Application Settings
-    APP_NAME: str = "RAKSHYA VISION"
+    APP_NAME: str = "SafeSync"
     APP_ENV: str = "development"  # 'development', 'test', 'production'
     DEBUG: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
     # Database
-    DATABASE_URL: str = "sqlite:///./rakshya_vision.db"
+    DATABASE_URL: str = "sqlite:///./safesync.db"
 
     # Paths
     MODEL_DIRECTORY: str = "../../models"
@@ -165,7 +165,7 @@ class Settings(BaseSettings):
     EVIDENCE_STORAGE_DIR: str = "outputs/evidence"
     EVIDENCE_RETENTION_DAYS: int = 30
     MAX_EVIDENCE_STORAGE_GB: float = 20.0
-    LOG_FILE_PATH: str = "outputs/logs/rakshya_vision.log"
+    LOG_FILE_PATH: str = "outputs/logs/safesync.log"
     LOG_LEVEL: str = "INFO"
     LOG_MAX_BYTES: int = 10485760
     LOG_BACKUP_COUNT: int = 5

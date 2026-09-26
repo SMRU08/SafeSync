@@ -1,5 +1,5 @@
 """
-test_hazard_scenarios.py — RAKSHYA VISION Phase 6
+test_hazard_scenarios.py — SafeSync Phase 6
 Controlled Scenario Testing for Fire and Smoke Hazard Analysis.
 Tests all 12 required controlled scenarios:
   1. No fire / no smoke

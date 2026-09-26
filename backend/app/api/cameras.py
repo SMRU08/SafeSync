@@ -1,5 +1,5 @@
 """
-cameras.py — RAKSHYA VISION Phase 10 Step 6
+cameras.py — SafeSync Phase 10 Step 6
 FastAPI REST router exposing production Multi-Camera Manager operations:
 - GET /api/cameras: List all registered cameras with real-time operational status and metrics
 - GET /api/cameras/{camera_id}: Retrieve single camera telemetry and status

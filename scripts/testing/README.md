@@ -1,7 +1,7 @@
-# RAKSHYA VISION — Testing & Integration Suite
+# SafeSync — Testing & Integration Suite
 
 ## Overview
-This directory contains end-to-end integration and verification scripts for RAKSHYA VISION.
+This directory contains end-to-end integration and verification scripts for SafeSync.
 The test suite exercises the full system pipeline:
 
 ```

@@ -1,5 +1,5 @@
 """
-temporal.py — RAKSHYA VISION Phase 5
+temporal.py — SafeSync Phase 5
 Temporal validation and state machine for worker-level PPE compliance.
 Eliminates single-frame detection flicker, honors occlusions with UNKNOWN state,
 and evaluates stable COMPLIANT / NON_COMPLIANT / UNKNOWN classifications.

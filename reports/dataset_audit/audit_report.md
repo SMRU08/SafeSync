@@ -1,8 +1,8 @@
-# Dataset Audit & Annotation Quality Report — RAKSHYA VISION
+# Dataset Audit & Annotation Quality Report — SafeSync
 
 ## 1. Executive Summary
 
-This audit evaluates the 4 approved source datasets for the **RAKSHYA VISION Safety Intelligence Pipeline** before model training and deployment. Original raw data directories remain strictly immutable and untouched.
+This audit evaluates the 4 approved source datasets for the **SafeSync Safety Intelligence Pipeline** before model training and deployment. Original raw data directories remain strictly immutable and untouched.
 
 | Dataset Name | Source / Universe | License | Total Images | Total Annotations | Canonical Target |
 | :--- | :--- | :--- | :--- | :--- | :--- |

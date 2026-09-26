@@ -1,6 +1,6 @@
-# RAKSHYA VISION — Dataset Source Registry
+# SafeSync — Dataset Source Registry
 
-All approved datasets for RAKSHYA VISION have been downloaded, verified, and preserved in `datasets/raw/`.
+All approved datasets for SafeSync have been downloaded, verified, and preserved in `datasets/raw/`.
 
 ---
 

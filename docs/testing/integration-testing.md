@@ -1,6 +1,6 @@
 # Integration Testing Report
 
-This document details the 39 end-to-end integration scenarios evaluated to verify the complete RAKSHYA VISION safety pipeline.
+This document details the 39 end-to-end integration scenarios evaluated to verify the complete SafeSync safety pipeline.
 
 ---
 

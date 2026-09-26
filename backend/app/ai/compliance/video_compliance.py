@@ -1,5 +1,5 @@
 """
-video_compliance.py — RAKSHYA VISION Phase 5
+video_compliance.py — SafeSync Phase 5
 Video processing pipeline for Worker Tracking, Spatial PPE Association & Compliance.
 Computes and exports tracking stability metrics to outputs/tracking/tracking_metrics.json.
 """

@@ -1,5 +1,5 @@
 """
-compliance.py — RAKSHYA VISION Phase 5
+compliance.py — SafeSync Phase 5
 FastAPI Router for Worker Tracking, Spatial PPE Association & Compliance Analysis.
 """
 

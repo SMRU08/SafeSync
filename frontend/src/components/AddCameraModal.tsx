@@ -1,5 +1,5 @@
 /**
- * AddCameraModal.tsx — RAKSHYA VISION Professional SOC
+ * AddCameraModal.tsx — SafeSync Professional SOC
  * Modal dialog for registering a new surveillance camera with pre-flight connection testing.
  */
 

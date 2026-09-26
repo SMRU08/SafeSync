@@ -1,4 +1,4 @@
-# Class Distribution Analysis — RAKSHYA VISION
+# Class Distribution Analysis — SafeSync
 
 **Total Processed Images**: 22453 (Train: 15717, Val: 4490, Test: 2246)
 **Total Annotated Bounding Boxes**: 51195

@@ -76,7 +76,7 @@ def download_target(target_name: str, api_key: str = None) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download approved datasets for RAKSHYA VISION.")
+    parser = argparse.ArgumentParser(description="Download approved datasets for SafeSync.")
     parser.add_argument(
         "--dataset",
         choices=["construction_ppe", "hard_hat", "ppe_compliance", "d_fire", "all"],

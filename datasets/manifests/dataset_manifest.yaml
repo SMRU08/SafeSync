@@ -1,9 +1,9 @@
-# datasets/manifests/dataset_manifest.yaml — RAKSHYA VISION
+# datasets/manifests/dataset_manifest.yaml — SafeSync
 # Master Dataset Manifest documenting raw dataset provenance, licenses, class inventories, and splits.
 
 metadata:
   generated_at: "2026-09-23T18:00:00Z"
-  system: "RAKSHYA VISION Safety Intelligence Pipeline"
+  system: "SafeSync Safety Intelligence Pipeline"
   total_raw_images: 22453
 
 datasets:

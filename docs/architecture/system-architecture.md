@@ -1,6 +1,6 @@
 # System Architecture
 
-RAKSHYA VISION is an automated, edge-ready artificial intelligence safety monitoring system designed for industrial facilities, manufacturing floors, and construction environments. It provides real-time personal protective equipment (PPE) compliance tracking, environmental hazard (fire and smoke) detection, explainable risk scoring, and automated incident management.
+SafeSync is an automated, edge-ready artificial intelligence safety monitoring system designed for industrial facilities, manufacturing floors, and construction environments. It provides real-time personal protective equipment (PPE) compliance tracking, environmental hazard (fire and smoke) detection, explainable risk scoring, and automated incident management.
 
 ---
 

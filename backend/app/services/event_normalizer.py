@@ -1,5 +1,5 @@
 """
-event_normalizer.py — RAKSHYA VISION Phase 7
+event_normalizer.py — SafeSync Phase 7
 Normalizes raw vision outputs from Phase 5 (Compliance) and Phase 6 (Hazards)
 into standardized NormalizedSafetyEvent envelopes.
 Enforces the strict rule: UNKNOWN state NEVER generates a violation.

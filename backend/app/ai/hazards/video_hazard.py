@@ -1,5 +1,5 @@
 """
-video_hazard.py — RAKSHYA VISION Phase 6
+video_hazard.py — SafeSync Phase 6
 Video processing and benchmarking pipeline for Fire & Smoke Hazard Analysis.
 Generates annotated hazard output video and exports performance metrics to outputs/hazards/hazard_benchmark.json.
 """

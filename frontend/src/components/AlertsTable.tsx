@@ -1,5 +1,5 @@
 /**
- * AlertsTable.tsx — RAKSHYA VISION Phase 8
+ * AlertsTable.tsx — SafeSync Phase 8
  * Interactive alerts table with multi-criteria filtering, search, and instant action triggers.
  */
 

@@ -1,6 +1,6 @@
-# RAKSHYA VISION — Frontend
+# SafeSync — Frontend
 
-React + TypeScript dashboard placeholder for RAKSHYA VISION ("AI Vision-Based Safety Monitoring").
+React + TypeScript dashboard placeholder for SafeSync ("AI Vision-Based Safety Monitoring").
 
 ## Features (Phase 1)
 - React 18 + TypeScript + Vite build setup

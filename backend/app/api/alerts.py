@@ -1,5 +1,5 @@
 """
-alerts.py — RAKSHYA VISION Phase 7
+alerts.py — SafeSync Phase 7
 FastAPI Router for Safety Risk Assessment, Incidents, and Smart Alerts.
 Provides REST endpoints for alert lifecycle management, history, and real-time risk summaries.
 """

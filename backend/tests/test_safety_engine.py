@@ -1,5 +1,5 @@
 """
-test_safety_engine.py — RAKSHYA VISION Safety Intelligence Pipeline
+test_safety_engine.py — SafeSync Safety Intelligence Pipeline
 Unit & Integration Tests for Centralized Safety Engine enforcing Rules 1 through 7:
 - Rule 1: Confirmed Fire -> P0 CRITICAL, Audible Siren
 - Rule 2: Confirmed Smoke -> P0/P1 Hazard, Audible Siren

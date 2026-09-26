@@ -1,4 +1,4 @@
-# RAKSHYA VISION — Model Registry
+# SafeSync — Model Registry
 
 This registry tracks all trained models, checkpoints, performance benchmarks, and deployment artifacts across the project lifecycle.
 

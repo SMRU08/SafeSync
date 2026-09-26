@@ -1,5 +1,5 @@
 """
-Fire and Smoke Hazard Analysis Package — RAKSHYA VISION Phase 6
+Fire and Smoke Hazard Analysis Package — SafeSync Phase 6
 """
 
 try:

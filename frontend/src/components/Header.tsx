@@ -1,5 +1,5 @@
 /**
- * Header.tsx — RAKSHYA VISION Phase 8
+ * Header.tsx — SafeSync Phase 8
  * Industrial SOC top navigation bar with live status telemetry and UTC clock.
  */
 
@@ -80,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div className="brand-text">
             <div className="brand-title-row">
-              <span className="brand-name">RAKSHYA VISION</span>
+              <span className="brand-name">SafeSync</span>
               <span className="brand-tag">SOC MONITOR</span>
               <span className="brand-version">v1.0-P8</span>
             </div>

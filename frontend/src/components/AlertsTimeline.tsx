@@ -1,5 +1,5 @@
 /**
- * AlertsTimeline.tsx — RAKSHYA VISION Professional SOC
+ * AlertsTimeline.tsx — SafeSync Professional SOC
  * Enterprise real-time incident log with dark header, timeline styling,
  * severity badges, and direct operational action buttons (Acknowledge & Resolve).
  */

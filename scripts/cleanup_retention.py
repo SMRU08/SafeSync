@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-cleanup_retention.py — RAKSHYA VISION Phase 10 Step 4
+cleanup_retention.py — SafeSync Phase 10 Step 4
 Database Retention Cleanup & Maintenance Utility
 
 Safely removes historical records exceeding retention thresholds without deleting:
@@ -54,7 +54,7 @@ logger = logging.getLogger("cleanup_retention")
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="RAKSHYA VISION Safe Database Retention Cleanup"
+        description="SafeSync Safe Database Retention Cleanup"
     )
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
@@ -214,7 +214,7 @@ def run_cleanup(execute: bool = False, override_days: int = None, vacuum: bool =
     mode = "EXECUTE" if execute else "DRY-RUN"
 
     logger.info("=" * 60)
-    logger.info(f"RAKSHYA VISION RETENTION CLEANUP — MODE: {mode}")
+    logger.info(f"SafeSync RETENTION CLEANUP — MODE: {mode}")
     logger.info("=" * 60)
     logger.info(f"Policy: Incidents={policy['incidents_days']}d, Alerts={policy['alerts_days']}d, "
                 f"History={policy['alert_history_days']}d, Hazards={policy['hazard_events_days']}d, "

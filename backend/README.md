@@ -1,6 +1,6 @@
-﻿# RAKSHYA VISION — Backend
+﻿# SafeSync — Backend
 
-FastAPI backend service for RAKSHYA VISION ("AI Vision-Based Safety Monitoring").
+FastAPI backend service for SafeSync ("AI Vision-Based Safety Monitoring").
 
 ## Features (Phase 1)
 - FastAPI application with lifespan structured logging

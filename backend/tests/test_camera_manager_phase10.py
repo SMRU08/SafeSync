@@ -1,5 +1,5 @@
 """
-test_camera_manager_phase10.py — RAKSHYA VISION Phase 10 Step 5
+test_camera_manager_phase10.py — SafeSync Phase 10 Step 5
 Automated unit and integration test suite for Multi-Camera Manager:
 - Schema validation
 - Credential masking

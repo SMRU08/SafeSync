@@ -1,5 +1,5 @@
 """
-run_hazard_video.py — RAKSHYA VISION Phase 6
+run_hazard_video.py — SafeSync Phase 6
 CLI Runner for Fire & Smoke Hazard Analysis on Video Files.
 Extracts fire/smoke detections, tracks persistent events, resolves camera & zone metadata,
 and exports benchmark metrics to outputs/hazards/hazard_benchmark.json.
@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="RAKSHYA VISION Phase 6 — Fire & Smoke Hazard Analysis Video CLI"
+        description="SafeSync Phase 6 — Fire & Smoke Hazard Analysis Video CLI"
     )
     parser.add_argument(
         "--input", "-i",
@@ -81,7 +81,7 @@ def main():
         sys.exit(1)
 
     print("=" * 70)
-    print("  RAKSHYA VISION — Phase 6: Fire & Smoke Hazard Analysis CLI")
+    print("  SafeSync — Phase 6: Fire & Smoke Hazard Analysis CLI")
     print("=" * 70)
     print(f"  Input Video   : {input_file}")
     print(f"  Camera ID     : {args.camera_id}")

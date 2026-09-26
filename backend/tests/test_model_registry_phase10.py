@@ -1,5 +1,5 @@
 """
-test_model_registry_phase10.py — RAKSHYA VISION Phase 10 Step 2
+test_model_registry_phase10.py — SafeSync Phase 10 Step 2
 Automated tests for Model Registry, lifecycle states, and SHA-256 Checksum Enforcement.
 """
 

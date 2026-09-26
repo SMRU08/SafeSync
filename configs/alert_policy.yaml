@@ -1,4 +1,4 @@
-# configs/alert_policy.yaml — RAKSHYA VISION Phase 7
+# configs/alert_policy.yaml — SafeSync Phase 7
 # Smart Alert Management & Cooldown Configuration
 
 cooldown_seconds:

@@ -1,5 +1,5 @@
 /**
- * CameraLiveCard.tsx — RAKSHYA VISION Professional SOC
+ * CameraLiveCard.tsx — SafeSync Professional SOC
  * High-performance, fault-isolated surveillance card with real MJPEG live stream,
  * real operational metrics (FPS, Latency, Dropped Frames, Reconnects),
  * independent error boundary with retry, and full surveillance controls.

@@ -1,6 +1,6 @@
 # Explainable Risk Engine
 
-RAKSHYA VISION uses a transparent, deterministic mathematical risk engine (`RiskEngine`) to quantify safety risk. Rather than relying on opaque deep-learning score predictions, risk is calculated using inspectable rules and policy weights defined in `configs/risk_policy.yaml`.
+SafeSync uses a transparent, deterministic mathematical risk engine (`RiskEngine`) to quantify safety risk. Rather than relying on opaque deep-learning score predictions, risk is calculated using inspectable rules and policy weights defined in `configs/risk_policy.yaml`.
 
 ---
 

@@ -1,5 +1,5 @@
 """
-ppe_policy.py — RAKSHYA VISION PS06 Compliance
+ppe_policy.py — SafeSync PS06 Compliance
 Zone-Specific PPE Policy Engine.
 
 Implements PS06 Requirement: "gloves where applicable"

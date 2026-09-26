@@ -1,5 +1,5 @@
 """
-evaluate.py — RAKSHYA VISION Phase 3
+evaluate.py — SafeSync Phase 3
 Evaluates the trained model on both val and test splits.
 Records Precision, Recall, mAP50, mAP50-95 per class.
 Generates visual predictions in validation_samples/.
@@ -29,7 +29,7 @@ CONFIDENCE_THRESHOLDS = [0.25, 0.35, 0.50, 0.60, 0.70]
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Model Evaluation Suite")
+    parser = argparse.ArgumentParser(description="SafeSync — Model Evaluation Suite")
     parser.add_argument("--experiment", "-e", type=str, default="ppe_fire_smoke_v1", help="Experiment name")
     parser.add_argument("--data", "-d", type=str, default=None, help="Data YAML path override")
     parser.add_argument("--model", "-m", type=str, default=None, help="Model weights path override")

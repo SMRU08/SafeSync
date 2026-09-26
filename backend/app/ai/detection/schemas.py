@@ -1,5 +1,5 @@
 """
-schemas.py — RAKSHYA VISION Phase 4
+schemas.py — SafeSync Phase 4
 Structured schemas for detection results, API responses, and processing options.
 Strictly decoupled from compliance logic and worker IDs (deferred to Phase 5).
 """

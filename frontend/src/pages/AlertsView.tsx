@@ -1,5 +1,5 @@
 /**
- * AlertsView.tsx — RAKSHYA VISION Professional SOC
+ * AlertsView.tsx — SafeSync Professional SOC
  * Centralized Operations Management for Safety Alerts & Verified Incidents.
  * Features tabs for ACTIVE, ACKNOWLEDGED, RESOLVED, and DISMISSED alerts with
  * full operational lifecycle action buttons (Acknowledge, Resolve, Dismiss).

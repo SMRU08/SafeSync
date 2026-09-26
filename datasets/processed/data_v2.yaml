@@ -1,4 +1,4 @@
-path: D:/Additional/PROJECT/RAKSHYA-VISION/datasets/processed
+path: D:/Additional/PROJECT/SafeSync/datasets/processed
 train: train_balanced.txt
 val: images/val
 test: images/test

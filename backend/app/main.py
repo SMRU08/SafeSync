@@ -12,7 +12,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
-logger = logging.getLogger("rakshya_vision")
+logger = logging.getLogger("safesync")
 
 
 @asynccontextmanager
@@ -115,7 +115,7 @@ app.include_router(workers_router)
 @app.get("/", response_model=RootResponse, status_code=status.HTTP_200_OK)
 def read_root():
     return {
-        "project": "RAKSHYA VISION",
+        "project": "SafeSync",
         "status": "running"
     }
 

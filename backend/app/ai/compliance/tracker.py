@@ -1,5 +1,5 @@
 """
-tracker.py — RAKSHYA VISION Phase 5 & 10
+tracker.py — SafeSync Phase 5 & 10
 Production Multi-Object Tracker (ByteTrack) for safety-critical worker tracking.
 Maintains persistent anonymous track IDs across frames without facial recognition.
 Implements robust track lifecycles: TENTATIVE -> ACTIVE -> LOST -> REMOVED.

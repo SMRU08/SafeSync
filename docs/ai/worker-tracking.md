@@ -1,6 +1,6 @@
 # Worker Tracking & Trajectory Estimation
 
-RAKSHYA VISION tracks individual workers across video frames using a customized implementation of the **ByteTrack** algorithm. This enables continuous, anonymous trajectory estimation and prevents identity switches without requiring facial recognition or personal biometric data.
+SafeSync tracks individual workers across video frames using a customized implementation of the **ByteTrack** algorithm. This enables continuous, anonymous trajectory estimation and prevents identity switches without requiring facial recognition or personal biometric data.
 
 ---
 

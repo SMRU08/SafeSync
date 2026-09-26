@@ -1,5 +1,5 @@
 """
-detector.py — RAKSHYA VISION Phase 4
+detector.py — SafeSync Phase 4
 Core object detector for single images and frames.
 Executes YOLO inference, parses bounding boxes, applies confidence/class filtering,
 and returns structured DetectionObject schemas.

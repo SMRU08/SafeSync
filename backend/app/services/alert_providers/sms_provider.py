@@ -1,5 +1,5 @@
 """
-sms_provider.py — RAKSHYA VISION Phase 10 Step 8
+sms_provider.py — SafeSync Phase 10 Step 8
 SMS Alert Provider Interface.
 Reports NOT_CONFIGURED when gateway credentials are not configured.
 Guarantees NO fake "SMS SENT" claims.

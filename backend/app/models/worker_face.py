@@ -1,5 +1,5 @@
 """
-worker_face.py — RAKSHYA VISION
+worker_face.py — SafeSync
 SQLAlchemy ORM models for facial recognition worker registry and attendance logging.
 """
 

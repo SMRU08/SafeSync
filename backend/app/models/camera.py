@@ -1,5 +1,5 @@
 """
-camera.py — RAKSHYA VISION
+camera.py — SafeSync
 SQLAlchemy Database Model for Persistent Camera Configurations.
 Enables dynamic addition, removal, and modification of surveillance cameras with persistent storage.
 """
@@ -15,7 +15,7 @@ except ImportError:
 
 class CameraModel(Base):
     """
-    Persistent registry of cameras configured in RAKSHYA VISION.
+    Persistent registry of cameras configured in SafeSync.
     """
     __tablename__ = "cameras"
 

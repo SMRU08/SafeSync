@@ -1,6 +1,6 @@
 # Multi-Camera Management
 
-RAKSHYA VISION manages multiple concurrent video streams across diverse camera hardware through a resilient, thread-isolated multi-camera architecture.
+SafeSync manages multiple concurrent video streams across diverse camera hardware through a resilient, thread-isolated multi-camera architecture.
 
 ---
 

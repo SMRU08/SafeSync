@@ -1,5 +1,5 @@
 /**
- * CamerasView.tsx — RAKSHYA VISION Professional SOC
+ * CamerasView.tsx — SafeSync Professional SOC
  * High-performance Multi-Camera Surveillance Dashboard.
  * Responsive multi-camera grid with real live streams, operational telemetry,
  * dynamic camera addition/removal, fault-isolated cards, and camera-specific AI analysis.

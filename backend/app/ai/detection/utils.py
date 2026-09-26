@@ -1,5 +1,5 @@
 """
-utils.py — RAKSHYA VISION Phase 4
+utils.py — SafeSync Phase 4
 Drawing utilities, color palettes, image conversion, and video codec helpers.
 Strictly decoupled from violation/compliance labels.
 """
@@ -39,7 +39,7 @@ def draw_detections(
     latency_ms: Optional[float] = None,
     show_fps: bool = True,
     show_timestamp: bool = True,
-    title: str = "RAKSHYA VISION — AI Safety Monitor",
+    title: str = "SafeSync — AI Safety Monitor",
 ) -> np.ndarray:
     """
     Draws bounding boxes and labels on an OpenCV BGR frame.

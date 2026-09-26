@@ -1,5 +1,5 @@
 """
-verify_phase3_model.py — RAKSHYA VISION Phase 4 Pre-check
+verify_phase3_model.py — SafeSync Phase 4 Pre-check
 Verifies the Phase 3 model checkpoint:
 1. File existence
 2. SHA-256 match
@@ -32,7 +32,7 @@ EXPECTED_CLASSES = {
 
 def verify():
     print("=" * 60)
-    print("  RAKSHYA VISION — Phase 3 Model Verification (Gate for Phase 4)")
+    print("  SafeSync — Phase 3 Model Verification (Gate for Phase 4)")
     print("=" * 60)
 
     # 1. Existence

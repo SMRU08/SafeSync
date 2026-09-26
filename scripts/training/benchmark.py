@@ -1,5 +1,5 @@
 """
-benchmark.py — RAKSHYA VISION Phase 3
+benchmark.py — SafeSync Phase 3
 Benchmarks inference latency of the trained model on GPU and CPU.
 Outputs results to models/detection/ppe_fire_smoke_v1/benchmark_results.json
 """
@@ -28,7 +28,7 @@ IMGSZ = 384
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Latency Benchmark")
+    parser = argparse.ArgumentParser(description="SafeSync — Latency Benchmark")
     parser.add_argument("--experiment", "-e", type=str, default="ppe_fire_smoke_v1", help="Experiment name")
     parser.add_argument("--model", "-m", type=str, default=None, help="Explicit weights path override")
     return parser.parse_args()

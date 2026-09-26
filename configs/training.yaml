@@ -1,4 +1,4 @@
-# configs/training.yaml — RAKSHYA VISION Phase 3
+# configs/training.yaml — SafeSync Phase 3
 # Hardware: CPU-only (torch 2.14.0+cpu, Intel(R) Core(TM) i5-13420H, 15.6 GB RAM)
 # GPU: None detected (Intel UHD Integrated Graphics only, no CUDA)
 #
@@ -50,7 +50,7 @@ erasing: 0.0
 # ─── Experiment Metadata ─────────────────────────────────────────────────────
 experiment: ppe_fire_smoke_v1
 phase: "Phase 3 — Model Training & Validation"
-project: "RAKSHYA VISION"
+project: "SafeSync"
 notes: >
   Baseline training run on CPU hardware (Intel Core i5-13420H, no CUDA GPU).
   YOLOv8n-384 with fraction=0.25 selected as the hardware-appropriate CPU baseline.

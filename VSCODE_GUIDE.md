@@ -1,12 +1,12 @@
-# RAKSHYA VISION — Complete VS Code Developer & Run Guide
+# SafeSync — Complete VS Code Developer & Run Guide
 
-A step-by-step guide on how to set up, run, debug, and monitor **RAKSHYA VISION** using Visual Studio Code on Windows.
+A step-by-step guide on how to set up, run, debug, and monitor **SafeSync** using Visual Studio Code on Windows.
 
 ---
 
 ## 1. Quick Start: The 2-Terminal Workflow (30 Seconds)
 
-Open the project in VS Code (`File -> Open Folder -> D:\Additional\PROJECT\RAKSHYA-VISION`).
+Open the project in VS Code (`File -> Open Folder -> D:\Additional\PROJECT\SafeSync`).
 
 Open two terminal tabs side-by-side (`Ctrl + ~` to open terminal, then click the **Split Terminal** icon `Ctrl + Shift + 5`):
 
@@ -58,7 +58,7 @@ To make sure VS Code recognizes all installed libraries (`fastapi`, `torch`, `ul
 
 ## 4. One-Click Run via VS Code Tasks
 
-We have preconfigured native VS Code tasks in [`.vscode/tasks.json`](file:///D:/Additional/PROJECT/RAKSHYA-VISION/.vscode/tasks.json).
+We have preconfigured native VS Code tasks in [`.vscode/tasks.json`](file:///D:/Additional/PROJECT/SafeSync/.vscode/tasks.json).
 
 1. Press `Ctrl + Shift + P` (or `F1`).
 2. Type: **`Tasks: Run Task`** and press `Enter`.
@@ -94,7 +94,7 @@ You can place breakpoints in any Python file (such as `app/camera/worker.py` or 
 1. Install **IP Webcam** (free on Google Play Store) or **DroidCam** on your Android phone.
 2. Connect your phone to the same Wi-Fi as your computer.
 3. Open the app on your phone and tap **Start Server** (it displays a URL like `http://192.168.1.105:8080`).
-4. In VS Code, open [`configs/cameras.yaml`](file:///D:/Additional/PROJECT/RAKSHYA-VISION/configs/cameras.yaml) and uncomment the Android camera:
+4. In VS Code, open [`configs/cameras.yaml`](file:///D:/Additional/PROJECT/SafeSync/configs/cameras.yaml) and uncomment the Android camera:
    ```yaml
    - id: "camera_android_wifi"
      name: "Android Phone Cam (Wi-Fi Stream)"

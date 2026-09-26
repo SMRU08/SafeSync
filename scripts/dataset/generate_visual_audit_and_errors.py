@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-ROOT = Path("D:/Additional/PROJECT/RAKSHYA-VISION")
+ROOT = Path("D:/Additional/PROJECT/SafeSync")
 PROCESSED_DIR = ROOT / "datasets" / "processed"
 GT_SAMPLES_DIR = ROOT / "datasets" / "reports" / "phase3_1_samples"
 ERROR_SAMPLES_DIR = ROOT / "models" / "detection" / "ppe_fire_smoke_v1" / "error_samples"

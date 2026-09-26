@@ -1,5 +1,5 @@
 /**
- * useSafetyData.ts — RAKSHYA VISION Phase 8
+ * useSafetyData.ts — SafeSync Phase 8
  * Custom hook orchestrating live safety metrics, alerts, camera metadata, and incident lifecycles.
  * Reacts automatically to WebSocket pushes and exposes explicit action dispatchers.
  */

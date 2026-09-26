@@ -1,5 +1,5 @@
 """
-email_provider.py — RAKSHYA VISION Phase 10 Step 8
+email_provider.py — SafeSync Phase 10 Step 8
 Production SMTP Email Alert Provider using standard library smtplib,
 environment credentials, and STARTTLS encryption.
 """
@@ -40,7 +40,7 @@ class EmailProvider(BaseAlertProvider):
         self.port = port
         self.username = username
         self.password = password
-        self.from_address = from_address or "alerts@rakshya-vision.local"
+        self.from_address = from_address or "alerts@safesync.local"
         self.recipients = [r.strip() for r in (recipients or "").split(",") if r.strip()]
         self.enabled = enabled
         self.timeout_seconds = timeout_seconds
@@ -59,7 +59,7 @@ class EmailProvider(BaseAlertProvider):
         if self.status != ProviderStatus.ENABLED or not self.host or not self.recipients:
             return False
 
-        subject = f"[RAKSHYA VISION {payload.severity}] {payload.title}"
+        subject = f"[SafeSync {payload.severity}] {payload.title}"
         body = (
             f"SAFETY INCIDENT NOTIFICATION\n"
             f"--------------------------------------------------\n"

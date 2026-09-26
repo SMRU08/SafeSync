@@ -1,5 +1,5 @@
 """
-test_alarm_priority.py — RAKSHYA VISION Safety Intelligence Pipeline
+test_alarm_priority.py — SafeSync Safety Intelligence Pipeline
 Tests for AlarmEngine priorities (P0, P1, P2, P3), audible siren policies, deduplication, and cooldowns.
 """
 

@@ -1,6 +1,6 @@
 """
-benchmark_false_positives.py — RAKSHYA VISION False Positive Benchmarking Suite
-Evaluates the RAKSHYA VISION detection and compliance pipeline against 4 core false-positive tests:
+benchmark_false_positives.py — SafeSync False Positive Benchmarking Suite
+Evaluates the SafeSync detection and compliance pipeline against 4 core false-positive tests:
 - TEST A: Uncovered hair -> Expected: NO helmet detection (0% false positives)
 - TEST B: Normal casual shirt -> Expected: NO safety vest detection (0% false positives)
 - TEST C: Baseball cap / beanie -> Expected: NO safety helmet detection (0% false positives)
@@ -227,7 +227,7 @@ def run_test_d_hoodie():
 
 def run_all_benchmarks():
     print("=" * 60)
-    print("RUNNING RAKSHYA VISION FALSE POSITIVE BENCHMARK SUITE")
+    print("RUNNING SafeSync FALSE POSITIVE BENCHMARK SUITE")
     print("=" * 60)
 
     benchmarks = [
@@ -242,7 +242,7 @@ def run_all_benchmarks():
     overall_pass = all(b["status"] == "PASS" for b in benchmarks)
 
     report = {
-        "suite_name": "RAKSHYA VISION False Positive Benchmark Suite",
+        "suite_name": "SafeSync False Positive Benchmark Suite",
         "overall_status": "PASS" if overall_pass else "FAIL",
         "total_cases_evaluated": total_tests,
         "total_false_positives_recorded": total_fps,

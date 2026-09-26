@@ -1,5 +1,5 @@
 """
-process_video.py — RAKSHYA VISION Phase 4
+process_video.py — SafeSync Phase 4
 CLI tool for batch processing of video files with YOLO safety detection.
 Usage:
     python scripts/inference/process_video.py --input path/to/video.mp4 [options]
@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Video File Inference Engine")
+    parser = argparse.ArgumentParser(description="SafeSync — Video File Inference Engine")
     parser.add_argument("--input", "-i", type=str, required=True, help="Path to input video file")
     parser.add_argument("--output", "-o", type=str, default=None, help="Path to save annotated output video")
     parser.add_argument("--confidence", "-c", type=float, default=0.25, help="Confidence threshold (0.01 - 1.0)")
@@ -52,7 +52,7 @@ def main():
     args = parse_args()
 
     print("=" * 65)
-    print("  RAKSHYA VISION — Video Detection CLI")
+    print("  SafeSync — Video Detection CLI")
     print("=" * 65)
     print(f"  Input File  : {args.input}")
     print(f"  Confidence  : {args.confidence}")

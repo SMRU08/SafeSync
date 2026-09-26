@@ -1,5 +1,5 @@
 """
-benchmark_video.py — RAKSHYA VISION Phase 4
+benchmark_video.py — SafeSync Phase 4
 Video inference benchmark suite.
 Measures real processing FPS, latency statistics (mean, median, min, max, stdev),
 and outputs a clean diagnostic table.
@@ -22,7 +22,7 @@ from backend.app.ai.detection.detector import Detector
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Video Inference Benchmark")
+    parser = argparse.ArgumentParser(description="SafeSync — Video Inference Benchmark")
     parser.add_argument("--input", "-i", type=str, required=True, help="Path to input video")
     parser.add_argument("--output-json", "-o", type=str, default=None, help="Path to save benchmark JSON")
     parser.add_argument("--confidence", type=float, default=0.25, help="Confidence threshold")
@@ -54,7 +54,7 @@ def main():
     detector = Detector(loader)
 
     print("=" * 60)
-    print("  RAKSHYA VISION — Video Inference Latency Benchmark")
+    print("  SafeSync — Video Inference Latency Benchmark")
     print("=" * 60)
     print(f"  Input Video   : {args.input}")
     print(f"  Resolution    : {width}x{height}")

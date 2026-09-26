@@ -1,5 +1,5 @@
 /**
- * IncidentDetailModal.tsx — RAKSHYA VISION Professional SOC
+ * IncidentDetailModal.tsx — SafeSync Professional SOC
  * Forensic Incident Investigation Modal with High-Resolution Snapshot Evidence Viewer,
  * Cryptographic SHA-256 Tamper Verification, Transparent Risk Breakdown, and Resolution Actions.
  */

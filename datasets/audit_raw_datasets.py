@@ -1,5 +1,5 @@
 """
-audit_raw_datasets.py — RAKSHYA VISION
+audit_raw_datasets.py — SafeSync
 Performs deep non-destructive inspection of all raw datasets:
 - Image counts, label counts, split distributions
 - Raw class names and declared class indexes

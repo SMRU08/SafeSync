@@ -1,5 +1,5 @@
 """
-train.py — RAKSHYA VISION Phase 3
+train.py — SafeSync Phase 3
 Runs YOLOv8 training for experiment: ppe_fire_smoke_v1
 Loads configs/training.yaml, applies hardware-appropriate overrides,
 saves all artifacts to models/detection/ppe_fire_smoke_v1/
@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="RAKSHYA VISION — Model Training Engine")
+    parser = argparse.ArgumentParser(description="SafeSync — Model Training Engine")
     parser.add_argument("--config", type=str, default=os.path.join(ROOT, "configs", "training.yaml"), help="Path to training config YAML")
     parser.add_argument("--experiment", type=str, default=None, help="Experiment name override")
     parser.add_argument("--data", type=str, default=None, help="Path to data YAML override")
@@ -260,7 +260,7 @@ def train(args=None):
             "sha256": sha,
         },
         "phase": cfg.get("phase", "Phase 3.1 — Model Diagnosis, Correction & Retraining"),
-        "project": "RAKSHYA VISION",
+        "project": "SafeSync",
     }
 
     meta_path = os.path.join(model_dir, "model_metadata.json")

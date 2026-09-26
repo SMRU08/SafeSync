@@ -1,6 +1,6 @@
-# RAKSHYA VISION — Live Camera Real-Time Latency & Streaming Fix Report
+# SafeSync — Live Camera Real-Time Latency & Streaming Fix Report
 
-**Project:** RAKSHYA VISION — AI Vision-Based Workplace Safety Monitoring System  
+**Project:** SafeSync — AI Vision-Based Workplace Safety Monitoring System  
 **Component:** Camera Pipeline, Video Streaming Engine, AI Decoupling  
 **Date:** September 23, 2026  
 **Status:** **COMPLETED & VERIFIED** (186/186 Tests Passing, Delivery Latency < 1.3 ms)
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-Prior to this fix, enabling the live camera in RAKSHYA VISION resulted in a severe **4–5 second stale-frame delay**. When a person moved in front of the camera, the physical motion was not reflected on the dashboard until 4–5 seconds later.
+Prior to this fix, enabling the live camera in SafeSync resulted in a severe **4–5 second stale-frame delay**. When a person moved in front of the camera, the physical motion was not reflected on the dashboard until 4–5 seconds later.
 
 The root cause was identified as **serial blocking execution**: frame capture and heavy AI inference (YOLOv8, ByteTrack, Hazard analysis, and Safety evaluation) were executed in the same single thread. While inference ran for 150–350 ms, the camera hardware/driver buffer continuously queued frames. Because OpenCV's `cap.read()` subsequently read the oldest buffered frame, the driver FIFO queue saturated at 10–15 frames, permanently lagging behind real time by 4–5 seconds.
 

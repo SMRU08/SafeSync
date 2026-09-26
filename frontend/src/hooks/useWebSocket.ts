@@ -1,5 +1,5 @@
 /**
- * useWebSocket.ts — RAKSHYA VISION Phase 8
+ * useWebSocket.ts — SafeSync Phase 8
  * Resilient WebSocket hook for real-time safety alert broadcasts.
  * Features automatic reconnection, heartbeat pings, and connection state management.
  */

@@ -1,5 +1,5 @@
 /**
- * OverviewView.tsx — RAKSHYA VISION Professional SOC
+ * OverviewView.tsx — SafeSync Professional SOC
  * Executive Industrial Safety Dashboard with real-time KPI metrics,
  * live camera stream with ByteTrack PPE overlay, hardware fleet grid,
  * recent alerts ledger, and zone compliance summary.

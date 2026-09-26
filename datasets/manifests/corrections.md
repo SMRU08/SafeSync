@@ -1,4 +1,4 @@
-# RAKSHYA VISION — Dataset Correction Log
+# SafeSync — Dataset Correction Log
 
 This log tracks manual and algorithmic corrections to annotation files across dataset versions.
 

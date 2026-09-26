@@ -1,5 +1,5 @@
 /**
- * live-bridge.js — RAKSHYA VISION
+ * live-bridge.js — SafeSync
  * Bridges the custom professional frontend design with the live FastAPI backend.
  * Replaces static mock figures, dummy videos, and placeholder tables with real-time
  * camera streams, ByteTrack worker compliance overlays, risk scores, and alert actions.
@@ -367,12 +367,12 @@
                 <div class="flex items-center gap-1">
                   ${
                     a.status === 'ACTIVE'
-                      ? `<button onclick="window.__rakshyaAction('${a.alert_id}', 'acknowledge')" class="px-1.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white text-[8px] font-semibold rounded cursor-pointer">Ack</button>`
+                      ? `<button onclick="window.__safesyncAction('${a.alert_id}', 'acknowledge')" class="px-1.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white text-[8px] font-semibold rounded cursor-pointer">Ack</button>`
                       : ''
                   }
                   ${
                     a.status !== 'RESOLVED'
-                      ? `<button onclick="window.__rakshyaAction('${a.alert_id}', 'resolve')" class="px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[8px] font-semibold rounded cursor-pointer">Resolve</button>`
+                      ? `<button onclick="window.__safesyncAction('${a.alert_id}', 'resolve')" class="px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[8px] font-semibold rounded cursor-pointer">Resolve</button>`
                       : ''
                   }
                 </div>
@@ -385,7 +385,7 @@
   }
 
   // ─── 6. Action Handlers: Acknowledge & Resolve ──────────────────────────────
-  window.__rakshyaAction = async function (alertId, action) {
+  window.__safesyncAction = async function (alertId, action) {
     try {
       const endpoint = action === 'acknowledge' ? `/api/incidents/${alertId}/acknowledge` : `/api/incidents/${alertId}/resolve`;
       const res = await fetch(`${API_BASE}${endpoint}`, {

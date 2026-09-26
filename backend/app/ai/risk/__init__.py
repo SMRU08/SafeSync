@@ -1,5 +1,5 @@
 """
-Risk Analysis & Smart Alert Engine Package — RAKSHYA VISION Phase 7
+Risk Analysis & Smart Alert Engine Package — SafeSync Phase 7
 """
 
 try:

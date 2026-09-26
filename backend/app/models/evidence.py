@@ -1,5 +1,5 @@
 """
-evidence.py — RAKSHYA VISION Phase 10 Step 9
+evidence.py — SafeSync Phase 10 Step 9
 SQLAlchemy Database Model for Tamper-Evident Safety Incident Evidence.
 Stores cryptographically verified snapshot records, SHA-256 integrity hashes,
 and metadata without any PII.

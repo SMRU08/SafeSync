@@ -1,6 +1,6 @@
 # Database Architecture & Persistence
 
-RAKSHYA VISION uses a relational database architecture designed for edge reliability, high concurrent throughput, and referential integrity.
+SafeSync uses a relational database architecture designed for edge reliability, high concurrent throughput, and referential integrity.
 
 ---
 
@@ -105,7 +105,7 @@ erDiagram
 
 ## 3. Data Retention & Maintenance Engine
 
-Continuous multi-camera monitoring generates thousands of temporal observations over time. To prevent unbounded disk growth, RAKSHYA VISION provides a deterministic retention cleanup engine:
+Continuous multi-camera monitoring generates thousands of temporal observations over time. To prevent unbounded disk growth, SafeSync provides a deterministic retention cleanup engine:
 
 ```bash
 python scripts/cleanup_retention.py --retention-days 30 --mode prune
@@ -131,7 +131,7 @@ The active state and PRAGMA settings can be queried via `GET /health/database`:
   "reachable": true,
   "query_ok": true,
   "dialect": "sqlite",
-  "database_url": "./rakshya_vision.db",
+  "database_url": "./safesync.db",
   "tables_available": [
     "incidents",
     "alerts",

@@ -1,5 +1,5 @@
 """
-audio_alert_engine.py — RAKSHYA VISION Core AI Vision & Audio-Alert Engine
+audio_alert_engine.py — SafeSync Core AI Vision & Audio-Alert Engine
 Real-time PPE compliance audio alert generation with camera-isolated speaker toggles,
 personalized worker grammar formatting, and event broadcasting.
 """
@@ -448,7 +448,7 @@ class AudioAlertEngine:
         if MetricsCollector:
             try:
                 MetricsCollector.get_instance().increment_counter(
-                    "rakshya_audio_alerts_total",
+                    "safesync_audio_alerts_total",
                     labels={"camera_id": camera_id, "action": "TRIGGERED"},
                 )
             except Exception:
@@ -562,7 +562,7 @@ class AudioAlertEngine:
         if MetricsCollector:
             try:
                 MetricsCollector.get_instance().increment_counter(
-                    "rakshya_hazard_audio_alerts_total",
+                    "safesync_hazard_audio_alerts_total",
                     labels={"camera_id": camera_id, "hazard": hazard_type},
                 )
             except Exception:

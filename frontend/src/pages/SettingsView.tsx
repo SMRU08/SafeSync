@@ -1,5 +1,5 @@
 /**
- * SettingsView.tsx — RAKSHYA VISION Professional SOC
+ * SettingsView.tsx — SafeSync Professional SOC
  * Clean industrial configuration panel for inspection of AI models,
  * camera configs, PPE compliance rules, hazard thresholds, and alert policies.
  */

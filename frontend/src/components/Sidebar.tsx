@@ -1,5 +1,5 @@
 /**
- * Sidebar.tsx — RAKSHYA VISION Professional SOC
+ * Sidebar.tsx — SafeSync Professional SOC
  * Deep industrial navy sidebar with 9 navigation tabs, dynamic alert badge,
  * and plant safety footer card.
  */
@@ -155,7 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="relative z-10 flex flex-col gap-2">
             <img
               src="/logo.png"
-              alt="RAKSHYA VISION"
+              alt="SafeSync"
               className="w-12 h-12 object-contain rounded-lg"
             />
             <div>
@@ -167,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div className="pt-2 border-t border-slate-700/50 flex items-center gap-2">
               <div>
-                <p className="text-[9px] font-bold text-slate-300">RAKSHYA VISION</p>
+                <p className="text-[9px] font-bold text-slate-300">SafeSync</p>
                 <p className="text-[8px] text-slate-500">v1.0.0 Team XERSES</p>
               </div>
             </div>

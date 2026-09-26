@@ -1,5 +1,5 @@
 """
-tracker.py — RAKSHYA VISION Phase 6
+tracker.py — SafeSync Phase 6
 Spatial Hazard Tracker for Fire and Smoke Events.
 Maintains persistent anonymous hazard event IDs (HAZARD-0001, HAZARD-0002) across video frames
 using IoU overlap and normalized centroid Euclidean distance.

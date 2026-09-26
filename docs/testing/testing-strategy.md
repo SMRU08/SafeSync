@@ -1,6 +1,6 @@
 # Testing Strategy
 
-RAKSHYA VISION maintains a rigorous, multi-layered automated testing regime spanning unit tests, integration test matrices, latency benchmarks, memory leak evaluations, and security penetration audits.
+SafeSync maintains a rigorous, multi-layered automated testing regime spanning unit tests, integration test matrices, latency benchmarks, memory leak evaluations, and security penetration audits.
 
 ---
 

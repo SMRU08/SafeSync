@@ -1,5 +1,5 @@
 """
-test_association_scenarios.py — RAKSHYA VISION Phase 5
+test_association_scenarios.py — SafeSync Phase 5
 Controlled test cases verifying spatial PPE association and temporal state rules:
  1. Worker with helmet
  2. Worker without visible helmet

@@ -1,5 +1,5 @@
 """
-session.py — RAKSHYA VISION Phase 10 Step 4
+session.py — SafeSync Phase 10 Step 4
 Hardened Database Session Management with SQLite Write-Ahead Logging (WAL),
 Connection Pooling, Foreign Key Enforcement, and Health Diagnostics.
 """

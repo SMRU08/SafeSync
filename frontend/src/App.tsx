@@ -1,5 +1,5 @@
 /**
- * App.tsx — RAKSHYA VISION Professional SOC
+ * App.tsx — SafeSync Professional SOC
  * Enterprise Industrial Safety Operations Center Root Application Shell.
  * Integrates real-time FastAPI endpoints, live WebSocket telemetry,
  * real multi-camera streams, ByteTrack PPE compliance HUD, and smart alert triage.

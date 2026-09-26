@@ -10,7 +10,7 @@ import random
 from pathlib import Path
 from collections import defaultdict
 
-ROOT = Path("D:/Additional/PROJECT/RAKSHYA-VISION")
+ROOT = Path("D:/Additional/PROJECT/SafeSync")
 PROCESSED_DIR = ROOT / "datasets" / "processed"
 TRAIN_IMG_DIR = PROCESSED_DIR / "images" / "train"
 TRAIN_LBL_DIR = PROCESSED_DIR / "labels" / "train"

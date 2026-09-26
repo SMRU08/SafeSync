@@ -22,7 +22,7 @@
     "device": "cpu"
   },
   "dataset": {
-    "path": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\datasets\\processed\\data.yaml",
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\processed\\data.yaml",
     "train_images": 15717,
     "val_images": 4490,
     "test_images": 2246,
@@ -37,9 +37,9 @@
     ]
   },
   "output": {
-    "best_pt": "D:\\Additional\\PROJECT\\RAKSHYA-VISION\\models\\detection\\ppe_fire_smoke_v1\\weights\\best.pt",
+    "best_pt": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\ppe_fire_smoke_v1\\weights\\best.pt",
     "sha256": "e265d7978b8cdb8cb2e6620e92e8c66d09a04d98b52d9409c91e3ceeba0cd5bf"
   },
   "phase": "Phase 3 \u2014 Model Training & Validation",
-  "project": "RAKSHYA VISION"
+  "project": "SafeSync"
 }

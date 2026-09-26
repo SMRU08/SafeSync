@@ -1,5 +1,5 @@
 """
-frame_processor.py — RAKSHYA VISION Phase 4
+frame_processor.py — SafeSync Phase 4
 Per-frame validation, inference execution, latency measurement, and visual annotation.
 Safe handling of corrupted/None frames to prevent pipeline crashes.
 """
