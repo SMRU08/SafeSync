@@ -155,7 +155,7 @@
     "cctv_compression": {
       "is_positive_scenario": false,
       "fire_detections": 0,
-      "smoke_detections": 89,
+      "smoke_detections": 80,
       "false_positive": true
     },
     "motion_blur": {
