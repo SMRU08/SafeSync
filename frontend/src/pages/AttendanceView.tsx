@@ -10,7 +10,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Users,
   Clock,
   Camera,
   Check,
@@ -20,8 +19,13 @@ import {
   X,
   UploadCloud,
   Video,
+  ShieldCheck,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { API_BASE_URL } from '../utils/constants';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 
 interface AttendanceRecord {
   id: number;
@@ -46,6 +50,7 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ cameras = [] }) 
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'today' | 'history'>('today');
   const [historyDays, setHistoryDays] = useState(7);
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   // Face match modal state
   const [showFaceMatch, setShowFaceMatch] = useState(false);
@@ -233,14 +238,19 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ cameras = [] }) 
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4 bg-[#eef3f9]">
+    <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-5 bg-[#070b14] text-slate-100">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Attendance &amp; Biometrics</h2>
-          <p className="text-xs text-slate-500">Automated daily attendance logging via facial biometric matching</p>
+          <h2 className="text-xl font-extrabold text-slate-100 tracking-tight flex items-center gap-2">
+            <UserCheck className="w-5 h-5 text-emerald-400" />
+            Attendance &amp; Biometrics Center
+          </h2>
+          <p className="text-xs text-slate-400">
+            Real-time biometric attendance logging, worker verification &amp; historical audit trail
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => {
               setShowFaceMatch(true);
@@ -249,14 +259,14 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ cameras = [] }) 
               setUploadedPreview(null);
               setCheckInSource('webcam');
             }}
-            className="flex items-center gap-2 px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg shadow-sm transition"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-500 hover:to-sky-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-600/30 border border-sky-400/30 transition-all duration-200"
           >
             <Camera className="w-4 h-4" />
             Biometric Check-In
           </button>
           <button
             onClick={fetchToday}
-            className="p-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-500"
+            className="p-2 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 rounded-xl transition text-slate-300 hover:text-white"
             title="Refresh Attendance Log"
           >
             <RefreshCw className="w-4 h-4" />
@@ -265,152 +275,280 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ cameras = [] }) 
       </div>
 
       {/* KPI Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 p-4 flex flex-col gap-1 relative overflow-hidden shadow-lg">
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-emerald-500" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div className="glass-card rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden border border-slate-800/80 shadow-xl">
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400" />
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Today's Check-Ins</span>
           <span className="text-3xl font-black text-white font-mono-nums">{todayLogs.length}</span>
-          <span className="text-[10px] text-emerald-400">
+          <span className="text-[10px] text-emerald-400 font-medium">
             {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
           </span>
         </div>
-        <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 p-4 flex flex-col gap-1 relative overflow-hidden shadow-lg">
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-sky-500" />
+        <div className="glass-card rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden border border-slate-800/80 shadow-xl">
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-sky-500 to-blue-500" />
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">First Check-In</span>
           <span className="text-sm font-black text-white font-mono-nums">
             {todayLogs.length > 0 ? formatTime(todayLogs[todayLogs.length - 1].check_in_time) : '--:--:--'}
           </span>
-          <span className="text-[10px] text-sky-400">Earliest check-in</span>
+          <span className="text-[10px] text-sky-400 font-medium">Earliest shift entry</span>
         </div>
-        <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 p-4 flex flex-col gap-1 relative overflow-hidden shadow-lg">
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-amber-500" />
+        <div className="glass-card rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden border border-slate-800/80 shadow-xl">
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-amber-500 to-orange-400" />
           <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Latest Check-In</span>
           <span className="text-sm font-black text-white font-mono-nums">
             {todayLogs.length > 0 ? formatTime(todayLogs[0].check_in_time) : '--:--:--'}
           </span>
-          <span className="text-[10px] text-amber-400">Most recent</span>
+          <span className="text-[10px] text-amber-400 font-medium">Most recent verification</span>
         </div>
-        <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 p-4 flex flex-col gap-1 relative overflow-hidden shadow-lg">
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-purple-500" />
-          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Monitored Cameras</span>
+        <div className="glass-card rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden border border-slate-800/80 shadow-xl">
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-500 to-indigo-400" />
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Active Entry Gates</span>
           <span className="text-3xl font-black text-white font-mono-nums">
             {new Set(todayLogs.map((l) => l.camera_id)).size}
           </span>
-          <span className="text-[10px] text-purple-400">Active entry gates</span>
+          <span className="text-[10px] text-purple-400 font-medium">Facial biometric cameras</span>
         </div>
       </div>
 
-      {/* Tab Switch */}
-      <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 w-fit shadow-xs">
-        <button
-          onClick={() => setActiveTab('today')}
-          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition ${
-            activeTab === 'today' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-100'
-          }`}
-        >
-          Today's Log
-        </button>
-        <button
-          onClick={() => setActiveTab('history')}
-          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition ${
-            activeTab === 'history' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-100'
-          }`}
-        >
-          History ({historyDays}d)
-        </button>
-      </div>
+      {/* Control Bar: Tab Switch & View Mode Toggle */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60 p-2 rounded-2xl border border-slate-800/80">
+        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <button
+            onClick={() => setActiveTab('today')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+              activeTab === 'today'
+                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            Today ({todayLogs.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
+              activeTab === 'history'
+                ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            History ({historyDays}d)
+          </button>
+        </div>
 
-      {/* Attendance Ledger Table */}
-      <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 overflow-hidden shadow-xl">
-        <div className="px-4 py-3 bg-[#111f35] border-b border-slate-700 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <h3 className="text-xs font-bold text-white uppercase tracking-wide">
-              {activeTab === 'today' ? "Today's Attendance" : `${historyDays}-Day History`}
-            </h3>
-            <span className="bg-sky-700 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-              {activeTab === 'today' ? todayLogs.length : historyLogs.length}
-            </span>
-          </div>
+        <div className="flex items-center gap-3">
           {activeTab === 'history' && (
             <select
               value={historyDays}
               onChange={(e) => setHistoryDays(Number(e.target.value))}
-              className="text-xs bg-slate-700 border border-slate-600 text-slate-200 rounded px-2 py-1 focus:outline-none"
+              className="text-xs bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-sky-500"
             >
               <option value={7}>Last 7 days</option>
               <option value={14}>Last 14 days</option>
               <option value={30}>Last 30 days</option>
             </select>
           )}
-        </div>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center p-12 text-slate-400">
-            <RefreshCw className="w-5 h-5 animate-spin mr-2" />
-            <span className="text-sm">Loading attendance ledger...</span>
+          {/* View Toggle */}
+          <div className="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`p-1.5 rounded-lg text-xs transition-all ${
+                viewMode === 'cards'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title="Profile Cards View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-1.5 rounded-lg text-xs transition-all ${
+                viewMode === 'table'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title="Compact Ledger View"
+            >
+              <List className="w-4 h-4" />
+            </button>
           </div>
-        ) : (activeTab === 'today' ? todayLogs : historyLogs).length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-slate-500">
-            <Users className="w-10 h-10 mb-2 opacity-30 text-slate-400" />
-            <p className="text-sm font-semibold text-slate-400">No attendance entries recorded yet</p>
-            <p className="text-[11px] text-slate-500 mt-1">
-              Check-ins appear automatically upon successful facial biometric matching
-            </p>
-          </div>
-        ) : (
+        </div>
+      </div>
+
+      {/* Main Attendance Content Area */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <CardSkeleton key={idx} rows={3} />
+          ))}
+        </div>
+      ) : (activeTab === 'today' ? todayLogs : historyLogs).length === 0 ? (
+        <EmptyState
+          icon={UserCheck}
+          title="No Attendance Entries Recorded"
+          description="Workers will appear here dynamically upon successful biometric face verification at entrance cameras or via manual check-in."
+          actionText="Trigger Biometric Check-In"
+          onAction={() => {
+            setShowFaceMatch(true);
+            setMatchResult(null);
+            setMatchError(null);
+            setUploadedPreview(null);
+            setCheckInSource('webcam');
+          }}
+        />
+      ) : viewMode === 'cards' ? (
+        /* ─── DYNAMIC EMPLOYEE PROFILE CARDS ─── */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {(activeTab === 'today' ? todayLogs : historyLogs).map((log, index) => (
+            <div
+              key={log.id}
+              className="glass-card rounded-2xl p-4.5 border border-slate-800/80 shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:border-sky-500/40 hover:shadow-sky-500/10 animate-in fade-in slide-in-from-bottom-3 duration-300 flex flex-col justify-between group"
+              style={{ animationDelay: `${Math.min(index * 40, 400)}ms` }}
+            >
+              {/* Top Row: Avatar & Profile Info */}
+              <div>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-600 via-indigo-600 to-sky-400 flex items-center justify-center text-white font-extrabold text-sm shadow-md flex-shrink-0">
+                        {log.worker_name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#0c1424] flex items-center justify-center text-white">
+                        <Check className="w-2.5 h-2.5 stroke-[3]" />
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-slate-100 group-hover:text-sky-300 transition-colors">
+                        {log.worker_name}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] font-mono text-sky-400 bg-sky-950/80 border border-sky-800/60 px-2 py-0.5 rounded-md font-semibold">
+                          {log.worker_id}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          {log.job_role || 'Field Personnel'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <span className="text-[10px] font-semibold bg-emerald-950/70 border border-emerald-700/60 text-emerald-400 px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-xs">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Present
+                  </span>
+                </div>
+
+                {/* Metadata Details */}
+                <div className="bg-slate-950/60 rounded-xl p-3 border border-slate-800/80 space-y-2 mt-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-sky-400" />
+                      Check-In Time:
+                    </span>
+                    <span className="font-mono font-bold text-emerald-300">
+                      {formatTime(log.check_in_time)}
+                    </span>
+                  </div>
+
+                  {activeTab === 'history' && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-400">Date:</span>
+                      <span className="font-mono text-slate-300">{formatDate(log.date)}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5 text-indigo-400" />
+                      Entry Gate:
+                    </span>
+                    <span className="text-[11px] text-indigo-300 font-medium truncate max-w-[150px]">
+                      {log.camera_name}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Verification Badge */}
+              <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Biometric Face Match
+                </span>
+                <span className="text-[10px] font-mono text-slate-500">
+                  {log.camera_id}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* ─── COMPACT LEDGER TABLE ─── */
+        <div className="glass-card rounded-2xl border border-slate-800/80 overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-700 bg-slate-800/50">
-                  <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Worker
+                <tr className="border-b border-slate-800 bg-slate-900/80">
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Worker Details
                   </th>
-                  <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     Designation
                   </th>
-                  <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Check-In Time
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Check-In Timestamp
                   </th>
                   {activeTab === 'history' && (
-                    <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                    <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                       Date
                     </th>
                   )}
-                  <th className="text-left px-4 py-2.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <th className="text-left px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     Origin Gate / Camera
+                  </th>
+                  <th className="text-right px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
+              <tbody className="divide-y divide-slate-800/60">
                 {(activeTab === 'today' ? todayLogs : historyLogs).map((log) => (
                   <tr key={log.id} className="hover:bg-slate-800/40 transition">
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-sky-700 flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                           {log.worker_name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-semibold text-white">{log.worker_name}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">{log.worker_id}</div>
+                          <div className="font-semibold text-slate-100">{log.worker_name}</div>
+                          <div className="text-[10px] text-sky-400 font-mono">{log.worker_id}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-300">{log.job_role || '—'}</td>
+                    <td className="px-4 py-3 text-slate-300 font-medium">{log.job_role || '—'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
-                        <Clock className="w-3 h-3 text-emerald-400" />
-                        <span className="text-emerald-300 font-mono-nums font-semibold">
+                        <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-300 font-mono-nums font-bold">
                           {formatTime(log.check_in_time)}
                         </span>
                       </div>
                     </td>
                     {activeTab === 'history' && (
-                      <td className="px-4 py-3 text-slate-400 text-[10px]">{formatDate(log.date)}</td>
+                      <td className="px-4 py-3 text-slate-400 text-xs font-mono">{formatDate(log.date)}</td>
                     )}
                     <td className="px-4 py-3">
-                      <span className="text-[10px] bg-sky-900/60 border border-sky-700/50 text-sky-300 px-2 py-0.5 rounded-full font-medium">
+                      <span className="text-[11px] bg-slate-900 border border-slate-700 text-slate-200 px-2.5 py-1 rounded-lg font-medium">
                         {log.camera_name}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="text-[10px] bg-emerald-950/80 border border-emerald-700/60 text-emerald-400 px-2 py-0.5 rounded-full font-bold">
+                        Verified
                       </span>
                     </td>
                   </tr>
@@ -418,8 +556,8 @@ export const AttendanceView: React.FC<AttendanceViewProps> = ({ cameras = [] }) 
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Biometric Check-In Modal */}
       {showFaceMatch && (

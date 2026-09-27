@@ -217,76 +217,95 @@ export const App: React.FC = () => {
         />
 
         {/* Main Content Router Surface */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#eef3f9]">
-          {activeTab === 'overview' && (
-            <OverviewView
-              summary={summary}
-              alerts={alerts}
-              hazards={hazards}
-              cameras={cameras}
-              onNavigate={handleTabChange}
-              onSelectAlert={(a) => setSelectedAlert(a)}
-              onAcknowledge={handleAcknowledge}
-              onResolve={handleResolve}
-              onDismiss={handleDismiss}
-              onRefresh={refreshAll}
-              onToggleSpeaker={handleToggleSpeaker}
-            />
-          )}
+        <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#070b14]">
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            {activeTab === 'overview' && (
+              <OverviewView
+                summary={summary}
+                alerts={alerts}
+                hazards={hazards}
+                cameras={cameras}
+                onNavigate={handleTabChange}
+                onSelectAlert={(a) => setSelectedAlert(a)}
+                onAcknowledge={handleAcknowledge}
+                onResolve={handleResolve}
+                onDismiss={handleDismiss}
+                onRefresh={refreshAll}
+                onToggleSpeaker={handleToggleSpeaker}
+              />
+            )}
 
-          {activeTab === 'live-monitor' && (
-            <LiveMonitoringView cameras={cameras} onRefresh={refreshAll} />
-          )}
+            {activeTab === 'live-monitor' && (
+              <LiveMonitoringView cameras={cameras} onRefresh={refreshAll} />
+            )}
 
-          {activeTab === 'cameras' && (
-            <CamerasView
-              cameras={cameras}
-              hazardConfig={hazardConfig}
-              onRefreshCameras={refreshAll}
-              onToggleSpeaker={handleToggleSpeaker}
-            />
-          )}
+            {activeTab === 'cameras' && (
+              <CamerasView
+                cameras={cameras}
+                hazardConfig={hazardConfig}
+                onRefreshCameras={refreshAll}
+                onToggleSpeaker={handleToggleSpeaker}
+              />
+            )}
 
-          {activeTab === 'workers' && (
-            <WorkersView
-              complianceConfig={complianceConfig}
-              onOpenEnrollModal={() => setIsEnrollModalOpen(true)}
-            />
-          )}
+            {activeTab === 'workers' && (
+              <WorkersView
+                complianceConfig={complianceConfig}
+                onOpenEnrollModal={() => setIsEnrollModalOpen(true)}
+              />
+            )}
 
-          {activeTab === 'attendance' && (
-            <AttendanceView cameras={cameras} />
-          )}
-          {activeTab === 'hazards' && (
-            <HazardsView hazards={hazards} hazardConfig={hazardConfig} />
-          )}
+            {activeTab === 'attendance' && (
+              <AttendanceView cameras={cameras} />
+            )}
+            {activeTab === 'hazards' && (
+              <HazardsView hazards={hazards} hazardConfig={hazardConfig} />
+            )}
 
-          {activeTab === 'alerts' && (
-            <AlertsView
-              alerts={alerts}
-              incidents={incidents}
-              summary={summary}
-              onAcknowledge={handleAcknowledge}
-              onResolve={handleResolve}
-              onDismiss={handleDismiss}
-              onRefresh={refreshAll}
-              onSelectAlert={(a) => setSelectedAlert(a)}
-              onSelectIncident={handleOpenIncident}
-            />
-          )}
+            {activeTab === 'alerts' && (
+              <AlertsView
+                alerts={alerts}
+                incidents={incidents}
+                summary={summary}
+                onAcknowledge={handleAcknowledge}
+                onResolve={handleResolve}
+                onDismiss={handleDismiss}
+                onRefresh={refreshAll}
+                onSelectAlert={(a) => setSelectedAlert(a)}
+                onSelectIncident={handleOpenIncident}
+              />
+            )}
 
-          {activeTab === 'analytics' && (
-            <AnalyticsView alerts={alerts} incidents={incidents} summary={summary} />
-          )}
+            {activeTab === 'analytics' && (
+              <AnalyticsView alerts={alerts} incidents={incidents} summary={summary} />
+            )}
 
-          {activeTab === 'health' && <SystemHealthView />}
+            {activeTab === 'health' && <SystemHealthView />}
 
-          {activeTab === 'settings' && (
-            <SettingsView
-              complianceConfig={complianceConfig}
-              hazardConfig={hazardConfig}
-            />
-          )}
+            {activeTab === 'settings' && (
+              <SettingsView
+                complianceConfig={complianceConfig}
+                hazardConfig={hazardConfig}
+              />
+            )}
+          </div>
+
+          {/* ─── Persistent Safety Boundary Disclaimer Banner ─────────────────── */}
+          <footer className="h-6 px-4 bg-[#050811] border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-500 font-mono select-none flex-shrink-0 z-30">
+            <div className="flex items-center gap-2 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 flex-shrink-0" />
+              <span className="truncate">
+                <strong className="text-slate-400 font-semibold">SAFETY BOUNDARY DISCLAIMER:</strong> SafeSync operates as an AI visual intelligence complement to certified primary safety systems and human supervisory procedures.
+              </span>
+            </div>
+            <div className="hidden lg:flex items-center gap-3 text-slate-500 text-[9px] flex-shrink-0">
+              <span>ISO 45001 Aligned</span>
+              <span>•</span>
+              <span>Fail-Safe Telemetry</span>
+              <span>•</span>
+              <span className="text-sky-400 font-semibold">v2.4.0 SOC-PRO</span>
+            </div>
+          </footer>
         </main>
       </div>
 

@@ -1,12 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  --brand-navy: #0f1e36;
-  --brand-dark: #0a1424;
-  --brand-blue: #1b68d6;
-  --brand-light-blue: #2575fc;
-  --brand-border: #e2e8f0;
-  --brand-bg-light: #f1f5fa;
+  --bg-primary: #070b14;
+  --bg-surface: #0c1424;
+  --bg-elevated: #111d35;
+  --border-subtle: rgba(51, 65, 85, 0.4);
+  --border-glow: rgba(56, 189, 248, 0.3);
+  --accent-cyan: #38bdf8;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
 }
 
 html,
@@ -16,9 +19,11 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #eef3f9;
+  background-color: #070b14;
+  color: #f1f5f9;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .font-mono-nums {
@@ -26,18 +31,80 @@ body,
   font-feature-settings: 'tnum' 1;
 }
 
-/* Subtle scrollbars */
+/* ─── Control Room Glassmorphism Utilities ────────────────────────────────── */
+.glass-card {
+  background: rgba(12, 20, 36, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px -2px rgba(56, 189, 248, 0.15);
+}
+
+/* ─── Pulsating Status Rings ──────────────────────────────────────────────── */
+.ring-pulse-active {
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: ring-pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+.ring-pulse-warning {
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: ring-pulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+.ring-pulse-offline {
+  box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+  animation: ring-pulse 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+@keyframes ring-pulse {
+  to {
+    box-shadow: 0 0 0 8px rgba(0, 0, 0, 0);
+  }
+}
+
+/* ─── Skeleton Shimmer Animation ─────────────────────────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.5) 0%,
+    rgba(51, 65, 85, 0.8) 50%,
+    rgba(30, 41, 59, 0.5) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite ease-in-out;
+}
+
+/* ─── Dark Industrial Scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #070b14;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #1e293b;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #334155;
 }
