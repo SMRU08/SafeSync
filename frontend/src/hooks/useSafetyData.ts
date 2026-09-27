@@ -28,6 +28,7 @@ import {
   acknowledgeIncident,
   resolveIncident,
   toggleCameraSpeaker,
+  fetchAnalyticsMetrics,
 } from '../services/api';
 
 export interface SystemStatusState {
@@ -52,6 +53,7 @@ export function useSafetyData() {
   const [cameras, setCameras] = useState<CameraConfig[]>([]);
   const [complianceConfig, setComplianceConfig] = useState<any>(null);
   const [hazardConfig, setHazardConfig] = useState<any>(null);
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -192,6 +194,14 @@ export function useSafetyData() {
       setComplianceConfig(null);
     }
 
+    // 8. Analytics Aggregations
+    try {
+      const aData = await fetchAnalyticsMetrics();
+      setAnalyticsData(aData);
+    } catch {
+      // Keep previous state
+    }
+
     setIsLoading(false);
   }, []);
 
@@ -205,6 +215,11 @@ export function useSafetyData() {
   const handleWebSocketMessage = useCallback(
     (msg: WebSocketMessage) => {
       if (msg.type === 'event' && msg.event) {
+        // Handle real-time analytics updates
+        if (msg.event === 'AnalyticsUpdated' && msg.payload) {
+          setAnalyticsData(msg.payload);
+        }
+
         // Handle dynamic AudioAlert voice synthesis (Strictly Hindi Voice)
         if (msg.event === 'AudioAlert' && msg.payload) {
           const payload = msg.payload;
@@ -247,6 +262,7 @@ export function useSafetyData() {
         fetchAlerts({ limit: 100 }).then(setAlerts).catch(() => {});
         fetchIncidents(undefined, 50).then(setIncidents).catch(() => {});
         fetchHazards().then(setHazards).catch(() => {});
+        fetchAnalyticsMetrics().then(setAnalyticsData).catch(() => {});
       }
     },
     []
@@ -354,6 +370,7 @@ export function useSafetyData() {
     cameras,
     complianceConfig,
     hazardConfig,
+    analyticsData,
     isLoading,
     actionError,
     actionSuccess,

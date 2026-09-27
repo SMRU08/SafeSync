@@ -45,6 +45,40 @@ def expand_source_env(source: str) -> str:
     return expanded
 
 
+def resolve_http_stream_url(source: str) -> List[str]:
+    """
+    Expands mobile IP camera URL into candidate video stream endpoints:
+    e.g. http://192.168.1.38:8080 ->
+      1. http://192.168.1.38:8080/video (IP Webcam Android standard)
+      2. http://192.168.1.38:8080/mjpeg
+      3. http://192.168.1.38:8080/videofeed
+      4. http://192.168.1.38:8080/mjpegfeed (DroidCam)
+      5. http://192.168.1.38:8080/shot.jpg
+      6. http://192.168.1.38:8080
+    """
+    s = str(source).strip()
+    if not (s.startswith("http://") or s.startswith("https://")):
+        return [s]
+
+    from urllib.parse import urlparse
+    parsed = urlparse(s)
+    path = parsed.path.rstrip('/')
+
+    candidates = [s]
+    # If the user provided the base server URL without a known stream path
+    if path in ("", "/", "/index.html", "/view"):
+        base = f"{parsed.scheme}://{parsed.netloc}"
+        candidates = [
+            f"{base}/video",      # Android IP Webcam app (most common)
+            f"{base}/mjpeg",      # Generic IP webcams
+            f"{base}/videofeed",  # Flask / Python streaming
+            f"{base}/mjpegfeed",  # DroidCam
+            f"{base}/shot.jpg",   # Snapshot fallback
+            s,
+        ]
+    return candidates
+
+
 class CameraWorker:
     """
     Isolated worker thread capturing frames from a single camera source.
@@ -135,15 +169,23 @@ class CameraWorker:
                 zone_id=self.config.zone_id or "UNKNOWN",
             )
 
-            # 2. Hazard analysis inference (fire and smoke)
+            # 2. Hazard analysis inference (fire and smoke - single-pass zero-latency reuse)
             hazard_resp = None
             if self._hazard_engine is not None:
                 try:
-                    hazard_resp, _, _ = self._hazard_engine.process_frame(
-                        frame,
-                        camera_id=self.camera_id,
-                        annotate=False,
-                    )
+                    raw_haz = getattr(compliance_resp, "environmental_hazards", None)
+                    if hasattr(self._hazard_engine, "process_raw_hazards") and raw_haz is not None:
+                        hazard_resp = self._hazard_engine.process_raw_hazards(
+                            raw_hazards=raw_haz,
+                            frame_shape=frame.shape[:2],
+                            camera_id=self.camera_id,
+                        )
+                    else:
+                        hazard_resp, _, _ = self._hazard_engine.process_frame(
+                            frame,
+                            camera_id=self.camera_id,
+                            annotate=False,
+                        )
                 except Exception as h_err:
                     logger.debug("Hazard engine frame evaluation skipped: %s", h_err)
 
@@ -558,14 +600,33 @@ class CameraWorker:
             if "nonexistent" in str(source_str).lower():
                 return None
 
-            cap = cv2.VideoCapture(target_source)
+            # For HTTP / mobile IP webcams, evaluate endpoint candidates
+            candidates = [target_source]
+            if not is_device_index and (str(target_source).startswith("http://") or str(target_source).startswith("https://")):
+                candidates = resolve_http_stream_url(str(target_source))
 
-            # On Windows, if default MSMF backend fails for device index, fallback to DirectShow
-            if (cap is None or not cap.isOpened()) and is_device_index and os.name == "nt":
+            cap = None
+            for cand in candidates:
                 try:
-                    cap = cv2.VideoCapture(target_source, cv2.CAP_DSHOW)
-                except Exception:
-                    cap = None
+                    c = cv2.VideoCapture(cand)
+                    if (c is None or not c.isOpened()) and is_device_index and os.name == "nt":
+                        try:
+                            c = cv2.VideoCapture(cand, cv2.CAP_DSHOW)
+                        except Exception:
+                            c = None
+                    if c is not None and c.isOpened():
+                        ret, test_frame = c.read()
+                        if ret and test_frame is not None:
+                            cap = c
+                            if cand != self.config.source and isinstance(cand, str):
+                                logger.info("Auto-resolved camera %s stream URL to: %s", self.camera_id, cand)
+                                self.config.source = cand
+                                self.safe_source = mask_camera_source(cand)
+                            break
+                        else:
+                            c.release()
+                except Exception as cand_err:
+                    logger.debug("Candidate stream %s failed: %s", cand, cand_err)
 
             if cap is None or not cap.isOpened():
                 return None

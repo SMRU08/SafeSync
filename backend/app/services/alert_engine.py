@@ -395,6 +395,13 @@ class AlertEngine:
                 except Exception:
                     pass
 
+                if db is not None:
+                    try:
+                        from app.api.analytics import broadcast_analytics_update
+                        broadcast_analytics_update(db)
+                    except Exception:
+                        pass
+
                 return escalated_alert, incident_schema, "ESCALATED"
 
             # Check Cooldown
@@ -509,6 +516,13 @@ class AlertEngine:
         except Exception:
             pass
 
+        if db is not None:
+            try:
+                from app.api.analytics import broadcast_analytics_update
+                broadcast_analytics_update(db)
+            except Exception:
+                pass
+
         return new_alert, incident_schema, "CREATED"
 
     def acknowledge_alert(self, alert_id: str, db: Session) -> AlertSchema:
@@ -558,6 +572,13 @@ class AlertEngine:
             )
         except Exception:
             pass
+
+        try:
+            from app.api.analytics import broadcast_analytics_update
+            broadcast_analytics_update(db)
+        except Exception:
+            pass
+
         return result
 
     def resolve_alert(self, alert_id: str, db: Session) -> AlertSchema:
@@ -614,6 +635,13 @@ class AlertEngine:
             )
         except Exception:
             pass
+
+        try:
+            from app.api.analytics import broadcast_analytics_update
+            broadcast_analytics_update(db)
+        except Exception:
+            pass
+
         return result
 
     def dismiss_alert(self, alert_id: str, db: Session) -> AlertSchema:
@@ -668,6 +696,13 @@ class AlertEngine:
             )
         except Exception:
             pass
+
+        try:
+            from app.api.analytics import broadcast_analytics_update
+            broadcast_analytics_update(db)
+        except Exception:
+            pass
+
         return result
 
     def acknowledge_incident(self, incident_id: str, db: Session) -> dict:
@@ -696,6 +731,13 @@ class AlertEngine:
 
         db.commit()
         broadcaster.broadcast("IncidentUpdated", {"incident_id": incident_id, "status": "ACKNOWLEDGED"})
+
+        try:
+            from app.api.analytics import broadcast_analytics_update
+            broadcast_analytics_update(db)
+        except Exception:
+            pass
+
         return {"status": "success", "incident_id": incident_id, "incident_status": "ACKNOWLEDGED"}
 
     def resolve_incident(self, incident_id: str, db: Session) -> dict:
@@ -729,6 +771,13 @@ class AlertEngine:
 
         db.commit()
         broadcaster.broadcast("IncidentResolved", {"incident_id": incident_id})
+
+        try:
+            from app.api.analytics import broadcast_analytics_update
+            broadcast_analytics_update(db)
+        except Exception:
+            pass
+
         return {"status": "success", "incident_id": incident_id, "incident_status": "RESOLVED"}
 
     def get_risk_summary(self, db: Session) -> RiskSummaryResponse:

@@ -16,26 +16,18 @@ hazard:
   # ── Stage 1: Candidate Detection Confidence ──────────────────────────────
   # Minimum confidence to even enter the tracking pipeline as a CANDIDATE.
   # Below this threshold, detections are silently discarded before tracking.
-  fire_candidate_confidence: 0.30
-  smoke_candidate_confidence: 0.35
+  fire_candidate_confidence: 0.25
+  smoke_candidate_confidence: 0.25
 
   # ── Stage 2: Confirmation Confidence ─────────────────────────────────────
-  # A track must have AVERAGE confidence >= this threshold AND be temporally
-  # confirmed before transitioning to CONFIRMED state.
-  # This prevents lucky high-confidence single-frame detections from
-  # immediately creating emergency incidents.
-  fire_confirmation_confidence: 0.40
-  smoke_confirmation_confidence: 0.45
+  fire_confirmation_confidence: 0.28
+  smoke_confirmation_confidence: 0.28
 
   # ── Temporal Confirmation Parameters ─────────────────────────────────────
-  # Frames of consistent DETECTING-state detection required before CONFIRMED.
-  # At 15 FPS, 8 frames = ~0.5s minimum evidence window.
-  # At 30 FPS, 8 frames = ~0.27s minimum evidence window.
-  confirmation_frames: 8
+  confirmation_frames: 3
 
   # Minimum ratio of detected frames in the confirmation window.
-  # 0.65 = smoke must appear in ≥65% of candidate frames (not just 1 flash).
-  minimum_observation_ratio: 0.65
+  minimum_observation_ratio: 0.50
 
   # ── Gap Tolerance ─────────────────────────────────────────────────────────
   # Frames a DETECTING track can be missed before decaying back to CANDIDATE.

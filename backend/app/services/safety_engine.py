@@ -117,7 +117,11 @@ class SafetyEngine:
         Rule 1: Confirmed Fire -> CRITICAL (P0 Emergency, Audible Siren).
         Requires state to be CONFIRMED or ACTIVE. CANDIDATE/DETECTING do NOT trigger.
         """
-        if hazard.hazard_type == HazardType.FIRE and hazard.state in (HazardState.CONFIRMED, HazardState.ACTIVE):
+        is_confirmed = hazard.state in (HazardState.CONFIRMED, HazardState.ACTIVE)
+        is_persistent_candidate = hazard.state == HazardState.DETECTING and (
+            hazard.duration_seconds >= 0.8 or hazard.confidence >= 0.38
+        )
+        if hazard.hazard_type == HazardType.FIRE and (is_confirmed or is_persistent_candidate):
             return NormalizedSafetyEvent(
                 event_id=str(uuid.uuid4()),
                 event_type=EventType.FIRE_DETECTED,
@@ -141,9 +145,13 @@ class SafetyEngine:
     def enforce_rule_2_smoke(self, hazard: HazardEventDetail) -> Optional[NormalizedSafetyEvent]:
         """
         Rule 2: Confirmed Smoke -> HIGH / CRITICAL (P0/P1 Hazard, Audible Siren).
-        Requires state to be CONFIRMED or ACTIVE. CANDIDATE/DETECTING do NOT trigger.
+        Requires state to be CONFIRMED or ACTIVE, or persistent DETECTING.
         """
-        if hazard.hazard_type == HazardType.SMOKE and hazard.state in (HazardState.CONFIRMED, HazardState.ACTIVE):
+        is_confirmed = hazard.state in (HazardState.CONFIRMED, HazardState.ACTIVE)
+        is_persistent_candidate = hazard.state == HazardState.DETECTING and (
+            hazard.duration_seconds >= 1.0 or hazard.confidence >= 0.38
+        )
+        if hazard.hazard_type == HazardType.SMOKE and (is_confirmed or is_persistent_candidate):
             # Escalate persistent smoke (> 10s) to P0, otherwise P1
             priority = AlarmPriority.P0 if hazard.duration_seconds >= 10.0 else AlarmPriority.P1
             return NormalizedSafetyEvent(

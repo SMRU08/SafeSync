@@ -294,24 +294,95 @@ class CameraManager:
         if st == "synthetic":
             return {"reachable": True, "details": "Synthetic stream generator available"}
 
+        from app.camera.worker import resolve_http_stream_url
+        candidates = resolve_http_stream_url(source) if source.startswith("http://") or source.startswith("https://") else [source]
+
+        last_error = ""
+        for cand in candidates:
+            try:
+                parsed_src = int(cand) if str(cand).isdigit() else cand
+                cap = cv2.VideoCapture(parsed_src)
+                if cap is not None and cap.isOpened():
+                    ret, frame = cap.read()
+                    cap.release()
+                    if ret and frame is not None:
+                        h, w = frame.shape[:2]
+                        return {
+                            "reachable": True,
+                            "resolved_source": cand,
+                            "resolution": f"{w}x{h}",
+                            "fps": 30.0,
+                            "details": f"Camera source verified ({w}x{h}) via {cand}",
+                        }
+                    else:
+                        last_error = f"Stream opened at {cand} but failed to capture frame."
+                else:
+                    last_error = f"Failed to open video capture for: {cand}"
+            except Exception as e:
+                last_error = str(e)
+
+        return {"reachable": False, "error": last_error or f"Failed to open video capture for: {source}"}
+
+    def validate_and_cleanup_cameras(self, remove_broken: bool = True) -> Dict[str, Any]:
+        """
+        Pings and validates connection status for all registered cameras.
+        Automatically purges false test artifacts and orphaned broken entries.
+        """
+        from app.database.session import SessionLocal
+        from app.models.camera import CameraModel
+
+        all_cams = list(self.configs.keys())
+        # Also query database for any cameras not currently in self.configs
         try:
-            # Parse integer index for USB devices
-            parsed_src = int(source) if source.isdigit() else source
-            cap = cv2.VideoCapture(parsed_src)
-            if not cap.isOpened():
-                return {"reachable": False, "error": f"Failed to open video capture for: {source}"}
-
-            ret, frame = cap.read()
-            cap.release()
-            if not ret or frame is None:
-                return {"reachable": False, "error": "Source opened but failed to capture test frame."}
-
-            h, w = frame.shape[:2]
-            return {
-                "reachable": True,
-                "resolution": f"{w}x{h}",
-                "fps": 30.0,
-                "details": f"Camera source verified ({w}x{h})"
-            }
+            with SessionLocal() as db:
+                db_rows = db.query(CameraModel).all()
+                for row in db_rows:
+                    if row.camera_id not in all_cams:
+                        all_cams.append(row.camera_id)
         except Exception as e:
-            return {"reachable": False, "error": str(e)}
+            logger.warning("Database query in cleanup: %s", e)
+
+        cleaned_ids = []
+        verified_ids = []
+        status_report = []
+
+        # Known mock / unit test prefixes that should never clutter live surveillance
+        test_prefixes = ("api_test_", "mgr_cam_", "dynamic_cam_", "cam_live_test", "mock_")
+
+        for cid in all_cams:
+            cfg = self.configs.get(cid)
+            source = cfg.source if cfg else ""
+            stype = str(cfg.source_type.value if hasattr(cfg.source_type, "value") else cfg.source_type) if cfg else "usb"
+
+            # Check if this camera is a false / test artifact
+            is_test_artifact = any(cid.startswith(p) for p in test_prefixes) or cid in ("2", "test_cam")
+            if is_test_artifact:
+                logger.info("Cleaning up false test camera entry: %s", cid)
+                self.unregister_camera(cid, delete_db=True)
+                cleaned_ids.append(cid)
+                status_report.append({"camera_id": cid, "action": "REMOVED", "reason": "Test artifact / false camera"})
+                continue
+
+            # Check connection
+            test_res = self.test_camera_source(source, stype) if source else {"reachable": False}
+            if test_res.get("reachable"):
+                verified_ids.append(cid)
+                status_report.append({"camera_id": cid, "status": "ONLINE", "details": test_res.get("details")})
+            else:
+                if remove_broken and not cfg.enabled:
+                    # Broken and disabled camera: prune
+                    self.unregister_camera(cid, delete_db=True)
+                    cleaned_ids.append(cid)
+                    status_report.append({"camera_id": cid, "action": "REMOVED", "reason": "Inactive and unreachable"})
+                else:
+                    status_report.append({"camera_id": cid, "status": "OFFLINE", "error": test_res.get("error")})
+
+        return {
+            "total_evaluated": len(all_cams),
+            "verified_active": len(verified_ids),
+            "cleaned_removed": len(cleaned_ids),
+            "active_cameras": verified_ids,
+            "removed_cameras": cleaned_ids,
+            "report": status_report,
+        }
+

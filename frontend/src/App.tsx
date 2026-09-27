@@ -43,6 +43,7 @@ export const App: React.FC = () => {
     cameras,
     complianceConfig,
     hazardConfig,
+    analyticsData,
     isLoading,
     actionError,
     actionSuccess,
@@ -277,7 +278,13 @@ export const App: React.FC = () => {
             )}
 
             {activeTab === 'analytics' && (
-              <AnalyticsView alerts={alerts} incidents={incidents} summary={summary} />
+              <AnalyticsView
+                alerts={alerts}
+                incidents={incidents}
+                summary={summary}
+                analyticsData={analyticsData}
+                onRefresh={refreshAll}
+              />
             )}
 
             {activeTab === 'health' && <SystemHealthView />}

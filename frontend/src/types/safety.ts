@@ -183,7 +183,16 @@ export interface ZoneConfig {
 export interface WebSocketMessage {
   type: 'connected' | 'event' | 'pong';
   message?: string;
-  event?: 'AlertCreated' | 'AlertUpdated' | 'AlertEscalated' | 'IncidentCreated' | 'IncidentResolved' | 'AudioAlert';
+  event?:
+    | 'AlertCreated'
+    | 'AlertUpdated'
+    | 'AlertEscalated'
+    | 'IncidentCreated'
+    | 'IncidentUpdated'
+    | 'IncidentResolved'
+    | 'AudioAlert'
+    | 'AnalyticsUpdated'
+    | string;
   payload?: any;
   active_connections?: number;
   timestamp: string;

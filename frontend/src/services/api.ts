@@ -234,3 +234,13 @@ export async function fetchAudioAlerts(cameraId?: string, limit: number = 50): P
   return request<any[]>(`/api/audio/alerts${qs}`);
 }
 
+// ─── Real-Time Analytics & Maintenance ─────────────────────────────────────
+
+export async function fetchAnalyticsMetrics(): Promise<any> {
+  return request<any>('/api/analytics');
+}
+
+export async function cleanupCameras(): Promise<any> {
+  return request<any>('/api/cameras/cleanup', { method: 'POST' });
+}
+

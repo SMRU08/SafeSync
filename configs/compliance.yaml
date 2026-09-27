@@ -3,49 +3,49 @@
 
 tracking:
   tracker: "bytetrack"
-  track_high_thresh: 0.25      # Detection confidence threshold for first-stage ByteTrack matching
-  track_low_thresh: 0.10       # Detection confidence threshold for second-stage matching (low-conf recovery)
-  new_track_thresh: 0.35       # Confidence required to initialize a new track ID (rejects spurious background noise)
+  track_high_thresh: 0.20      # Detection confidence threshold for first-stage ByteTrack matching
+  track_low_thresh: 0.08       # Detection confidence threshold for second-stage matching (low-conf recovery)
+  new_track_thresh: 0.25       # Confidence required to initialize a new track ID
   track_buffer: 30             # Number of frames to keep a lost track in memory
   match_thresh: 0.70           # IoU threshold for track matching
-  min_box_area: 400            # Minimum pixel area for a valid person bounding box
-  confirmation_frames: 2       # Consecutive detections required to confirm an active worker (eliminates single-frame ghosts)
-  lost_tolerance_frames: 15    # Max unobserved frames before an active track stops being displayed
+  min_box_area: 250            # Minimum pixel area for a valid person bounding box (allows portrait/upper body)
+  confirmation_frames: 2       # Consecutive detections required to confirm an active worker
+  lost_tolerance_frames: 20    # Max unobserved frames before an active track stops being displayed
 
 association:
   helmet:
-    vertical_roi_top: -0.05    # Relative to person box height (allow slightly above top of head)
-    vertical_roi_bottom: 0.25  # Cranium / head zone (rejects torso/chest overlap)
-    max_lateral_offset: 0.20   # Maximum relative lateral offset outside person width
-    min_containment_ratio: 0.35
+    vertical_roi_top: -0.10    # Relative to person box height (allow headgear extending above)
+    vertical_roi_bottom: 0.32  # Cranium / head zone
+    max_lateral_offset: 0.25   # Maximum relative lateral offset outside person width
+    min_containment_ratio: 0.25
   safety_vest:
-    vertical_roi_top: 0.18     # Torso zone top (below neck)
-    vertical_roi_bottom: 0.58  # Torso zone bottom (above waist)
-    max_lateral_offset: 0.15
-    min_containment_ratio: 0.40
+    vertical_roi_top: 0.15     # Torso zone top (below neck)
+    vertical_roi_bottom: 0.65  # Torso zone bottom
+    max_lateral_offset: 0.20
+    min_containment_ratio: 0.30
   gloves:
-    vertical_roi_top: 0.35     # Lower arm / hand zone top
-    vertical_roi_bottom: 0.90  # Lower arm / hand zone bottom
-    max_lateral_offset: 0.35   # Allow hands extending laterally
-    min_containment_ratio: 0.15
+    vertical_roi_top: 0.30     # Lower arm / hand zone top
+    vertical_roi_bottom: 0.95  # Lower arm / hand zone bottom
+    max_lateral_offset: 0.40   # Allow hands extending laterally
+    min_containment_ratio: 0.10
   safety_footwear:
-    vertical_roi_top: 0.70     # Lower leg / feet zone top
-    vertical_roi_bottom: 1.05  # Feet zone bottom (allow slight floor contact margin)
-    max_lateral_offset: 0.25
-    min_containment_ratio: 0.15
+    vertical_roi_top: 0.65     # Lower leg / feet zone top
+    vertical_roi_bottom: 1.10  # Feet zone bottom
+    max_lateral_offset: 0.30
+    min_containment_ratio: 0.10
 
 temporal:
-  confirmation_frames: 5         # Consecutive/accumulated detections required to confirm PRESENT (prevents flicker)
-  missing_detection_tolerance: 5 # Tolerated missed detections before transitioning to ABSENT
+  confirmation_frames: 2         # Frames required to confirm PRESENT
+  missing_detection_tolerance: 2 # Tolerated missed detections before transitioning to ABSENT
   history_window_frames: 30      # Sliding history window per active worker track
   prune_lost_after_frames: 60    # Purge worker history after 60 frames of inactivity
 
 required_ppe:
   helmet: true
   safety_vest: true
-  gloves: true
-  safety_footwear: true
+  gloves: false                  # Monitored, but not globally mandatory to prevent spurious UNKNOWN in upper-body views
+  safety_footwear: false         # Monitored, but not globally mandatory to allow half-body / desk / mobile camera feeds
 
 occlusion:
-  edge_margin_px: 20             # Boundary cutoff margin (pixels near frame edge flag UNKNOWN)
-  inter_person_overlap_thresh: 0.35 # IoU between workers triggering partial occlusion state
+  edge_margin_px: 10             # Boundary cutoff margin
+  inter_person_overlap_thresh: 0.40 # IoU between workers triggering partial occlusion state

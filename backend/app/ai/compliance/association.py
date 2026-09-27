@@ -101,10 +101,9 @@ def verify_helmet_features(
             total = float(crop.shape[0] * crop.shape[1])
             shell_color_ratio = float(np.count_nonzero(m_yellow | m_red | m_white | m_blue | m_green)) / total
 
-            # Industrial helmets have a distinct uniform shell covering >= 10% of the candidate box
-            # If the crop lacks helmet shell colors, reject natural hair / unhelmeted heads
-            if shell_color_ratio < 0.10:
-                if confidence < 0.85:
+            # If the crop lacks helmet shell colors, only reject if confidence is very low (< 0.40)
+            if shell_color_ratio < 0.05:
+                if confidence < 0.40:
                     return False
 
     return True
@@ -180,19 +179,10 @@ def verify_safety_vest_features(
             hivis_ratio = float(np.count_nonzero(mask_lime | mask_orange)) / total
             refl_ratio = float(np.count_nonzero(mask_reflective)) / total
 
-            # Rejection of plain white/light clothing (e.g. solid white shirt):
-            # Pure white garment without fluorescent background has high refl_ratio (> 0.35) and 0% fluorescent color
-            if hivis_ratio < 0.04 and refl_ratio > 0.35:
-                if confidence < 0.88:
-                    return False
-
-            # An industrial safety vest must exhibit fluorescent color (>= 5%) OR
-            # reflective tape banding (>= 2.5%) supported by fluorescent trim (>= 2%)
-            is_valid_vest = (hivis_ratio >= 0.05) or (refl_ratio >= 0.025 and hivis_ratio >= 0.02)
-            if not is_valid_vest:
-                # Ordinary casual clothing (shirt, t-shirt, suit, dress, hoodie): reject false positive
-                if confidence < 0.85:
-                    return False
+            # An industrial safety vest: accept high-confidence model detections directly
+            is_valid_vest = (hivis_ratio >= 0.03) or (refl_ratio >= 0.015)
+            if not is_valid_vest and confidence < 0.45:
+                return False
 
     return True
 
@@ -374,15 +364,13 @@ class SpatialPPEAssociator:
         zone = self.get_body_zone(wb, item_type)
         zx1, zy1, zx2, zy2 = zone
 
-        # Check frame boundary clipping
-        if item_type == PPEItemType.HELMET and zy1 <= self.edge_margin_px:
+        # Check frame boundary clipping — only flag if cranium is genuinely severed off-screen
+        if item_type == PPEItemType.HELMET and wb[1] <= 2 and (zy2 - zy1) < 25:
             return True  # Head cut off at top
-        if item_type == PPEItemType.SAFETY_FOOTWEAR and zy2 >= (img_h - self.edge_margin_px):
+        if item_type == PPEItemType.SAFETY_FOOTWEAR and zy2 >= (img_h - 2):
             return True  # Feet cut off at bottom
-        if (zx1 <= self.edge_margin_px and (wb[2] - wb[0]) < 30) or (
-            zx2 >= (img_w - self.edge_margin_px) and (wb[2] - wb[0]) < 30
-        ):
-            return True  # Body cut off at side
+        if (wb[0] <= 0 and (wb[2] - wb[0]) < 25) or (wb[2] >= img_w and (wb[2] - wb[0]) < 25):
+            return True  # Body severely cut off at lateral side
 
         # Check occlusion by other workers
         zone_area = max(1.0, (zx2 - zx1) * (zy2 - zy1))

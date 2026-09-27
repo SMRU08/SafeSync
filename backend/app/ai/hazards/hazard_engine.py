@@ -271,3 +271,107 @@ class HazardAnalysisEngine:
         )
 
         return response, annotated_frame, latencies
+
+    def process_raw_hazards(
+        self,
+        raw_hazards: List[Dict[str, Any]],
+        frame_shape: Tuple[int, int],
+        camera_id: str = "camera_01",
+    ) -> HazardAnalysisResponse:
+        """
+        Fast-path hazard evaluation using pre-computed model detections (Single-pass YOLO).
+        Completely eliminates secondary YOLO neural network execution latency.
+        """
+        self.frame_counter += 1
+        h, w = frame_shape[:2]
+        total_frame_area = max(1.0, float(h * w))
+
+        hazard_dets = []
+        for obj in raw_hazards:
+            cname = str(obj.get("class_name", "")).lower()
+            if cname not in ["fire", "smoke"]:
+                continue
+
+            htype = HazardType.FIRE if cname == "fire" else HazardType.SMOKE
+            conf = float(obj.get("confidence", 0.0))
+            req_conf = self.fire_candidate_conf if htype == HazardType.FIRE else self.smoke_candidate_conf
+            if conf < req_conf:
+                continue
+
+            b = obj.get("bbox", [0, 0, 0, 0])
+            bx1, by1, bx2, by2 = float(b[0]), float(b[1]), float(b[2]), float(b[3])
+            box_w = max(0.0, bx2 - bx1)
+            box_h = max(0.0, by2 - by1)
+            box_area = box_w * box_h
+
+            if (box_area / total_frame_area) < self.min_area_fraction:
+                continue
+
+            cx = (bx1 + bx2) / 2.0
+            cy = (by1 + by2) / 2.0
+
+            if self.zone_manager.is_in_exclusion_roi(camera_id, cx, cy, w, h):
+                continue
+            if not self.zone_manager.is_in_hazard_roi(camera_id, cx, cy, w, h):
+                continue
+
+            zone_id = self.zone_manager.resolve_zone(camera_id, cx, cy, w, h)
+            hazard_dets.append({
+                "hazard_type": htype,
+                "confidence": conf,
+                "bbox": [bx1, by1, bx2, by2],
+                "zone_id": zone_id,
+            })
+
+        active_tracks = self.tracker.update(
+            hazard_detections=hazard_dets,
+            frame_idx=self.frame_counter,
+            camera_id=camera_id,
+            frame_shape=(h, w),
+        )
+
+        hazard_details: List[HazardEventDetail] = []
+        for trk in active_tracks:
+            state = self.state_machine.evaluate_track_state(trk)
+            bbox_schema = HazardBoundingBox.from_xyxy(
+                trk.last_bbox[0], trk.last_bbox[1], trk.last_bbox[2], trk.last_bbox[3]
+            )
+            detail = HazardEventDetail(
+                event_id=trk.event_id,
+                hazard_type=trk.hazard_type,
+                state=state,
+                camera_id=trk.camera_id,
+                zone_id=trk.zone_id,
+                confidence=round(trk.last_confidence, 4),
+                raw_model_confidence=round(getattr(trk, "raw_model_confidence", trk.last_confidence), 4),
+                average_confidence=round(trk.average_confidence, 4),
+                max_confidence=round(trk.max_confidence, 4),
+                validated_confidence=round(getattr(trk, "validated_confidence", trk.average_confidence), 4),
+                bbox=bbox_schema,
+                first_seen=trk.first_seen.isoformat(),
+                last_seen=trk.last_seen.isoformat(),
+                duration_seconds=round(trk.duration_seconds, 2),
+                detection_count=trk.detection_count,
+                persistence_ratio=round(trk.persistence_ratio, 4),
+                frames_detected=trk.detection_count,
+                frames_missed=trk.missed_frames,
+                spatial_consistency_score=round(getattr(trk, "spatial_consistency_score", 1.0), 4),
+                temporal_score=round(trk.persistence_ratio, 4),
+                final_hazard_state=state.value,
+            )
+            hazard_details.append(detail)
+
+        scene_state = self.state_machine.evaluate_overall_scene_state(active_tracks)
+        relationship = self.state_machine.evaluate_scene_relationship(active_tracks)
+
+        return HazardAnalysisResponse(
+            frame_id=self.frame_counter,
+            timestamp_utc=datetime.now(timezone.utc).isoformat(),
+            camera_id=camera_id,
+            zone_id=hazard_details[0].zone_id if hazard_details else "UNKNOWN",
+            scene_hazard_state=scene_state,
+            relationship=relationship,
+            hazards=hazard_details,
+            total_active_hazards=len(hazard_details),
+            annotated_image_base64=None,
+        )

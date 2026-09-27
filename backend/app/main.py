@@ -96,6 +96,7 @@ from app.api.auth import router as auth_router
 from app.api.evidence import router as evidence_router
 from app.api.monitoring import router as monitoring_router
 from app.api.workers import router as workers_router
+from app.api.analytics import router as analytics_router
 from app.config import setup_production_logging
 
 setup_production_logging()
@@ -110,6 +111,7 @@ app.include_router(auth_router)
 app.include_router(evidence_router)
 app.include_router(monitoring_router)
 app.include_router(workers_router)
+app.include_router(analytics_router)
 
 
 @app.get("/", response_model=RootResponse, status_code=status.HTTP_200_OK)

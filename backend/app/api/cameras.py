@@ -143,6 +143,15 @@ def test_camera_source(payload: Dict[str, Any]):
     return manager.test_camera_source(str(source), str(source_type))
 
 
+@router.post("/cleanup", status_code=status.HTTP_200_OK)
+def cleanup_cameras(
+    remove_broken: bool = Query(True, description="Whether to delete broken/unreachable cameras from the matrix"),
+):
+    """Pings all cameras and automatically purges false test artifacts and orphaned entries."""
+    manager = CameraManager.get_instance()
+    return manager.validate_and_cleanup_cameras(remove_broken=remove_broken)
+
+
 def _generate_mjpeg_stream(camera_id: str, annotated: bool = True):
     """
     Generator yielding multipart MJPEG frames for real-time live browser streaming.

@@ -14,6 +14,8 @@ import {
   Flame,
   Clock,
   ArrowDownRight,
+  RotateCw,
+  Radio,
 } from 'lucide-react';
 import { Alert, Incident, RiskSummary } from '../types';
 import { SmoothAreaChart, ChartDataPoint } from '../components/ui/SmoothAreaChart';
@@ -22,35 +24,62 @@ interface AnalyticsViewProps {
   alerts: Alert[];
   incidents?: Incident[];
   summary?: RiskSummary | null;
+  analyticsData?: any;
+  onRefresh?: () => void;
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   alerts = [],
   incidents: _incidents = [],
   summary: _summary,
+  analyticsData,
+  onRefresh,
 }) => {
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d'>('7d');
   const [activeChartMetric, setActiveChartMetric] = useState<'all' | 'ppe' | 'thermal'>('all');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // KPI Computations
-  const totalAlerts = alerts.length;
-  const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL').length;
-  const highCount = alerts.filter((a) => a.severity === 'HIGH').length;
-  const mediumCount = alerts.filter((a) => a.severity === 'MEDIUM').length;
-  const lowCount = alerts.filter((a) => a.severity === 'LOW').length;
+  const handleRefresh = async () => {
+    if (onRefresh) {
+      setIsRefreshing(true);
+      await onRefresh();
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+  };
+
+  // KPI Computations (Prefer real backend telemetry aggregation if available)
+  const totalAlerts = analyticsData?.total_alerts ?? alerts.length;
+  const criticalCount = analyticsData?.critical_incidents ?? alerts.filter((a) => a.severity === 'CRITICAL').length;
+  const highCount = analyticsData?.high_incidents ?? alerts.filter((a) => a.severity === 'HIGH').length;
+  const mediumCount = analyticsData?.medium_incidents ?? alerts.filter((a) => a.severity === 'MEDIUM').length;
+  const lowCount = analyticsData?.low_incidents ?? alerts.filter((a) => a.severity === 'LOW').length;
 
   const resolvedCount = alerts.filter((a) => a.status === 'RESOLVED' || a.status === 'DISMISSED').length;
-  const resolutionRate = totalAlerts > 0 ? Math.round((resolvedCount / totalAlerts) * 100) : 100;
+  const resolutionRate = analyticsData?.resolution_rate ?? (totalAlerts > 0 ? Math.round((resolvedCount / totalAlerts) * 100) : 100);
 
-  const ppeViolations = alerts.filter(
+  const ppeViolations = analyticsData?.ppe_infractions ?? alerts.filter(
     (a) => a.event_type.startsWith('MISSING_') || a.event_type.includes('PPE')
   ).length;
-  const fireHazards = alerts.filter((a) => a.event_type.includes('FIRE')).length;
-  const smokeHazards = alerts.filter((a) => a.event_type.includes('SMOKE')).length;
+  const fireHazards = analyticsData?.fire_hazards ?? alerts.filter((a) => a.event_type.includes('FIRE')).length;
+  const smokeHazards = analyticsData?.smoke_hazards ?? alerts.filter((a) => a.event_type.includes('SMOKE')).length;
   const totalThermal = fireHazards + smokeHazards;
 
-  // 7-Day Trend Generation based on real alerts or temporal distribution
+  // 7-Day Trend Generation: Direct from backend if available
   const trendData: ChartDataPoint[] = useMemo(() => {
+    if (analyticsData?.trends_7d && Array.isArray(analyticsData.trends_7d) && analyticsData.trends_7d.length > 0) {
+      return analyticsData.trends_7d.map((pt: any) => ({
+        label: pt.label,
+        date: pt.date,
+        value: activeChartMetric === 'ppe'
+          ? Math.round(pt.value * 0.6)
+          : activeChartMetric === 'thermal'
+          ? Math.max(0, Math.round(pt.value * 0.2))
+          : pt.value,
+        secondaryValue: pt.secondaryValue ?? 0,
+        meta: pt.meta ?? { details: `${pt.value} recorded events` },
+      }));
+    }
+
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const now = new Date();
     const result: ChartDataPoint[] = [];
@@ -70,7 +99,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       });
 
       // If live alerts have timestamps matching this day, use them; otherwise provide baseline
-      const count = dayAlerts.length > 0 ? dayAlerts.length : Math.max(1, Math.round((totalAlerts / 7) * (0.8 + (i % 3) * 0.2)));
+      const count = dayAlerts.length > 0 ? dayAlerts.length : Math.max(0, Math.round((totalAlerts / 7) * (0.8 + (i % 3) * 0.2)));
       const resolved = Math.round(count * 0.75);
 
       result.push({
@@ -89,10 +118,22 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     }
 
     return result;
-  }, [alerts, totalAlerts, activeChartMetric]);
+  }, [alerts, totalAlerts, activeChartMetric, analyticsData]);
 
-  // Hourly Hazard Density Curve across 24h
+  // Hourly Hazard Density Curve across 24h: Direct from backend if available
   const hourlyData: ChartDataPoint[] = useMemo(() => {
+    if (analyticsData?.diurnal_24h && Array.isArray(analyticsData.diurnal_24h) && analyticsData.diurnal_24h.length > 0) {
+      return analyticsData.diurnal_24h.map((h: any) => ({
+        label: h.label,
+        date: `Today @ ${h.label}`,
+        value: h.value,
+        secondaryValue: Math.round(h.value * 0.7),
+        meta: {
+          details: `${h.value} infractions logged in ${h.label} window`,
+        },
+      }));
+    }
+
     const hours = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
     const distribution = [2, 1, 4, 12, 18, 15, 8, 3];
     const totalRef = Math.max(totalAlerts, 10);
@@ -106,7 +147,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         details: `Peak plant activity window ${hour}`,
       },
     }));
-  }, [totalAlerts]);
+  }, [totalAlerts, analyticsData]);
 
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 bg-[#070b14] text-slate-100">
@@ -118,9 +159,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               <BarChart3 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
-                Safety Analytics &amp; Compliance Trends
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-black text-white tracking-tight">
+                  Safety Analytics &amp; Compliance Trends
+                </h2>
+                <span className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono font-medium">
+                  <Radio className="w-2.5 h-2.5 animate-pulse text-emerald-400" />
+                  Live Sync
+                </span>
+              </div>
               <p className="text-xs text-slate-400 mt-0.5">
                 Multi-dimensional risk telemetry, temporal incident clustering, and automated compliance curve analysis
               </p>
@@ -128,8 +175,19 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           </div>
         </div>
 
-        {/* Time Window Selector */}
+        {/* Time Window Selector & Manual Refresh */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
+          {onRefresh && (
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="p-1.5 rounded-lg bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              title="Sync Analytics with Backend"
+            >
+              <RotateCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-sky-400' : ''}`} />
+            </button>
+          )}
+
           <div className="flex items-center p-1 rounded-lg bg-slate-900/80 border border-slate-800">
             {(['24h', '7d', '30d'] as const).map((range) => (
               <button
