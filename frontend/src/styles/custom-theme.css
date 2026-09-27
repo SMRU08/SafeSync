@@ -159,3 +159,45 @@ body,
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.6);
 }
+
+/* ─── Form Controls & Modal Inputs Contrast Enforcement ──────────────────── */
+/* Ensure inputs on light surfaces / white modals always render visible dark text */
+.bg-white,
+.bg-slate-50,
+.bg-slate-100 {
+  color: #0f172a;
+}
+
+.bg-white input,
+.bg-white select,
+.bg-white textarea,
+.bg-slate-50 input,
+.bg-slate-50 select,
+.bg-slate-50 textarea,
+.bg-slate-100 input,
+.bg-slate-100 select,
+.bg-slate-100 textarea {
+  color: #0f172a !important;
+  background-color: #ffffff;
+}
+
+.bg-white input::placeholder,
+.bg-slate-50 input::placeholder,
+.bg-slate-100 input::placeholder {
+  color: #64748b !important;
+}
+
+/* Ensure native dropdown options have high contrast against their backgrounds */
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+/* Dark container dropdown options */
+.bg-slate-800 select option,
+.bg-slate-900 select option,
+.bg-slate-950 select option {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+

@@ -118,7 +118,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden flex flex-col">
+      <div className="bg-white text-slate-900 rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden flex flex-col">
         {/* Header */}
         <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 onChange={(e) => handleNameChange(e.target.value)}
                 placeholder="e.g. Entrance Camera"
                 required
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
             <div>
@@ -167,7 +167,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 onChange={(e) => setCameraId(e.target.value)}
                 placeholder="e.g. camera_02"
                 required
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 font-mono focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 font-mono bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
           </div>
@@ -185,12 +185,12 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                   else if (st === 'http') setSource('http://192.168.1.105:8080/video');
                   else if (st === 'synthetic') setSource('synthetic://demo');
                 }}
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
-                <option value="usb">USB Webcam / Local Device</option>
-                <option value="rtsp">RTSP IP Camera Stream</option>
-                <option value="http">HTTP / MJPEG Stream (IP Webcam)</option>
-                <option value="synthetic">Synthetic Test Stream</option>
+                <option value="usb" className="bg-white text-slate-900">USB Webcam / Local Device</option>
+                <option value="rtsp" className="bg-white text-slate-900">RTSP IP Camera Stream</option>
+                <option value="http" className="bg-white text-slate-900">HTTP / MJPEG Stream (IP Webcam)</option>
+                <option value="synthetic" className="bg-white text-slate-900">Synthetic Test Stream</option>
               </select>
             </div>
 
@@ -217,13 +217,13 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                   setSelectedZone(val);
                   if (val !== 'custom') setCustomZone('');
                 }}
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white"
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white text-slate-900"
               >
-                <option value="production_floor">Production Floor</option>
-                <option value="storage_area">Storage Area</option>
-                <option value="loading_dock">Loading Dock</option>
-                <option value="electrical_room">Electrical Room</option>
-                <option value="custom">Other (Custom)...</option>
+                <option value="production_floor" className="bg-white text-slate-900">Production Floor</option>
+                <option value="storage_area" className="bg-white text-slate-900">Storage Area</option>
+                <option value="loading_dock" className="bg-white text-slate-900">Loading Dock</option>
+                <option value="electrical_room" className="bg-white text-slate-900">Electrical Room</option>
+                <option value="custom" className="bg-white text-slate-900">Other (Custom)...</option>
               </select>
 
               {isCustomZone && (
@@ -235,7 +235,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                     placeholder="e.g. West Staging Bay or Enter custom zone"
                     required={isCustomZone}
                     autoFocus
-                    className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500 placeholder-slate-400 text-xs font-medium"
+                    className="w-full px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500 text-xs font-medium"
                   />
                 </div>
               )}
@@ -253,13 +253,13 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 onChange={(e) => setSource(e.target.value)}
                 placeholder="0 or rtsp://... or http://..."
                 required
-                className="flex-1 px-3 py-1.5 rounded-md border border-slate-300 font-mono text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="flex-1 px-3 py-1.5 rounded-md border border-slate-300 font-mono text-xs bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
               <button
                 type="button"
                 onClick={handleTestConnection}
                 disabled={isTesting}
-                className="px-3 py-1.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 rounded-md font-semibold shrink-0 transition flex items-center gap-1.5"
+                className="px-3 py-1.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 rounded-md font-semibold shrink-0 transition flex items-center gap-1.5 cursor-pointer"
               >
                 {isTesting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : 'Test Feed'}
               </button>
@@ -291,7 +291,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. West Staging Bay"
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
               />
             </div>
 
@@ -304,7 +304,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                   max="60"
                   value={fpsTarget}
                   onChange={(e) => setFpsTarget(Number(e.target.value))}
-                  className="w-full px-3 py-1.5 rounded-md border border-slate-300 font-mono"
+                  className="w-full px-3 py-1.5 rounded-md border border-slate-300 font-mono bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 />
               </div>
               <div>
@@ -312,11 +312,11 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 <select
                   value={resolution}
                   onChange={(e) => setResolution(e.target.value)}
-                  className="w-full px-2 py-1.5 rounded-md border border-slate-300 text-[11px]"
+                  className="w-full px-2 py-1.5 rounded-md border border-slate-300 text-[11px] bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 >
-                  <option value="1280x720">720p</option>
-                  <option value="1920x1080">1080p</option>
-                  <option value="640x480">480p</option>
+                  <option value="1280x720" className="bg-white text-slate-900">720p</option>
+                  <option value="1920x1080" className="bg-white text-slate-900">1080p</option>
+                  <option value="640x480" className="bg-white text-slate-900">480p</option>
                 </select>
               </div>
             </div>
