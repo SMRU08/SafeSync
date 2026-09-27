@@ -309,6 +309,14 @@ class CameraWorker:
             frame_id, frame_time, frame = item
             try:
                 self._process_frame_ai(frame, frame_time, frame_id)
+                # Periodic VRAM hygiene: clear PyTorch CUDA cache every 120 frames to prevent fragmentation
+                if frame_id % 120 == 0:
+                    try:
+                        import torch
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                    except Exception:
+                        pass
             except Exception as e:
                 logger.error("AI worker error in %s: %s", self.camera_id, e)
             finally:

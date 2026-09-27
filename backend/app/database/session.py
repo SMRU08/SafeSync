@@ -39,7 +39,10 @@ def configure_sqlite_pragmas(dbapi_connection, connection_record):
     - journal_mode=WAL: Enables Write-Ahead Logging for non-blocking concurrent readers.
     - synchronous=NORMAL: Safe durability without excessive fsync() calls in WAL mode.
     - foreign_keys=ON: Enforces relational integrity across tables.
-    - busy_timeout=5000: Prevents 'database locked' errors by waiting up to 5s.
+    - busy_timeout=10000: Prevents 'database locked' errors by waiting up to 10s.
+    - cache_size=-64000: 64MB memory page cache for high-throughput reads.
+    - temp_store=MEMORY: Keeps temp tables in RAM to reduce disk wear on SD/NVMe.
+    - wal_autocheckpoint=1000: Auto-commits WAL every 1000 frames to prevent disk ballooning.
     """
     if is_sqlite:
         try:
@@ -47,7 +50,10 @@ def configure_sqlite_pragmas(dbapi_connection, connection_record):
             cursor.execute("PRAGMA journal_mode=WAL;")
             cursor.execute("PRAGMA synchronous=NORMAL;")
             cursor.execute("PRAGMA foreign_keys=ON;")
-            cursor.execute("PRAGMA busy_timeout=5000;")
+            cursor.execute("PRAGMA busy_timeout=10000;")
+            cursor.execute("PRAGMA cache_size=-64000;")
+            cursor.execute("PRAGMA temp_store=MEMORY;")
+            cursor.execute("PRAGMA wal_autocheckpoint=1000;")
             cursor.close()
         except Exception as e:
             logger.warning(f"Could not configure SQLite PRAGMAs: {e}")
@@ -181,3 +187,57 @@ def check_database_health(engine_instance=None) -> Dict[str, Any]:
         health["error"] = str(e)
 
     return health
+
+
+def checkpoint_database(engine_instance=None, mode: str = "PASSIVE") -> Dict[str, Any]:
+    """
+    Performs a safe SQLite WAL checkpoint (PASSIVE, FULL, RESTART, or TRUNCATE).
+    Flushes WAL transactions into the main database file without corrupting concurrent readers.
+    """
+    eng = engine_instance or engine
+    if not str(eng.url).startswith("sqlite"):
+        return {"status": "not_sqlite", "checkpoint": "skipped"}
+    try:
+        with eng.connect() as conn:
+            mode_upper = mode.upper() if mode.upper() in ("PASSIVE", "FULL", "RESTART", "TRUNCATE") else "PASSIVE"
+            res = conn.execute(text(f"PRAGMA wal_checkpoint({mode_upper});")).fetchone()
+            status_dict = {
+                "status": "success",
+                "mode": mode_upper,
+                "busy": res[0] if res else 0,
+                "log_frames": res[1] if res else 0,
+                "checkpointed_frames": res[2] if res else 0,
+            }
+            logger.info("Database WAL checkpoint completed: %s", status_dict)
+            return status_dict
+    except Exception as exc:
+        logger.error("Database WAL checkpoint failed: %s", exc)
+        return {"status": "error", "error": str(exc)}
+
+
+def recover_database_wal(engine_instance=None) -> Dict[str, Any]:
+    """
+    Recovers from a locked, stalled, or degraded SQLite WAL state.
+    Executes quick integrity check, clears stale locks via TRUNCATE checkpoint,
+    and resets WAL pragmas safely.
+    """
+    eng = engine_instance or engine
+    if not str(eng.url).startswith("sqlite"):
+        return {"status": "not_sqlite", "recovered": False}
+    try:
+        with eng.connect() as conn:
+            integrity = conn.execute(text("PRAGMA quick_check;")).scalar()
+            ckpt = conn.execute(text("PRAGMA wal_checkpoint(TRUNCATE);")).fetchone()
+            conn.execute(text("PRAGMA journal_mode=WAL;"))
+            conn.execute(text("PRAGMA busy_timeout=10000;"))
+            conn.commit()
+            return {
+                "status": "healthy" if integrity == "ok" else "warning",
+                "quick_check": integrity,
+                "wal_checkpoint": list(ckpt) if ckpt else None,
+                "recovered": True,
+            }
+    except Exception as exc:
+        logger.error("Failed to recover database WAL: %s", exc)
+        return {"status": "error", "recovered": False, "error": str(exc)}
+

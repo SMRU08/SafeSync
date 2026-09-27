@@ -174,6 +174,11 @@ class Detector:
         model = self.loader.model
         device = self.loader.device
 
+        # Enable FP16 half-precision on GPU to stabilize latency and accelerate Tensor Cores
+        use_half = False
+        if str(device).lower() not in ("cpu", ""):
+            use_half = True
+
         t0 = time.perf_counter()
         results = model.predict(
             source=frame,
@@ -181,6 +186,7 @@ class Detector:
             iou=iou_thresh,
             imgsz=inference_size,
             device=device,
+            half=use_half,
             verbose=False,
         )
         latency_ms = (time.perf_counter() - t0) * 1000.0

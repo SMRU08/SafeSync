@@ -11,13 +11,13 @@ from fastapi import APIRouter, Response, status
 from fastapi.responses import JSONResponse
 
 try:
-    from app.database.session import check_database_connection, check_database_health
+    from app.database.session import check_database_connection, check_database_health, checkpoint_database, recover_database_wal
     from app.ai.detection.model_loader import ModelLoader
     from app.services.evidence_manager import EvidenceManager
     from app.camera.manager import CameraManager
     from app.services.metrics import MetricsCollector
 except ImportError:
-    from backend.app.database.session import check_database_connection, check_database_health
+    from backend.app.database.session import check_database_connection, check_database_health, checkpoint_database, recover_database_wal
     from backend.app.ai.detection.model_loader import ModelLoader
     from backend.app.services.evidence_manager import EvidenceManager
     from backend.app.camera.manager import CameraManager
@@ -136,10 +136,32 @@ def deep_system_health():
     camera_statuses = CameraManager.get_instance().get_all_statuses()
     evidence_mgr = EvidenceManager.get_instance()
 
+    # AI pipeline telemetry & SLA calculation
+    ai_loader = ModelLoader.get_instance()
+    active_latencies = [
+        s.metrics.inference_latency_ms
+        for s in camera_statuses
+        if s.metrics and s.metrics.inference_latency_ms > 0
+    ]
+    mean_latency = round(sum(active_latencies) / len(active_latencies), 2) if active_latencies else 0.0
+    ai_status = "healthy"
+    if mean_latency > 60.0:
+        ai_status = "warning"
+    elif not ai_loader.is_loaded() and len(camera_statuses) > 0:
+        ai_status = "ready"
+
     return {
         "timestamp": _utc_now_iso(),
         "uptime_seconds": collector.get_uptime_seconds(),
         "database": db_health,
+        "ai_pipeline": {
+            "status": ai_status,
+            "device": getattr(ai_loader, "device", "unknown"),
+            "model_path": getattr(ai_loader, "model_path", "unknown"),
+            "mean_inference_latency_ms": mean_latency,
+            "target_sla_ms": 60.0,
+            "is_loaded": ai_loader.is_loaded(),
+        },
         "cameras": {
             "total_registered": len(camera_statuses),
             "connected": sum(1 for c in camera_statuses if c.state.value == "CONNECTED"),
@@ -153,3 +175,28 @@ def deep_system_health():
             "retention_days": evidence_mgr.retention_days,
         },
     }
+
+
+@router.post("/api/monitoring/database/checkpoint")
+def trigger_database_checkpoint(mode: str = "PASSIVE"):
+    """
+    Triggers an on-demand SQLite WAL checkpoint (PASSIVE, FULL, RESTART, or TRUNCATE).
+    Flushes WAL transactions safely to prevent log file ballooning and disk pressure.
+    """
+    result = checkpoint_database(mode=mode)
+    if result.get("status") == "error":
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=result)
+    return result
+
+
+@router.post("/api/monitoring/database/recover")
+def trigger_database_recovery():
+    """
+    Recovers from a degraded or locked SQLite database state.
+    Executes integrity verification, forces a TRUNCATE checkpoint, and re-applies WAL mode.
+    """
+    result = recover_database_wal()
+    if not result.get("recovered"):
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=result)
+    return result
+
