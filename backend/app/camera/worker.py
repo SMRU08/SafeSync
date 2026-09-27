@@ -203,6 +203,19 @@ class CameraWorker:
                     ai_available=True,
                 )
 
+            # Ensure annotated frame reflects validated hazard state
+            visualizer = getattr(self._compliance_engine, "visualizer", None) if self._compliance_engine else None
+            if visualizer and hazard_resp and hazard_resp.hazards:
+                try:
+                    annotated_frame = visualizer.draw_frame(
+                        frame,
+                        compliance_resp.workers,
+                        unassociated_ppe=None,
+                        hazards=hazard_resp.hazards,
+                    )
+                except Exception as viz_err:
+                    logger.debug("Hazard overlay generation skipped: %s", viz_err)
+
             with self._lock:
                 self._latest_annotated_frame = annotated_frame
                 self._latest_workers = compliance_resp.workers

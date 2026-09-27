@@ -16,12 +16,12 @@ hazard:
   # ── Stage 1: Candidate Detection Confidence ──────────────────────────────
   # Minimum confidence to even enter the tracking pipeline as a CANDIDATE.
   # Below this threshold, detections are silently discarded before tracking.
-  fire_candidate_confidence: 0.25
-  smoke_candidate_confidence: 0.25
+  fire_candidate_confidence: 0.20
+  smoke_candidate_confidence: 0.20
 
   # ── Stage 2: Confirmation Confidence ─────────────────────────────────────
-  fire_confirmation_confidence: 0.28
-  smoke_confirmation_confidence: 0.28
+  fire_confirmation_confidence: 0.22
+  smoke_confirmation_confidence: 0.25
 
   # ── Temporal Confirmation Parameters ─────────────────────────────────────
   confirmation_frames: 3

@@ -203,14 +203,11 @@ class Detector:
                     cls_name = model.names.get(cls_id, f"class_{cls_id}")
                     score = float(box.conf[0].item())
 
-                    # Decoupled model class isolation
+                    # Model class routing
                     low_name = cls_name.lower()
-                    if self.model_type == "ppe" and low_name in ("fire", "smoke"):
-                        continue
                     if self.model_type == "hazards":
                         if low_name not in ("fire", "smoke"):
                             continue
-                        cls_id = 0 if low_name == "fire" else 1
 
                     # Per-class confidence filtering
                     req_conf = conf_thresh

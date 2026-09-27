@@ -15,21 +15,25 @@
             "1": "helmet",
             "2": "safety_vest",
             "3": "gloves",
-            "4": "safety_footwear"
+            "4": "safety_footwear",
+            "5": "fire",
+            "6": "smoke"
           },
           "operating_thresholds": {
             "person": 0.25,
             "helmet": 0.38,
             "safety_vest": 0.38,
             "gloves": 0.28,
-            "safety_footwear": 0.28
+            "safety_footwear": 0.28,
+            "fire": 0.20,
+            "smoke": 0.20
           },
           "datasets": [
             "ppe_detection_compliance",
             "construction_ppe",
             "hard_hat_workers"
           ],
-          "notes": "Dedicated PPE model decoupled from fire and smoke. Enforces cranial and thoracic spatial verification."
+          "notes": "Unified multi-task model detecting PPE and environmental fire and smoke hazards."
         }
       }
     },
@@ -42,17 +46,17 @@
           "architecture": "yolov8n",
           "image_size": 384,
           "classes": {
-            "0": "fire",
-            "1": "smoke"
+            "5": "fire",
+            "6": "smoke"
           },
           "operating_thresholds": {
-            "fire": 0.30,
-            "smoke": 0.30
+            "fire": 0.20,
+            "smoke": 0.20
           },
           "datasets": [
             "d_fire"
           ],
-          "notes": "Dedicated fire and smoke hazard detection model decoupled from PPE detection. Feeds into P0 emergency alarm path."
+          "notes": "Fire and smoke hazard detector. Canonical 7-class taxonomy: 5=fire, 6=smoke."
         }
       }
     }

@@ -55,18 +55,46 @@ class ComplianceVisualizer:
         """
         out = image.copy()
 
-        # 1. Render environmental hazards (fire, smoke) if present (clean pass-through)
+        # 1. Render environmental hazards (fire, smoke) if present (clean pass-through and validated tracks)
         if hazards:
             for h in hazards:
-                b = h.get("bbox", [0, 0, 0, 0])
-                cname = h.get("class_name", "hazard")
-                conf = h.get("confidence", 0.0)
-                color = (0, 0, 255) if cname == "fire" else (128, 128, 128)
-                cv2.rectangle(out, (int(b[0]), int(b[1])), (int(b[2]), int(b[3])), color, 2)
-                lbl = f"{cname.upper()} {conf:.2f}"
+                if isinstance(h, dict):
+                    b = h.get("bbox", [0, 0, 0, 0])
+                    cname = str(h.get("class_name", "hazard")).lower()
+                    conf = float(h.get("confidence", 0.0))
+                    state = str(h.get("state", "")).upper()
+                else:
+                    # HazardEventDetail or duck-typed hazard object
+                    raw_b = getattr(h, "bbox", None)
+                    if hasattr(raw_b, "x1"):
+                        b = [raw_b.x1, raw_b.y1, raw_b.x2, raw_b.y2]
+                    elif isinstance(raw_b, (list, tuple)):
+                        b = raw_b
+                    else:
+                        b = [0, 0, 0, 0]
+                    htype = getattr(h, "hazard_type", "hazard")
+                    cname = htype.value.lower() if hasattr(htype, "value") else str(htype).lower()
+                    conf = float(getattr(h, "confidence", 0.0))
+                    hstate = getattr(h, "state", "")
+                    state = hstate.value.upper() if hasattr(hstate, "value") else str(hstate).upper()
+
+                # Distinct high-contrast colors: Fire=Crimson Red, Smoke=Bright Amber
+                color = (0, 0, 240) if cname == "fire" else (0, 140, 255)
+                bx1, by1, bx2, by2 = int(b[0]), int(b[1]), int(b[2]), int(b[3])
+                cv2.rectangle(out, (bx1, by1), (bx2, by2), color, 3)
+
+                state_str = f" [{state}]" if state and state not in ("NO_HAZARD", "") else ""
+                lbl = f"{cname.upper()}{state_str} {conf:.2f}"
+
+                # Render background badge pill for label legibility
+                (lw, lh), _ = cv2.getTextSize(lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
+                lbl_y1 = max(0, by1 - lh - 6)
+                lbl_y2 = by1
+                cv2.rectangle(out, (bx1, lbl_y1), (bx1 + lw + 6, lbl_y2), (0, 0, 0), -1)
+                cv2.rectangle(out, (bx1, lbl_y1), (bx1 + lw + 6, lbl_y2), color, 1)
                 cv2.putText(
-                    out, lbl, (int(b[0]), max(15, int(b[1]) - 5)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 1, cv2.LINE_AA
+                    out, lbl, (bx1 + 3, lbl_y2 - 3),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1, cv2.LINE_AA
                 )
 
         # 2. Render unassociated PPE in thin dashed/gray boxes

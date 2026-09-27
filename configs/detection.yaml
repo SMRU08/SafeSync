@@ -20,8 +20,8 @@ inference:
     safety_vest: 0.38
     gloves: 0.28
     safety_footwear: 0.28
-    fire: 0.30
-    smoke: 0.30
+    fire: 0.20
+    smoke: 0.20
 
 classes:
   all:
