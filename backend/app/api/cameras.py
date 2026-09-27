@@ -14,7 +14,7 @@ import time
 import cv2
 import logging
 from typing import List, Dict, Any, Optional, Union
-from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File, Request, Body
+from fastapi import APIRouter, HTTPException, status, Response, Depends, UploadFile, File, Request, Body, Query
 from fastapi.responses import StreamingResponse
 
 from app.camera.schemas import CameraConfigModel, CameraStatus, CameraState, CameraSpeakerToggleRequest
