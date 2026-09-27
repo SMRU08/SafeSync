@@ -1,20 +1,22 @@
 /**
  * AlertsView.tsx — SafeSync Professional SOC
- * Centralized Operations Management for Safety Alerts & Verified Incidents.
- * Features tabs for ACTIVE, ACKNOWLEDGED, RESOLVED, and DISMISSED alerts with
- * full operational lifecycle action buttons (Acknowledge, Resolve, Dismiss).
+ * Centralized Operations Management for Safety Alerts & Verified Incidents (Phase 14 & 15).
+ * Features Priority tiers (P0 Critical, P1 High, P2 Medium, P3 Low),
+ * lifecycle status filtering (ACTIVE, ACKNOWLEDGED, RESOLVED, DISMISSED),
+ * operator triage actions, and linked forensic evidence navigation.
  */
 
 import React, { useState } from 'react';
 import {
   AlertTriangle,
   Search,
-  Filter,
   CheckCircle2,
   RefreshCw,
-  Eye,
+  Check,
+  ExternalLink,
 } from 'lucide-react';
-import { Alert, Incident, RiskSummary, RiskLevel, AlertStatus } from '../types';
+import { Alert, Incident, RiskSummary, AlertStatus } from '../types';
+import { EmptyState } from '../components/ui/EmptyState';
 
 interface AlertsViewProps {
   alerts: Alert[];
@@ -33,20 +35,23 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
   incidents: _incidents,
   onAcknowledge,
   onResolve,
-  onDismiss,
+  onDismiss: _onDismiss,
   onRefresh,
   onSelectAlert,
   onSelectIncident,
 }) => {
   const [activeTab, setActiveTab] = useState<AlertStatus>('ACTIVE');
   const [searchQuery, setSearchQuery] = useState('');
-  const [severityFilter, setSeverityFilter] = useState<string>('ALL');
+  const [priorityFilter, setPriorityFilter] = useState<string>('ALL');
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
-  // Filter alerts by tab, severity, and search query
+  // Filter alerts by tab, priority, and search query
   const filteredAlerts = alerts.filter((alert) => {
     if (alert.status !== activeTab) return false;
-    if (severityFilter !== 'ALL' && alert.severity !== severityFilter) return false;
+    if (priorityFilter !== 'ALL') {
+      const p = alert.priority || (alert.severity === 'CRITICAL' ? 'P0' : alert.severity === 'HIGH' ? 'P1' : 'P2');
+      if (p !== priorityFilter) return false;
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
@@ -60,18 +65,17 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
     return true;
   });
 
-  const getSeverityBadge = (sev: RiskLevel) => {
-    switch (sev) {
-      case 'CRITICAL':
-        return 'bg-rose-600 text-white';
-      case 'HIGH':
-        return 'bg-rose-500 text-white';
-      case 'MEDIUM':
-        return 'bg-amber-500 text-white';
-      case 'LOW':
-        return 'bg-sky-500 text-white';
+  const getPriorityBadgeClass = (priority?: string, sev?: string) => {
+    const p = priority || (sev === 'CRITICAL' ? 'P0' : sev === 'HIGH' ? 'P1' : 'P2');
+    switch (p) {
+      case 'P0':
+        return 'text-rose-400 bg-rose-500/15 border-rose-500/30';
+      case 'P1':
+        return 'text-orange-400 bg-orange-500/15 border-orange-500/30';
+      case 'P2':
+        return 'text-amber-400 bg-amber-500/15 border-amber-500/30';
       default:
-        return 'bg-slate-500 text-white';
+        return 'text-sky-400 bg-sky-500/15 border-sky-500/30';
     }
   };
 
@@ -92,218 +96,202 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4 bg-[#eef3f9]">
+    <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-5 bg-[#070b14] text-slate-100 select-none">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-rose-500" />
-            Alerts &amp; Incident Lifecycle Triage
-          </h2>
-          <p className="text-xs text-slate-500">
-            Real-time incident dispatch, human-in-the-loop acknowledgment, and compliance remediation
-          </p>
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
+                Alerts &amp; Incident Operations
+                <span className="text-[11px] font-mono px-2 py-0.2 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 font-medium">
+                  {counts.ACTIVE} Active Alerts
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Priority-tiered alarm queue with operator acknowledgement, cooldown suppression, and resolution ledger
+              </p>
+            </div>
+          </div>
         </div>
 
         {onRefresh && (
           <button
             onClick={onRefresh}
-            className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+            className="self-start sm:self-auto px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-sky-600" />
+            <RefreshCw className="w-3.5 h-3.5 text-sky-400" />
             <span>Refresh Ledger</span>
           </button>
         )}
       </div>
 
       {/* Main Ledger Card */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-        {/* Tabs Row */}
-        <div className="flex items-center gap-2 px-4 pt-3 border-b border-slate-200 bg-white">
-          {(['ACTIVE', 'ACKNOWLEDGED', 'RESOLVED', 'DISMISSED'] as AlertStatus[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2.5 px-3 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer ${
-                activeTab === tab
-                  ? 'border-sky-600 text-sky-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              <span>{tab}</span>
-              <span
-                className={`text-[9px] px-1.5 py-0.2 rounded-full font-mono ${
+      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden flex flex-col">
+        {/* Status Tab Navigation & Search Filters */}
+        <div className="p-4 bg-slate-900/80 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {(['ACTIVE', 'ACKNOWLEDGED', 'RESOLVED', 'DISMISSED'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
                   activeTab === tab
-                    ? 'bg-sky-100 text-sky-800'
-                    : 'bg-slate-100 text-slate-600'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
                 }`}
               >
-                {counts[tab]}
-              </span>
-            </button>
-          ))}
-        </div>
+                <span>{tab}</span>
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                    activeTab === tab ? 'bg-sky-800 text-white' : 'bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  {counts[tab]}
+                </span>
+              </button>
+            ))}
+          </div>
 
-        {/* Filter Toolbar */}
-        <div className="p-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white">
           <div className="flex items-center gap-2">
-            <div className="relative w-64">
-              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-400" />
+            {/* Priority Filter */}
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+              {(['ALL', 'P0', 'P1', 'P2'] as const).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPriorityFilter(p)}
+                  className={`px-2 py-0.5 rounded text-[11px] font-semibold transition ${
+                    priorityFilter === p
+                      ? 'bg-slate-800 text-white font-bold'
+                      : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  {p === 'ALL' ? 'All' : p}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Box */}
+            <div className="relative w-48 sm:w-60">
+              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search alerts, zones, cameras..."
-                className="w-full bg-slate-50 border border-slate-200 text-xs rounded-md pl-8 pr-3 py-1.5 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="Search alerts, cameras..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
               />
             </div>
-
-            <div className="flex items-center gap-1.5">
-              <Filter className="w-3.5 h-3.5 text-slate-400" />
-              <select
-                value={severityFilter}
-                onChange={(e) => setSeverityFilter(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-xs rounded-md py-1 px-2.5 font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500"
-              >
-                <option value="ALL">All Severities</option>
-                <option value="CRITICAL">Critical</option>
-                <option value="HIGH">High</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="LOW">Low</option>
-              </select>
-            </div>
           </div>
-
-          <span className="text-[11px] text-slate-400 font-mono-nums">
-            Showing {filteredAlerts.length} entries
-          </span>
         </div>
 
-        {/* Ledger Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold text-[10px] uppercase">
-                <th className="py-2.5 px-3">Severity</th>
-                <th className="py-2.5 px-3">Incident ID</th>
-                <th className="py-2.5 px-3">Hazard Event</th>
-                <th className="py-2.5 px-3">Camera Node</th>
-                <th className="py-2.5 px-3">Plant Zone</th>
-                <th className="py-2.5 px-3">Timestamp</th>
-                <th className="py-2.5 px-3">Status</th>
-                <th className="py-2.5 px-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredAlerts.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-400">
-                    <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-1.5" />
-                    <p className="text-xs font-semibold text-slate-700">No {activeTab} Alerts</p>
-                    <p className="text-[10px] text-slate-400">Ledger is clear for this state.</p>
-                  </td>
+        {/* Alerts Table */}
+        {filteredAlerts.length === 0 ? (
+          <EmptyState
+            icon={CheckCircle2}
+            title={`No ${activeTab} Alerts`}
+            description={`There are currently no alerts in ${activeTab.toLowerCase()} status matching the filters.`}
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-950/70 border-b border-slate-800 text-slate-400 font-semibold text-[10px] uppercase tracking-wider">
+                  <th className="py-3 px-4">Priority / Severity</th>
+                  <th className="py-3 px-4">Event Description</th>
+                  <th className="py-3 px-4">Camera &amp; Zone</th>
+                  <th className="py-3 px-4">Timestamp</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
-              ) : (
-                filteredAlerts.map((a) => {
-                  const isBusy = actionInProgress === a.alert_id;
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {filteredAlerts.map((alert) => {
+                  const isActing = actionInProgress === alert.alert_id;
+                  const priority = alert.priority || (alert.severity === 'CRITICAL' ? 'P0' : alert.severity === 'HIGH' ? 'P1' : 'P2');
 
                   return (
-                    <tr key={a.alert_id} className="hover:bg-slate-50 transition">
-                      <td className="py-2.5 px-3">
-                        <span
-                          className={`text-[8px] font-bold px-2 py-0.5 rounded tracking-wide ${getSeverityBadge(
-                            a.severity
-                          )}`}
-                        >
-                          {a.severity}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
-                        {onSelectAlert ? (
-                          <button
-                            onClick={() => onSelectAlert(a)}
-                            className="hover:text-indigo-600 hover:underline text-left cursor-pointer"
-                            title="Click to view alert details"
-                          >
-                            {a.alert_id}
-                          </button>
-                        ) : (
-                          a.alert_id
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <div
-                          className={`font-semibold text-slate-800 ${onSelectAlert ? 'cursor-pointer hover:text-indigo-600' : ''}`}
-                          onClick={() => onSelectAlert && onSelectAlert(a)}
-                        >
-                          {a.title || a.event_type.replace(/_/g, ' ')}
+                    <tr
+                      key={alert.alert_id}
+                      onClick={() => onSelectAlert?.(alert)}
+                      className="hover:bg-slate-900/60 transition cursor-pointer"
+                    >
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${getPriorityBadgeClass(alert.priority, alert.severity)}`}>
+                            {priority} • {alert.severity}
+                          </span>
                         </div>
-                        <p className="text-[10px] text-slate-500 truncate max-w-xs">{a.message}</p>
                       </td>
-                      <td className="py-2.5 px-3 font-mono-nums text-slate-600">{a.camera_id}</td>
-                      <td className="py-2.5 px-3 text-slate-600">{a.zone_id}</td>
-                      <td className="py-2.5 px-3 font-mono-nums text-slate-500 text-[11px]">
-                        {new Date(a.timestamp).toLocaleString('en-GB')}
+
+                      <td className="py-3 px-4">
+                        <div>
+                          <div className="font-bold text-white text-xs leading-tight">
+                            {alert.title}
+                          </div>
+                          <p className="text-[11px] text-slate-400 mt-0.5 max-w-md line-clamp-1">
+                            {alert.message}
+                          </p>
+                        </div>
                       </td>
-                      <td className="py-2.5 px-3">
-                        <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-                          {a.status}
+
+                      <td className="py-3 px-4">
+                        <div className="text-[11px] text-slate-300 font-mono">
+                          {alert.camera_id}
+                        </div>
+                        <div className="text-[10px] text-slate-500">
+                          {alert.zone_id || 'production_floor'}
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <span className="font-mono text-[11px] text-slate-400">
+                          {new Date(alert.timestamp).toLocaleTimeString()}
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {(onSelectIncident || onSelectAlert) && (
+
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          {alert.status === 'ACTIVE' && (
                             <button
-                              onClick={() => {
-                                if (onSelectIncident && a.incident_id) {
-                                  onSelectIncident(a.incident_id);
-                                } else if (onSelectAlert) {
-                                  onSelectAlert(a);
-                                }
-                              }}
-                              className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-[10px] font-semibold transition cursor-pointer flex items-center gap-1 shadow-xs"
-                              title="Forensic Snapshot & Incident Evidence"
-                            >
-                              <Eye className="w-3 h-3" />
-                              <span>Inspect</span>
-                            </button>
-                          )}
-                          {a.status === 'ACTIVE' && (
-                            <button
-                              disabled={isBusy}
-                              onClick={() => handleAction(a.alert_id, onAcknowledge)}
-                              className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px] font-semibold transition cursor-pointer shadow-xs disabled:opacity-50"
+                              onClick={() => handleAction(alert.alert_id, onAcknowledge)}
+                              disabled={isActing}
+                              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition"
                             >
                               Ack
                             </button>
                           )}
-                          {a.status !== 'RESOLVED' && (
+
+                          {alert.status !== 'RESOLVED' && (
                             <button
-                              disabled={isBusy}
-                              onClick={() => handleAction(a.alert_id, onResolve)}
-                              className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-semibold transition cursor-pointer shadow-xs disabled:opacity-50"
+                              onClick={() => handleAction(alert.alert_id, onResolve)}
+                              disabled={isActing}
+                              className="px-2.5 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 text-[11px] font-semibold transition flex items-center gap-1"
                             >
-                              Resolve
+                              <Check className="w-3 h-3" /> Resolve
                             </button>
                           )}
-                          {a.status !== 'DISMISSED' && a.status !== 'RESOLVED' && (
+
+                          {alert.incident_id && onSelectIncident && (
                             <button
-                              disabled={isBusy}
-                              onClick={() => handleAction(a.alert_id, onDismiss)}
-                              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[10px] font-semibold transition cursor-pointer disabled:opacity-50"
+                              onClick={() => onSelectIncident(alert.incident_id)}
+                              className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                              title="Open Incident File"
                             >
-                              Dismiss
+                              <ExternalLink className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -33,6 +33,8 @@ export interface Alert {
   alert_id: string;
   incident_id: string;
   severity: RiskLevel;
+  priority?: 'P0' | 'P1' | 'P2' | 'P3' | string;
+  is_audible?: boolean;
   title: string;
   message: string;
   camera_id: string;
@@ -119,6 +121,7 @@ export interface HazardEventDetail {
   first_seen_frame?: number;
   last_seen_frame?: number;
   persistence_frames?: number;
+  active_frames?: number;
   bbox?: [number, number, number, number];
 }
 

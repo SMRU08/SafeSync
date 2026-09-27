@@ -1,15 +1,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
+/* ─── Industrial SOC Theme System ─────────────────────────────────────────── */
 :root {
+  /* Default: Dark Industrial SOC */
   --bg-primary: #070b14;
+  --bg-secondary: #090e1a;
   --bg-surface: #0c1424;
   --bg-elevated: #111d35;
-  --border-subtle: rgba(51, 65, 85, 0.4);
-  --border-glow: rgba(56, 189, 248, 0.3);
+  --bg-card: rgba(12, 20, 36, 0.85);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --border-subtle: rgba(51, 65, 85, 0.5);
+  --border-active: rgba(56, 189, 248, 0.4);
+  --border-card: rgba(51, 65, 85, 0.6);
+
+  /* Semantic Operations Colors */
+  --status-online: #10b981;
+  --status-warning: #f59e0b;
+  --status-critical: #ef4444;
+  --status-info: #0284c7;
+  --status-offline: #64748b;
+
   --accent-cyan: #38bdf8;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
   --accent-rose: #f43f5e;
+}
+
+/* Light Industrial Control Room Theme */
+[data-theme='light'],
+.light {
+  --bg-primary: #f1f5fa;
+  --bg-secondary: #e2e8f0;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.95);
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  --border-subtle: rgba(203, 213, 225, 0.9);
+  --border-active: rgba(2, 132, 199, 0.6);
+  --border-card: rgba(226, 232, 240, 1);
+
+  --status-online: #059669;
+  --status-warning: #d97706;
+  --status-critical: #dc2626;
+  --status-info: #0284c7;
+  --status-offline: #64748b;
 }
 
 html,
@@ -19,11 +61,12 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: #070b14;
-  color: #f1f5f9;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .font-mono-nums {
@@ -33,21 +76,18 @@ body,
 
 /* ─── Control Room Glassmorphism Utilities ────────────────────────────────── */
 .glass-card {
-  background: rgba(12, 20, 36, 0.75);
+  background: var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.5);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-}
-
-.glass-card-hover {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(56, 189, 248, 0.4);
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px -2px rgba(56, 189, 248, 0.15);
+  transform: translateY(-2px);
+  border-color: var(--border-active);
+  box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.4), 0 0 12px -2px rgba(56, 189, 248, 0.15);
 }
 
 /* ─── Pulsating Status Rings ──────────────────────────────────────────────── */
@@ -62,7 +102,7 @@ body,
 }
 
 .ring-pulse-offline {
-  box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
   animation: ring-pulse 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
 }
 
@@ -85,26 +125,37 @@ body,
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(30, 41, 59, 0.5) 0%,
-    rgba(51, 65, 85, 0.8) 50%,
-    rgba(30, 41, 59, 0.5) 100%
+    rgba(30, 41, 59, 0.4) 0%,
+    rgba(71, 85, 105, 0.6) 50%,
+    rgba(30, 41, 59, 0.4) 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite ease-in-out;
 }
 
-/* ─── Dark Industrial Scrollbar ───────────────────────────────────────────── */
+[data-theme='light'] .animate-shimmer,
+.light .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(226, 232, 240, 0.6) 0%,
+    rgba(203, 213, 225, 0.9) 50%,
+    rgba(226, 232, 240, 0.6) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* ─── Industrial Scrollbars ──────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #070b14;
+  background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: rgba(100, 116, 139, 0.35);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: rgba(100, 116, 139, 0.6);
 }

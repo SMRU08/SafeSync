@@ -21,10 +21,13 @@ import { SettingsView } from './pages/SettingsView';
 import { AlertDetailModal } from './components/AlertDetailModal';
 import { IncidentDetailModal } from './components/IncidentDetailModal';
 import { WorkerRegistrationModal } from './components/WorkerRegistrationModal';
+import { GlobalSearchModal } from './components/GlobalSearchModal';
+import { NotificationDrawer } from './components/NotificationDrawer';
+import { SystemStatusBar } from './components/SystemStatusBar';
 import { useSafetyData } from './hooks/useSafetyData';
 import { useWebSocket } from './hooks/useWebSocket';
 import { Alert, Incident } from './types';
-import { CheckCircle2, AlertTriangle, X, Flame, Wind, ShieldAlert } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, X, Flame, ShieldAlert } from 'lucide-react';
 import './styles/custom-theme.css';
 
 export const App: React.FC = () => {
@@ -32,6 +35,29 @@ export const App: React.FC = () => {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Theme Management (Default Dark Industrial Mode, with Light mode support & persistence)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('safesync_theme');
+    return saved === 'light' ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('safesync_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Real-time backend data & WebSocket hooks
   const {
@@ -69,6 +95,7 @@ export const App: React.FC = () => {
         hash === 'live-monitor' ||
         hash === 'cameras' ||
         hash === 'workers' ||
+        hash === 'attendance' ||
         hash === 'hazards' ||
         hash === 'alerts' ||
         hash === 'analytics' ||
@@ -111,9 +138,13 @@ export const App: React.FC = () => {
     }
   };
 
+  const activeCamerasCount = cameras.filter(
+    (c) => c.state === 'CONNECTED' || c.status === 'ACTIVE'
+  ).length;
+
   return (
-    <div className="flex flex-col w-full h-screen overflow-hidden bg-[#eef3f9] text-slate-800 antialiased font-sans">
-      {/* ─── Top Header with Live Status Indicators ─────────────────────────── */}
+    <div className="flex flex-col w-full h-screen overflow-hidden bg-[#070b14] text-slate-100 antialiased font-sans select-none">
+      {/* ─── Top Header with Live Status Indicators & Theme Toggle ───────────── */}
       <TopHeader
         apiStatus={status?.backend === 'healthy' ? 'online' : status?.backend === 'checking' ? 'checking' : 'offline'}
         aiEngineStatus={status?.aiEngine || 'Ready'}
@@ -122,6 +153,11 @@ export const App: React.FC = () => {
         unreadAlertsCount={activeAlertsCount}
         onRefresh={refreshAll}
         isRefreshing={isLoading}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenNotifications={() => setIsNotificationsOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onNavigateHealth={() => handleTabChange('health')}
       />
 
       {/* ─── CRITICAL ALERT BANNER (Sticky, pulsing red) ─────────────────────── */}
@@ -148,46 +184,44 @@ export const App: React.FC = () => {
           ? `⚠️ ALERT: ${criticalAlert.title || criticalAlert.event_type.replace(/_/g, ' ')} — ${criticalAlert.camera_id}`
           : null;
         const isFireOrSmoke = !!(fireHazard || smokeHazard);
-        const isEval = !isFireOrSmoke && !!evaluatingHazard;
+
         if (!bannerText) return null;
+
         return (
           <div
-            className={`sticky top-0 z-[60] flex items-center justify-between gap-3 px-5 py-2.5 text-white text-sm font-bold shadow-lg select-none ${
+            className={`w-full px-4 py-2 flex items-center justify-between text-xs font-bold tracking-wide select-none z-30 transition-all ${
               isFireOrSmoke
-                ? 'bg-red-600 animate-pulse'
-                : isEval
-                ? 'bg-amber-600'
-                : 'bg-rose-500'
+                ? 'bg-rose-600 text-white animate-pulse shadow-lg shadow-rose-900/40'
+                : criticalAlert
+                ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md'
+                : 'bg-sky-950 border-b border-sky-800 text-sky-200'
             }`}
-            style={isFireOrSmoke ? { animationDuration: '1s' } : {}}
           >
-            <div className="flex items-center gap-3">
-              {fireHazard ? (
-                <Flame className="w-5 h-5 text-yellow-200 animate-bounce flex-shrink-0" />
-              ) : smokeHazard ? (
-                <Wind className="w-5 h-5 text-slate-100 flex-shrink-0" />
+            <div className="flex items-center gap-2 truncate">
+              {isFireOrSmoke ? (
+                <Flame className="w-4 h-4 shrink-0 animate-bounce" />
               ) : (
-                <ShieldAlert className="w-5 h-5 text-white flex-shrink-0" />
+                <ShieldAlert className="w-4 h-4 shrink-0" />
               )}
-              <span className="tracking-wide">{bannerText}</span>
+              <span className="truncate">{bannerText}</span>
             </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="text-[11px] font-normal text-white/80 hidden sm:block">
-                {new Date().toLocaleTimeString()}
-              </span>
+
+            <div className="flex items-center gap-2 shrink-0 ml-2">
               <button
-                onClick={() => setActiveTab('hazards')}
-                className="px-2.5 py-1 bg-white/20 hover:bg-white/30 text-white text-[11px] font-bold rounded border border-white/30 transition"
+                onClick={() => {
+                  if (criticalAlert) setSelectedAlert(criticalAlert);
+                  else handleTabChange('hazards');
+                }}
+                className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-black/30 hover:bg-black/50 text-white transition"
               >
-                View Details
+                Inspect
               </button>
             </div>
           </div>
         );
       })()}
 
-      {/* ─── Global Action Notification Toast Banner ─────────────────────────── */}
-
+      {/* Floating Action Notifications */}
       {actionSuccess && (
         <div className="fixed top-16 right-5 z-50 flex items-center gap-2.5 px-4 py-2.5 bg-emerald-600 text-white text-xs font-semibold rounded-lg shadow-lg animate-in fade-in slide-in-from-top-2">
           <CheckCircle2 className="w-4 h-4" />
@@ -215,6 +249,8 @@ export const App: React.FC = () => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           activeAlertsCount={activeAlertsCount}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         />
 
         {/* Main Content Router Surface */}
@@ -237,7 +273,11 @@ export const App: React.FC = () => {
             )}
 
             {activeTab === 'live-monitor' && (
-              <LiveMonitoringView cameras={cameras} onRefresh={refreshAll} />
+              <LiveMonitoringView
+                cameras={cameras}
+                onRefresh={refreshAll}
+                onNavigateCameras={() => handleTabChange('cameras')}
+              />
             )}
 
             {activeTab === 'cameras' && (
@@ -259,6 +299,7 @@ export const App: React.FC = () => {
             {activeTab === 'attendance' && (
               <AttendanceView cameras={cameras} />
             )}
+
             {activeTab === 'hazards' && (
               <HazardsView hazards={hazards} hazardConfig={hazardConfig} />
             )}
@@ -297,24 +338,41 @@ export const App: React.FC = () => {
             )}
           </div>
 
-          {/* ─── Persistent Safety Boundary Disclaimer Banner ─────────────────── */}
-          <footer className="h-6 px-4 bg-[#050811] border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-500 font-mono select-none flex-shrink-0 z-30">
-            <div className="flex items-center gap-2 truncate">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 flex-shrink-0" />
-              <span className="truncate">
-                <strong className="text-slate-400 font-semibold">SAFETY BOUNDARY DISCLAIMER:</strong> SafeSync operates as an AI visual intelligence complement to certified primary safety systems and human supervisory procedures.
-              </span>
-            </div>
-            <div className="hidden lg:flex items-center gap-3 text-slate-500 text-[9px] flex-shrink-0">
-              <span>ISO 45001 Aligned</span>
-              <span>•</span>
-              <span>Fail-Safe Telemetry</span>
-              <span>•</span>
-              <span className="text-sky-400 font-semibold">v2.4.0 SOC-PRO</span>
-            </div>
-          </footer>
+          {/* ─── Persistent System Status Bar (Phase 30) ──────────────────────── */}
+          <SystemStatusBar
+            apiStatus={status?.backend === 'healthy' ? 'online' : status?.backend === 'checking' ? 'checking' : 'offline'}
+            aiEngineStatus={status?.aiEngine || 'Ready'}
+            databaseStatus={status?.database === 'connected' ? 'connected' : status?.database === 'checking' ? 'checking' : 'disconnected'}
+            wsStatus={wsStatus}
+            camerasCount={cameras.length}
+            activeCamerasCount={activeCamerasCount}
+            lastChecked={status?.lastChecked}
+            onNavigate={handleTabChange}
+          />
         </main>
       </div>
+
+      {/* ─── Global Command Palette Search Modal (Phase 19) ────────────────── */}
+      <GlobalSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        cameras={cameras}
+        alerts={alerts}
+        incidents={incidents}
+        onNavigate={handleTabChange}
+        onSelectAlert={(a) => setSelectedAlert(a)}
+        onSelectIncident={handleOpenIncident}
+      />
+
+      {/* ─── Global Notification Center Drawer (Phase 20) ─────────────────── */}
+      <NotificationDrawer
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        alerts={alerts}
+        onSelectAlert={(a) => setSelectedAlert(a)}
+        onAcknowledgeAlert={handleAcknowledge}
+        onResolveAlert={handleResolve}
+      />
 
       {/* ─── Global Alert Detail & Verification Modal ───────────────────────── */}
       <AlertDetailModal
@@ -340,6 +398,7 @@ export const App: React.FC = () => {
         onAcknowledgeIncident={handleAcknowledgeIncident}
         onResolveIncident={handleResolveIncident}
       />
+
       {/* ─── Worker Biometric Enrollment Modal ───────────────────────────── */}
       <WorkerRegistrationModal
         isOpen={isEnrollModalOpen}
@@ -347,6 +406,7 @@ export const App: React.FC = () => {
         cameras={cameras}
         onSuccess={() => {
           setIsEnrollModalOpen(false);
+          refreshAll();
         }}
       />
     </div>

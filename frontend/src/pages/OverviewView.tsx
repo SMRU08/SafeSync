@@ -1,8 +1,8 @@
 /**
  * OverviewView.tsx — SafeSync Professional SOC
- * Executive Industrial Safety Dashboard with real-time KPI metrics,
- * live camera stream with ByteTrack PPE overlay, hardware fleet grid,
- * recent alerts ledger, and zone compliance summary.
+ * Executive Command Center Dashboard (Phase 6).
+ * Features 7 real-time KPI metrics, live stream with ByteTrack PPE HUD,
+ * active critical incidents timeline, itemized PPE compliance density, and zone health matrix.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -15,6 +15,8 @@ import {
   AlertTriangle,
   ArrowRight,
   MapPin,
+  Activity,
+  Radio,
 } from 'lucide-react';
 import {
   RiskSummary,
@@ -78,7 +80,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           }
         }
       } catch {
-        // Silently tolerate background dropouts
+        // Tolerate network dropouts
       }
     };
 
@@ -102,7 +104,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
   const complianceRate = complianceSummary
     ? Math.round(complianceSummary.compliance_rate_percent)
-    : 67;
+    : 100;
 
   const activeViolationsCount = complianceSummary
     ? complianceSummary.non_compliant_workers
@@ -111,172 +113,194 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const activeAlerts = alerts.filter((a) => a.status === 'ACTIVE');
   const fireAlertsCount =
     alerts.filter((a) => a.status === 'ACTIVE' && a.event_type.includes('FIRE')).length +
-    hazards.filter((h) => h.hazard_type === 'fire').length;
+    hazards.filter((h) => h.hazard_type === 'fire' && (h.state === 'ACTIVE' || h.state === 'CONFIRMED')).length;
 
   const smokeAlertsCount =
     alerts.filter((a) => a.status === 'ACTIVE' && a.event_type.includes('SMOKE')).length +
-    hazards.filter((h) => h.hazard_type === 'smoke').length;
+    hazards.filter((h) => h.hazard_type === 'smoke' && (h.state === 'ACTIVE' || h.state === 'CONFIRMED')).length;
 
   const activeAlertsCount = summary?.active_alerts ?? activeAlerts.length;
+  const openIncidentsCount = summary?.open_incidents ?? activeAlerts.length;
 
   const itemized = complianceSummary?.itemized_compliance;
-  const calcPpeRate = (stat?: { present: number; absent: number; unknown: number }, fallback = 80) => {
+  const calcPpeRate = (stat?: { present: number; absent: number; unknown: number }, fallback = 100) => {
     if (!stat) return fallback;
     const evalTotal = stat.present + stat.absent;
     if (evalTotal === 0) return fallback;
     return Math.round((stat.present / evalTotal) * 100);
   };
 
-  const helmetPct = calcPpeRate(itemized?.helmet, 78);
-  const vestPct = calcPpeRate(itemized?.vest, 67);
-  const glovesPct = calcPpeRate(itemized?.gloves, 52);
-  const footwearPct = calcPpeRate(itemized?.footwear, 85);
+  const helmetPct = calcPpeRate(itemized?.helmet, 100);
+  const vestPct = calcPpeRate(itemized?.vest, 100);
+  const glovesPct = calcPpeRate(itemized?.gloves, 100);
+  const footwearPct = calcPpeRate(itemized?.footwear, 100);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 lg:p-5 space-y-4 bg-[#eef3f9]">
-      {/* Top Header & Safety Quote Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-5 bg-[#070b14] text-slate-100 select-none">
+      {/* Top Header & Operational Tagline */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-800/80">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Overview</h2>
-          <p className="text-xs text-slate-500">Real-time monitoring of workplace safety and hazards</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-black text-white tracking-tight">Overview</h2>
+            <span className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono font-medium">
+              <Radio className="w-2.5 h-2.5 animate-pulse text-emerald-400" />
+              Live Telemetry
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">Real-time command center for workplace safety, PPE tracking, and thermal hazards</p>
         </div>
-        <div className="flex items-center gap-2.5 px-3 py-1.5 bg-sky-50/80 border border-sky-200/70 rounded-lg text-sky-900 shadow-xs">
-          <ShieldCheck className="w-4 h-4 text-sky-600 flex-shrink-0" />
-          <span className="text-[11px] font-medium italic">
-            "Safety is not an option, it's a responsibility."
+        <div className="flex items-center gap-2.5 px-3 py-1.5 bg-slate-900/80 border border-slate-800 rounded-lg text-slate-300">
+          <ShieldCheck className="w-4 h-4 text-sky-400 flex-shrink-0" />
+          <span className="text-[11px] font-medium italic text-slate-300">
+            "Zero Compromise on Worker Life Safety"
           </span>
         </div>
       </div>
 
-      {/* ─── 1. Key Metrics Row (6 Cards) — Enterprise Color-Coded ──────────── */}
-      <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-        {/* Metric 1: Active Cameras */}
-        {(() => {
-          const pct = totalCameras > 0 ? Math.round((activeCameras / totalCameras) * 100) : 0;
-          const color = pct >= 75 ? 'emerald' : pct >= 50 ? 'amber' : 'rose';
-          return (
-            <div className={`bg-white rounded-xl p-3.5 border shadow-sm flex flex-col justify-between relative overflow-hidden border-${color}-200`}>
-              <div className={`absolute inset-x-0 bottom-0 h-1 bg-${color}-500`} />
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Active Cameras</span>
-                <div className={`w-7 h-7 rounded-lg bg-${color}-50 text-${color}-600 flex items-center justify-center shadow-inner`}>
-                  <Camera className="w-3.5 h-3.5" />
-                </div>
-              </div>
-              <div className="text-2xl font-black text-slate-900 font-mono-nums leading-none">
-                {activeCameras}<span className="text-sm font-semibold text-slate-400">/{totalCameras || 4}</span>
-              </div>
-              <div className={`text-[10px] font-semibold mt-1.5 text-${color}-600`}>
-                {activeCameras} online • {Math.max(0, (totalCameras || 4) - activeCameras)} offline
-              </div>
+      {/* ─── 1. Key Metrics Row (7 Cards as Required by Phase 6) ──────────── */}
+      <section className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-7 gap-3">
+        {/* Card 1: Active Cameras */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">Active Cameras</span>
+            <div className="p-1 rounded bg-sky-500/10 text-sky-400">
+              <Camera className="w-3.5 h-3.5" />
             </div>
-          );
-        })()}
+          </div>
+          <div>
+            <div className="text-2xl font-black text-white font-mono-nums leading-none">
+              {activeCameras}
+              <span className="text-xs text-slate-400 font-normal ml-1">/{totalCameras || 1}</span>
+            </div>
+            <div className="text-[10px] text-emerald-400 font-semibold mt-1.5 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              {activeCameras} Online Matrix
+            </div>
+          </div>
+        </div>
 
-        {/* Metric 2: Tracked Workers */}
-        <div className="bg-white rounded-xl p-3.5 border border-sky-200 shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-sky-500" />
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Tracked Workers</span>
-            <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shadow-inner">
+        {/* Card 2: Tracked Workers */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">Tracked Workers</span>
+            <div className="p-1 rounded bg-sky-500/10 text-sky-400">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 font-mono-nums leading-none">{totalWorkersCount}</span>
-            <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full animate-pulse">LIVE</span>
+          <div>
+            <div className="text-2xl font-black text-sky-400 font-mono-nums leading-none">
+              {totalWorkersCount}
+            </div>
+            <div className="text-[10px] text-slate-400 font-medium mt-1.5">
+              Active in camera feeds
+            </div>
           </div>
-          <div className="text-[10px] font-semibold text-sky-600 mt-1.5">Across all active cameras</div>
         </div>
 
-        {/* Metric 3: PPE Compliance */}
-        {(() => {
-          const color = complianceRate >= 80 ? 'emerald' : complianceRate >= 60 ? 'amber' : 'rose';
-          return (
-            <div className={`bg-white rounded-xl p-3.5 border border-${color}-200 shadow-sm flex items-center justify-between relative overflow-hidden`}>
-              <div className={`absolute inset-x-0 bottom-0 h-1 bg-${color}-500`} />
-              <div>
-                <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">PPE Compliance</div>
-                <div className={`text-2xl font-black font-mono-nums leading-none text-${color}-600`}>{complianceRate}%</div>
-                <div className={`text-[10px] font-semibold mt-1.5 text-${color}-600`}>
-                  {activeViolationsCount > 0 ? `${activeViolationsCount} violations` : 'All compliant'}
-                </div>
-              </div>
-              <div className="relative w-12 h-12 flex-shrink-0">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path className="text-slate-100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3.5" />
-                  <path className={`text-${color}-500 transition-all duration-700`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray={`${complianceRate}, 100`} strokeLinecap="round" strokeWidth="3.5" />
-                </svg>
-                <ShieldCheck className={`absolute inset-0 m-auto w-4 h-4 text-${color}-500`} />
-              </div>
+        {/* Card 3: PPE Compliance */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">PPE Compliance</span>
+            <div className="p-1 rounded bg-emerald-500/10 text-emerald-400">
+              <ShieldCheck className="w-3.5 h-3.5" />
             </div>
-          );
-        })()}
+          </div>
+          <div>
+            <div className={`text-2xl font-black font-mono-nums leading-none ${complianceRate >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {complianceRate}%
+            </div>
+            <div className="text-[10px] text-slate-400 font-medium mt-1.5">
+              {activeViolationsCount > 0 ? `${activeViolationsCount} Non-compliant` : '100% compliant'}
+            </div>
+          </div>
+        </div>
 
-        {/* Metric 4: Fire Incidents */}
-        {(() => {
-          const hasFire = fireAlertsCount > 0;
-          return (
-            <div className={`bg-white rounded-xl p-3.5 border shadow-sm flex flex-col justify-between relative overflow-hidden ${hasFire ? 'border-rose-300' : 'border-emerald-200'}`}>
-              <div className={`absolute inset-x-0 bottom-0 h-1 ${hasFire ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Fire Incidents</span>
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-inner ${hasFire ? 'bg-rose-100 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                  <Flame className={`w-3.5 h-3.5 ${hasFire ? 'animate-pulse' : ''}`} />
-                </div>
-              </div>
-              <div className={`text-2xl font-black font-mono-nums leading-none ${hasFire ? 'text-rose-600' : 'text-slate-900'}`}>{fireAlertsCount}</div>
-              <div className={`text-[10px] font-semibold mt-1.5 ${hasFire ? 'text-rose-500' : 'text-emerald-600'}`}>
-                {hasFire ? '🔥 Hazard ACTIVE' : '✓ All zones clear'}
-              </div>
+        {/* Card 4: Active Incidents */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">Active Incidents</span>
+            <div className="p-1 rounded bg-rose-500/10 text-rose-400">
+              <Activity className="w-3.5 h-3.5" />
             </div>
-          );
-        })()}
+          </div>
+          <div>
+            <div className={`text-2xl font-black font-mono-nums leading-none ${openIncidentsCount > 0 ? 'text-rose-400' : 'text-white'}`}>
+              {openIncidentsCount}
+            </div>
+            <div className="text-[10px] text-slate-400 font-medium mt-1.5">
+              {openIncidentsCount > 0 ? 'Operator triage pending' : 'Zero open incidents'}
+            </div>
+          </div>
+        </div>
 
-        {/* Metric 5: Smoke Incidents */}
-        {(() => {
-          const hasSmoke = smokeAlertsCount > 0;
-          return (
-            <div className={`bg-white rounded-xl p-3.5 border shadow-sm flex flex-col justify-between relative overflow-hidden ${hasSmoke ? 'border-amber-300' : 'border-emerald-200'}`}>
-              <div className={`absolute inset-x-0 bottom-0 h-1 ${hasSmoke ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Smoke Detection</span>
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-inner ${hasSmoke ? 'bg-amber-100 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                  <CloudRain className="w-3.5 h-3.5" />
-                </div>
-              </div>
-              <div className={`text-2xl font-black font-mono-nums leading-none ${hasSmoke ? 'text-amber-600' : 'text-slate-900'}`}>{smokeAlertsCount}</div>
-              <div className={`text-[10px] font-semibold mt-1.5 ${hasSmoke ? 'text-amber-500' : 'text-emerald-600'}`}>
-                {hasSmoke ? '💨 Hazard ACTIVE' : '✓ All zones clear'}
-              </div>
+        {/* Card 5: Fire Events */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">Fire Events</span>
+            <div className="p-1 rounded bg-rose-500/10 text-rose-400">
+              <Flame className="w-3.5 h-3.5" />
             </div>
-          );
-        })()}
+          </div>
+          <div>
+            <div className={`text-2xl font-black font-mono-nums leading-none ${fireAlertsCount > 0 ? 'text-rose-400 animate-pulse' : 'text-white'}`}>
+              {fireAlertsCount}
+            </div>
+            <div className="text-[10px] font-semibold mt-1.5">
+              {fireAlertsCount > 0 ? (
+                <span className="text-rose-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                  Combustion active
+                </span>
+              ) : (
+                <span className="text-emerald-400">✓ All zones clear</span>
+              )}
+            </div>
+          </div>
+        </div>
 
-        {/* Metric 6: Active Alerts */}
-        {(() => {
-          const hasAlerts = activeAlertsCount > 0;
-          const color = activeAlertsCount === 0 ? 'emerald' : activeAlertsCount <= 2 ? 'amber' : 'rose';
-          return (
-            <div className={`bg-white rounded-xl p-3.5 border border-${color}-200 shadow-sm flex flex-col justify-between relative overflow-hidden`}>
-              <div className={`absolute inset-x-0 bottom-0 h-1 bg-${color}-500 ${hasAlerts ? 'animate-pulse' : ''}`} />
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Active Alerts</span>
-                <div className={`w-7 h-7 rounded-lg bg-${color}-50 text-${color}-600 flex items-center justify-center shadow-inner`}>
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                </div>
-              </div>
-              <div className={`text-2xl font-black font-mono-nums leading-none text-${color}-600`}>{activeAlertsCount}</div>
-              <div className={`text-[10px] font-semibold mt-1.5 text-${color}-600`}>
-                {hasAlerts ? 'Needs attention' : '✓ Normal state'}
-              </div>
+        {/* Card 6: Smoke Events */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">Smoke Events</span>
+            <div className="p-1 rounded bg-amber-500/10 text-amber-400">
+              <CloudRain className="w-3.5 h-3.5" />
             </div>
-          );
-        })()}
+          </div>
+          <div>
+            <div className={`text-2xl font-black font-mono-nums leading-none ${smokeAlertsCount > 0 ? 'text-amber-400 animate-pulse' : 'text-white'}`}>
+              {smokeAlertsCount}
+            </div>
+            <div className="text-[10px] font-semibold mt-1.5">
+              {smokeAlertsCount > 0 ? (
+                <span className="text-amber-400">Plume confirmed</span>
+              ) : (
+                <span className="text-emerald-400">✓ Air quality clear</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Card 7: Active Alerts */}
+        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span className="font-semibold text-[10px] uppercase tracking-wider">Active Alerts</span>
+            <div className="p-1 rounded bg-sky-500/10 text-sky-400">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <div>
+            <div className={`text-2xl font-black font-mono-nums leading-none ${activeAlertsCount > 0 ? 'text-amber-400' : 'text-white'}`}>
+              {activeAlertsCount}
+            </div>
+            <div className="text-[10px] text-slate-400 font-medium mt-1.5">
+              {activeAlertsCount > 0 ? `${activeAlertsCount} Unresolved` : 'Normal state'}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ─── 2. Core Dashboard Split Grid ─────────────────────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
         {/* Left / Center Column: Live Camera & Camera Grid (8 Cols) */}
         <div className="xl:col-span-8 space-y-4">
           <CameraFeedPlayer
@@ -287,17 +311,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onRefresh={onRefresh ? () => onRefresh() : undefined}
           />
 
-          <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 shadow-xl overflow-hidden">
-            <div className="px-4 py-3 bg-[#111f35] border-b border-slate-700/80 flex items-center justify-between">
+          <div className="glass-card rounded-xl border border-slate-800 overflow-hidden">
+            <div className="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Camera className="w-3.5 h-3.5 text-sky-400" />
-                <h3 className="font-bold text-xs text-white tracking-wide uppercase">All Cameras</h3>
+                <h3 className="font-bold text-xs text-white tracking-wide uppercase">All Camera Feeds</h3>
               </div>
               <button
                 onClick={() => onNavigate('cameras')}
-                className="text-[10px] font-semibold text-sky-400 hover:text-sky-200 flex items-center gap-1 transition"
+                className="text-[11px] font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1 transition"
               >
-                View All <ArrowRight className="w-3 h-3" />
+                View Camera Matrix <ArrowRight className="w-3 h-3" />
               </button>
             </div>
 
@@ -325,31 +349,33 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             onSelectAlert={onSelectAlert}
           />
 
-          <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 shadow-xl overflow-hidden">
-            <div className="px-4 py-3 bg-[#111f35] border-b border-slate-700/80 flex items-center gap-2">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <h3 className="font-bold text-xs text-white tracking-wide uppercase">
-                PPE Compliance
-                <span className="ml-2 font-normal text-slate-400 normal-case text-[10px]">Live Fleet</span>
-              </h3>
+          <div className="glass-card rounded-xl border border-slate-800 overflow-hidden">
+            <div className="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <h3 className="font-bold text-xs text-white tracking-wide uppercase">
+                  PPE Compliance Matrix
+                </h3>
+              </div>
+              <span className="text-[10px] text-slate-400 font-mono">Live Telemetry</span>
             </div>
 
             <div className="p-4 space-y-3">
               {[
-                { label: '🪖 Helmet', pct: helmetPct },
-                { label: '🦺 Safety Vest', pct: vestPct },
-                { label: '🧤 Gloves', pct: glovesPct },
+                { label: '🪖 Safety Helmet', pct: helmetPct },
+                { label: '🦺 High-Vis Vest', pct: vestPct },
+                { label: '🧤 Protective Gloves', pct: glovesPct },
                 { label: '🥾 Safety Footwear', pct: footwearPct },
               ].map(({ label, pct }) => {
                 const barColor = pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-rose-500';
                 const textColor = pct >= 80 ? 'text-emerald-400' : pct >= 60 ? 'text-amber-400' : 'text-rose-400';
                 return (
                   <div key={label}>
-                    <div className="flex justify-between items-center text-[10px] mb-1.5 font-medium">
+                    <div className="flex justify-between items-center text-[11px] mb-1 font-medium">
                       <span className="text-slate-300 flex items-center gap-1.5">{label}</span>
                       <span className={`font-mono-nums font-bold ${textColor}`}>{pct}%</span>
                     </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
                         style={{ width: `${pct}%` }}
@@ -361,32 +387,32 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             </div>
           </div>
 
-          <div className="bg-[#0c1a2e] rounded-xl border border-slate-700 shadow-xl overflow-hidden">
-            <div className="px-4 py-3 bg-[#111f35] border-b border-slate-700/80 flex items-center justify-between">
+          <div className="glass-card rounded-xl border border-slate-800 overflow-hidden">
+            <div className="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-sky-400" />
-                <h3 className="font-bold text-xs text-white tracking-wide uppercase">Zone Safety Status</h3>
+                <h3 className="font-bold text-xs text-white tracking-wide uppercase">Safety Zones</h3>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">4 Zones</span>
+              <span className="text-[10px] text-slate-400 font-medium">Facility Zones</span>
             </div>
 
             <div className="p-3 space-y-2">
               {[
                 {
                   zone: 'Production Floor South',
-                  status: activeViolationsCount > 0 ? `${activeViolationsCount} violations` : 'Normal',
+                  status: activeViolationsCount > 0 ? `${activeViolationsCount} Infractions` : 'Normal',
                   isWarning: activeViolationsCount > 0,
                 },
-                { zone: 'Raw Material Storage', status: 'Standby', isWarning: false },
+                { zone: 'Raw Material Storage', status: 'Normal', isWarning: false },
                 { zone: 'High Voltage Room', status: 'Normal', isWarning: false },
                 { zone: 'Loading Dock Outer', status: 'Normal', isWarning: false },
               ].map((z, idx) => (
                 <div
                   key={idx}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-[11px] border ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs border ${
                     z.isWarning
-                      ? 'bg-rose-950/40 border-rose-700/50'
-                      : 'bg-slate-800/50 border-slate-700/50'
+                      ? 'bg-rose-500/10 border-rose-500/30'
+                      : 'bg-slate-900/40 border-slate-800/60'
                   }`}
                 >
                   <span className="font-medium text-slate-300">{z.zone}</span>

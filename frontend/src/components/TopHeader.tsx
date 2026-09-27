@@ -1,15 +1,16 @@
 /**
  * TopHeader.tsx — SafeSync Industrial SOC
- * Control-room top header with real-time backend indicators, search, notifications,
- * operator profile, pulsating status rings, and live UTC/Local clock.
+ * Control-room top header with real-time backend indicators, search trigger,
+ * notification drawer trigger, theme toggle (Sun/Moon), operator profile, and live UTC/Local clock.
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, ChevronDown, RefreshCw } from 'lucide-react';
+import { Search, Bell, ChevronDown, RefreshCw, Sun, Moon } from 'lucide-react';
 import { WebSocketStatus } from '../hooks/useWebSocket';
 
 export interface TopHeaderProps {
-  onSearch?: (query: string) => void;
+  onOpenSearch?: () => void;
+  onOpenNotifications?: () => void;
   unreadAlertsCount?: number;
   apiStatus?: 'online' | 'offline' | 'checking';
   aiEngineStatus?: string;
@@ -17,10 +18,14 @@ export interface TopHeaderProps {
   wsStatus?: WebSocketStatus;
   onRefresh?: () => void;
   isRefreshing?: boolean;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
+  onNavigateHealth?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
-  onSearch,
+  onOpenSearch,
+  onOpenNotifications,
   unreadAlertsCount = 0,
   apiStatus = 'online',
   aiEngineStatus = 'Ready',
@@ -28,6 +33,9 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   wsStatus = 'CONNECTED',
   onRefresh,
   isRefreshing = false,
+  theme = 'dark',
+  onToggleTheme,
+  onNavigateHealth,
 }) => {
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -66,10 +74,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   const isWsConnecting = wsStatus === 'CONNECTING';
 
   return (
-    <header className="h-14 bg-[#0c1424]/95 backdrop-blur-md border-b border-slate-800/80 px-4 flex items-center justify-between sticky top-0 z-50 shadow-md select-none text-slate-100">
+    <header className="h-14 bg-[#0c1424]/95 backdrop-blur-md border-b border-slate-800/80 px-4 flex items-center justify-between sticky top-0 z-40 shadow-md select-none text-slate-100">
       {/* Brand / Logo Area */}
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 cursor-pointer">
           <img
             src="/logo.png"
             alt="SafeSync Logo"
@@ -83,29 +91,36 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               </span>
             </h1>
             <p className="text-[9px] text-slate-400 font-medium tracking-wide mt-0.5">
-              AI Industrial Hazard &amp; Compliance Monitor
+              Industrial Safety Operations Center
             </p>
           </div>
         </div>
 
-        {/* Header Search Input */}
-        <div className="relative w-64 md:w-72 hidden sm:block">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-500">
+        {/* Global Search Trigger Input */}
+        <div
+          onClick={onOpenSearch}
+          className="relative w-64 md:w-72 hidden sm:flex items-center cursor-pointer group"
+        >
+          <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-500 group-hover:text-sky-400 transition">
             <Search className="w-3.5 h-3.5" />
           </span>
-          <input
-            className="w-full bg-slate-900/80 border border-slate-800 text-xs text-slate-200 rounded-md pl-8 pr-3 py-1.5 focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition placeholder:text-slate-500"
-            placeholder="Search cameras, workers, infractions..."
-            type="text"
-            onChange={(e) => onSearch?.(e.target.value)}
-          />
+          <div className="w-full bg-slate-900/80 border border-slate-800 group-hover:border-slate-700 text-xs text-slate-400 rounded-md pl-8 pr-12 py-1.5 transition flex items-center justify-between">
+            <span>Search telemetry, cameras...</span>
+            <kbd className="text-[10px] font-mono text-slate-500 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
+              Ctrl+K
+            </kbd>
+          </div>
         </div>
       </div>
 
       {/* Health Indicators & User Profile */}
-      <div className="flex items-center gap-4 lg:gap-5">
+      <div className="flex items-center gap-3 lg:gap-4">
         {/* Real Backend Telemetry Status Badges */}
-        <div className="hidden lg:flex items-center gap-2">
+        <div
+          onClick={onNavigateHealth}
+          className="hidden lg:flex items-center gap-2 cursor-pointer hover:opacity-90 transition"
+          title="Click to view detailed system health"
+        >
           {/* API Status */}
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-semibold transition ${
@@ -113,7 +128,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 ? 'bg-slate-900/80 border-emerald-900/40 text-emerald-400'
                 : 'bg-slate-900/80 border-rose-900/40 text-rose-400'
             }`}
-            title={`Backend API: ${isApiOnline ? 'Online' : 'Offline'}`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
@@ -132,7 +146,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 ? 'bg-slate-900/80 border-emerald-900/40 text-emerald-400'
                 : 'bg-slate-900/80 border-amber-900/40 text-amber-400'
             }`}
-            title={`YOLO / AI Model: ${aiEngineStatus}`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
@@ -154,7 +167,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 ? 'bg-slate-900/80 border-emerald-900/40 text-emerald-400'
                 : 'bg-slate-900/80 border-rose-900/40 text-rose-400'
             }`}
-            title={`Database: ${databaseStatus}`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
@@ -175,7 +187,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 ? 'bg-slate-900/80 border-amber-900/40 text-amber-400'
                 : 'bg-slate-900/80 border-rose-900/40 text-rose-400'
             }`}
-            title={`Real-Time WebSocket: ${wsStatus}`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
@@ -190,20 +201,31 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               WS <span className="font-normal text-slate-400 capitalize">{wsStatus.toLowerCase()}</span>
             </span>
           </div>
-
-          {/* Manual Refresh Button */}
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              className={`p-1.5 text-slate-400 hover:text-white rounded-md hover:bg-slate-800 transition ${
-                isRefreshing ? 'animate-spin text-sky-400' : ''
-              }`}
-              title="Refresh telemetry"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
+
+        {/* Manual Refresh Button */}
+        {onRefresh && (
+          <button
+            onClick={onRefresh}
+            className={`p-1.5 text-slate-400 hover:text-white rounded-md hover:bg-slate-800 transition ${
+              isRefreshing ? 'animate-spin text-sky-400' : ''
+            }`}
+            title="Refresh telemetry"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        )}
+
+        {/* Theme Toggle (Light / Dark) */}
+        {onToggleTheme && (
+          <button
+            onClick={onToggleTheme}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Industrial Mode'}
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-sky-400" />}
+          </button>
+        )}
 
         <div className="h-4 w-px bg-slate-800 hidden sm:block" />
 
@@ -212,7 +234,8 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           {/* Notification Bell */}
           <div className="relative">
             <button
-              title="Active Notifications"
+              onClick={onOpenNotifications}
+              title="Active Notifications (Click to open center)"
               className="p-1.5 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition cursor-pointer"
             >
               <Bell className="w-4 h-4" />
