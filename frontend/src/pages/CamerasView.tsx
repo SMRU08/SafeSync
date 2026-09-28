@@ -18,6 +18,8 @@ import {
   X,
   Volume2,
   VolumeX,
+  Play,
+  Pause,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { CameraLiveCard } from '../components/CameraLiveCard';
@@ -26,6 +28,8 @@ import {
   fetchCameras,
   deleteCamera,
   reconnectCamera,
+  startCamera,
+  stopCamera,
   analyzeCameraLive,
   analyzeCameraUpload,
   toggleCameraSpeaker,
@@ -154,6 +158,34 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
       await loadCameras();
     } catch (err) {
       console.error(`Reconnect error on ${cameraId}:`, err);
+    }
+  };
+
+  const handleToggleStartStop = async (cameraId: string, start: boolean) => {
+    try {
+      // Optimistic update
+      setCameraList((prev) =>
+        prev.map((c) =>
+          c.camera_id === cameraId
+            ? {
+                ...c,
+                enabled: start,
+                status: start ? 'connecting' : 'offline',
+              }
+            : c
+        )
+      );
+
+      if (start) {
+        await startCamera(cameraId);
+      } else {
+        await stopCamera(cameraId);
+      }
+
+      await loadCameras();
+    } catch (err: any) {
+      console.error(`Failed to ${start ? 'start' : 'stop'} camera ${cameraId}:`, err);
+      await loadCameras();
     }
   };
 
@@ -376,6 +408,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
               onAnalyzeLive={handleAnalyzeLive}
               onUploadAnalyze={handleUploadAnalyze}
               onToggleSpeaker={handleToggleSpeaker}
+              onToggleStartStop={handleToggleStartStop}
             />
           ))}
         </div>
@@ -383,10 +416,12 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
         /* List View */
         <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 shadow-sm overflow-hidden">
           {filteredCameras.map((camera) => {
+            const isEnabled = camera.enabled !== false;
             const isOnline =
-              camera.status === 'online' ||
-              camera.status === 'ACTIVE' ||
-              camera.state === 'CONNECTED';
+              isEnabled &&
+              (camera.status === 'online' ||
+                camera.status === 'ACTIVE' ||
+                camera.state === 'CONNECTED');
             return (
               <div
                 key={camera.camera_id}
@@ -395,7 +430,11 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-3 h-3 rounded-full shrink-0 ${
-                      isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+                      !isEnabled
+                        ? 'bg-slate-400'
+                        : isOnline
+                        ? 'bg-emerald-500 animate-pulse'
+                        : 'bg-rose-500'
                     }`}
                   />
                   <div>
@@ -408,12 +447,14 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
                       </span>
                       <span
                         className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                          isOnline
+                          !isEnabled
+                            ? 'bg-slate-100 text-slate-600 border border-slate-300'
+                            : isOnline
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             : 'bg-rose-50 text-rose-700 border border-rose-200'
                         }`}
                       >
-                        {isOnline ? 'ONLINE' : 'OFFLINE'}
+                        {!isEnabled ? 'STOPPED' : isOnline ? 'ONLINE' : 'OFFLINE'}
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-0.5">
@@ -424,6 +465,27 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggleStartStop(camera.camera_id, !isEnabled)}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      isEnabled
+                        ? 'bg-rose-50 border-rose-200 text-rose-800 hover:bg-rose-100'
+                        : 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100'
+                    }`}
+                    title={isEnabled ? 'Stop Camera Stream' : 'Start Camera Stream'}
+                  >
+                    {isEnabled ? (
+                      <>
+                        <Pause className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Stop</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-3.5 h-3.5 text-emerald-600 fill-emerald-600" />
+                        <span>Start</span>
+                      </>
+                    )}
+                  </button>
                   <button
                     onClick={() => handleToggleSpeaker(camera.camera_id, camera.speaker_enabled === false)}
                     className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${

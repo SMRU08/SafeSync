@@ -79,6 +79,34 @@ def resolve_http_stream_url(source: str) -> List[str]:
     return candidates
 
 
+def is_network_endpoint_reachable(source: str, timeout: float = 0.8) -> bool:
+    """Quickly tests whether a network host/port is reachable before letting OpenCV hang for 30s."""
+    s = str(source).strip()
+    if not (s.startswith("http://") or s.startswith("https://") or s.startswith("rtsp://") or s.startswith("tcp://")):
+        return True
+    try:
+        from urllib.parse import urlparse
+        import socket
+        parsed = urlparse(s)
+        host = parsed.hostname
+        if not host:
+            return True
+        port = parsed.port
+        if not port:
+            if parsed.scheme == "rtsp":
+                port = 554
+            elif parsed.scheme == "https":
+                port = 443
+            else:
+                port = 80
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except (socket.timeout, ConnectionRefusedError, OSError):
+        return False
+    except Exception:
+        return True
+
+
 class CameraWorker:
     """
     Isolated worker thread capturing frames from a single camera source.
@@ -623,8 +651,13 @@ class CameraWorker:
 
             # For HTTP / mobile IP webcams, evaluate endpoint candidates
             candidates = [target_source]
-            if not is_device_index and (str(target_source).startswith("http://") or str(target_source).startswith("https://")):
-                candidates = resolve_http_stream_url(str(target_source))
+            if not is_device_index and any(str(target_source).startswith(p) for p in ("http://", "https://", "rtsp://", "tcp://")):
+                # Fast pre-probe socket check (< 0.8s) to prevent 30-second OS TCP socket hanging on dead cameras
+                if not is_network_endpoint_reachable(str(target_source), timeout=0.8):
+                    logger.debug("Camera %s host/port is unreachable. Skipping OpenCV open.", self.camera_id)
+                    return None
+                if str(target_source).startswith("http://") or str(target_source).startswith("https://"):
+                    candidates = resolve_http_stream_url(str(target_source))
 
             cap = None
             for cand in candidates:

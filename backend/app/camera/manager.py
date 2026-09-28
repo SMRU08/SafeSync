@@ -128,20 +128,43 @@ class CameraManager:
         logger.info("All camera workers stopped.")
 
     def start_camera(self, camera_id: str) -> bool:
-        """Starts a specific camera worker."""
+        """Starts a specific camera worker and persists enabled state to database."""
         if camera_id not in self.workers:
             logger.warning("Cannot start unknown camera: %s", camera_id)
             return False
-        self.workers[camera_id].start()
+        if camera_id in self.configs:
+            self.configs[camera_id].enabled = True
+        worker = self.workers[camera_id]
+        worker.config.enabled = True
+        worker.start()
+        self._persist_camera_enabled(camera_id, True)
         return True
 
     def stop_camera(self, camera_id: str) -> bool:
-        """Stops a specific camera worker."""
+        """Stops a specific camera worker and persists disabled state to database."""
         if camera_id not in self.workers:
             logger.warning("Cannot stop unknown camera: %s", camera_id)
             return False
-        self.workers[camera_id].stop()
+        if camera_id in self.configs:
+            self.configs[camera_id].enabled = False
+        worker = self.workers[camera_id]
+        worker.config.enabled = False
+        worker.stop()
+        self._persist_camera_enabled(camera_id, False)
         return True
+
+    def _persist_camera_enabled(self, camera_id: str, enabled: bool):
+        """Persists the enabled status of a camera to SQLite."""
+        try:
+            from app.database.session import SessionLocal
+            from app.models.camera import CameraModel
+            with SessionLocal() as db:
+                cam = db.query(CameraModel).filter_by(camera_id=camera_id).first()
+                if cam:
+                    cam.enabled = enabled
+                    db.commit()
+        except Exception as e:
+            logger.warning("Failed to persist enabled state for %s: %s", camera_id, e)
 
     def get_worker(self, camera_id: str) -> Optional[CameraWorker]:
         """Returns the worker instance for a camera if registered."""
@@ -294,7 +317,11 @@ class CameraManager:
         if st == "synthetic":
             return {"reachable": True, "details": "Synthetic stream generator available"}
 
-        from app.camera.worker import resolve_http_stream_url
+        from app.camera.worker import resolve_http_stream_url, is_network_endpoint_reachable
+        if any(str(source).startswith(p) for p in ("http://", "https://", "rtsp://", "tcp://")):
+            if not is_network_endpoint_reachable(str(source), timeout=0.8):
+                return {"reachable": False, "error": f"Network camera endpoint is unreachable at {source}"}
+
         candidates = resolve_http_stream_url(source) if source.startswith("http://") or source.startswith("https://") else [source]
 
         last_error = ""

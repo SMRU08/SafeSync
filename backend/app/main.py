@@ -69,15 +69,21 @@ app = FastAPI(
     debug=settings.DEBUG
 )
 
-# Dynamic CORS Configuration for Production (Vercel, Netlify, Render, Localhost)
+# Dynamic CORS Configuration for Production (Hugging Face, Vercel, Netlify, Render, Localhost)
 cors_origins = [o for o in settings.CORS_ORIGINS if o]
 if not cors_origins:
-    cors_origins = ["http://localhost:5173", "http://localhost:3000"]
+    cors_origins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "https://huggingface.co",
+        "https://snsahil08-safesync-xerses.hf.space",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app|https://.*\.netlify\.app|https://.*\.onrender\.com",
+    allow_origin_regex=r"https://.*\.hf\.space|https://.*\.huggingface\.co|https://huggingface\.co|https://.*\.vercel\.app|https://.*\.netlify\.app|https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -114,8 +120,26 @@ app.include_router(workers_router)
 app.include_router(analytics_router)
 
 
-@app.get("/", response_model=RootResponse, status_code=status.HTTP_200_OK)
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Optional static frontend mount (for Hugging Face Spaces / all-in-one deployment)
+static_candidates = [
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")),
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dist")),
+    os.path.abspath(os.path.join(os.getcwd(), "frontend", "dist")),
+    os.path.abspath(os.path.join(os.getcwd(), "dist")),
+]
+frontend_dist = next(
+    (d for d in static_candidates if os.path.isdir(d) and os.path.isfile(os.path.join(d, "index.html"))),
+    None,
+)
+
+@app.get("/", status_code=status.HTTP_200_OK)
 def read_root():
+    if frontend_dist and os.path.isfile(os.path.join(frontend_dist, "index.html")):
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
     return {
         "project": "SafeSync",
         "status": "running"
@@ -210,4 +234,21 @@ def unified_health_check():
 def database_health_check():
     """Returns detailed database health, connectivity, tables, and SQLite PRAGMA status."""
     return check_database_health()
+
+
+# Mount frontend static assets and SPA fallback if dist is present
+if frontend_dist:
+    assets_dir = os.path.join(frontend_dist, "assets")
+    if os.path.isdir(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_spa_frontend(full_path: str):
+        if full_path.startswith(("api", "ws", "docs", "redoc", "openapi.json", "health")):
+            return None
+        target_file = os.path.join(frontend_dist, full_path)
+        if full_path and os.path.isfile(target_file):
+            return FileResponse(target_file)
+        return FileResponse(os.path.join(frontend_dist, "index.html"))
+
 

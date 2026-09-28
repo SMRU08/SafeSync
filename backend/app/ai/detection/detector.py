@@ -180,15 +180,18 @@ class Detector:
             use_half = True
 
         t0 = time.perf_counter()
-        results = model.predict(
-            source=frame,
-            conf=pred_conf,
-            iou=iou_thresh,
-            imgsz=inference_size,
-            device=device,
-            half=use_half,
-            verbose=False,
-        )
+        predict_kwargs: Dict[str, Any] = {
+            "source": frame,
+            "conf": pred_conf,
+            "iou": iou_thresh,
+            "imgsz": inference_size,
+            "device": device,
+            "verbose": False,
+        }
+        if use_half:
+            predict_kwargs["half"] = True
+
+        results = model.predict(**predict_kwargs)
         latency_ms = (time.perf_counter() - t0) * 1000.0
 
         # 4. Extract detections
