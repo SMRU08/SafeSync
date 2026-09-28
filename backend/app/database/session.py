@@ -13,7 +13,14 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+db_url = settings.DATABASE_URL
+if db_url.startswith("sqlite:///./") or db_url.startswith("sqlite:///") and "safesync.db" in db_url and not os.path.isabs(db_url.replace("sqlite:///", "")):
+    # Canonicalize to authoritative backend/safesync.db file path
+    backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    canonical_db_file = os.path.join(backend_dir, "safesync.db")
+    db_url = f"sqlite:///{canonical_db_file.replace(os.sep, '/')}"
+
+is_sqlite = db_url.startswith("sqlite")
 connect_args = {"check_same_thread": False, "timeout": 15} if is_sqlite else {}
 
 engine_kwargs: Dict[str, Any] = {
@@ -29,7 +36,7 @@ if not is_sqlite:
         "pool_recycle": 1800,
     })
 
-engine = create_engine(settings.DATABASE_URL, **engine_kwargs)
+engine = create_engine(db_url, **engine_kwargs)
 
 
 @event.listens_for(engine, "connect")

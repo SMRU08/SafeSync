@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { CameraConfig, WorkerTrack, PPEPresence } from '../types';
 import { API_BASE_URL } from '../utils/constants';
+import { reconnectCamera } from '../services/api';
 
 interface CameraFeedPlayerProps {
   cameras: CameraConfig[];
@@ -53,6 +54,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   const [isPaused, setIsPaused] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasStreamError, setHasStreamError] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
   const [streamType, setStreamType] = useState<'mjpeg' | 'snapshot'>('mjpeg');
   const [snapshotTimestamp, setSnapshotTimestamp] = useState<number>(Date.now());
   const containerRef = useRef<HTMLDivElement>(null);
@@ -128,16 +130,29 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
       },
     };
 
+  const cameraState = activeCamera.state;
+  const isConnecting = cameraState === 'CONNECTING' || cameraState === 'RECONNECTING' || isReconnecting;
   const isCameraOnline =
-    activeCamera.is_streaming === true ||
-    activeCamera.state === 'STREAMING' ||
-    activeCamera.state === 'CONNECTED' ||
-    activeCamera.state === 'DEGRADED' ||
-    activeCamera.status === 'ACTIVE';
+    !isConnecting &&
+    (activeCamera.is_streaming === true ||
+      activeCamera.state === 'STREAMING' ||
+      activeCamera.status === 'streaming' ||
+      ((activeCamera.state === 'CONNECTED' || activeCamera.status === 'ACTIVE') &&
+        (activeCamera.last_frame_age_ms == null || activeCamera.last_frame_age_ms < 3000)));
+
+  const isStale =
+    !isConnecting &&
+    activeCamera.last_frame_age_ms != null &&
+    activeCamera.last_frame_age_ms > 3000;
 
   const isDegraded =
     activeCamera.state === 'DEGRADED' ||
-    (activeCamera.last_frame_age_ms != null && activeCamera.last_frame_age_ms > 2500);
+    (!isStale && activeCamera.last_frame_age_ms != null && activeCamera.last_frame_age_ms > 2000);
+
+  const isOffline =
+    cameraState === 'OFFLINE' ||
+    cameraState === 'ERROR' ||
+    (!isCameraOnline && !isConnecting);
 
   // Toggle fullscreen
   const toggleFullscreen = () => {
@@ -239,17 +254,25 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
         {/* Status & Controls */}
         <div className="flex items-center gap-2">
-          {isCameraOnline && !isDegraded ? (
+          {isCameraOnline && !isDegraded && !isStale ? (
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> LIVE
+            </span>
+          ) : isConnecting ? (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-600 text-white tracking-wide">
+              <RefreshCw className="w-2.5 h-2.5 animate-spin" /> CONNECTING
+            </span>
+          ) : isStale ? (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" /> STALE
             </span>
           ) : isDegraded ? (
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" /> DEGRADED
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-600 text-white tracking-wide">
-              STANDBY
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-600 text-white tracking-wide">
+              OFFLINE
             </span>
           )}
 
@@ -288,24 +311,54 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
       {/* Feed Viewport */}
       <div ref={viewportRef} className="relative bg-slate-950 aspect-[16/9] w-full overflow-hidden select-none group flex items-center justify-center">
-        {hasStreamError || (!isCameraOnline && (activeCamera.last_frame_age_ms == null || activeCamera.last_frame_age_ms > 3000)) ? (
+        {hasStreamError || !isCameraOnline || isStale ? (
           <div className="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
-            <AlertTriangle className="w-10 h-10 text-amber-500 mb-2" />
-            <h4 className="text-sm font-bold text-white mb-0.5">Camera Signal Standby</h4>
+            {isConnecting ? (
+              <RefreshCw className="w-10 h-10 text-sky-400 mb-2 animate-spin" />
+            ) : isStale ? (
+              <AlertTriangle className="w-10 h-10 text-amber-500 mb-2" />
+            ) : (
+              <AlertTriangle className="w-10 h-10 text-rose-500 mb-2" />
+            )}
+            <h4 className="text-sm font-bold text-white mb-0.5">
+              {isConnecting
+                ? 'Connecting to Camera Feed...'
+                : isStale
+                ? 'Stale Camera Stream'
+                : isOffline
+                ? `Camera ${activeCamId.toUpperCase()} Offline`
+                : 'Camera Signal Standby'}
+            </h4>
             <p className="text-xs text-slate-400 max-w-sm">
-              {activeCamera.metrics?.last_error ||
-                'Waiting for video frame data from hardware device. Ensure webcam or RTSP feed is operational.'}
+              {activeCamera.last_error ||
+                activeCamera.metrics?.last_error ||
+                (isConnecting
+                  ? 'Initiating hardware capture handshake and frame acquisition loop...'
+                  : isStale
+                  ? `No new video frame received in ${(activeCamera.last_frame_age_ms! / 1000).toFixed(1)}s.`
+                  : isOffline
+                  ? `Cannot reach source (${activeCamera.safe_source || activeCamera.source || 'endpoint offline'}). Click below to retry connection.`
+                  : 'Waiting for video frame data from hardware device. Ensure webcam or RTSP feed is operational.')}
             </p>
             <button
-              onClick={() => {
+              onClick={async () => {
+                setIsReconnecting(true);
                 setHasStreamError(false);
-                setStreamType(streamType === 'mjpeg' ? 'snapshot' : 'mjpeg');
-                setSnapshotTimestamp(Date.now());
-                onRefresh?.();
+                try {
+                  await reconnectCamera(activeCamId);
+                } catch (err) {
+                  console.warn('Manual reconnect failed:', err);
+                } finally {
+                  setIsReconnecting(false);
+                  setSnapshotTimestamp(Date.now());
+                  onRefresh?.();
+                }
               }}
-              className="mt-3 px-3 py-1 bg-sky-600 hover:bg-sky-700 text-white rounded text-xs font-semibold flex items-center gap-1.5 transition"
+              disabled={isReconnecting}
+              className="mt-3 px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
             >
-              <RefreshCw className="w-3 h-3" /> Retry Stream Connection
+              <RefreshCw className={`w-3 h-3 ${isReconnecting ? 'animate-spin' : ''}`} />
+              {isReconnecting ? 'Reconnecting Hardware...' : 'Retry Stream Connection'}
             </button>
           </div>
         ) : (

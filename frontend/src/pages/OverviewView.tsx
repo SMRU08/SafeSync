@@ -102,9 +102,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     liveWorkers.length ??
     cameras.reduce((sum, c) => sum + (c.metrics?.active_workers ?? 0), 0);
 
+  const hasLiveWorkers = totalWorkersCount > 0;
   const complianceRate = complianceSummary
     ? Math.round(complianceSummary.compliance_rate_percent)
-    : 100;
+    : (hasLiveWorkers ? 100 : null);
 
   const activeViolationsCount = complianceSummary
     ? complianceSummary.non_compliant_workers
@@ -123,17 +124,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const openIncidentsCount = summary?.open_incidents ?? activeAlerts.length;
 
   const itemized = complianceSummary?.itemized_compliance;
-  const calcPpeRate = (stat?: { present: number; absent: number; unknown: number }, fallback = 100) => {
-    if (!stat) return fallback;
+  const calcPpeRate = (stat?: { present: number; absent: number; unknown: number }): number | null => {
+    if (!hasLiveWorkers || !stat) return null;
     const evalTotal = stat.present + stat.absent;
-    if (evalTotal === 0) return fallback;
+    if (evalTotal === 0) return null;
     return Math.round((stat.present / evalTotal) * 100);
   };
 
-  const helmetPct = calcPpeRate(itemized?.helmet, 100);
-  const vestPct = calcPpeRate(itemized?.vest, 100);
-  const glovesPct = calcPpeRate(itemized?.gloves, 100);
-  const footwearPct = calcPpeRate(itemized?.footwear, 100);
+  const helmetPct = calcPpeRate(itemized?.helmet);
+  const vestPct = calcPpeRate(itemized?.vest);
+  const glovesPct = calcPpeRate(itemized?.gloves);
+  const footwearPct = calcPpeRate(itemized?.footwear);
 
   return (
     <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-5 bg-[#070b14] text-slate-100 select-none">
@@ -206,11 +207,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             </div>
           </div>
           <div>
-            <div className={`text-2xl font-black font-mono-nums leading-none ${complianceRate >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {complianceRate}%
+            <div className={`text-2xl font-black font-mono-nums leading-none ${complianceRate !== null && complianceRate >= 80 ? 'text-emerald-400' : complianceRate !== null ? 'text-amber-400' : 'text-slate-400'}`}>
+              {complianceRate !== null ? `${complianceRate}%` : 'N/A'}
             </div>
             <div className="text-[10px] text-slate-400 font-medium mt-1.5">
-              {activeViolationsCount > 0 ? `${activeViolationsCount} Non-compliant` : '100% compliant'}
+              {hasLiveWorkers
+                ? (activeViolationsCount > 0 ? `${activeViolationsCount} Non-compliant` : '100% compliant')
+                : 'No workers detected'}
             </div>
           </div>
         </div>
@@ -243,10 +246,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
           <div>
             <div className={`text-2xl font-black font-mono-nums leading-none ${fireAlertsCount > 0 ? 'text-rose-400 animate-pulse' : 'text-white'}`}>
-              {fireAlertsCount}
+              {activeCameras === 0 && fireAlertsCount === 0 ? '--' : fireAlertsCount}
             </div>
             <div className="text-[10px] font-semibold mt-1.5">
-              {fireAlertsCount > 0 ? (
+              {activeCameras === 0 && fireAlertsCount === 0 ? (
+                <span className="text-slate-500">No live camera data</span>
+              ) : fireAlertsCount > 0 ? (
                 <span className="text-rose-400 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
                   Combustion active
@@ -268,10 +273,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           </div>
           <div>
             <div className={`text-2xl font-black font-mono-nums leading-none ${smokeAlertsCount > 0 ? 'text-amber-400 animate-pulse' : 'text-white'}`}>
-              {smokeAlertsCount}
+              {activeCameras === 0 && smokeAlertsCount === 0 ? '--' : smokeAlertsCount}
             </div>
             <div className="text-[10px] font-semibold mt-1.5">
-              {smokeAlertsCount > 0 ? (
+              {activeCameras === 0 && smokeAlertsCount === 0 ? (
+                <span className="text-slate-500">No live camera data</span>
+              ) : smokeAlertsCount > 0 ? (
                 <span className="text-amber-400">Plume confirmed</span>
               ) : (
                 <span className="text-emerald-400">✓ Air quality clear</span>
@@ -367,18 +374,21 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 { label: '🧤 Protective Gloves', pct: glovesPct },
                 { label: '🥾 Safety Footwear', pct: footwearPct },
               ].map(({ label, pct }) => {
-                const barColor = pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-rose-500';
-                const textColor = pct >= 80 ? 'text-emerald-400' : pct >= 60 ? 'text-amber-400' : 'text-rose-400';
+                const isAvailable = pct !== null;
+                const barColor = !isAvailable ? 'bg-slate-700' : pct >= 80 ? 'bg-emerald-500' : pct >= 60 ? 'bg-amber-500' : 'bg-rose-500';
+                const textColor = !isAvailable ? 'text-slate-400' : pct >= 80 ? 'text-emerald-400' : pct >= 60 ? 'text-amber-400' : 'text-rose-400';
                 return (
                   <div key={label}>
                     <div className="flex justify-between items-center text-[11px] mb-1 font-medium">
                       <span className="text-slate-300 flex items-center gap-1.5">{label}</span>
-                      <span className={`font-mono-nums font-bold ${textColor}`}>{pct}%</span>
+                      <span className={`font-mono-nums font-bold ${textColor}`}>
+                        {isAvailable ? `${pct}%` : 'N/A'}
+                      </span>
                     </div>
                     <div className="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
-                        style={{ width: `${pct}%` }}
+                        style={{ width: isAvailable ? `${pct}%` : '0%' }}
                       />
                     </div>
                   </div>

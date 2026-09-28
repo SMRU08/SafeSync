@@ -83,15 +83,40 @@ export const SystemHealthView: React.FC<SystemHealthViewProps> = ({ wsStatus = '
     healthData?.cluster_message ||
     (probeError ? 'Backend Core REST Gateway is unreachable' : 'Evaluating microservices...');
 
-  const isApiOnline = healthData?.api?.status === 'online';
-  const isAiReady = healthData?.ai_engine?.status === 'ready';
-  const isAiWarning = healthData?.ai_engine?.status === 'warning' || healthData?.ai_engine?.status === 'degraded';
-  const isDbConnected = healthData?.database?.status === 'connected' || healthData?.database?.reachable === true;
-  const isWsActive = (healthData?.websocket?.server_active ?? true) && wsStatus === 'CONNECTED';
+  const isApiOnline =
+    healthData?.api?.status === 'online' ||
+    healthData?.api?.status === 'healthy' ||
+    healthData?.status === 'healthy';
+
+  const isAiReady =
+    healthData?.ai_engine?.status === 'ready' ||
+    healthData?.ai_engine?.status === 'healthy' ||
+    healthData?.ai_engine?.loaded === true;
+
+  const isAiWarning =
+    !isAiReady &&
+    (healthData?.ai_engine?.status === 'warning' || healthData?.ai_engine?.status === 'degraded');
+
+  const isDbConnected =
+    healthData?.database?.status === 'connected' ||
+    healthData?.database?.status === 'healthy' ||
+    healthData?.database?.connected === true ||
+    healthData?.database?.reachable === true ||
+    dbHealth?.status === 'healthy';
+
+  const isWsActive =
+    (healthData?.websocket?.server_active ?? true) &&
+    (wsStatus === 'CONNECTED' || healthData?.websocket?.status === 'healthy');
+
   const isCameraHealthy =
-    healthData?.camera_manager?.status === 'online' &&
-    (healthData.camera_manager.streaming_cameras > 0 || healthData.camera_manager.total_cameras === 0);
-  const isIncidentEngineActive = healthData?.incident_engine?.status === 'online';
+    healthData?.camera_manager?.status === 'online' ||
+    healthData?.camera_manager?.status === 'healthy' ||
+    (healthData?.camera_manager?.streaming_cameras ?? 0) > 0 ||
+    healthData?.camera_manager?.total_cameras === 0;
+
+  const isIncidentEngineActive =
+    healthData?.incident_engine?.status === 'online' ||
+    healthData?.incident_engine?.status === 'healthy';
 
   // Status badge styling helper
   const getStatusBadge = (status: 'healthy' | 'degraded' | 'warning' | 'critical' | 'online' | 'offline' | 'unknown' | 'ready') => {

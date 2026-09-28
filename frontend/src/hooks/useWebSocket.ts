@@ -39,7 +39,10 @@ export function useWebSocket(onEvent?: (message: WebSocketMessage) => void): Use
       wsRef.current = null;
     }
 
-    const wsUrl = `${API_BASE_URL.replace(/^http/, 'ws')}/ws/alerts`;
+    const baseWs = (API_BASE_URL || 'http://localhost:8000')
+      .replace(/\/+$/, '')
+      .replace(/^http/, 'ws');
+    const wsUrl = `${baseWs}/ws/alerts`;
     setStatus('CONNECTING');
 
     try {

@@ -118,7 +118,8 @@ export const WorkersView: React.FC<WorkersViewProps> = ({ onOpenEnrollModal }) =
   const unknownCount = workers.filter((w) =>
     Object.values(w.ppe_status || {}).some((st) => st === 'UNKNOWN')
   ).length;
-  const compliancePct = total > 0 ? Math.round((compliant / total) * 100) : 100;
+  const hasWorkers = total > 0;
+  const compliancePct = hasWorkers ? Math.round((compliant / total) * 100) : null;
 
   const handleExportWorkerLog = (w: WorkerTrack) => {
     const reportData = {
@@ -206,7 +207,9 @@ export const WorkersView: React.FC<WorkersViewProps> = ({ onOpenEnrollModal }) =
           <div className="text-2xl font-black text-emerald-400 font-mono-nums mt-1 leading-none">
             {compliant}
           </div>
-          <span className="text-[10px] text-emerald-400 font-medium mt-1">{compliancePct}% rate</span>
+          <span className="text-[10px] text-emerald-400 font-medium mt-1">
+            {hasWorkers ? `${compliancePct}% rate` : 'N/A — No workers'}
+          </span>
         </div>
 
         {/* Non-Compliant */}

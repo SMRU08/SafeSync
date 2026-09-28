@@ -71,28 +71,34 @@ export function useSafetyData() {
       setSystemHealth(healthData);
 
       // Determine Database status
+      const dbStatusStr = String(healthData.database?.status || '').toLowerCase();
       const isDbConnected =
-        healthData.database?.status === 'connected' ||
+        ['connected', 'healthy', 'ready', 'nominal'].includes(dbStatusStr) ||
+        healthData.database?.connected === true ||
         healthData.database?.reachable === true ||
         (healthData as any).database_connected === true;
 
       // Determine AI Engine status
-      const aiStatusRaw = healthData.ai_engine?.status || (healthData as any).ai_status;
+      const aiStatusRaw = typeof healthData.ai_engine === 'object' ? healthData.ai_engine?.status : healthData.ai_engine || (healthData as any).ai_status;
       const isAiAvailable =
-        ['available', 'connected', 'ready', 'loaded', 'online'].includes(
+        ['available', 'connected', 'ready', 'loaded', 'online', 'healthy', 'nominal'].includes(
           String(aiStatusRaw || '').toLowerCase()
         ) ||
+        healthData.ai_engine?.loaded === true ||
+        (healthData.ai_engine?.classes_count ?? 0) > 0 ||
         (healthData.ai_engine?.models_loaded ?? 0) > 0 ||
         (healthData as any).model_loaded === true;
       const aiLabel = isAiAvailable ? 'Ready' : 'Unavailable';
 
       // Determine API status
-      const apiStatusRaw = healthData.api?.status || healthData.status;
+      const apiStatusRaw = typeof healthData.api === 'object' ? healthData.api?.status : healthData.api || healthData.status;
       const isApiHealthy =
-        apiStatusRaw === 'online' ||
-        healthData.status === 'healthy' ||
-        healthData.status === 'degraded' ||
-        healthData.status === 'running';
+        ['online', 'healthy', 'degraded', 'running', 'nominal'].includes(
+          String(apiStatusRaw || '').toLowerCase()
+        ) ||
+        ['healthy', 'degraded', 'running'].includes(
+          String(healthData.status || '').toLowerCase()
+        );
 
       setStatus({
         backend: isApiHealthy ? 'healthy' : 'offline',
