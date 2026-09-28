@@ -437,16 +437,38 @@ class CameraWorker:
     def get_status(self) -> CameraStatus:
         """Returns snapshot of current camera status and metrics."""
         with self._lock:
+            now = time.time()
             # Update uptime
-            if self._start_time and self.state == CameraState.CONNECTED:
-                self.metrics.uptime_seconds = round(time.time() - self._start_time, 1)
+            if self._start_time and self.state in (CameraState.CONNECTED, CameraState.STREAMING):
+                self.metrics.uptime_seconds = round(now - self._start_time, 1)
+
+            # Compute last_frame_age_ms
+            age_ms = None
+            if self.metrics.last_successful_frame_timestamp:
+                age_ms = int((now - self.metrics.last_successful_frame_timestamp) * 1000)
+
+            # Dynamic state transition based on real frame delivery
+            current_state = self.state
+            if self.state in (CameraState.CONNECTED, CameraState.STREAMING):
+                if age_ms is not None and age_ms < 2000:
+                    current_state = CameraState.STREAMING
+                elif age_ms is not None and age_ms < 5000:
+                    current_state = CameraState.DEGRADED
+                elif age_ms is not None and age_ms >= 5000:
+                    current_state = CameraState.DEGRADED
+
+            is_streaming = (current_state == CameraState.STREAMING) or (age_ms is not None and age_ms < 2000)
 
             # Determine human-friendly status string
-            if self.state in (CameraState.CONNECTED, CameraState.DEGRADED):
+            if current_state == CameraState.STREAMING:
+                status_str = "streaming"
+            elif current_state == CameraState.CONNECTED:
                 status_str = "online"
-            elif self.state in (CameraState.CONNECTING, CameraState.RECONNECTING):
+            elif current_state == CameraState.DEGRADED:
+                status_str = "degraded"
+            elif current_state in (CameraState.CONNECTING, CameraState.RECONNECTING):
                 status_str = "connecting"
-            elif self.state == CameraState.ERROR:
+            elif current_state == CameraState.ERROR:
                 status_str = "error"
             else:
                 status_str = "offline"
@@ -481,9 +503,13 @@ class CameraWorker:
                 source_type=self.config.source_type.value,
                 enabled=self.config.enabled,
                 speaker_enabled=self.speaker_enabled,
-                state=self.state,
+                state=current_state,
                 status=status_str,
-                connection_status=self.state.value.lower(),
+                connection_status=current_state.value.lower(),
+                is_streaming=is_streaming,
+                last_frame_age_ms=age_ms,
+                frame_id=self._frame_id,
+                last_frame_timestamp=self.metrics.last_successful_frame_timestamp,
                 stream_url=f"/api/cameras/{self.camera_id}/stream",
                 fps=self.metrics.fps,
                 resolution=self.config.resolution or "1280x720",
@@ -765,7 +791,7 @@ class CameraWorker:
                 # 1. Handle synthetic camera streams
                 if self.config.source_type == CameraSourceType.SYNTHETIC:
                     with self._lock:
-                        self.state = CameraState.CONNECTED
+                        self.state = CameraState.STREAMING
                     while not self._stop_event.is_set():
                         t0 = time.time()
                         frame = self._generate_synthetic_frame(self._frame_id)
@@ -898,7 +924,7 @@ class CameraWorker:
                         pass
 
                 with self._frame_cv:
-                    self.state = CameraState.CONNECTED
+                    self.state = CameraState.STREAMING
                     if is_shutter_blocked:
                         self.metrics.last_error = (
                             "Camera privacy shutter closed or disabled via laptop hotkey (e.g. F10 / Fn+F10 on Asus). Physical sensor is blocked."

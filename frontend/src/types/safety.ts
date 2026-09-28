@@ -140,12 +140,17 @@ export interface CameraMetrics {
 }
 
 export type RealCameraState =
-  | 'DISABLED'
+  | 'CONFIGURED'
   | 'CONNECTING'
   | 'CONNECTED'
+  | 'STREAMING'
+  | 'ONLINE'
   | 'RECONNECTING'
   | 'DEGRADED'
   | 'DISCONNECTED'
+  | 'OFFLINE'
+  | 'DISABLED'
+  | 'UNKNOWN'
   | 'ERROR';
 
 export interface CameraConfig {
@@ -153,9 +158,13 @@ export interface CameraConfig {
   name: string;
   location?: string;
   zone_id: string;
-  status: 'ACTIVE' | 'STANDBY' | 'OFFLINE' | 'online' | 'offline' | 'connecting' | 'error';
+  status: 'ACTIVE' | 'STANDBY' | 'OFFLINE' | 'DEGRADED' | 'online' | 'offline' | 'connecting' | 'error' | 'streaming' | 'degraded';
   connection_status?: string;
   state?: RealCameraState;
+  is_streaming?: boolean;
+  last_frame_age_ms?: number | null;
+  frame_id?: number;
+  last_frame_timestamp?: number | null;
   source?: string;
   source_type?: string;
   enabled?: boolean;

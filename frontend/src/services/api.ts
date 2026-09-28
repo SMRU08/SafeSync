@@ -6,7 +6,7 @@
 
 import { API_BASE_URL } from '../utils/constants';
 import {
-  BackendHealthResponse,
+  SystemHealthSnapshot,
   RiskSummary,
   Alert,
   Incident,
@@ -48,8 +48,16 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 // ─── Health & Detection Status ──────────────────────────────────────────────
 
-export async function fetchHealth(): Promise<BackendHealthResponse> {
-  return request<BackendHealthResponse>('/health');
+export async function fetchHealth(): Promise<SystemHealthSnapshot> {
+  return request<SystemHealthSnapshot>('/health');
+}
+
+export async function fetchSystemHealth(): Promise<SystemHealthSnapshot> {
+  return request<SystemHealthSnapshot>('/health');
+}
+
+export async function fetchDatabaseHealth(): Promise<any> {
+  return request<any>('/health/database');
 }
 
 export async function fetchDetectionHealth(): Promise<any> {

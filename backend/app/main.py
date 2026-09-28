@@ -146,88 +146,33 @@ def read_root():
     }
 
 
+@app.get("/health/live", status_code=status.HTTP_200_OK)
+def health_live():
+    """Liveness probe: returns 200 OK immediately if the ASGI process is alive."""
+    from app.services.health_service import HealthService
+    return HealthService.get_instance().get_liveness()
+
+
+@app.get("/health/ready")
+def health_ready():
+    """Readiness probe: returns 200 if database and dependencies are ready, 503 otherwise."""
+    from app.services.health_service import HealthService
+    from fastapi.responses import JSONResponse
+    ready_data = HealthService.get_instance().get_readiness()
+    if not ready_data.get("database_connected"):
+        return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content=ready_data)
+    return ready_data
+
+
 @app.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
 @app.get("/api/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
 def unified_health_check():
     """
-    Unified Real Health Check Endpoint (Phase 6).
-    Checks real API, Database, AI Engine, and WebSocket statuses.
+    Unified Real Health Diagnostics Endpoint.
+    Provides authoritative, calculated telemetry for all 6 subsystems without hardcoding.
     """
-    # 1. Real API status
-    api_info = {
-        "status": "online",
-        "app_name": settings.APP_NAME,
-        "environment": settings.APP_ENV,
-        "version": "1.0.0",
-    }
-
-    # 2. Real Database probe (executes SELECT 1)
-    db_ok = check_database_connection()
-    database_info = {
-        "status": "connected" if db_ok else "disconnected",
-        "dialect": engine.dialect.name,
-        "reachable": db_ok,
-    }
-
-    # 3. Real AI Engine check (ModelLoader)
-    ai_status_val = "unavailable"
-    device_str = "cpu"
-    classes_count = 0
-    model_name = "ppe_fire_smoke_v2"
-    is_loaded = False
-    try:
-        loader = ModelLoader.get_instance()
-        if not loader.is_loaded():
-            try:
-                loader.load_model()
-            except Exception as load_err:
-                logger.debug("Model lazy load during health check: %s", load_err)
-
-        if loader.is_loaded():
-            ai_status_val = "available"
-            is_loaded = True
-            device_str = loader.device
-            classes_count = len(loader.classes)
-        else:
-            ai_status_val = "initializing"
-    except Exception as exc:
-        logger.warning("AI Engine health check error: %s", exc)
-        ai_status_val = "unavailable"
-
-    ai_engine_info = {
-        "status": ai_status_val,
-        "loaded": is_loaded,
-        "device": device_str,
-        "model": model_name,
-        "classes": classes_count,
-    }
-
-    # 4. Real WebSocket connection manager probe
-    try:
-        from app.api.websocket import manager as ws_manager
-        ws_count = ws_manager.active_count
-        ws_info = {
-            "status": "connected",
-            "active_connections": ws_count,
-        }
-    except Exception as exc:
-        ws_info = {
-            "status": "unavailable",
-            "error": str(exc),
-        }
-
-    overall_status = "healthy" if (db_ok and is_loaded) else ("degraded" if db_ok else "unhealthy")
-
-    return {
-        "status": overall_status,
-        "api": api_info,
-        "database": database_info,
-        "database_connected": db_ok,
-        "ai_engine": ai_engine_info,
-        "ai_status": "Connected" if is_loaded else ("Ready" if ai_status_val == "initializing" else "Unavailable"),
-        "model_loaded": is_loaded,
-        "websocket": ws_info,
-    }
+    from app.services.health_service import HealthService
+    return HealthService.get_instance().get_full_diagnostics()
 
 
 @app.get("/health/database", status_code=status.HTTP_200_OK)

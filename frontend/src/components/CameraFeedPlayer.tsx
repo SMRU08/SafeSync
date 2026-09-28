@@ -118,19 +118,26 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
       camera_id: 'camera_01',
       name: 'Default Camera',
       zone_id: 'production_floor',
-      state: 'ACTIVE',
-      status: 'ACTIVE',
+      state: 'CONFIGURED',
+      status: 'STANDBY',
+      is_streaming: false,
       metrics: {
-        fps: 18.4,
-        inference_latency_ms: 82,
+        fps: 0,
+        inference_latency_ms: 0,
         active_workers: workers.length,
       },
     };
 
   const isCameraOnline =
+    activeCamera.is_streaming === true ||
+    activeCamera.state === 'STREAMING' ||
     activeCamera.state === 'CONNECTED' ||
     activeCamera.state === 'DEGRADED' ||
     activeCamera.status === 'ACTIVE';
+
+  const isDegraded =
+    activeCamera.state === 'DEGRADED' ||
+    (activeCamera.last_frame_age_ms != null && activeCamera.last_frame_age_ms > 2500);
 
   // Toggle fullscreen
   const toggleFullscreen = () => {
@@ -232,9 +239,13 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
         {/* Status & Controls */}
         <div className="flex items-center gap-2">
-          {isCameraOnline ? (
+          {isCameraOnline && !isDegraded ? (
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> LIVE
+            </span>
+          ) : isDegraded ? (
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-black tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-black animate-ping" /> DEGRADED
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-600 text-white tracking-wide">
@@ -277,7 +288,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
       {/* Feed Viewport */}
       <div ref={viewportRef} className="relative bg-slate-950 aspect-[16/9] w-full overflow-hidden select-none group flex items-center justify-center">
-        {hasStreamError || !isCameraOnline ? (
+        {hasStreamError || (!isCameraOnline && (activeCamera.last_frame_age_ms == null || activeCamera.last_frame_age_ms > 3000)) ? (
           <div className="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
             <AlertTriangle className="w-10 h-10 text-amber-500 mb-2" />
             <h4 className="text-sm font-bold text-white mb-0.5">Camera Signal Standby</h4>
@@ -386,20 +397,22 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           <div className="flex items-center gap-3 font-mono-nums">
             <span>
               FPS:{' '}
-              <strong className="text-slate-200">
-                {activeCamera.metrics?.fps?.toFixed(1) ?? '18.4'}
+              <strong className={activeCamera.metrics?.fps && activeCamera.metrics.fps > 0 ? 'text-slate-200' : 'text-slate-400'}>
+                {activeCamera.metrics?.fps != null ? activeCamera.metrics.fps.toFixed(1) : '0.0'}
               </strong>
             </span>
             <span className="text-slate-500">|</span>
             <span>
               Inference:{' '}
-              <strong className="text-slate-200">
-                {activeCamera.metrics?.inference_latency_ms?.toFixed(0) ?? '82'} ms
+              <strong className={activeCamera.metrics?.inference_latency_ms ? 'text-slate-200' : 'text-slate-400'}>
+                {activeCamera.metrics?.inference_latency_ms != null && activeCamera.metrics.inference_latency_ms > 0
+                  ? `${activeCamera.metrics.inference_latency_ms.toFixed(0)} ms`
+                  : 'N/A'}
               </strong>
             </span>
             <span className="text-slate-500">|</span>
             <span>
-              Resolution: <strong className="text-slate-200">1280 × 720</strong>
+              Resolution: <strong className="text-slate-200">{activeCamera.resolution || '1280 × 720'}</strong>
             </span>
             <span className="text-slate-500">|</span>
             <span>
@@ -408,6 +421,17 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                 {workers.length > 0 ? workers.length : activeCamera.metrics?.active_workers ?? 0}
               </strong>
             </span>
+            {activeCamera.last_frame_age_ms != null && (
+              <>
+                <span className="text-slate-500">|</span>
+                <span>
+                  Age:{' '}
+                  <strong className={activeCamera.last_frame_age_ms > 2000 ? 'text-amber-400' : 'text-slate-400'}>
+                    {activeCamera.last_frame_age_ms}ms
+                  </strong>
+                </span>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">

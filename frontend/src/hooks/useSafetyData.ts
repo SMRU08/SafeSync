@@ -12,9 +12,10 @@ import {
   HazardEventDetail,
   CameraConfig,
   WebSocketMessage,
+  SystemHealthSnapshot,
 } from '../types';
 import {
-  fetchHealth,
+  fetchSystemHealth,
   fetchRiskSummary,
   fetchAlerts,
   fetchIncidents,
@@ -45,6 +46,7 @@ export function useSafetyData() {
     aiEngine: 'Initializing',
     lastChecked: '',
   });
+  const [systemHealth, setSystemHealth] = useState<SystemHealthSnapshot | null>(null);
 
   const [summary, setSummary] = useState<RiskSummary | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -65,26 +67,32 @@ export function useSafetyData() {
 
     // 1. Health check
     try {
-      const healthData = await fetchHealth();
+      const healthData = await fetchSystemHealth();
+      setSystemHealth(healthData);
 
       // Determine Database status
-      const dbStatusRaw = typeof healthData.database === 'object' && healthData.database !== null
-        ? (healthData.database as any).status
-        : healthData.database;
-      const isDbConnected = dbStatusRaw === 'connected' || healthData.database_connected === true;
+      const isDbConnected =
+        healthData.database?.status === 'connected' ||
+        healthData.database?.reachable === true ||
+        (healthData as any).database_connected === true;
 
       // Determine AI Engine status
-      const aiStatusRaw = typeof healthData.ai_engine === 'object' && healthData.ai_engine !== null
-        ? (healthData.ai_engine as any).status
-        : (healthData.ai_engine || healthData.ai_status);
-      const isAiAvailable = ['available', 'connected', 'ready', 'loaded'].includes(String(aiStatusRaw || '').toLowerCase()) || healthData.model_loaded === true;
-      const aiLabel = isAiAvailable ? (String(aiStatusRaw || '').toLowerCase() === 'available' ? 'Available' : 'Connected') : 'Unavailable';
+      const aiStatusRaw = healthData.ai_engine?.status || (healthData as any).ai_status;
+      const isAiAvailable =
+        ['available', 'connected', 'ready', 'loaded', 'online'].includes(
+          String(aiStatusRaw || '').toLowerCase()
+        ) ||
+        (healthData.ai_engine?.models_loaded ?? 0) > 0 ||
+        (healthData as any).model_loaded === true;
+      const aiLabel = isAiAvailable ? 'Ready' : 'Unavailable';
 
       // Determine API status
-      const apiStatusRaw = typeof healthData.api === 'object' && healthData.api !== null
-        ? (healthData.api as any).status
-        : healthData.status;
-      const isApiHealthy = apiStatusRaw === 'online' || healthData.status === 'healthy' || healthData.status === 'running';
+      const apiStatusRaw = healthData.api?.status || healthData.status;
+      const isApiHealthy =
+        apiStatusRaw === 'online' ||
+        healthData.status === 'healthy' ||
+        healthData.status === 'degraded' ||
+        healthData.status === 'running';
 
       setStatus({
         backend: isApiHealthy ? 'healthy' : 'offline',
@@ -93,6 +101,7 @@ export function useSafetyData() {
         lastChecked: nowStr,
       });
     } catch {
+      setSystemHealth(null);
       setStatus({
         backend: 'offline',
         database: 'disconnected',
@@ -146,8 +155,19 @@ export function useSafetyData() {
             camera_id: c.camera_id,
             name: c.name || `Camera ${c.camera_id}`,
             zone_id: c.zone_id,
-            status: c.state === 'CONNECTED' ? 'ACTIVE' : c.state === 'DISABLED' ? 'STANDBY' : 'OFFLINE',
+            status:
+              c.state === 'STREAMING' || c.state === 'CONNECTED' || c.is_streaming
+                ? 'ACTIVE'
+                : c.state === 'DISABLED'
+                ? 'STANDBY'
+                : c.state === 'DEGRADED'
+                ? 'DEGRADED'
+                : 'OFFLINE',
             state: c.state,
+            is_streaming: c.is_streaming ?? (c.state === 'STREAMING'),
+            last_frame_age_ms: c.last_frame_age_ms,
+            frame_id: c.frame_id,
+            last_frame_timestamp: c.last_frame_timestamp,
             source_type: c.source_type,
             enabled: c.enabled,
             resolution: '1280x720',
@@ -363,6 +383,7 @@ export function useSafetyData() {
 
   return {
     status,
+    systemHealth,
     summary,
     alerts,
     incidents,

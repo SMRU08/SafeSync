@@ -209,7 +209,7 @@ class CameraManager:
 
         # Find first worker with active tracking data
         for cid, worker in self.workers.items():
-            if worker.state == CameraState.CONNECTED:
+            if worker.state in (CameraState.CONNECTED, CameraState.STREAMING):
                 data = worker.get_live_compliance()
                 if data.get("workers") or data.get("summary"):
                     return data

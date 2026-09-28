@@ -9,13 +9,18 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class CameraState(str, Enum):
+    CONFIGURED = "CONFIGURED"
     DISABLED = "DISABLED"
     CONNECTING = "CONNECTING"
+    ONLINE = "ONLINE"
     CONNECTED = "CONNECTED"
+    STREAMING = "STREAMING"
     RECONNECTING = "RECONNECTING"
     DEGRADED = "DEGRADED"
     DISCONNECTED = "DISCONNECTED"
+    OFFLINE = "OFFLINE"
     ERROR = "ERROR"
+    UNKNOWN = "UNKNOWN"
 
 
 class CameraSourceType(str, Enum):
@@ -77,8 +82,12 @@ class CameraStatus(BaseModel):
     enabled: bool
     speaker_enabled: bool = Field(default=True, description="Camera speaker audio alert status (ON/OFF)")
     state: CameraState
-    status: str = Field(default="offline", description="online, offline, connecting, error")
+    status: str = Field(default="offline", description="online, streaming, offline, connecting, error, degraded")
     connection_status: str = Field(default="offline")
+    is_streaming: bool = Field(default=False, description="True only when valid frames are actively flowing")
+    last_frame_age_ms: Optional[int] = Field(default=None, description="Age of newest frame in milliseconds")
+    frame_id: int = Field(default=0, description="Latest captured frame monotonic sequence number")
+    last_frame_timestamp: Optional[float] = Field(default=None)
     stream_url: str = Field(default="")
     fps: float = Field(default=0.0)
     resolution: Optional[str] = Field(default="1280x720")

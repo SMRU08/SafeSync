@@ -328,7 +328,7 @@ export const App: React.FC = () => {
               />
             )}
 
-            {activeTab === 'health' && <SystemHealthView />}
+            {activeTab === 'health' && <SystemHealthView wsStatus={wsStatus} />}
 
             {activeTab === 'settings' && (
               <SettingsView
