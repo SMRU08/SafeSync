@@ -175,6 +175,9 @@ export interface CameraConfig {
   rtsp_url?: string;
   safe_source?: string;
   last_seen?: string | null;
+  last_attempt?: string | null;
+  last_error?: string | null;
+  retry_count?: number;
   metrics?: CameraMetrics;
   ai_analysis?: {
     active_workers?: number;

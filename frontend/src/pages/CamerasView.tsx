@@ -54,6 +54,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
   const [cameraList, setCameraList] = useState<CameraConfig[]>(initialCameras);
   const [filterTab, setFilterTab] = useState<FilterTab>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [editingCamera, setEditingCamera] = useState<CameraConfig | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -84,6 +85,9 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
           stream_url: c.stream_url || `/api/cameras/${c.camera_id}/stream`,
           safe_source: c.safe_source,
           last_seen: c.last_seen,
+          last_attempt: c.last_attempt || c.metrics?.last_attempt,
+          last_error: c.last_error || c.metrics?.last_error,
+          retry_count: c.retry_count ?? c.metrics?.retry_count ?? 0,
           metrics: c.metrics,
           ai_analysis: c.ai_analysis,
         }));
@@ -368,8 +372,11 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
           </button>
 
           <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg shadow-sm text-xs font-bold transition"
+            onClick={() => {
+              setEditingCamera(null);
+              setIsAddModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg shadow-sm text-xs font-bold transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add Camera
@@ -409,6 +416,10 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
               onUploadAnalyze={handleUploadAnalyze}
               onToggleSpeaker={handleToggleSpeaker}
               onToggleStartStop={handleToggleStartStop}
+              onEdit={(cam) => {
+                setEditingCamera(cam);
+                setIsAddModalOpen(true);
+              }}
             />
           ))}
         </div>
@@ -527,11 +538,15 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
         </div>
       )}
 
-      {/* ─── Add Camera Modal ────────────────────────────────────────── */}
+      {/* ─── Add / Edit Camera Modal ───────────────────────────────── */}
       <AddCameraModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingCamera(null);
+        }}
         onCameraAdded={loadCameras}
+        editCamera={editingCamera}
       />
 
       {/* ─── AI Analysis Results Modal ──────────────────────────────── */}

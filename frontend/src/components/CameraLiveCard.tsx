@@ -33,6 +33,7 @@ interface CameraLiveCardProps {
   onUploadAnalyze?: (camera: CameraConfig, file: File) => void;
   onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
   onToggleStartStop?: (cameraId: string, start: boolean) => void;
+  onEdit?: (camera: CameraConfig) => void;
 }
 
 export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
@@ -43,6 +44,7 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
   onUploadAnalyze,
   onToggleSpeaker,
   onToggleStartStop,
+  onEdit,
 }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [streamKey, setStreamKey] = useState(Date.now());
@@ -54,7 +56,12 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
   const isEnabled = camera.enabled !== false;
   const isLive =
     isEnabled &&
-    (camera.status === 'online' || camera.status === 'ACTIVE' || camera.state === 'CONNECTED') &&
+    (camera.status === 'online' ||
+      camera.status === 'streaming' ||
+      camera.status === 'ACTIVE' ||
+      camera.state === 'CONNECTED' ||
+      camera.state === 'STREAMING' ||
+      camera.is_streaming === true) &&
     !hasStreamError;
   const isConnecting =
     isEnabled &&
@@ -63,7 +70,7 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
       camera.state === 'RECONNECTING');
   const isError =
     isEnabled &&
-    (camera.status === 'error' || camera.state === 'ERROR' || hasStreamError);
+    (camera.status === 'error' || camera.state === 'ERROR' || camera.state === 'OFFLINE' || hasStreamError);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
@@ -247,20 +254,40 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
         ) : (
           <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400">
             <VideoOff className="w-10 h-10 text-slate-600 mb-2 stroke-[1.5]" />
-            <p className="text-xs font-semibold text-slate-300">
-              {isConnecting ? 'Establishing camera connection...' : `Camera ${camera.camera_id} connection failed`}
+            <p className="text-xs font-semibold text-slate-200">
+              {isConnecting
+                ? 'Establishing camera connection...'
+                : `${camera.camera_id.toUpperCase().replace('_', '-')} OFFLINE`}
             </p>
-            <p className="text-[10px] text-slate-500 mt-1 max-w-[240px]">
+            <p className="text-[11px] text-amber-400/90 mt-1 max-w-[280px] font-medium leading-tight">
+              {camera.last_error || camera.metrics?.last_error || 'Connection failed: host unreachable or stream offline'}
+            </p>
+            <p className="text-[10px] text-slate-500 mt-1 max-w-[260px] font-mono truncate">
               {camera.safe_source ? `Source: ${camera.safe_source}` : 'Hardware feed unreachable'}
             </p>
-            <button
-              onClick={handleRetry}
-              disabled={isRetrying}
-              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-md text-[11px] font-semibold transition disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3 h-3 ${isRetrying ? 'animate-spin' : ''}`} />
-              Retry Connection
-            </button>
+            {(camera.last_attempt || camera.last_seen) && (
+              <p className="text-[9px] font-mono text-slate-500 mt-0.5">
+                Last attempt: {camera.last_attempt || camera.last_seen}
+              </p>
+            )}
+            <div className="mt-3.5 flex items-center gap-2">
+              <button
+                onClick={handleRetry}
+                disabled={isRetrying}
+                className="inline-flex items-center gap-1.5 px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-md text-[11px] font-semibold transition disabled:opacity-50 cursor-pointer"
+              >
+                <RefreshCw className={`w-3 h-3 ${isRetrying ? 'animate-spin' : ''}`} />
+                Retry Connection
+              </button>
+              {onEdit && (
+                <button
+                  onClick={() => onEdit(camera)}
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-semibold border border-slate-300 transition cursor-pointer"
+                >
+                  Configure Source
+                </button>
+              )}
+            </div>
           </div>
         )}
 

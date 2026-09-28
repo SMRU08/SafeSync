@@ -81,6 +81,7 @@ def stop_camera(
     return manager.get_camera_status(camera_id)
 
 
+@router.post("/{camera_id}/retry", response_model=CameraStatus, status_code=status.HTTP_200_OK)
 @router.post("/{camera_id}/reconnect", response_model=CameraStatus, status_code=status.HTTP_200_OK)
 def reconnect_camera(
     camera_id: str,

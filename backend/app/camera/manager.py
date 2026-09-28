@@ -320,7 +320,11 @@ class CameraManager:
         from app.camera.worker import resolve_http_stream_url, is_network_endpoint_reachable
         if any(str(source).startswith(p) for p in ("http://", "https://", "rtsp://", "tcp://")):
             if not is_network_endpoint_reachable(str(source), timeout=0.8):
-                return {"reachable": False, "error": f"Network camera endpoint is unreachable at {source}"}
+                return {
+                    "reachable": False,
+                    "error": f"Network camera endpoint unreachable at {source}. Verify device IP address, Wi-Fi connection, and ensure IP Webcam app is running.",
+                    "failure_code": "HOST_UNREACHABLE",
+                }
 
         candidates = resolve_http_stream_url(source) if source.startswith("http://") or source.startswith("https://") else [source]
 
@@ -339,16 +343,20 @@ class CameraManager:
                             "resolved_source": cand,
                             "resolution": f"{w}x{h}",
                             "fps": 30.0,
-                            "details": f"Camera source verified ({w}x{h}) via {cand}",
+                            "details": f"SUCCESS: Connection established and frame received ({w}x{h}) from {cand}",
                         }
                     else:
-                        last_error = f"Stream opened at {cand} but failed to capture frame."
+                        last_error = f"Stream endpoint opened at {cand} but no video frame data was delivered."
                 else:
-                    last_error = f"Failed to open video capture for: {cand}"
+                    last_error = f"OpenCV capture failed to open video feed for: {cand}"
             except Exception as e:
                 last_error = str(e)
 
-        return {"reachable": False, "error": last_error or f"Failed to open video capture for: {source}"}
+        return {
+            "reachable": False,
+            "error": last_error or f"Failed to acquire video stream from: {source}",
+            "failure_code": "FRAME_ACQUISITION_FAILED",
+        }
 
     def validate_and_cleanup_cameras(self, remove_broken: bool = True) -> Dict[str, Any]:
         """

@@ -483,6 +483,16 @@ class CameraWorker:
                 except Exception:
                     pass
 
+            last_attempt_iso = None
+            if self.metrics.last_attempt_timestamp:
+                try:
+                    from datetime import datetime, timezone
+                    last_attempt_iso = datetime.fromtimestamp(
+                        self.metrics.last_attempt_timestamp, tz=timezone.utc
+                    ).isoformat()
+                except Exception:
+                    pass
+
             ai_summary_dict = None
             if self._latest_compliance_summary:
                 try:
@@ -510,6 +520,10 @@ class CameraWorker:
                 last_frame_age_ms=age_ms,
                 frame_id=self._frame_id,
                 last_frame_timestamp=self.metrics.last_successful_frame_timestamp,
+                last_attempt=last_attempt_iso,
+                last_attempt_timestamp=self.metrics.last_attempt_timestamp,
+                last_error=self.metrics.last_error,
+                retry_count=self.metrics.retry_count,
                 stream_url=f"/api/cameras/{self.camera_id}/stream",
                 fps=self.metrics.fps,
                 resolution=self.config.resolution or "1280x720",
@@ -846,17 +860,20 @@ class CameraWorker:
 
                     if cap is None or not cap.isOpened():
                         reconnect_attempts += 1
+                        now_attempt = time.time()
                         with self._lock:
                             self.metrics.reconnect_count = reconnect_attempts
-                            self.metrics.last_error = f"Failed to connect to source: {self.safe_source}"
+                            self.metrics.retry_count = reconnect_attempts
+                            self.metrics.last_attempt_timestamp = now_attempt
+                            self.metrics.last_error = f"Connection failed: host unreachable or stream offline at {self.safe_source}"
                             if reconnect_attempts >= policy.max_retries:
-                                self.state = CameraState.ERROR
+                                self.state = CameraState.OFFLINE
                             else:
                                 self.state = CameraState.RECONNECTING
 
                         if reconnect_attempts >= policy.max_retries:
                             logger.error(
-                                "Camera %s reached max retries (%d). Stopping retry loop.",
+                                "Camera %s reached max retries (%d). Transitioning to OFFLINE.",
                                 self.camera_id,
                                 policy.max_retries
                             )
@@ -882,6 +899,7 @@ class CameraWorker:
                         with self._lock:
                             self.state = CameraState.CONNECTED
                             self.metrics.last_error = None
+                            self.metrics.retry_count = 0
                         logger.info("Camera %s successfully connected.", self.camera_id)
 
                 # 3. Dedicated Read loop (runs at maximum camera FPS, never blocks for AI)
@@ -1013,8 +1031,8 @@ class CameraWorker:
                 except Exception:
                     pass
             with self._lock:
-                if self.state not in (CameraState.ERROR, CameraState.DISABLED):
-                    self.state = CameraState.DISCONNECTED
+                if self.state not in (CameraState.ERROR, CameraState.DISABLED, CameraState.OFFLINE):
+                    self.state = CameraState.OFFLINE
             logger.info("CameraWorker capture loop exited for %s", self.camera_id)
 
     def _update_fps(self):

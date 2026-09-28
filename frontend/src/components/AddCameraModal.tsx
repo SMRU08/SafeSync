@@ -3,25 +3,31 @@
  * Modal dialog for registering a new surveillance camera with pre-flight connection testing.
  */
 
-import React, { useState } from 'react';
-import { X, Camera, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Camera, CheckCircle2, AlertTriangle, RefreshCw, Smartphone } from 'lucide-react';
 import { createCamera, testCameraSource } from '../services/api';
+import { CameraConfig } from '../types';
 
 interface AddCameraModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCameraAdded: () => void;
+  editCamera?: CameraConfig | null;
 }
 
 export const AddCameraModal: React.FC<AddCameraModalProps> = ({
   isOpen,
   onClose,
   onCameraAdded,
+  editCamera = null,
 }) => {
   const [name, setName] = useState('');
   const [cameraId, setCameraId] = useState('');
   const [sourceType, setSourceType] = useState<'usb' | 'rtsp' | 'http' | 'synthetic'>('usb');
   const [source, setSource] = useState('0');
+  const [httpHost, setHttpHost] = useState('192.168.137.166');
+  const [httpPort, setHttpPort] = useState('8080');
+  const [httpPath, setHttpPath] = useState('/video');
   const [location, setLocation] = useState('');
   const [selectedZone, setSelectedZone] = useState('production_floor');
   const [customZone, setCustomZone] = useState('');
@@ -29,11 +35,61 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
   const [resolution, setResolution] = useState('1280x720');
 
   const isCustomZone = selectedZone === 'custom';
+  const isEditMode = Boolean(editCamera);
 
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (editCamera) {
+      setName(editCamera.name || '');
+      setCameraId(editCamera.camera_id || '');
+      const st = ((editCamera.source_type || 'http') as any);
+      setSourceType(st);
+      const src = editCamera.source || editCamera.safe_source || '';
+      setSource(src);
+      setLocation(editCamera.location || '');
+      setSelectedZone(editCamera.zone_id || 'production_floor');
+      setFpsTarget(editCamera.fps || 30);
+      setResolution(editCamera.resolution || '1280x720');
+
+      if (src.startsWith('http://') || src.startsWith('https://')) {
+        try {
+          const u = new URL(src);
+          setHttpHost(u.hostname || '');
+          setHttpPort(u.port || '8080');
+          setHttpPath(u.pathname || '/video');
+        } catch {
+          // ignore parsing error
+        }
+      }
+    } else {
+      setName('');
+      setCameraId('');
+      setSourceType('usb');
+      setSource('0');
+      setHttpHost('192.168.137.166');
+      setHttpPort('8080');
+      setHttpPath('/video');
+      setLocation('');
+      setSelectedZone('production_floor');
+      setCustomZone('');
+      setFpsTarget(30);
+      setResolution('1280x720');
+    }
+    setTestResult(null);
+    setSubmitError(null);
+  }, [editCamera, isOpen]);
+
+  const updateHttpUrl = (host: string, port: string, path: string) => {
+    const cleanHost = host.trim();
+    const cleanPort = port.trim();
+    const cleanPath = path.startsWith('/') ? path.trim() : `/${path.trim()}`;
+    const assembled = `http://${cleanHost}:${cleanPort}${cleanPath}`;
+    setSource(assembled);
+  };
 
   if (!isOpen) return null;
 
@@ -126,8 +182,12 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
               <Camera className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-800">Add Live Camera</h2>
-              <p className="text-[11px] text-slate-500">Configure real RTSP, USB webcam, or HTTP camera stream</p>
+              <h2 className="text-sm font-bold text-slate-800">
+                {isEditMode ? `Configure Camera (${cameraId})` : 'Add Live Camera'}
+              </h2>
+              <p className="text-[11px] text-slate-500">
+                {isEditMode ? 'Update network stream endpoint, phone IP, or zone' : 'Configure real RTSP, USB webcam, or HTTP camera stream'}
+              </p>
             </div>
           </div>
           <button
@@ -167,7 +227,8 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 onChange={(e) => setCameraId(e.target.value)}
                 placeholder="e.g. camera_02"
                 required
-                className="w-full px-3 py-1.5 rounded-md border border-slate-300 font-mono bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                disabled={isEditMode}
+                className="w-full px-3 py-1.5 rounded-md border border-slate-300 font-mono bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-100 disabled:text-slate-500"
               />
             </div>
           </div>
@@ -182,8 +243,9 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                   setSourceType(st);
                   if (st === 'usb') setSource('0');
                   else if (st === 'rtsp') setSource('rtsp://admin:password@192.168.1.100:554/stream1');
-                  else if (st === 'http') setSource('http://192.168.1.105:8080/video');
-                  else if (st === 'synthetic') setSource('synthetic://demo');
+                  else if (st === 'http') {
+                    updateHttpUrl(httpHost, httpPort, httpPath);
+                  } else if (st === 'synthetic') setSource('synthetic://demo');
                 }}
                 className="w-full px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
@@ -242,6 +304,59 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
             </div>
           </div>
 
+          {sourceType === 'http' && (
+            <div className="p-3 bg-sky-50/70 rounded-lg border border-sky-200/80 space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-900 font-bold text-[11px]">
+                <Smartphone className="w-3.5 h-3.5 text-sky-600" />
+                <span>Android Phone / IP Webcam Helper</span>
+              </div>
+              <p className="text-[10px] text-slate-600 leading-relaxed">
+                If using the <strong>IP Webcam</strong> app, check the IPv4 address shown on your phone's screen and enter it below:
+              </p>
+              <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-6">
+                  <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Phone IP Address</label>
+                  <input
+                    type="text"
+                    value={httpHost}
+                    onChange={(e) => {
+                      setHttpHost(e.target.value);
+                      updateHttpUrl(e.target.value, httpPort, httpPath);
+                    }}
+                    placeholder="e.g. 192.168.1.100 or 10.57.213.x"
+                    className="w-full px-2 py-1 rounded border border-slate-300 font-mono text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Port</label>
+                  <input
+                    type="text"
+                    value={httpPort}
+                    onChange={(e) => {
+                      setHttpPort(e.target.value);
+                      updateHttpUrl(httpHost, e.target.value, httpPath);
+                    }}
+                    placeholder="8080"
+                    className="w-full px-2 py-1 rounded border border-slate-300 font-mono text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Path</label>
+                  <input
+                    type="text"
+                    value={httpPath}
+                    onChange={(e) => {
+                      setHttpPath(e.target.value);
+                      updateHttpUrl(httpHost, httpPort, e.target.value);
+                    }}
+                    placeholder="/video"
+                    className="w-full px-2 py-1 rounded border border-slate-300 font-mono text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-slate-700 font-semibold mb-1">
               Stream Source / Connection URL
@@ -259,7 +374,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 type="button"
                 onClick={handleTestConnection}
                 disabled={isTesting}
-                className="px-3 py-1.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 rounded-md font-semibold shrink-0 transition flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 rounded-md font-semibold shrink-0 transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {isTesting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : 'Test Feed'}
               </button>
@@ -334,10 +449,10 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-1.5 rounded-md bg-sky-600 hover:bg-sky-500 text-white font-bold transition disabled:opacity-50 flex items-center gap-1.5"
+              className="px-4 py-1.5 rounded-md bg-sky-600 hover:bg-sky-500 text-white font-bold transition disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
             >
               {isSubmitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-              Add Camera
+              {isEditMode ? 'Update Camera' : 'Add Camera'}
             </button>
           </div>
         </form>

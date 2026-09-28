@@ -71,6 +71,8 @@ class CameraMetrics(BaseModel):
     dropped_ai_frames: int = Field(default=0, description="Frames skipped for AI inference to maintain real-time display")
     frame_queue_depth: int = Field(default=0, description="Pending frame buffer depth (strictly bounded at 0 or 1)")
     latest_frame_id: int = Field(default=0, description="Monotonically increasing captured frame counter")
+    last_attempt_timestamp: Optional[float] = Field(default=None, description="Timestamp of the most recent connection attempt")
+    retry_count: int = Field(default=0, description="Current retry attempt count")
 
 
 class CameraStatus(BaseModel):
@@ -88,6 +90,10 @@ class CameraStatus(BaseModel):
     last_frame_age_ms: Optional[int] = Field(default=None, description="Age of newest frame in milliseconds")
     frame_id: int = Field(default=0, description="Latest captured frame monotonic sequence number")
     last_frame_timestamp: Optional[float] = Field(default=None)
+    last_attempt: Optional[str] = Field(default=None, description="ISO timestamp of last connection attempt")
+    last_attempt_timestamp: Optional[float] = Field(default=None)
+    last_error: Optional[str] = Field(default=None)
+    retry_count: int = Field(default=0)
     stream_url: str = Field(default="")
     fps: float = Field(default=0.0)
     resolution: Optional[str] = Field(default="1280x720")
