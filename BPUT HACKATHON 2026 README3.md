@@ -132,254 +132,279 @@ Tested against 13 synthetic/physical negative challenge scenarios (non-hazard ph
 
 ---
 
-# FINAL 6-SLIDE PRESENTATION CONTENT
+# FINAL 6-SLIDE PRESENTATION CONTENT (EXACT COMMITTEE TEMPLATE)
 
 ---
 
-## SLIDE 1: WHO ARE WE?
+## SLIDE 1 — TITLE PAGE
 
-### Slide Header & Identification
-- **Event:** BPUT HACKATHON 2026
+```
+BPUT HACKATHON 2026
+
+Problem Statement ID:
+PS06
+
+Problem Statement Title:
+Build a prototype AI system that detects safety gear compliance
+
+Theme:
+Artificial Intelligence & Computer Vision / Workplace Safety
+
+Category:
+Software (Edge AI & Full-Stack Web Application)
+
+Team ID:
+BPUT-PS06-XERSES (To Be Assigned)
+
+Team Name:
+XERSES
+
+College / Institution:
+Biju Patnaik University of Technology (BPUT) Affiliated Institute
+
+Department:
+Computer Science & Engineering (To Be Updated)
+```
+
+### Presentation Delivery Context
 - **Project Name:** SafeSync
-- **Problem Statement ID:** PS06
-- **Problem Statement:** Build a prototype AI system that detects safety gear compliance
-- **Organizers:** Software Technology Parks of India (STPI) & EmTek
-- **Theme:** Artificial Intelligence & Computer Vision / Industrial Workplace Safety
-- **Category:** Software (Edge AI & Full-Stack Web Application)
-- **Team Name:** XERSES
-- **Team ID:** BPUT-PS06-XERSES
-- **Institution:** Biju Patnaik University of Technology (BPUT) Affiliated Institute
+- **Subtitle:** Autonomous AI Vision Platform for Industrial Safety Gear Compliance & Hazard Governance
 - **Project Lead:** Smruti Ranjan Nayak ([@SMRU08](https://github.com/SMRU08))
-- **Official GitHub:** `https://github.com/SMRU08/SafeSync.git` *(Repository: RAKSHYA-VISION)*
-
-### Subtitle
-**SafeSync: Edge-Intelligent Safety Gear Compliance, Hazard Detection & Evidence Governance Platform**
-
-### Key System Highlights
-- **100% Real Verification:** 250 unit tests, 39 integration scenarios, 20 end-to-end recovery tests passing.
-- **Unified 7-Class AI Model:** Simultaneous person, PPE (helmets, vests, gloves, footwear), and fire/smoke detection.
-- **Zero-Biometric Privacy:** Anonymous ByteTrack trajectories with zero facial recognition or PII storage.
-- **Edge-Ready Performance:** ~56.4 ms total CPU pipeline latency (~18 FPS continuous) on commodity Intel i5 hardware.
+- **Official GitHub:** `https://github.com/SMRU08/SafeSync.git`
+- **Organization:** Software Technology Parks of India (STPI) & EmTek
 
 > **Speaker Notes (Slide 1):**  
-> *"Good morning respected jury members and representatives from STPI and EmTek. We are Team XERSES, presenting SafeSync for Problem Statement PS06. SafeSync is a fully functioning, edge-compatible AI computer vision system designed to monitor safety gear compliance and industrial combustion hazards in real time. Everything you see today is backed by our live codebase, verified benchmarks on standard laptop CPU hardware, and zero fabricated claims."*
+> *"Respected jury members, evaluators from STPI and EmTek. We are Team XERSES presenting SafeSync for Problem Statement PS06: Build a prototype AI system that detects safety gear compliance. SafeSync is a fully functioning, edge-compatible AI computer vision system designed to monitor safety gear compliance and industrial combustion hazards in real time. Everything you see today is backed by our live codebase, verified benchmarks on standard laptop CPU hardware, and zero fabricated claims."*
 
 ---
 
-## SLIDE 2: WHAT ARE WE SOLVING?
+## SLIDE 2 — IDEA TITLE
 
-### 1. The Industrial Workplace Safety Problem
-- **Observer Fatigue & Vigilance Decay:** Safety officers monitoring multi-screen CCTV feeds suffer steep attention loss within 20–30 minutes, missing subtle infractions during active shifts.
-- **Intermittent Spot-Check Blindness:** Manual physical walkthroughs provide only snapshot compliance; workers routinely remove mandatory PPE as soon as inspectors depart.
-- **Delayed Combustion Alarms:** Traditional ceiling-mounted smoke and heat sensors require airborne particles to physically reach sensors (often taking 2–5 minutes), forfeiting critical early containment seconds.
-- **Unverifiable Audit Disputes:** Post-accident investigations frequently suffer from contested timelines, unauthenticated video clips, and missing contextual visual evidence.
+```
+IDEA TITLE
 
-### 2. The SafeSync Proposed Solution
-- **Continuous Edge AI Surveillance:** Ingests live video from standard CCTV cameras, webcams, and IP feeds with zero human observer fatigue.
-- **Automated Individual Compliance:** Localizes workers, tracks movement paths, and checks required safety gear for each individual worker continuously.
-- **Sub-Second Flame & Smoke Warning:** Detects incipient flame and smoke plumes visually directly in camera frames long before physical ceiling alarms trigger.
-- **Tamper-Evident Incident Governance:** Immediately logs infractions with SHA-256 hashed photographic snapshots, explainable 0–100 risk scores, and audio-visual alerts.
+SafeSync
+```
 
-### 3. Core Engineering Innovation: Positive Detection + Derived Absence
-- **No Fake "Missing Gear" Classes:** SafeSync does not train noisy negative classes (e.g. `no_helmet`). Instead, it detects positive items (`helmet`, `safety_vest`) and maps them to human anatomy using spatial bounding box geometry.
-- **Strict Ambiguity Invariant (`UNKNOWN != VIOLATION`):** When a worker is occluded behind machinery, distant, or clipped by the frame edge, the item is labeled `UNKNOWN`. SafeSync **never** flags unknown states as violations, preventing operator alert fatigue.
+### PROPOSED SOLUTION
+SafeSync is an edge-compatible, multi-camera AI computer vision system designed to automate workplace safety monitoring. It continuously inspects live video streams, localizes workers, tracks movement paths, and evaluates Personal Protective Equipment (PPE) compliance while monitoring early flame and smoke hazards before escalation.
 
-### 4. Verified Core Feature Set
-- Real-time 4-zone PPE tracking (Head, Torso, Hands, Feet)
-- Dual-channel fire and smoke temporal state machine
-- Explainable 0–100 mathematical risk scoring engine
-- Anti-flood alert deduplication with 60-second cooldown windows
-- React 18 real-time Operations Center dashboard via native WebSockets
+### HOW IT ADDRESSES THE PROBLEM
+- **Replaces Intermittent Walkthroughs:** Replaces infrequent manual spot-checks with 24/7 automated video surveillance.
+- **Eliminates Observer Fatigue:** Overcomes human monitor vigilance decay, which drops sharply within 20–30 minutes of continuous CCTV monitoring.
+- **Delivers Sub-Second Escalation:** Dispatches instant audio-visual alerts accompanied by cryptographically signed photographic snapshots.
+
+### INNOVATION / UNIQUENESS
+- **Positive Detection + Derived Absence:** SafeSync avoids training noisy negative classes (e.g. `no_helmet`). It positively detects physical PPE items and mathematically verifies anatomical overlap with tracked worker bodies.
+- **Strict Ambiguity Invariant (`UNKNOWN != VIOLATION`):** Partial machine occlusions, distant workers, or boundary clipping yield an `UNKNOWN` state. `UNKNOWN` states strictly never trigger false violation alarms.
+- **Zero-Biometric Privacy Architecture:** Employs anonymous ByteTrack integer track IDs (`Track #101`); zero facial recognition, zero facial vector storage, and zero personally identifiable information (PII) collected.
+
+### KEY FEATURES (VERIFIED IMPLEMENTED FEATURES)
+- **Real-Time PPE Compliance:** 4-zone anatomical association (Head, Torso, Hands, Feet)
+- **Worker-Level PPE Association:** Nearest-centroid IoU mapping eliminates double-counting
+- **Helmet Detection:** High-confidence cranial coverage validation (top 25% height)
+- **Safety Vest Detection:** High-visibility thoracic coverage validation (20%–70% height)
+- **Gloves Detection:** Distal limb mechanical protection detection with far-field UNKNOWN suppression
+- **Safety Footwear Detection:** Bottom-tier puncture-resistant footwear detection
+- **Fire and Smoke Detection:** Dual-channel 7-stage state machine ($N_{\text{confirm}} = 5$ frames)
+- **Temporal Validation:** $N_{\text{confirm}} = 3$ consecutive frames eliminates 1-frame false alarms
+- **Location-Specific Policy:** Declarative YAML zone rules (e.g. mandatory boots in Loading Dock)
+- **Multi-Camera Monitoring:** Thread-isolated RTSP, USB Webcam, HTTP MJPEG, and file inputs
+- **Real-Time Dashboard:** React 18 SOC interface with live video HUD & WebSocket streaming
+- **Incident & Evidence Tracking:** SHA-256 hashed photographic snapshots & 60s alert cooldown
 
 > **Speaker Notes (Slide 2):**  
 > *"In heavy industrial environments, safety monitoring is fundamentally broken: humans get tired, spot-checks only inspect a single moment, and traditional smoke alarms are too slow. SafeSync solves this with continuous edge vision. Our major engineering breakthrough is decoupling object detection from policy: we don't train models to guess what's missing. We positively detect PPE, anatomically associate it to tracked workers, and enforce that an unknown condition never generates a false alarm."*
 
 ---
 
-## SLIDE 3: HOW DOES IT WORK?
+## SLIDE 3 — TECHNICAL APPROACH
 
-### 1. Technology Stack
-- **AI & Deep Learning:** Ultralytics YOLOv8n (384x384 input), PyTorch 2.14.0 CPU execution
-- **Tracking & Geometry:** Custom ByteTrack with 8-State Kalman Filters and Hungarian Data Association
-- **Backend Core:** FastAPI (Python 3.13), Uvicorn ASGI, Pydantic v2 schemas, Thread-Isolated Workers
-- **Persistence & Security:** SQLite WAL mode (5000ms busy timeout), SQLAlchemy ORM, PBKDF2-HMAC-SHA256, PyJWT RBAC
-- **Frontend SOC Dashboard:** React 18, Vite 6, TypeScript, Tailwind CSS, Native WebSockets
+### TECHNOLOGIES USED
+- **Programming Languages:** Python 3.13, TypeScript, SQL
+- **Frameworks:** FastAPI, React 18, Vite 6, Tailwind CSS, PyTorch 2.14.0+cpu, OpenCV
+- **AI/ML Models:** Ultralytics YOLOv8n (384x384 input), Custom ByteTrack with 8-State Kalman Filter
+- **Database:** SQLite (Write-Ahead Logging / WAL Mode, PRAGMA synchronous=NORMAL, 5000ms busy timeout)
+- **APIs:** Async REST APIs, Bi-directional WebSockets (`/ws/events`, `/ws/alerts`), Prometheus (`/metrics`)
+- **Hardware / Sensors:** 13th Gen Intel Core i5-13420H CPU, USB Webcams, IP Cameras, RTSP CCTV Feeds
 
-### 2. End-to-End System Architecture
+### METHODOLOGY
+1. **Thread-Isolated Ingestion:** OpenCV worker acquires video frames into a bounded queue of size 1 (eliminates frame buffering and memory bloat).
+2. **Single-Pass Neural Inference:** YOLOv8n identifies positive person, PPE, and combustion items in ~56 ms on CPU.
+3. **Motion Tracking & Spatial Zoning:** ByteTrack links worker trajectories; geometric heuristics map items to Head (top 25%), Torso (20%–70%), Hands, and Feet.
+4. **Temporal Debouncing:** State transitions require persistence across $N \ge 3$ consecutive frames (PPE violations) or $N \ge 5$ frames (Fire/Smoke).
+5. **Governance & Dispatch:** Calculates an explainable 0–100 risk score, applies a 60-second anti-flood cooldown, and pushes instant notifications over WebSockets.
+
+### SYSTEM ARCHITECTURE / FLOW
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                      VIDEO INGESTION LAYER                             │
-│   RTSP Industrial CCTV  │  USB Webcams  │  HTTP MJPEG  │  Video Files  │
-└────────────────────────────────────┬───────────────────────────────────┘
-                                     │ (Thread-isolated worker, Queue Depth = 1)
-                                     ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                    NEURAL DETECTION PIPELINE                           │
-│  Ultralytics YOLOv8n (384x384) ──► Canonical 7-Class Positive Output  │
-│  [person, helmet, safety_vest, gloves, safety_footwear, fire, smoke]   │
-└──────────────────┬─────────────────────────────────┬───────────────────┘
-                   │ (Person & PPE Boxes)            │ (Fire & Smoke Boxes)
-                   ▼                                 ▼
-┌─────────────────────────────────────┐  ┌───────────────────────────────┐
-│     TRACKING & SPATIAL ZONING       │  │      HAZARD STATE MACHINE     │
-│  • ByteTrack 8-State Kalman Filter  │  │  • Dual-Channel Fire & Smoke  │
-│  • Head / Torso / Hands / Feet Zones│  │  • 7-Stage Life Cycle         │
-│  • Nearest-Centroid Assignment      │  │  • N_confirm = 5 Frames       │
-└──────────────────┬──────────────────┘  └───────────────┬───────────────┘
-                   ▼                                     │
-┌────────────────────────────────────────────────────────┴───────────────┐
-│                 TEMPORAL VALIDATION & GOVERNANCE ENGINE                │
-│  • N_confirm = 3 Frames for PPE Absence (UNKNOWN != VIOLATION)         │
-│  • Explainable 0–100 Risk Score: Severity + Persistence + Multipliers  │
-│  • 60s Deduplication Cooldown & Operator Acknowledge/Resolve Actions   │
-└────────────────────────────────────┬───────────────────────────────────┘
-                                     ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                   PERSISTENCE, DISPATCH & DISPLAY                      │
-│   SQLite WAL Mode  │  SHA-256 Evidence  │  WebSocket  │  React 18 UI   │
-└────────────────────────────────────────────────────────────────────────┘
+Camera / CCTV / Video Feed
+        ↓
+Frame Capture (Queue Depth = 1)
+        ↓
+AI Detection (Ultralytics YOLOv8n)
+        ↓
+Person + PPE + Hazard Detection
+        ↓
+Worker Tracking (ByteTrack)
+        ↓
+PPE Association (4-Zone Geometry)
+        ↓
+Temporal Validation (N_confirm = 3)
+        ↓
+Safety / Risk Engine (0-100 Score)
+        ↓
+Incident & Alert Engine (60s Cooldown)
+        ↓
+Database (WAL) + WebSocket Gateway
+        ↓
+SafeSync React 18 Dashboard
 ```
 
-### 3. Five-Step Operational Pipeline
-1. **Thread-Isolated Capture:** OpenCV worker acquires frames into a bounded queue of size 1 (eliminates frame buffering and memory leaks).
-2. **Single-Pass Inference:** YOLOv8n performs multi-task detection in a single forward pass (~56 ms on CPU).
-3. **Motion Tracking & Anatomical Association:** ByteTrack assigns persistent Track IDs; spatial logic checks whether helmets sit in the cranial zone (top 25%) and vests cover the torso (20–70%).
-4. **Temporal State Confirmation:** Violations must persist for $N \ge 3$ consecutive frames before transitioning to confirmed `ABSENT`. Fire/smoke must persist for $N \ge 5$ frames.
-5. **Real-Time Escalation:** Critical events trigger browser audio chimes, update the React SOC dashboard over WebSockets, and archive SHA-256 hashed frame snapshots.
+### WORKING PROTOTYPE / DEMO
+- **Automated Test Coverage:** 250 / 250 Unit Tests Passing (100% Pass Rate).
+- **Integration Test Coverage:** 39 / 39 Real-World Integration Scenarios Passing.
+- **End-to-End Recovery:** 20 / 20 Matrix Scenarios Verified.
+- **Measured CPU Latency:** 56.45 ms/frame (~18 FPS on commodity Intel i5 laptop).
+- **Optical Challenge Score:** 0 / 13 False Positives (100% negative challenge rejection).
+- **Model Checkpoint Artifact:** `models/detection/ppe_fire_smoke_v2/weights/best.pt` (SHA-256 verified).
+- **Visual Validation Evidence:** Prediction validation batch embedded directly in presentation slide (`val_batch0_pred.jpg`).
 
 > **Speaker Notes (Slide 3):**  
 > *"Here is how SafeSync operates under the hood. Frame ingestion runs in isolated threads with a strict queue depth of 1, so the system never buffers old video. A single YOLOv8n forward pass detects workers, gear, fire, and smoke. ByteTrack Kalman filters track workers anonymously across frames. If a worker lacks a helmet for 3 consecutive frames, our risk engine calculates a mathematical score from 0 to 100, archives a cryptographically hashed snapshot to disk, and pushes an instant alert over WebSockets to the React control room dashboard."*
 
 ---
 
-## SLIDE 4: CAN IT WORK AND SCALE?
+## SLIDE 4 — FEASIBILITY AND VIABILITY
 
-### 1. Technical Feasibility (Verified on Real Hardware)
-- **Runs on Commodity Hardware:** Measured **56.45 ms/frame** total latency (~18 FPS) on a standard 13th Gen Intel Core i5 laptop without requiring expensive discrete GPUs.
-- **Multiple Supported Video Ingestion Modes:** Supports USB webcams, HTTP/MJPEG streams, simulated RTSP network feeds, and pre-recorded high-resolution videos.
-- **Cryptographic Model Verification:** Checkpoint weights (`ppe_fire_smoke_v2`) are verified via SHA-256 checksums at boot time before loading into RAM.
+### TECHNICAL FEASIBILITY
+- **AI Model:** Ultralytics YOLOv8n operating at $384 \times 384$ resolution; lightweight 3.2M parameters.
+- **Hardware Requirements:** Validated on standard commodity 8-core CPU (Intel Core i5-13420H); runs completely without discrete GPUs.
+- **Camera/Video Compatibility:** Ingests standard USB Webcams, HTTP MJPEG IP camera streams, recorded video files, and simulated RTSP feeds.
+- **Processing Architecture:** Multi-threaded asynchronous pipeline; thread-isolated capture protects the AI engine from network decode stalls.
+- **Real-Time Capability:** Sustains ~56.45 ms latency (17.7 FPS) on CPU hardware with bounded queue depth 1.
 
-### 2. Operational Feasibility (Human-in-the-Loop Governance)
-- **Live SOC Operator Feedback:** Visual checklist HUD displays per-worker badges (Helmet, Vest, Gloves, Footwear) with instant color coding (Green: PRESENT, Red: ABSENT, Gray: UNKNOWN).
-- **Incident Lifecycle Control:** Operators can directly *Acknowledge*, *Resolve*, or *Dismiss* incidents with mandatory resolution notes stored in the audit trail.
-- **Zero Privacy Pushback:** Anonymous integer track IDs (`Track #101`) eliminate employee surveillance resistance and ensure compliance with biometric privacy norms.
+### FINANCIAL FEASIBILITY
+- **Eliminates Dedicated AI Server Hardware:** Operates directly on existing edge or plant PCs, avoiding \$5,000–\$15,000 server expenses per site.
+- **Zero Software Licensing Costs:** Built entirely on open-source frameworks (Python, FastAPI, React, SQLite, PyTorch), eliminating recurring proprietary license fees.
+- **Retrofit Compatibility:** Connects directly with existing on-site CCTV infrastructure without requiring expensive camera re-cabling.
 
-### 3. Challenges & Verified Engineering Mitigations
+### OPERATIONAL FEASIBILITY
+- **CCTV / Video Monitoring:** Continuous automated surveillance operates 24/7 without observer fatigue or shift turnover gaps.
+- **Live Operator Dashboard:** Real-time multi-camera grid with per-worker Checklist HUD badges (Helmet, Vest, Gloves, Footwear).
+- **Color-Coded Alert HUD:** Green (PRESENT), Red (ABSENT violation), and Gray (UNKNOWN non-alerting).
+- **Human-in-the-Loop Actions:** Control room operators can Acknowledge, Resolve, or Dismiss alerts with mandatory notes recorded in an immutable audit log.
+- **Multi-Camera Thread Isolation:** Stream decoding failures or network drops on one camera thread never crash neighboring feeds.
 
-| Real-World Challenge | Engineering Vulnerability | SafeSync Verified Mitigation |
-|---|---|---|
-| **Occlusions & Edge Clipping** | Workers walking behind equipment trigger false missing gear alarms. | **Strict `UNKNOWN != VIOLATION` Policy:** Incomplete views mark items `UNKNOWN` and suppress alerts. |
-| **Hair / Clothing Confusion** | Dark hair mistaken for helmets, or bright shirts mistaken for safety vests. | **Multi-Frame Debouncing ($N_{\text{confirm}}=3$):** Transient 1-frame misclassifications are discarded before confirmation. |
-| **Steam, Dust & Welding Glare** | Industrial exhaust or steam vents generate false smoke/fire alarms. | **Dual-Channel State Machine ($N_{\text{confirm}}=5$) + ROI Masks:** Tested 0/13 FP on negative optical challenges. |
-| **Edge CPU Bottlenecks** | Multi-camera high-resolution feeds overwhelm CPU computing capacity. | **Decoupled Architecture:** Latest-frame-wins ingestion queue (depth 1) + configurable inference skip intervals. |
-| **Unauthorized Evidence Modification** | Legal disputes over whether incident snapshot images were altered post-event. | **SHA-256 Checksum on Write:** Re-calculated dynamically on retrieval; any single-byte file alteration is flagged. |
+### CHALLENGES / RISKS & VERIFIED MITIGATIONS
+- **Challenge: False PPE Absences on Occlusion**  
+  $\rightarrow$ **Solution:** Strict `UNKNOWN != VIOLATION` policy suppresses alerts during boundary clipping or machine obstruction.
+- **Challenge: Hair or Clothing Confusion**  
+  $\rightarrow$ **Solution:** Multi-frame debouncing ($N_{\text{confirm}} = 3$ consecutive frames) filters transient 1-frame misclassifications.
+- **Challenge: Steam, Dust & Welding Glare**  
+  $\rightarrow$ **Solution:** Dual-channel 7-stage state machine ($N=5$) and negative training data; verified 0/13 false positives.
+- **Challenge: Limited Edge CPU Resources**  
+  $\rightarrow$ **Solution:** Thread-isolated latest-frame-wins ingestion (Queue depth = 1) avoids buffer growth and memory bloat.
+- **Challenge: Camera or Network Disconnections**  
+  $\rightarrow$ **Solution:** Bounded exponential backoff reconnection loop automatically re-establishes dropped video feeds.
 
-### 4. Scalability & Future Scope
-- **Edge Accelerator Optimization (Roadmap):** Exporting YOLOv8n to TensorRT and ONNX Runtime INT8 for low-power NVIDIA Jetson Orin micro-nodes ($>60$ FPS per node).
-- **Physical Factory CCTV Pilot:** Transitioning from lab/simulated RTSP feeds to physical high-mount industrial CCTV trials.
-- **Automated Industrial Interlocks:** Integration with Modbus TCP and MQTT to automatically halt hazardous machinery when critical non-compliance or fire is confirmed.
+### SCALABILITY / FUTURE SCOPE
+- **[FUTURE] INT8 TensorRT & ONNX Runtime:** Quantization for low-power NVIDIA Jetson Orin edge micro-nodes ($>60$ FPS per node).
+- **[FUTURE] Physical Factory CCTV Pilot:** On-site multi-week trial deployment under continuous 72-hour soak conditions.
+- **[FUTURE] Automated PLC Interlocks:** Integration with Modbus TCP and MQTT to automatically halt dangerous machinery upon confirmed critical violations.
+- **[FUTURE] Expanded Safety Gear:** High-angle safety harnesses for work-at-height, welding face-shields, and hearing protection.
 
 > **Speaker Notes (Slide 4):**  
 > *"Is this feasible in the real world? Yes, and we have the data to prove it. On a standard non-GPU Intel laptop, the entire pipeline executes in 56 milliseconds. We tackled real-world hurdles directly: when workers are partially hidden by machines, our system flags them as UNKNOWN rather than spamming false violations. Boiler steam and welding arcs were verified against a 15-scenario optical benchmark resulting in zero false alarms. For scaling, our roadmap incorporates NVIDIA Jetson edge nodes and industrial PLC cutoffs via Modbus TCP."*
 
 ---
 
-## SLIDE 5: WHY DOES IT MATTER?
+## SLIDE 5 — IMPACT AND BENEFITS
 
-### 1. Target Operational Personas
-- **Plant Safety Officers & EHS Managers:** Transition from reactive paper-based checklists to automated, continuous compliance monitoring across all facility zones.
-- **Control Room Operators:** Single-screen situational awareness with prioritized incident queues, color-coded HUD overlays, and instant audio warnings.
-- **Operations & Plant Directors:** Defensible safety audit trails, reduced insurance risk premiums, and auditable evidence for regulatory compliance reviews.
+### TARGET USERS
+- **Industrial Safety Officers & EHS Managers:** Centralized real-time compliance oversight replacing paper-based inspections.
+- **Control-Room Operators:** Prioritized visual incident alerts, checklist HUDs, and instant audio warning chimes.
+- **Plant Operations Directors:** Tamper-evident visual audit trails for regulatory defense and liability management.
+- **Industrial Enterprises:** Facility-wide monitoring without hiring dedicated surveillance monitoring personnel.
 
-### 2. Practical Operational Impact
-- **24/7 Continuous Vigilance:** Replaces intermittent spot-checks with 100% temporal coverage across active shifts, completely removing observer fatigue.
-- **Sub-Second Hazard Awareness:** Identifies open flames and smoke development at the visual source before atmospheric smoke reaches ceiling sensors.
-- **Verifiable Legal Chain of Custody:** Immutable SHA-256 hashed photographic snapshots eliminate disputed claims during post-incident investigations.
+### EXPECTED IMPACT
+Automated visual safety monitoring eliminates human observer fatigue and spot-check blind spots. By alerting safety teams within seconds of sustained gear removal and detecting incipient flames before physical smoke alarms trigger, SafeSync actively mitigates severe workplace casualties and structural asset loss.
 
-### 3. Multidimensional Benefits Matrix
+### BENEFITS
+- **Social Benefits:** Protects human life and worker physical integrity; upholds worker dignity through zero-biometric anonymous tracking.
+- **Economic Benefits:** Drastically cuts incident-related downtime, lowers workers' compensation liabilities, and prevents regulatory fines.
+- **Technological Benefits:** Delivers production-grade edge AI execution on commodity CPU hardware with explainable 0–100 risk scoring.
+- **Environmental Benefits:** Rapid flame and smoke plume detection prevents uncontrolled industrial fires and toxic atmospheric emissions.
 
-```
-┌─────────────────────────────────┬─────────────────────────────────┐
-│        SAFETY BENEFITS          │      OPERATIONAL BENEFITS       │
-│ • Proactive incident prevention │ • Zero human monitor fatigue    │
-│ • Sub-second combustion alerts  │ • Centralized multi-camera SOC  │
-│ • Zero worker privacy friction  │ • Automated incident logging    │
-├─────────────────────────────────┼─────────────────────────────────┤
-│     TECHNOLOGICAL BENEFITS      │       ECONOMIC BENEFITS         │
-│ • Edge CPU compatible (56 ms)   │ • Low hardware deployment cost  │
-│ • Mathematical risk governance  │ • Lower accident downtime costs │
-│ • Tamper-evident evidence store │ • Regulatory penalty protection │
-└─────────────────────────────────┴─────────────────────────────────┘
-```
+### REAL-WORLD APPLICATIONS
+- **Heavy Manufacturing & Fabrication:** Active overhead crane zones, press bays, and CNC machining lines requiring helmets, vests, and fire vigilance.
+- **Construction & Infrastructure Sites:** High-traffic perimeter gates, scaffold zones, and heavy earth-moving equipment pathways.
+- **Chemical Processing & Storage Hubs:** Volatile liquid storage, hazardous warehousing, and battery charging bays requiring rapid smoke warning.
+- **Metal Smelting & Power Plants:** Turbine floors, boiler halls, and electrical sub-stations requiring high-temperature flame monitoring.
 
-### 4. High-Hazard Real-World Applications
-- **Heavy Manufacturing & Fabrication:** Overhead crane zones, hot-work bays, and press lines requiring helmets, vests, and fire vigilance.
-- **Infrastructure & Construction Sites:** Continuous compliance tracking across high-traffic access gates and mobile equipment pathways.
-- **Chemical Warehouses & Distribution Hubs:** Rapid combustible plume detection in enclosed storage facilities alongside PPE enforcement.
-
-### 5. Long-Term Value & System Evolution
-SafeSync is built as a modular edge safety operating platform. By maintaining clean separation between detection, tracking, policy evaluation, and event dispatch, the architecture is ready to scale across distributed enterprise sites with centralized cloud governance.
+### LONG-TERM IMPACT / SCALABILITY
+SafeSync is built as a modular edge safety platform. By keeping vision inference decoupled from administrative policy, individual plants can scale from a single standalone camera to enterprise-wide distributed networks with centralized cloud reporting and localized edge autonomy.
 
 > **Speaker Notes (Slide 5):**  
 > *"Why does SafeSync matter? Because workplace safety failures carry tragic human and severe financial costs. SafeSync delivers value on four fronts: continuous safety vigilance that never gets tired, operational simplicity with a single real-time dashboard, low economic barrier to entry by using existing cameras and standard CPUs, and immutable evidence that satisfies regulatory reviews. SafeSync protects workers with zero privacy intrusion while giving safety officers actionable, instant control."*
 
 ---
 
-## SLIDE 6: WHAT IS IT BASED ON?
+## SLIDE 6 — RESEARCH AND REFERENCES
 
-### 1. Foundational Research Papers
-- **YOLOv8 Real-Time Object Detection:** Jocher, G., Chaurasia, A., & Qiu, J. (2023). *Ultralytics YOLOv8*. Provides anchor-free detection heads and high parameter efficiency for edge inference. (`https://github.com/ultralytics/ultralytics`)
-- **ByteTrack Multi-Object Tracking:** Zhang, Y., Sun, P., Dong, Y., et al. (2022). *ByteTrack: Multi-Object Tracking by Associating Every Detection Box*. ECCV 2022. Enables robust worker tracking through occlusions by retaining low-confidence bounding boxes. (`https://arxiv.org/abs/2110.06864`)
-- **CPPE-5 Industrial PPE Benchmark:** Bansal, A., & Sivaswamy, J. (2021). *CPPE-5: Challenging Personal Protective Equipment Dataset*. CVPR Workshop. Establishes multi-hazard visual PPE benchmarks. (`https://arxiv.org/abs/2112.07253`)
-- **D-Fire Dataset & Combustion Analysis:** de Venâncio, P. V. A., et al. (2022). *D-Fire: An Image Dataset for Fire and Smoke Detection*. IEEE Access. Ground-truth benchmark for visual fire and smoke segmentation. (`https://github.com/gaia-solutions-on-demand/DFireDataset`)
+### RESEARCH PAPERS / JOURNALS
+- **Ultralytics YOLOv8 (2023):** Jocher, G., Chaurasia, A., & Qiu, J. *Real-Time Edge Object Detection*. Anchor-free neural architecture providing efficient real-time multi-task object detection at the edge.  
+  Link: `https://github.com/ultralytics/ultralytics`
+- **ByteTrack Multi-Object Tracking (ECCV 2022):** Zhang, Y., Sun, P., Dong, Y., et al. *ByteTrack: Multi-Object Tracking by Associating Every Detection Box*. Associates both high- and low-confidence detection boxes to maintain robust worker trajectories through occlusions.  
+  Link: `https://arxiv.org/abs/2110.06864`
+- **CPPE-5 Benchmark (CVPR Workshop 2021):** Bansal, A., & Sivaswamy, J. *CPPE-5: Challenging Personal Protective Equipment Dataset*. Establishes visual multi-class safety evaluation criteria.  
+  Link: `https://arxiv.org/abs/2112.07253`
+- **D-Fire Combustion Dataset (IEEE Access 2022):** de Venâncio, P. V. A., et al. *D-Fire: An Image Dataset for Fire and Smoke Detection*. Benchmark research for optical flame and smoke detection and boundary localization.  
+  Link: `https://github.com/gaia-solutions-on-demand/DFireDataset`
 
-### 2. Actual Ingested Datasets
-- **Pictor Construction Safety Dataset:** 1,487 images of real construction personnel in high-resolution field settings.
-- **Hard Hat Workers Dataset:** 7,035 images covering multi-angle helmet and vest variations (Roboflow Universe).
-- **Construction Site Safety (CSS) Dataset:** 9,451 images providing localized annotations for gloves and safety boots.
-- **D-Fire Combustion Research Dataset:** 4,480 images of active open flames and industrial smoke plumes.
+### DATASETS (ACTUALLY USED & REFERENCED)
+- **Pictor Construction Safety [ACTUALLY USED]:** 1,487 images of real construction personnel, helmets, and vests.  
+  Link: `https://github.com/carlosh93/pictor-ppe`
+- **Hard Hat Workers [ACTUALLY USED]:** 7,035 images covering multi-angle worker headwear and safety vests.  
+  Link: `https://public.roboflow.com/object-detection/hard-hat-workers`
+- **Construction Site Safety (CSS) [ACTUALLY USED]:** 9,451 images covering helmets, vests, gloves, and protective boots.  
+  Link: `https://universe.roboflow.com/roboflow-universe-projects/construction-site-safety`
+- **D-Fire Combustion Dataset [ACTUALLY USED]:** 4,480 images of active flames and industrial smoke plumes.  
+  Link: `https://github.com/gaia-solutions-on-demand/DFireDataset`
+- **SH17 & Ultralytics PPE [REFERENCED / EVALUATED]:** Evaluated for benchmark ontology alignment and training hyperparameters.
 
-### 3. Core Software Frameworks & Standards
-- **PyTorch & Torchvision:** Core deep learning runtime (`https://pytorch.org`)
-- **FastAPI Framework:** Asynchronous high-concurrency Python ASGI REST & WebSocket engine (`https://fastapi.tiangolo.com`)
-- **React 18 & Vite:** Declarative component UI with sub-millisecond DOM reconciliation (`https://react.dev`)
-- **SQLite Engine:** ACID-compliant embedded persistence operating with Write-Ahead Logging (`https://sqlite.org`)
-- **OSHA Standards & ISO 45001:** Regulatory framework alignment (OSHA 1926.100 Head Protection, OSHA 1926.95 Personal Protective Equipment, ISO 45001 Occupational Health and Safety).
+### TECHNOLOGIES / FRAMEWORKS
+- **Ultralytics YOLOv8n:** Single forward-pass multi-class neural detector.
+- **PyTorch 2.14.0+cpu:** Deep learning runtime environment.
+- **OpenCV-Python:** Low-latency video capture and matrix transformations.
+- **FastAPI & Uvicorn:** Asynchronous Python ASGI web service and WebSocket server.
+- **React 18 & Vite:** High-performance reactive control center dashboard.
+- **SQLite (WAL Mode):** Embedded ACID persistence engine.
 
-### 4. Official Project Repository & Verification Links
-- **GitHub Repository:** `https://github.com/SMRU08/SafeSync.git` *(Repository: RAKSHYA-VISION)*
-- **Automated Test Suite:** 250 unit tests, 39 integration scenarios, 20 end-to-end recovery tests passing.
-- **Live Interactive Demo:** Real-time multi-camera ingestion on CPU host (`http://localhost:8000/api/docs` and `http://localhost:5173`).
+### OFFICIAL DOCUMENTATION
+- **FastAPI Documentation:** Asynchronous REST and WebSocket architecture.  
+  Link: `https://fastapi.tiangolo.com`
+- **PyTorch Documentation:** Tensor operations and edge execution.  
+  Link: `https://pytorch.org/docs`
+- **SQLite Documentation:** Write-Ahead Logging (WAL) and concurrency controls.  
+  Link: `https://sqlite.org/wal.html`
+- **React Documentation:** Declarative UI component patterns.  
+  Link: `https://react.dev`
+
+### GITHUB
+- **Official SafeSync Repository:** Live codebase, automated tests, model weights, and documentation.  
+  Link: `https://github.com/SMRU08/SafeSync.git`
+
+### OTHER SOURCES & SAFETY STANDARDS
+- **OSHA 29 CFR 1926.100:** Head Protection Standards in Construction & Industrial Operations.  
+  Link: `https://www.osha.gov`
+- **OSHA 29 CFR 1926.95:** General Personal Protective Equipment Criteria.  
+  Link: `https://www.osha.gov`
+- **ISO 45001:2018:** Occupational Health and Safety Management Systems Standard.  
+  Link: `https://www.iso.org/standard/63787.html`
 
 > **Speaker Notes (Slide 6):**  
 > *"SafeSync stands on solid academic and industrial foundations. Our vision models build upon peer-reviewed work in YOLOv8, ByteTrack, and the D-Fire combustion dataset. We trained and evaluated on over 22,000 verified images across four major datasets. Our compliance logic maps directly to OSHA and ISO 45001 standards. The complete source code, test matrix, and architecture are publicly accessible on GitHub. Thank you, and we welcome your questions."*
-
----
-
-## Part 4: Hackathon Technical Presentation Delivery Guide
-
-### Timing Strategy (Total: 5–7 Minutes)
-- **Slide 1 (Who Are We?):** 45 seconds — Set the team identity, problem statement PS06, and core credibility.
-- **Slide 2 (What Are We Solving?):** 60 seconds — Define observer fatigue, delayed fire alarms, and the `UNKNOWN != VIOLATION` innovation.
-- **Slide 3 (How Does It Work?):** 90 seconds — Walk through the decoupled 5-step pipeline and the clean architecture diagram.
-- **Slide 4 (Can It Work and Scale?):** 90 seconds — Highlight real 56 ms CPU benchmarks, the 15-scenario optical test (0 FP), and Jetson scalability.
-- **Slide 5 (Why Does It Matter?):** 60 seconds — Emphasize operator personas, 24/7 continuous vigilance, and zero privacy friction.
-- **Slide 6 (What Is It Based On?):** 45 seconds — Reference peer-reviewed literature, OSHA alignment, and invite jury evaluation.
-
-### Anticipated Jury Questions & Verified Technical Answers
-
-1. **Question:** *"Why didn't you train a model to detect 'no helmet' or 'no vest' directly?"*  
-   **Answer:** *"Training a neural network on 'absence' introduces major ambiguity: bare heads look very different across people, and absence is an administrative rule rather than a physical object. By positively detecting helmets and mapping them to the top 25% of a tracked worker's body, we decouple computer vision from safety policy, achieving zero false alarms on occluded or partial views."*
-
-2. **Question:** *"Can this system run on an industrial factory floor without an expensive GPU server?"*  
-   **Answer:** *"Yes. SafeSync processes video at ~56.4 ms per frame—over 17 FPS—on a standard non-GPU Intel Core i5 CPU. By maintaining a strict queue depth of 1 and using asynchronous decoupled capture threads, video display remains 100% smooth without memory accumulation."*
-
-3. **Question:** *"How does your fire and smoke detection avoid false alarms from boiler steam or welding arcs?"*  
-   **Answer:** *"We employ a 7-stage temporal state machine that requires 5 consecutive frames of positive detection before confirming an active hazard. In our 15-scenario empirical challenge benchmark including steam, welding arcs, dust, and diesel exhaust, the production model achieved a 0% false alarm rate (0/13 negative triggers)."*
-
-4. **Question:** *"How do you handle worker privacy regulations regarding video surveillance?"*  
-   **Answer:** *"SafeSync utilizes anonymous ByteTrack trajectory tracking. Workers are assigned transient integer track IDs like Track #101. The platform performs zero facial recognition, stores zero biometric vectors, and records zero personally identifiable information (PII)."*
 
 ---
 *SafeSync — BPUT Hackathon 2026 Submission Document (BPUT HACKATHON 2026 README3.md) • Team XERSES • Problem Statement PS06*
