@@ -249,9 +249,12 @@ class CameraWorker:
                 self._latest_workers = compliance_resp.workers
                 self._latest_compliance_summary = compliance_resp.summary
                 self._latest_annotated_b64 = compliance_resp.annotated_image_base64
-                if hazard_resp:
-                    self._latest_hazards = hazard_resp.hazards
-                    self.metrics.active_hazards = len(hazard_resp.hazards)
+                if hazard_resp is not None:
+                    self._latest_hazards = hazard_resp.hazards or []
+                    self.metrics.active_hazards = len(self._latest_hazards)
+                else:
+                    self._latest_hazards = []
+                    self.metrics.active_hazards = 0
                 if safety_assessment:
                     self._latest_safety_assessment = safety_assessment
                 self.metrics.inference_latency_ms = round(ai_duration_ms, 2)
@@ -646,6 +649,42 @@ class CameraWorker:
                 except Exception as e:
                     logger.debug("Error serializing worker in get_live_compliance: %s", e)
 
+            hazards_out = []
+            for idx, h in enumerate(self._latest_hazards):
+                try:
+                    if hasattr(h, "model_dump"):
+                        hd = h.model_dump()
+                    elif isinstance(h, dict):
+                        hd = dict(h)
+                    else:
+                        hd = vars(h).copy()
+
+                    if "hazard_id" not in hd:
+                        hd["hazard_id"] = str(hd.get("event_id", f"hazard_{idx+1}"))
+                    if "state" not in hd:
+                        hd["state"] = "ACTIVE"
+
+                    if "bbox" in hd:
+                        b = hd["bbox"]
+                        if isinstance(b, dict):
+                            hd["bbox"] = [
+                                float(b.get("x1", 0)),
+                                float(b.get("y1", 0)),
+                                float(b.get("x2", 0)),
+                                float(b.get("y2", 0)),
+                            ]
+                        if isinstance(hd["bbox"], list) and len(hd["bbox"]) >= 4:
+                            bx1, by1, bx2, by2 = hd["bbox"][:4]
+                            hd["normalized_bbox"] = [
+                                round(bx1 / max(1, fw), 4),
+                                round(by1 / max(1, fh), 4),
+                                round(bx2 / max(1, fw), 4),
+                                round(by2 / max(1, fh), 4),
+                            ]
+                    hazards_out.append(hd)
+                except Exception as e:
+                    logger.debug("Error serializing hazard in get_live_compliance: %s", e)
+
             track_telemetry = []
             if self._compliance_engine and hasattr(self._compliance_engine.tracker, "get_track_telemetry"):
                 try:
@@ -659,6 +698,7 @@ class CameraWorker:
                 "frame_width": fw,
                 "frame_height": fh,
                 "workers": workers_out,
+                "hazards": hazards_out,
                 "track_telemetry": track_telemetry,
                 "summary": self._latest_compliance_summary.model_dump() if hasattr(self._latest_compliance_summary, "model_dump") else self._latest_compliance_summary,
                 "annotated_image_base64": self._latest_annotated_b64,

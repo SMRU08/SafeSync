@@ -14,6 +14,10 @@ BACKEND_URL = "http://127.0.0.1:8000"
 FRONTEND_URL = "http://127.0.0.1:5173"
 WS_URL = "ws://127.0.0.1:8000/ws/alerts"
 
+if __name__ != "__main__":
+    import pytest
+    pytest.skip("Standalone live server matrix test — run with python backend/tests/test_prototype_e2e_matrix.py", allow_module_level=True)
+
 results = []
 
 def record(test_id, name, expected, actual, passed):

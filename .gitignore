@@ -73,6 +73,8 @@ datasets/normalized/*
 !datasets/normalized/.gitkeep
 datasets/processed/images/
 datasets/processed/labels/
+datasets/processed_v3/images/
+datasets/processed_v3/labels/
 datasets/staging/
 
 # Training artifacts & runs

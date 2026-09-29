@@ -2,24 +2,24 @@
 # Real-Time & Video Detection Configuration
 
 model:
-  path: "models/detection/ppe_fire_smoke_v2/weights/best.pt"
-  name: "ppe_fire_smoke_v2"
+  path: "models/detection/ppe_fire_smoke_v3/weights/best.pt"
+  name: "ppe_fire_smoke_v3"
   architecture: "yolov8n"
   expected_classes: 7
 
 inference:
   confidence_threshold: 0.20
   iou_threshold: 0.45
-  image_size: 384
+  image_size: 448
   device: "auto"        # "auto" | "cpu" | "cuda" | "0"
   max_detections: 300
   half: false           # FP16 (requires GPU)
   class_confidence_thresholds:
-    person: 0.25
-    helmet: 0.38
-    safety_vest: 0.38
-    gloves: 0.28
-    safety_footwear: 0.28
+    person: 0.22
+    helmet: 0.30
+    safety_vest: 0.30
+    gloves: 0.22
+    safety_footwear: 0.22
     fire: 0.20
     smoke: 0.20
 

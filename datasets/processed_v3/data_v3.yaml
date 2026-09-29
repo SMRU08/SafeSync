@@ -1,0 +1,14 @@
+# data_v3.yaml — SafeSync Curated Dataset (Phase 3 Hardened)
+path: D:/Additional/PROJECT/RAKSHYA-VISION/datasets/processed_v3
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: person
+  1: helmet
+  2: safety_vest
+  3: gloves
+  4: safety_footwear
+  5: fire
+  6: smoke

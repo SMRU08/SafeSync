@@ -1,10 +1,41 @@
 {
   "system": "SafeSync Safety Intelligence Pipeline",
-  "updated_at": "2026-09-23T18:03:00Z",
+  "updated_at": "2026-09-29T15:00:00Z",
   "models": {
     "ppe": {
-      "active_version": "ppe_v1",
+      "active_version": "ppe_v3",
       "versions": {
+        "ppe_v3": {
+          "path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
+          "sha256": "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295",
+          "architecture": "yolov8n",
+          "image_size": 448,
+          "classes": {
+            "0": "person",
+            "1": "helmet",
+            "2": "safety_vest",
+            "3": "gloves",
+            "4": "safety_footwear",
+            "5": "fire",
+            "6": "smoke"
+          },
+          "operating_thresholds": {
+            "person": 0.22,
+            "helmet": 0.30,
+            "safety_vest": 0.30,
+            "gloves": 0.22,
+            "safety_footwear": 0.22,
+            "fire": 0.20,
+            "smoke": 0.20
+          },
+          "datasets": [
+            "ppe_safup",
+            "ppec",
+            "d_fire_corrected",
+            "hard_negatives"
+          ],
+          "notes": "Unified hardened model v3 with person co-occurrence and corrected fire/smoke polygon parsing."
+        },
         "ppe_v1": {
           "path": "models/ppe/ppe_v1/weights/best.pt",
           "sha256": "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3",
@@ -38,8 +69,27 @@
       }
     },
     "hazards": {
-      "active_version": "fire_smoke_v1",
+      "active_version": "fire_smoke_v3",
       "versions": {
+        "fire_smoke_v3": {
+          "path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
+          "sha256": "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295",
+          "architecture": "yolov8n",
+          "image_size": 448,
+          "classes": {
+            "5": "fire",
+            "6": "smoke"
+          },
+          "operating_thresholds": {
+            "fire": 0.20,
+            "smoke": 0.20
+          },
+          "datasets": [
+            "d_fire_corrected",
+            "hard_negatives"
+          ],
+          "notes": "Hardened fire and smoke detector v3 with clean background rejection."
+        },
         "fire_smoke_v1": {
           "path": "models/hazards/fire_smoke_v1/weights/best.pt",
           "sha256": "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3",

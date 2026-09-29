@@ -1,15 +1,35 @@
 # models/registry/model_registry.yaml — SafeSync Model Registry
 # Centralized production model catalog with immutable SHA-256 checksum verification.
 
-active_production_model: "ppe_fire_smoke_v2"
+active_production_model: "ppe_fire_smoke_v3"
 
 models:
+  ppe_fire_smoke_v3:
+    model_name: "ppe_fire_smoke_v3"
+    version: "3.0.0"
+    model_path: "models/detection/ppe_fire_smoke_v3/weights/best.pt"
+    sha256: "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295"
+    status: "production"
+    classes:
+      0: "person"
+      1: "helmet"
+      2: "safety_vest"
+      3: "gloves"
+      4: "safety_footwear"
+      5: "fire"
+      6: "smoke"
+    input_size: [448, 448]
+    framework: "Ultralytics YOLO (PyTorch)"
+    created_date: "2026-09-29"
+    verified_date: "2026-09-29"
+    description: "Phase 3.2 hardened multi-task detector with curated unpoisoned dataset, corrected fire/smoke polygon coordinates, and full worker PPE co-occurrence."
+
   ppe_fire_smoke_v2:
     model_name: "ppe_fire_smoke_v2"
     version: "2.0.0"
     model_path: "models/detection/ppe_fire_smoke_v2/weights/best.pt"
     sha256: "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3"
-    status: "production"
+    status: "archived"
     classes:
       0: "person"
       1: "helmet"

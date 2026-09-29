@@ -15,8 +15,9 @@ import {
   Check,
   X,
   Minus,
+  Flame,
 } from 'lucide-react';
-import { CameraConfig, WorkerTrack, PPEPresence } from '../types';
+import { CameraConfig, WorkerTrack, PPEPresence, HazardEventDetail } from '../types';
 import { API_BASE_URL } from '../utils/constants';
 import { reconnectCamera } from '../services/api';
 
@@ -25,6 +26,7 @@ interface CameraFeedPlayerProps {
   selectedCameraId?: string;
   onSelectCamera?: (cameraId: string) => void;
   workers?: WorkerTrack[];
+  hazards?: HazardEventDetail[];
   onRefresh?: () => void;
 }
 
@@ -46,6 +48,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   selectedCameraId,
   onSelectCamera,
   workers = [],
+  hazards = [],
   onRefresh,
 }) => {
   const [activeCamId, setActiveCamId] = useState<string>(
@@ -439,6 +442,58 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                     {renderPPEItem('Vest', worker.ppe_status?.safety_vest)}
                     {renderPPEItem('Gloves', worker.ppe_status?.gloves)}
                     {renderPPEItem('Shoes', worker.ppe_status?.safety_footwear)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+        {/* Dynamic Environmental Hazard HUD Overlays (Fire & Smoke) */}
+        {isCameraOnline &&
+          hazards.map((hazard, idx) => {
+            if (!hazard.bbox || hazard.bbox.length < 4) return null;
+            const [x1, y1, x2, y2] = hazard.bbox;
+            const nw = videoImgRef.current?.naturalWidth || 1280;
+            const nh = videoImgRef.current?.naturalHeight || 720;
+
+            let nx1 = hazard.normalized_bbox ? hazard.normalized_bbox[0] : (x1 > 1 ? x1 / nw : x1);
+            let ny1 = hazard.normalized_bbox ? hazard.normalized_bbox[1] : (y1 > 1 ? y1 / nh : y1);
+            let nx2 = hazard.normalized_bbox ? hazard.normalized_bbox[2] : (x2 > 1 ? x2 / nw : x2);
+            let ny2 = hazard.normalized_bbox ? hazard.normalized_bbox[3] : (y2 > 1 ? y2 / nh : y2);
+
+            nx1 = Math.max(0, Math.min(1, nx1));
+            ny1 = Math.max(0, Math.min(1, ny1));
+            nx2 = Math.max(nx1 + 0.02, Math.min(1, nx2));
+            ny2 = Math.max(ny1 + 0.02, Math.min(1, ny2));
+
+            const hasBounds = videoBounds.width > 0 && videoBounds.height > 0;
+            const leftPx = hasBounds ? videoBounds.offsetX + nx1 * videoBounds.width : nx1 * 100;
+            const topPx = hasBounds ? videoBounds.offsetY + ny1 * videoBounds.height : ny1 * 100;
+            const widthPx = hasBounds ? (nx2 - nx1) * videoBounds.width : (nx2 - nx1) * 100;
+            const heightPx = hasBounds ? (ny2 - ny1) * videoBounds.height : (ny2 - ny1) * 100;
+
+            const isFire = hazard.hazard_type.toLowerCase() === 'fire';
+            const borderColor = isFire ? 'border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.5)]' : 'border-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.5)]';
+            const badgeBg = isFire ? 'bg-red-600' : 'bg-amber-600';
+            const confPct = Math.round((hazard.confidence || 0) * 100);
+
+            return (
+              <div
+                key={hazard.event_id || hazard.hazard_id || `hazard-${idx}`}
+                className="absolute pointer-events-none transition-all duration-150 animate-pulse"
+                style={{
+                  left: hasBounds ? `${leftPx}px` : `${leftPx}%`,
+                  top: hasBounds ? `${topPx}px` : `${topPx}%`,
+                  width: hasBounds ? `${widthPx}px` : `${widthPx}%`,
+                  height: hasBounds ? `${heightPx}px` : `${heightPx}%`,
+                }}
+              >
+                <div className={`w-full h-full border-2 ${borderColor} relative`}>
+                  <div
+                    className={`absolute -top-5 left-0 ${badgeBg} text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-t flex items-center gap-1 uppercase tracking-wider whitespace-nowrap shadow-md`}
+                  >
+                    <Flame className="w-3 h-3 inline animate-bounce" />
+                    {isFire ? 'FIRE HAZARD' : 'SMOKE HAZARD'} ({confPct}%)
                   </div>
                 </div>
               </div>

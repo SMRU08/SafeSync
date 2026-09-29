@@ -113,16 +113,18 @@ export interface ComplianceSummary {
 
 export interface HazardEventDetail {
   hazard_id: string;
-  hazard_type: 'fire' | 'smoke';
+  event_id?: string;
+  hazard_type: 'fire' | 'smoke' | string;
   state: HazardState;
   confidence: number;
-  zone_id: string;
-  camera_id: string;
+  zone_id?: string;
+  camera_id?: string;
   first_seen_frame?: number;
   last_seen_frame?: number;
   persistence_frames?: number;
   active_frames?: number;
   bbox?: [number, number, number, number];
+  normalized_bbox?: [number, number, number, number];
 }
 
 export interface CameraMetrics {

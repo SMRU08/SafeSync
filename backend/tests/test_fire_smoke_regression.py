@@ -28,8 +28,9 @@ from app.ai.hazards.schemas import (
 from app.services.safety_engine import SafetyEngine, EventType, AlarmPriority
 
 
-TEST_A_PATH = r"C:\Users\smrut\.gemini\antigravity\brain\c8c2a490-b991-40ca-b3c4-64711685ed0b\.user_uploaded\media_1790522768667.png"
-TEST_B_PATH = r"C:\Users\smrut\.gemini\antigravity\brain\c8c2a490-b991-40ca-b3c4-64711685ed0b\.user_uploaded\media_1790522768710.png"
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+TEST_A_PATH = os.path.join(ROOT, "datasets", "processed_v3", "images", "test", "dfire_00013.jpg")
+TEST_B_PATH = os.path.join(ROOT, "datasets", "processed_v3", "images", "test", "dfire_00000.jpg")
 
 
 class TestFireSmokeRegression:

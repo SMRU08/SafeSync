@@ -61,6 +61,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
     cameras[0]?.camera_id || 'camera_01'
   );
   const [liveWorkers, setLiveWorkers] = useState<WorkerTrack[]>([]);
+  const [liveHazards, setLiveHazards] = useState<HazardEventDetail[]>([]);
   const [complianceSummary, setComplianceSummary] = useState<ComplianceSummary | null>(null);
 
   useEffect(() => {
@@ -73,6 +74,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
           if (data) {
             if (Array.isArray(data.workers)) {
               setLiveWorkers(data.workers);
+            }
+            if (Array.isArray(data.hazards)) {
+              setLiveHazards(data.hazards);
             }
             if (data.summary) {
               setComplianceSummary(data.summary);
@@ -315,6 +319,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
             selectedCameraId={selectedCameraId}
             onSelectCamera={setSelectedCameraId}
             workers={liveWorkers}
+            hazards={
+              liveHazards.length > 0
+                ? liveHazards.filter((h) => !h.camera_id || h.camera_id === selectedCameraId)
+                : hazards.filter((h) => !h.camera_id || h.camera_id === selectedCameraId)
+            }
             onRefresh={onRefresh ? () => onRefresh() : undefined}
           />
 

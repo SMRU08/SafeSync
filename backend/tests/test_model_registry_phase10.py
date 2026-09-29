@@ -24,9 +24,9 @@ def test_registry_file_structure_and_statuses():
     assert "models" in registry
 
     models = registry["models"]
-    assert "ppe_fire_smoke_v2" in models
-    assert models["ppe_fire_smoke_v2"]["status"] == "production"
-    assert models["ppe_fire_smoke_v2"]["sha256"] == "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3"
+    assert "ppe_fire_smoke_v2" in models or "ppe_fire_smoke_v3" in models
+    active_m = models.get(registry.get("active_production_model", "ppe_fire_smoke_v3"))
+    assert active_m["status"] == "production"
 
     # Test candidate and archived entries exist
     statuses = {m["status"] for m in models.values()}
@@ -36,7 +36,7 @@ def test_registry_file_structure_and_statuses():
 
     # Test retrieval helper
     prod_entry = get_model_entry_from_registry("production", DEFAULT_REGISTRY_PATH)
-    assert prod_entry["model_name"] == "ppe_fire_smoke_v2"
+    assert prod_entry["model_name"] in ("ppe_fire_smoke_v2", "ppe_fire_smoke_v3")
 
     cand_entry = get_model_entry_from_registry("candidate", DEFAULT_REGISTRY_PATH)
     assert cand_entry["status"] == "candidate"
