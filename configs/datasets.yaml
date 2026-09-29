@@ -1,0 +1,272 @@
+# configs/datasets.yaml — SafeSync Comprehensive Dataset Source Registry
+# BPUT Hackathon 2026 — PS06: AI Safety Gear Compliance & Environmental Hazard Detection
+# Tracks all verified dataset sources (Existing and New additions)
+
+version: "2.0.0"
+updated_at: "2026-09-29T18:30:00Z"
+canonical_classes:
+  0: person
+  1: helmet
+  2: safety_vest
+  3: gloves
+  4: safety_footwear
+  5: fire
+  6: smoke
+
+datasets:
+  # ============================================================================
+  # NEW DATASET ADDITIONS (Phase 24+)
+  # ============================================================================
+
+  - dataset_id: "hf_smruti_ppe_bucket"
+    name: "PPE Detection Storage Bucket"
+    source_status: "NEW"
+    source_url: "https://huggingface.co/buckets/smrutiranjannayakcs/PPE_Detection-bucket"
+    source_type: "huggingface_bucket"
+    category: "ppe"
+    license: "CC-BY-4.0"
+    access_requirement: "public"
+    download_method: "huggingface_hub HfFileSystem stream (resumable range requests)"
+    local_path: "data/raw/huggingface/PPE_Detection-bucket/"
+    status: "VERIFIED"
+    image_count: 12078
+    annotation_count: 36234
+    classes:
+      - "Vest"
+      - "Safety Shoe"
+      - "Mask"
+      - "Helmet"
+      - "Goggles"
+      - "Gloves"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 12078
+    notes: "High-quality industrial and construction PPE images with direct mapping for Vest, Safety Shoe, Helmet, and Gloves."
+    source_version: "1.0.0"
+
+  - dataset_id: "ultralytics_construction_ppe"
+    name: "Ultralytics Construction-PPE"
+    source_status: "NEW"
+    source_url: "https://github.com/ultralytics/assets/releases/download/v0.0.0/construction-ppe.zip"
+    source_type: "github_asset"
+    category: "ppe"
+    license: "AGPL-3.0"
+    access_requirement: "public"
+    download_method: "direct_zip_download"
+    local_path: "data/raw/construction_ppe/"
+    status: "VERIFIED"
+    image_count: 1416
+    annotation_count: 5800
+    classes:
+      - "helmet"
+      - "gloves"
+      - "vest"
+      - "boots"
+      - "goggles"
+      - "none"
+      - "Person"
+      - "no_helmet"
+      - "no_goggle"
+      - "no_gloves"
+      - "no_boots"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 1416
+    notes: "Official Ultralytics Construction-PPE dataset. Positive classes (Person, helmet, vest, gloves, boots) mapped to SafeSync 0-4. no_* negative classes used as background hard negatives."
+    source_version: "v0.0.0"
+
+  - dataset_id: "datacluster_fire_smoke"
+    name: "DataCluster Fire and Smoke Dataset"
+    source_status: "NEW"
+    source_url: "https://www.kaggle.com/datasets/dataclusterlabs/fire-and-smoke-dataset"
+    source_type: "kaggle_dataset"
+    category: "hazard"
+    license: "CC-BY-SA-4.0"
+    access_requirement: "public_kaggle"
+    download_method: "kagglehub.dataset_download"
+    local_path: "data/raw/datacluster_fire_smoke/"
+    status: "VERIFIED"
+    image_count: 100
+    annotation_count: 122
+    classes:
+      - "fire"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 100
+    notes: "Verified as Sample/Subset (100 images, 122 Pascal VOC XML bounding box annotations of real fire incidents). Converted to YOLO normalized coordinates."
+    source_version: "v3"
+
+  # ============================================================================
+  # EXISTING VERIFIED SAFESYNC DATASETS (Preserved & Active)
+  # ============================================================================
+
+  - dataset_id: "ppe_safup"
+    name: "SafeUp PPE Detection & Tracking"
+    source_status: "EXISTING"
+    source_url: "https://universe.roboflow.com/uniform-fhonp/ppe-safup"
+    source_type: "roboflow"
+    category: "ppe"
+    license: "CC-BY-4.0"
+    access_requirement: "public"
+    download_method: "roboflow_sdk"
+    local_path: "datasets/raw/ppe_safup/"
+    status: "VERIFIED"
+    image_count: 4273
+    annotation_count: 14500
+    classes:
+      - "person"
+      - "helmet"
+      - "safety_vest"
+      - "boots"
+    mapping_status: "MAPPED"
+    duplicate_count: 12
+    invalid_count: 0
+    usable_count: 4261
+    notes: "Core PPE foundation providing clean co-occurrence of person bounding boxes with hard hats and safety vests."
+    source_version: "2.0.0"
+
+  - dataset_id: "gaia_dfire"
+    name: "GAIA D-Fire Fire & Smoke Dataset"
+    source_status: "EXISTING"
+    source_url: "https://github.com/gaia-solutions-on-demand/DFireDataset"
+    source_type: "github_repo"
+    category: "hazard"
+    license: "CC-BY-4.0"
+    access_requirement: "public"
+    download_method: "git_clone"
+    local_path: "datasets/raw/d_fire/"
+    status: "VERIFIED"
+    image_count: 4631
+    annotation_count: 9850
+    classes:
+      - "smoke"
+      - "fire"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 14
+    usable_count: 4617
+    notes: "Primary environmental hazard dataset. Polygon coordinates parsed with odd-token stripping to eliminate diagonal inversion."
+    source_version: "1.0.0"
+
+  - dataset_id: "ppec_compliance"
+    name: "PPE Compliance Industrial Dataset"
+    source_status: "EXISTING"
+    source_url: "https://universe.roboflow.com/industrial-safety/ppe-shikk"
+    source_type: "roboflow"
+    category: "ppe"
+    license: "CC-BY-4.0"
+    access_requirement: "public"
+    download_method: "roboflow_sdk"
+    local_path: "datasets/raw/ppe_shikk/"
+    status: "VERIFIED"
+    image_count: 1200
+    annotation_count: 4100
+    classes:
+      - "person"
+      - "helmet"
+      - "vest"
+      - "gloves"
+    mapping_status: "MAPPED"
+    duplicate_count: 4
+    invalid_count: 0
+    usable_count: 1196
+    notes: "High-resolution factory floor footage with worker extremity annotations (gloves and footwear)."
+    source_version: "1.0.0"
+
+  - dataset_id: "sh17_ppe"
+    name: "SH17 Dataset"
+    source_status: "EXISTING"
+    source_url: "https://github.com/ahmadmughees/SH17dataset"
+    source_type: "github_repo"
+    category: "ppe"
+    license: "MIT"
+    access_requirement: "public"
+    download_method: "git_clone"
+    local_path: "datasets/raw/sh17_ppe/"
+    status: "REGISTERED"
+    image_count: 3500
+    annotation_count: 11000
+    classes:
+      - "Person"
+      - "Gloves"
+      - "Shoes"
+      - "Safety-vest"
+      - "Helmet"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 3500
+    notes: "Verified class mapping: Person->0, Helmet->1, Safety-vest->2, Gloves->3, Shoes->4."
+    source_version: "1.0.0"
+
+  - dataset_id: "hf_51ddhesh_ppe"
+    name: "Hugging Face 51ddhesh PPE Detection"
+    source_status: "EXISTING"
+    source_url: "https://huggingface.co/datasets/51ddhesh/PPE_Detection"
+    source_type: "huggingface_dataset"
+    category: "ppe"
+    license: "Apache-2.0"
+    access_requirement: "public"
+    download_method: "huggingface_hub"
+    local_path: "datasets/raw/hf_51ddhesh_ppe/"
+    status: "REGISTERED"
+    image_count: 2400
+    annotation_count: 7200
+    classes:
+      - "hard-hat"
+      - "vest"
+      - "person"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 2400
+    notes: "Hugging Face community PPE dataset with person and protective headwear."
+    source_version: "1.0.0"
+
+  - dataset_id: "gdut_hwd_helmet"
+    name: "GDUT-HWD Hard Hat Workers"
+    source_status: "EXISTING"
+    source_url: "https://github.com/wujixiu/helmet-detection"
+    source_type: "github_repo"
+    category: "ppe"
+    license: "Academic"
+    access_requirement: "public"
+    download_method: "git_clone"
+    local_path: "datasets/raw/gdut_hwd/"
+    status: "REGISTERED"
+    image_count: 3174
+    annotation_count: 8900
+    classes:
+      - "helmet"
+      - "person"
+      - "none"
+    mapping_status: "MAPPED"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 3174
+    notes: "Helmet detection dataset. 'none' class rejected from detector and preserved for hard-negative background learning."
+    source_version: "1.0.0"
+
+  - dataset_id: "hard_negatives_industrial"
+    name: "Industrial Hard Negative Distractors"
+    source_status: "EXISTING"
+    source_url: "internal_curated"
+    source_type: "local_curated"
+    category: "hard_negatives"
+    license: "Internal SafeSync"
+    access_requirement: "local"
+    download_method: "curated_extraction"
+    local_path: "datasets/processed_v3/images/hard_negatives/"
+    status: "VERIFIED"
+    image_count: 300
+    annotation_count: 0
+    classes: []
+    mapping_status: "EMPTY_LABEL"
+    duplicate_count: 0
+    invalid_count: 0
+    usable_count: 300
+    notes: "Curated negative samples containing steam, dust, sunlight glare, orange traffic cones, yellow machinery, and non-PPE clothing to force zero false alarms."
+    source_version: "1.0.0"

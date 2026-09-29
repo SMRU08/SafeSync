@@ -36,7 +36,7 @@ def test_registry_file_structure_and_statuses():
 
     # Test retrieval helper
     prod_entry = get_model_entry_from_registry("production", DEFAULT_REGISTRY_PATH)
-    assert prod_entry["model_name"] in ("ppe_fire_smoke_v2", "ppe_fire_smoke_v3")
+    assert prod_entry["model_name"] in ("ppe_fire_smoke_v2", "ppe_fire_smoke_v3", "ppe_fire_smoke_v4")
 
     cand_entry = get_model_entry_from_registry("candidate", DEFAULT_REGISTRY_PATH)
     assert cand_entry["status"] == "candidate"

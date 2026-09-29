@@ -1,9 +1,9 @@
 {
   "system": "SafeSync Safety Intelligence Pipeline",
-  "updated_at": "2026-09-29T15:00:00Z",
+  "updated_at": "2026-09-29T19:00:00Z",
   "models": {
     "ppe": {
-      "active_version": "ppe_v3",
+      "active_version": "ppe_v4",
       "versions": {
         "ppe_v3": {
           "path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
@@ -21,12 +21,12 @@
           },
           "operating_thresholds": {
             "person": 0.22,
-            "helmet": 0.30,
-            "safety_vest": 0.30,
+            "helmet": 0.3,
+            "safety_vest": 0.3,
             "gloves": 0.22,
             "safety_footwear": 0.22,
-            "fire": 0.20,
-            "smoke": 0.20
+            "fire": 0.2,
+            "smoke": 0.2
           },
           "datasets": [
             "ppe_safup",
@@ -56,8 +56,8 @@
             "safety_vest": 0.38,
             "gloves": 0.28,
             "safety_footwear": 0.28,
-            "fire": 0.20,
-            "smoke": 0.20
+            "fire": 0.2,
+            "smoke": 0.2
           },
           "datasets": [
             "ppe_detection_compliance",
@@ -65,11 +65,46 @@
             "hard_hat_workers"
           ],
           "notes": "Unified multi-task model detecting PPE and environmental fire and smoke hazards."
+        },
+        "ppe_v4": {
+          "path": "models/detection/ppe_fire_smoke_v4/weights/best.pt",
+          "sha256": "6c6e564a07024e9b29e6999d2d0af74586576082aada5c5ad4d757a06b1c0313",
+          "architecture": "yolov8n",
+          "image_size": 448,
+          "classes": {
+            "0": "person",
+            "1": "helmet",
+            "2": "safety_vest",
+            "3": "gloves",
+            "4": "safety_footwear",
+            "5": "fire",
+            "6": "smoke"
+          },
+          "operating_thresholds": {
+            "person": 0.22,
+            "helmet": 0.3,
+            "safety_vest": 0.3,
+            "gloves": 0.22,
+            "safety_footwear": 0.22,
+            "fire": 0.2,
+            "smoke": 0.2
+          },
+          "datasets": [
+            "ppe_safup",
+            "ppec",
+            "safety_ppe_4",
+            "d_fire",
+            "hf_smruti_ppe_bucket",
+            "ultralytics_construction_ppe",
+            "datacluster_fire_smoke",
+            "hard_negatives"
+          ],
+          "notes": "Unified hardened v4 model with multi-source PPE, fire, and smoke detection."
         }
       }
     },
     "hazards": {
-      "active_version": "fire_smoke_v3",
+      "active_version": "fire_smoke_v4",
       "versions": {
         "fire_smoke_v3": {
           "path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
@@ -81,8 +116,8 @@
             "6": "smoke"
           },
           "operating_thresholds": {
-            "fire": 0.20,
-            "smoke": 0.20
+            "fire": 0.2,
+            "smoke": 0.2
           },
           "datasets": [
             "d_fire_corrected",
@@ -100,13 +135,33 @@
             "6": "smoke"
           },
           "operating_thresholds": {
-            "fire": 0.20,
-            "smoke": 0.20
+            "fire": 0.2,
+            "smoke": 0.2
           },
           "datasets": [
             "d_fire"
           ],
           "notes": "Fire and smoke hazard detector. Canonical 7-class taxonomy: 5=fire, 6=smoke."
+        },
+        "fire_smoke_v4": {
+          "path": "models/detection/ppe_fire_smoke_v4/weights/best.pt",
+          "sha256": "6c6e564a07024e9b29e6999d2d0af74586576082aada5c5ad4d757a06b1c0313",
+          "architecture": "yolov8n",
+          "image_size": 448,
+          "classes": {
+            "5": "fire",
+            "6": "smoke"
+          },
+          "operating_thresholds": {
+            "fire": 0.2,
+            "smoke": 0.2
+          },
+          "datasets": [
+            "d_fire",
+            "datacluster_fire_smoke",
+            "hard_negatives"
+          ],
+          "notes": "Hardened fire and smoke detector v4 with multi-source hazard coverage."
         }
       }
     }

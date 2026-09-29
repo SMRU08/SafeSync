@@ -9,7 +9,7 @@
     "scenario": 2,
     "name": "Single-frame fire detection",
     "result": "PASS",
-    "state": "SUSPECTED"
+    "state": "CANDIDATE"
   },
   {
     "scenario": 3,
@@ -21,7 +21,7 @@
     "scenario": 4,
     "name": "Single-frame smoke detection",
     "result": "PASS",
-    "state": "SUSPECTED"
+    "state": "CANDIDATE"
   },
   {
     "scenario": 5,
@@ -51,7 +51,7 @@
     "scenario": 9,
     "name": "False/brief detection",
     "result": "PASS",
-    "cleared_state": "CLEARED",
+    "cleared_state": "NO_HAZARD",
     "final_state": "NO_HAZARD"
   },
   {

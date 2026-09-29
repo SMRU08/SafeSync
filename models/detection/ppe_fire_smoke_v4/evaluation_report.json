@@ -1,0 +1,79 @@
+{
+  "model_name": "ppe_fire_smoke_v4",
+  "created_at": "2026-09-29T19:00:00Z",
+  "sha256": "6c6e564a07024e9b29e6999d2d0af74586576082aada5c5ad4d757a06b1c0313",
+  "weights_path": "models\\detection\\ppe_fire_smoke_v4\\weights\\best.pt",
+  "train_duration_s": 3017.9,
+  "validation_metrics": {
+    "mAP50": 0.473,
+    "mAP50-95": 0.255,
+    "precision": 0.4972,
+    "recall": 0.513,
+    "per_class": {
+      "person": {
+        "mAP50": 0.3372
+      },
+      "helmet": {
+        "mAP50": 0.3514
+      },
+      "safety_vest": {
+        "mAP50": 0.5118
+      },
+      "gloves": {
+        "mAP50": 0.1616
+      },
+      "safety_footwear": {
+        "mAP50": 0.1953
+      },
+      "fire": {
+        "mAP50": 0.0716
+      },
+      "smoke": {
+        "mAP50": 0.1557
+      }
+    }
+  },
+  "test_metrics": {
+    "mAP50": 0.4583,
+    "mAP50-95": 0.2473,
+    "precision": 0.5173,
+    "recall": 0.4643,
+    "per_class": {
+      "person": {
+        "mAP50": 0.351
+      },
+      "helmet": {
+        "mAP50": 0.3371
+      },
+      "safety_vest": {
+        "mAP50": 0.497
+      },
+      "gloves": {
+        "mAP50": 0.1922
+      },
+      "safety_footwear": {
+        "mAP50": 0.1454
+      },
+      "fire": {
+        "mAP50": 0.0928
+      },
+      "smoke": {
+        "mAP50": 0.1158
+      }
+    }
+  },
+  "benchmarks": {
+    "384x384": {
+      "latency_ms": 38.82,
+      "fps": 25.8
+    },
+    "448x448": {
+      "latency_ms": 45.51,
+      "fps": 22.0
+    },
+    "512x512": {
+      "latency_ms": 47.67,
+      "fps": 21.0
+    }
+  }
+}

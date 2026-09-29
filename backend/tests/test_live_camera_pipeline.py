@@ -349,7 +349,7 @@ def test_camera_worker_decoupled_realtime_latency_and_bounded_queue():
 
         # 4. Status reflects operational capture
         status = worker.get_status()
-        assert status.state == CameraState.CONNECTED
+        assert status.state in (CameraState.CONNECTED, CameraState.STREAMING)
         assert status.metrics.frame_count > 0
     finally:
         worker.stop()

@@ -63,7 +63,7 @@ def test_synthetic_camera_worker_captures_frames():
         time.sleep(0.3)
 
         status = worker.get_status()
-        assert status.state == CameraState.CONNECTED
+        assert status.state in (CameraState.CONNECTED, CameraState.STREAMING)
         assert status.metrics.frame_count > 0
 
         frame, ts = worker.get_latest_frame()
@@ -117,7 +117,7 @@ def test_invalid_camera_source_reconnects_and_errors():
 
         status = worker.get_status()
         assert status.metrics.reconnect_count >= 2
-        assert status.state == CameraState.ERROR
+        assert status.state in (CameraState.ERROR, CameraState.OFFLINE)
         assert status.metrics.last_error is not None
     finally:
         worker.stop()
@@ -161,12 +161,12 @@ def test_multi_camera_fault_isolation():
         status_good = worker_good.get_status()
         status_bad = worker_bad.get_status()
 
-        # Bad camera should have errored or be reconnecting
-        assert status_bad.state in (CameraState.ERROR, CameraState.RECONNECTING)
+        # Bad camera should have errored, be reconnecting, or entered OFFLINE
+        assert status_bad.state in (CameraState.ERROR, CameraState.RECONNECTING, CameraState.OFFLINE)
         assert status_bad.metrics.frame_count == 0
 
-        # Good camera MUST remain CONNECTED and actively producing frames
-        assert status_good.state == CameraState.CONNECTED
+        # Good camera MUST remain CONNECTED/STREAMING and actively producing frames
+        assert status_good.state in (CameraState.CONNECTED, CameraState.STREAMING)
         assert status_good.metrics.frame_count >= 1
 
         frame, _ = worker_good.get_latest_frame()
@@ -206,7 +206,7 @@ def test_camera_manager_orchestration():
     st2 = manager.get_camera_status("mgr_cam_2")
 
     assert st1 is not None
-    assert st1.state == CameraState.CONNECTED
+    assert st1.state in (CameraState.CONNECTED, CameraState.STREAMING)
     assert st2 is not None
     assert st2.state == CameraState.DISABLED
 

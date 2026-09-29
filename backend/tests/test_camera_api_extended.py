@@ -73,7 +73,7 @@ def test_create_and_delete_camera():
     assert create_resp.status_code == 201
     created_data = create_resp.json()
     assert created_data["camera_id"] == "test_cam_surveillance"
-    assert created_data["status"] in ("online", "connecting", "offline")
+    assert created_data["status"] in ("online", "connecting", "offline", "streaming")
     assert created_data["stream_url"] == "/api/cameras/test_cam_surveillance/stream"
 
     # 2. Verify it is present in camera list

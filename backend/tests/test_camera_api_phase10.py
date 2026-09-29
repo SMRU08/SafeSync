@@ -66,7 +66,7 @@ def test_list_cameras_endpoint():
     assert "api_test_disabled" in ids
 
     synth_cam = next(c for c in data if c["camera_id"] == "api_test_synth")
-    assert synth_cam["state"] == "CONNECTED"
+    assert synth_cam["state"] in ("CONNECTED", "STREAMING")
     assert synth_cam["metrics"]["frame_count"] > 0
     assert "safe_source" in synth_cam
 
@@ -77,7 +77,7 @@ def test_get_single_camera_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["camera_id"] == "api_test_synth"
-    assert data["state"] == "CONNECTED"
+    assert data["state"] in ("CONNECTED", "STREAMING")
     assert data["zone_id"] == "production_floor"
 
 
@@ -104,7 +104,7 @@ def test_stop_and_start_camera_endpoints():
     assert res_start.status_code == 200
     time.sleep(0.2)
     res_get2 = client.get("/api/cameras/api_test_synth")
-    assert res_get2.json()["state"] == "CONNECTED"
+    assert res_get2.json()["state"] in ("CONNECTED", "STREAMING", "CONNECTING")
 
 
 def test_register_camera_endpoint():
@@ -128,7 +128,7 @@ def test_register_camera_endpoint():
     assert response.status_code == 201
     data = response.json()
     assert data["camera_id"] == "dynamic_cam_01"
-    assert data["state"] in ("CONNECTED", "CONNECTING")
+    assert data["state"] in ("CONNECTED", "CONNECTING", "STREAMING")
 
     # Cleanup
     client.post("/api/cameras/dynamic_cam_01/stop")

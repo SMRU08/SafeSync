@@ -2,8 +2,8 @@
 # Real-Time & Video Detection Configuration
 
 model:
-  path: "models/detection/ppe_fire_smoke_v3/weights/best.pt"
-  name: "ppe_fire_smoke_v3"
+  path: "models/detection/ppe_fire_smoke_v4/weights/best.pt"
+  name: "ppe_fire_smoke_v4"
   architecture: "yolov8n"
   expected_classes: 7
 
@@ -16,8 +16,8 @@ inference:
   half: false           # FP16 (requires GPU)
   class_confidence_thresholds:
     person: 0.22
-    helmet: 0.30
-    safety_vest: 0.30
+    helmet: 0.38
+    safety_vest: 0.38
     gloves: 0.22
     safety_footwear: 0.22
     fire: 0.20

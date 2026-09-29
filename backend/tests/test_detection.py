@@ -196,7 +196,7 @@ def test_api_detection_health():
     assert response.status_code == 200
     data = response.json()
     assert data["model_loaded"] is True
-    assert data["model_version"] in ["ppe_fire_smoke_v1", "ppe_fire_smoke_v2", "ppe_fire_smoke_v3"]
+    assert data["model_version"] in ["ppe_fire_smoke_v1", "ppe_fire_smoke_v2", "ppe_fire_smoke_v3", "ppe_fire_smoke_v4"]
     assert data["class_count"] == 7
     assert data["status"] == "healthy"
     assert "helmet" in data["classes"].values()

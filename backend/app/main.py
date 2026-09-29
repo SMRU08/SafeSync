@@ -189,8 +189,11 @@ if frontend_dist:
 
     @app.get("/{full_path:path}", include_in_schema=False)
     async def serve_spa_frontend(full_path: str):
+        from fastapi import HTTPException
         if full_path.startswith(("api", "ws", "docs", "redoc", "openapi.json", "health")):
-            return None
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+        if ".." in full_path or "passwd" in full_path or full_path.startswith(("/", "\\")) or any(full_path.endswith(ext) for ext in (".passwd", ".env", ".py", ".sh", ".conf", ".ini")):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
         target_file = os.path.join(frontend_dist, full_path)
         if full_path and os.path.isfile(target_file):
             return FileResponse(target_file)

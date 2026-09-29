@@ -1,85 +1,110 @@
-# models/registry/model_registry.yaml — SafeSync Model Registry
-# Centralized production model catalog with immutable SHA-256 checksum verification.
-
-active_production_model: "ppe_fire_smoke_v3"
-
+active_production_model: ppe_fire_smoke_v4
 models:
   ppe_fire_smoke_v3:
-    model_name: "ppe_fire_smoke_v3"
-    version: "3.0.0"
-    model_path: "models/detection/ppe_fire_smoke_v3/weights/best.pt"
-    sha256: "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295"
-    status: "production"
+    model_name: ppe_fire_smoke_v3
+    version: 3.0.0
+    model_path: models/detection/ppe_fire_smoke_v3/weights/best.pt
+    sha256: 22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295
+    status: verified_fallback
     classes:
-      0: "person"
-      1: "helmet"
-      2: "safety_vest"
-      3: "gloves"
-      4: "safety_footwear"
-      5: "fire"
-      6: "smoke"
-    input_size: [448, 448]
-    framework: "Ultralytics YOLO (PyTorch)"
-    created_date: "2026-09-29"
-    verified_date: "2026-09-29"
-    description: "Phase 3.2 hardened multi-task detector with curated unpoisoned dataset, corrected fire/smoke polygon coordinates, and full worker PPE co-occurrence."
-
+      0: person
+      1: helmet
+      2: safety_vest
+      3: gloves
+      4: safety_footwear
+      5: fire
+      6: smoke
+    input_size:
+    - 448
+    - 448
+    framework: Ultralytics YOLO (PyTorch)
+    created_date: '2026-09-29'
+    verified_date: '2026-09-29'
+    description: Phase 3.2 hardened multi-task detector with curated unpoisoned dataset,
+      corrected fire/smoke polygon coordinates, and full worker PPE co-occurrence.
   ppe_fire_smoke_v2:
-    model_name: "ppe_fire_smoke_v2"
-    version: "2.0.0"
-    model_path: "models/detection/ppe_fire_smoke_v2/weights/best.pt"
-    sha256: "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3"
-    status: "archived"
+    model_name: ppe_fire_smoke_v2
+    version: 2.0.0
+    model_path: models/detection/ppe_fire_smoke_v2/weights/best.pt
+    sha256: 490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3
+    status: archived
     classes:
-      0: "person"
-      1: "helmet"
-      2: "safety_vest"
-      3: "gloves"
-      4: "safety_footwear"
-      5: "fire"
-      6: "smoke"
-    input_size: [384, 384]
-    framework: "Ultralytics YOLO (PyTorch)"
-    created_date: "2026-09-20"
-    verified_date: "2026-09-21"
-    description: "Phase 3.1 improved multi-task detector with balanced PPE and fire/smoke representation."
-
+      0: person
+      1: helmet
+      2: safety_vest
+      3: gloves
+      4: safety_footwear
+      5: fire
+      6: smoke
+    input_size:
+    - 384
+    - 384
+    framework: Ultralytics YOLO (PyTorch)
+    created_date: '2026-09-20'
+    verified_date: '2026-09-21'
+    description: Phase 3.1 improved multi-task detector with balanced PPE and fire/smoke
+      representation.
   ppe_fire_smoke_v2_candidate:
-    model_name: "ppe_fire_smoke_v2_candidate"
-    version: "2.1.0-rc1"
-    model_path: "models/detection/ppe_fire_smoke_v2/weights/best.pt"
-    sha256: "490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3"
-    status: "candidate"
+    model_name: ppe_fire_smoke_v2_candidate
+    version: 2.1.0-rc1
+    model_path: models/detection/ppe_fire_smoke_v2/weights/best.pt
+    sha256: 490a4867d0c9c848ed38e9d5b196a21f925371e3019079b6b7e30c0a5084b2f3
+    status: candidate
     classes:
-      0: "person"
-      1: "helmet"
-      2: "safety_vest"
-      3: "gloves"
-      4: "safety_footwear"
-      5: "fire"
-      6: "smoke"
-    input_size: [384, 384]
-    framework: "Ultralytics YOLO (PyTorch)"
-    created_date: "2026-09-21"
-    verified_date: "2026-09-21"
-    description: "Release candidate evaluated for edge optimization."
-
+      0: person
+      1: helmet
+      2: safety_vest
+      3: gloves
+      4: safety_footwear
+      5: fire
+      6: smoke
+    input_size:
+    - 384
+    - 384
+    framework: Ultralytics YOLO (PyTorch)
+    created_date: '2026-09-21'
+    verified_date: '2026-09-21'
+    description: Release candidate evaluated for edge optimization.
   ppe_fire_smoke_v1:
-    model_name: "ppe_fire_smoke_v1"
-    version: "1.0.0"
-    model_path: "models/detection/ppe_fire_smoke_v1/weights/best.pt"
-    sha256: "4aef531db8b91c8564bc774aa0ec3d27da7619ae7e3355099e28f3ea7f3114ba"
-    status: "archived"
+    model_name: ppe_fire_smoke_v1
+    version: 1.0.0
+    model_path: models/detection/ppe_fire_smoke_v1/weights/best.pt
+    sha256: 4aef531db8b91c8564bc774aa0ec3d27da7619ae7e3355099e28f3ea7f3114ba
+    status: archived
     classes:
-      0: "person"
-      1: "helmet"
-      2: "safety_vest"
-      3: "gloves"
-      4: "safety_footwear"
-      5: "fire"
-      6: "smoke"
-    input_size: [384, 384]
-    framework: "Ultralytics YOLO (PyTorch)"
-    created_date: "2026-09-20"
-    verified_date: "2026-09-20"
-    description: "Phase 3 baseline model (archived; superseded by v2)."
+      0: person
+      1: helmet
+      2: safety_vest
+      3: gloves
+      4: safety_footwear
+      5: fire
+      6: smoke
+    input_size:
+    - 384
+    - 384
+    framework: Ultralytics YOLO (PyTorch)
+    created_date: '2026-09-20'
+    verified_date: '2026-09-20'
+    description: Phase 3 baseline model (archived; superseded by v2).
+  ppe_fire_smoke_v4:
+    model_name: ppe_fire_smoke_v4
+    version: 4.0.0
+    model_path: models/detection/ppe_fire_smoke_v4/weights/best.pt
+    sha256: 6c6e564a07024e9b29e6999d2d0af74586576082aada5c5ad4d757a06b1c0313
+    status: production
+    classes:
+      0: person
+      1: helmet
+      2: safety_vest
+      3: gloves
+      4: safety_footwear
+      5: fire
+      6: smoke
+    input_size:
+    - 448
+    - 448
+    framework: Ultralytics YOLO (PyTorch)
+    created_date: '2026-09-29'
+    verified_date: '2026-09-29'
+    description: Unified 7-class detector v4 trained on enriched dataset (HF bucket,
+      Construction-PPE, DataCluster fire/smoke, hard negatives).

@@ -101,9 +101,9 @@ def verify_helmet_features(
             total = float(crop.shape[0] * crop.shape[1])
             shell_color_ratio = float(np.count_nonzero(m_yellow | m_red | m_white | m_blue | m_green)) / total
 
-            # If the crop lacks helmet shell colors, only reject if confidence is very low (< 0.40)
+            # If the crop lacks helmet shell colors, reject hair/head false positives
             if shell_color_ratio < 0.05:
-                if confidence < 0.40:
+                if confidence < 0.65:
                     return False
 
     return True
@@ -179,9 +179,9 @@ def verify_safety_vest_features(
             hivis_ratio = float(np.count_nonzero(mask_lime | mask_orange)) / total
             refl_ratio = float(np.count_nonzero(mask_reflective)) / total
 
-            # An industrial safety vest: accept high-confidence model detections directly
+            # An industrial safety vest: reject casual clothing lacking hi-vis/reflective materials
             is_valid_vest = (hivis_ratio >= 0.03) or (refl_ratio >= 0.015)
-            if not is_valid_vest and confidence < 0.45:
+            if not is_valid_vest and confidence < 0.65:
                 return False
 
     return True
@@ -364,10 +364,10 @@ class SpatialPPEAssociator:
         zone = self.get_body_zone(wb, item_type)
         zx1, zy1, zx2, zy2 = zone
 
-        # Check frame boundary clipping — only flag if cranium is genuinely severed off-screen
-        if item_type == PPEItemType.HELMET and wb[1] <= 2 and (zy2 - zy1) < 25:
+        # Check frame boundary clipping — flag if zone/boundary is cut off by camera frame edges
+        if item_type == PPEItemType.HELMET and (wb[1] <= self.edge_margin_px or zy1 <= 0):
             return True  # Head cut off at top
-        if item_type == PPEItemType.SAFETY_FOOTWEAR and zy2 >= (img_h - 2):
+        if item_type == PPEItemType.SAFETY_FOOTWEAR and (wb[3] >= (img_h - self.edge_margin_px) or zy2 >= img_h):
             return True  # Feet cut off at bottom
         if (wb[0] <= 0 and (wb[2] - wb[0]) < 25) or (wb[2] >= img_w and (wb[2] - wb[0]) < 25):
             return True  # Body severely cut off at lateral side
