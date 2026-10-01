@@ -18,7 +18,7 @@ import glob
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path("D:/Additional/PROJECT/SafeSync")
+ROOT = Path(__file__).resolve().parent.parent.parent
 PROCESSED_DIR = ROOT / "datasets" / "processed"
 CANONICAL_CLASSES = {
     0: "person",
