@@ -1,7 +1,7 @@
 # SafeSync — Real-World Production Readiness Audit
 **Date of Audit:** September 27, 2026  
 **System:** SafeSync — AI Vision-Based Safety Monitoring System  
-**Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)  
+**Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)  
 **Lead Auditor:** Antigravity AI Engineering Validation Agent  
 **Audit Standard:** Comprehensive Industrial Operational Readiness Standard  
 

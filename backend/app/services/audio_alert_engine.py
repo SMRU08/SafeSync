@@ -478,12 +478,27 @@ class AudioAlertEngine:
 
         has_fire = False
         has_smoke = False
+        ALARM_STATES = {"CONFIRMED", "ACTIVE"}
         for h in hazards:
             cname = ""
+            # Extract class name / hazard type
             if isinstance(h, dict):
-                cname = str(h.get("class_name") or h.get("type") or "").lower()
+                htype_raw = h.get("hazard_type", "")
+                htype_val = htype_raw.value if hasattr(htype_raw, "value") else str(htype_raw)
+                cname = htype_val.lower() or str(h.get("class_name") or h.get("type") or "").lower()
+                raw_state = str(h.get("state", "")).upper()
+                if hasattr(h.get("state"), "value"):
+                    raw_state = h["state"].value.upper()
             else:
-                cname = str(getattr(h, "class_name", getattr(h, "type", ""))).lower()
+                htype_raw = getattr(h, "hazard_type", None)
+                htype_val = htype_raw.value if hasattr(htype_raw, "value") else str(htype_raw or "")
+                cname = htype_val.lower() or str(getattr(h, "class_name", getattr(h, "type", ""))).lower()
+                raw_state_obj = getattr(h, "state", None)
+                raw_state = raw_state_obj.value.upper() if hasattr(raw_state_obj, "value") else str(raw_state_obj or "").upper()
+
+            # Only CONFIRMED or ACTIVE hazards trigger audio alarm (state gate)
+            if raw_state not in ALARM_STATES:
+                continue
 
             if "fire" in cname:
                 has_fire = True

@@ -36,7 +36,7 @@ association:
 
 temporal:
   confirmation_frames: 2         # Frames required to confirm PRESENT
-  missing_detection_tolerance: 2 # Tolerated missed detections before transitioning to ABSENT
+  missing_detection_tolerance: 6 # Tolerated missed detections before transitioning to ABSENT (increased from 2 to reduce flicker)
   history_window_frames: 30      # Sliding history window per active worker track
   prune_lost_after_frames: 60    # Purge worker history after 60 frames of inactivity
 
@@ -47,5 +47,5 @@ required_ppe:
   safety_footwear: false         # Monitored, but not globally mandatory to allow half-body / desk / mobile camera feeds
 
 occlusion:
-  edge_margin_px: 10             # Boundary cutoff margin
+  edge_margin_px: 30             # Boundary cutoff margin (increased from 10 to 30 for generous half-body detection)
   inter_person_overlap_thresh: 0.40 # IoU between workers triggering partial occlusion state

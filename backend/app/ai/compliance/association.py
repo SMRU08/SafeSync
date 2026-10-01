@@ -26,7 +26,8 @@ def verify_helmet_features(
     Validates candidate helmet detection against human cranial anatomy and visual features:
     1. Relative height ratio: Head/helmet occupies 0.05 to 0.26 of standing person height
        (or up to 0.42 if the lower body is clipped by the bottom frame boundary).
-    2. Aspect ratio: Helmets are relatively round/compact (0.65 to 1.90 width-to-height).
+    2. Aspect ratio: Helmets range from compact to wide-brim (0.55 to 2.80 width-to-height).
+       Wide-brim hard hats (ANSI Type P, forestry, wide-brim industrial) have pw/ph up to ~2.26.
     3. Cranium zone: Helmet center must fall in the uppermost cranium region of the worker.
     4. Relative width ratio: Helmet width occupies 0.18 to 0.90 of worker box width.
     5. Hair vs Helmet visual verification (when frame is available):
@@ -55,9 +56,9 @@ def verify_helmet_features(
     if h_ratio < 0.05 or h_ratio > max_h_ratio:
         return False
 
-    # 2. Aspect ratio (width / height)
+    # 2. Aspect ratio (width / height) — range: 0.55 (narrow safety cap) to 2.80 (wide-brim hard hat)
     aspect_ratio = pw / ph
-    if aspect_ratio < 0.65 or aspect_ratio > 1.90:
+    if aspect_ratio < 0.55 or aspect_ratio > 2.80:
         return False
 
     # 3. Cranium zone: helmet center relative to top of worker
@@ -66,9 +67,9 @@ def verify_helmet_features(
     if rel_yc < -0.10 or rel_yc > max_yc:
         return False
 
-    # 4. Relative width
+    # 4. Relative width (pw / ww) — up to 0.98 for wide-brim industrial helmets
     w_ratio = pw / ww
-    if w_ratio < 0.18 or w_ratio > 0.90:
+    if w_ratio < 0.18 or w_ratio > 0.98:
         return False
 
     # 5. Visual chromatic & luminance check for hair false positives
@@ -101,9 +102,13 @@ def verify_helmet_features(
             total = float(crop.shape[0] * crop.shape[1])
             shell_color_ratio = float(np.count_nonzero(m_yellow | m_red | m_white | m_blue | m_green)) / total
 
-            # If the crop lacks helmet shell colors, reject hair/head false positives
+            # If the model has high confidence (>=0.65), trust it directly without HSV gating
+            if confidence >= 0.65:
+                return True
+
+            # If the crop lacks helmet shell colors, reject only if confidence is low (<0.50)
             if shell_color_ratio < 0.05:
-                if confidence < 0.65:
+                if confidence < 0.50:
                     return False
 
     return True
@@ -179,9 +184,9 @@ def verify_safety_vest_features(
             hivis_ratio = float(np.count_nonzero(mask_lime | mask_orange)) / total
             refl_ratio = float(np.count_nonzero(mask_reflective)) / total
 
-            # An industrial safety vest: reject casual clothing lacking hi-vis/reflective materials
+            # An industrial safety vest: accept high-confidence model detections directly
             is_valid_vest = (hivis_ratio >= 0.03) or (refl_ratio >= 0.015)
-            if not is_valid_vest and confidence < 0.65:
+            if not is_valid_vest and confidence < 0.45:
                 return False
 
     return True
@@ -331,6 +336,9 @@ class SpatialPPEAssociator:
         elif item_type == PPEItemType.SAFETY_VEST:
             if rel_yc < 0.12 or rel_yc > 0.70:
                 return 0.0
+        elif item_type == PPEItemType.GLOVES:
+            if rel_yc < 0.20 or rel_yc > 1.05:
+                return 0.0
         elif item_type == PPEItemType.SAFETY_FOOTWEAR:
             if rel_yc < 0.60 or rel_yc > 1.15:
                 return 0.0
@@ -358,21 +366,57 @@ class SpatialPPEAssociator:
         """
         Determines whether a worker's anatomical zone for a given PPE type is occluded
         either by frame boundary clipping or by overlapping adjacent workers.
+
+        Frame boundary occlusion logic:
+        - HELMET: head severed at top frame boundary
+        - GLOVES / SAFETY_FOOTWEAR: lower body (hands/feet) clipped at bottom or lateral
+        - Any type: severe lateral clipping (< 25px visible width)
+        - Half-body workers (wh/ww < 2.0): lower body not in frame → GLOVES and SAFETY_FOOTWEAR UNKNOWN
         """
         img_h, img_w = img_shape[:2]
         wb = worker_boxes[worker_idx]
+        wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
+        wh = max(1.0, wy2 - wy1)
+        ww = max(1.0, wx2 - wx1)
+
         zone = self.get_body_zone(wb, item_type)
         zx1, zy1, zx2, zy2 = zone
 
-        # Check frame boundary clipping — flag if zone/boundary is cut off by camera frame edges
-        if item_type == PPEItemType.HELMET and (wb[1] <= self.edge_margin_px or zy1 <= 0):
-            return True  # Head cut off at top
-        if item_type == PPEItemType.SAFETY_FOOTWEAR and (wb[3] >= (img_h - self.edge_margin_px) or zy2 >= img_h):
-            return True  # Feet cut off at bottom
-        if (wb[0] <= 0 and (wb[2] - wb[0]) < 25) or (wb[2] >= img_w and (wb[2] - wb[0]) < 25):
-            return True  # Body severely cut off at lateral side
+        # --- Frame boundary clipping checks ---
+        margin = max(25, int(img_w * 0.04))
 
-        # Check occlusion by other workers
+        # Helmet: head/cranium severed at top frame edge
+        if item_type == PPEItemType.HELMET:
+            if wy1 <= margin and (zy2 - zy1) < 25:
+                return True  # Only head visible at top of frame → cranium clipped
+
+        # Safety footwear: feet cut off at bottom frame edge
+        if item_type == PPEItemType.SAFETY_FOOTWEAR:
+            if zy2 >= (img_h - margin) or wy2 >= (img_h - margin):
+                return True  # Feet zone extends to or below frame bottom
+
+        # Gloves: hands (lower-arm zone) clipped at bottom or lateral edges
+        if item_type == PPEItemType.GLOVES:
+            if zy2 >= (img_h - margin) or wy2 >= (img_h - margin):
+                return True  # Gloves zone clipped at bottom
+
+        # Lateral clipping: body severely cut off at either side
+        if (wx1 <= margin and ww < 40) or (wx2 >= (img_w - margin) and ww < 40):
+            return True
+
+        # Half-body detection: worker height-to-width ratio < 2.0 suggests lower body is off frame
+        # (Standing adult: wh/ww ≈ 2.5–4.0; if ratio < 2.0 → bottom of body is not in frame)
+        if wh / ww < 2.0:
+            if item_type in (PPEItemType.SAFETY_FOOTWEAR, PPEItemType.GLOVES):
+                return True  # Lower body not visible
+
+        # --- Frame boundary check on the body zone itself ---
+        if zy2 > img_h - 2 or zy1 < 0:
+            return True
+        if zx2 > img_w - 2 or zx1 < 0:
+            return True
+
+        # --- Occlusion by other workers ---
         zone_area = max(1.0, (zx2 - zx1) * (zy2 - zy1))
         for j, other_wb in enumerate(worker_boxes):
             if j == worker_idx:

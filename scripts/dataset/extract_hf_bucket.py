@@ -9,8 +9,8 @@ import zipfile
 from pathlib import Path
 from tqdm import tqdm
 
-ZIP_PATH = Path(r"D:\Additional\PROJECT\RAKSHYA-VISION\data\raw\huggingface\PPE_Detection-bucket\PPE.zip")
-EXTRACT_DIR = Path(r"D:\Additional\PROJECT\RAKSHYA-VISION\data\raw\huggingface\PPE_Detection-bucket\extracted")
+ZIP_PATH = Path(r"D:\Additional\PROJECT\SafeSync\data\raw\huggingface\PPE_Detection-bucket\PPE.zip")
+EXTRACT_DIR = Path(r"D:\Additional\PROJECT\SafeSync\data\raw\huggingface\PPE_Detection-bucket\extracted")
 EXTRACT_DIR.mkdir(parents=True, exist_ok=True)
 
 

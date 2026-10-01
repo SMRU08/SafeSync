@@ -152,14 +152,14 @@ The prototype appeared completely down in the user's browser (API Down, AI Stand
 
 ### To Start the Backend:
 ```powershell
-cd D:\Additional\PROJECT\RAKSHYA-VISION\backend
+cd D:\Additional\PROJECT\SafeSync\backend
 .\.venv\Scripts\Activate.ps1
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### To Start the Frontend:
 ```powershell
-cd D:\Additional\PROJECT\RAKSHYA-VISION\frontend
+cd D:\Additional\PROJECT\SafeSync\frontend
 npm run dev -- --host 0.0.0.0 --port 5173
 ```
 

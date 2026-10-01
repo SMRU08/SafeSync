@@ -243,6 +243,7 @@ class WorkerComplianceEngine:
             summary=summary,
             unassociated_ppe_count=len(unassociated_ppe),
             environmental_hazards=hazards,
+            raw_detections=getattr(det_response, "raw_detections", []),
             annotated_image_base64=b64_img,
         )
 

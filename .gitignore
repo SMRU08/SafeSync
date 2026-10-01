@@ -86,6 +86,7 @@ models/**/*.onnx
 models/**/*.engine
 models/**/*.h5
 models/**/*.tflite
+models/detection/*_backup/
 
 # IDE & OS
 .vscode/

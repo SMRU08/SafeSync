@@ -664,13 +664,12 @@ SafeSync React 18 Dashboard"""
         r2.font.size = Pt(8)
         r2.font.color.rgb = COLOR_TEXT_DARK
 
-    # Save to both target locations
-    path1 = os.path.join("BPUT-HACKATHON-2026", "SafeSync-BPUT-HACKATHON-2026.pptx")
-    path2 = "SafeSync-BPUT-HACKATHON-2026.pptx"
-
-    prs.save(path1)
-    prs.save(path2)
-    print(f"Presentation successfully created with {len(prs.slides)} slides at:\n  - {path1}\n  - {path2}")
+    # Save to canonical target location
+    out_dir = "BPUT-HACKATHON-2026"
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, "BPUT_HACKATHON_2026.pptx")
+    prs.save(out_path)
+    print(f"Presentation successfully created with {len(prs.slides)} slides at:\n  - {out_path}")
 
 if __name__ == "__main__":
     build_presentation()

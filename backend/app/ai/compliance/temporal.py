@@ -161,6 +161,8 @@ class TemporalComplianceTracker:
 
                 if is_occluded:
                     # Occluded body zone: Do NOT penalize worker with ABSENT
+                    # Also reset consecutive_missed so clearing occlusion doesn't trigger ABSENT immediately
+                    self._consecutive_missed[track_id][item_type] = 0
                     self._confirmed_state[track_id][item_type] = PPEState.UNKNOWN
                     details_str = "Body zone occluded or clipped by frame boundary"
                 else:

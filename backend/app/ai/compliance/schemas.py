@@ -112,6 +112,10 @@ class ComplianceAnalysisResponse(BaseModel):
         default_factory=list,
         description="Active fire and smoke detections passed through without marking PPE violations"
     )
+    raw_detections: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="Raw unfiltered model output coordinates and confidences"
+    )
     annotated_image_base64: Optional[str] = None
 
 

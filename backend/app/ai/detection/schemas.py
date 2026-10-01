@@ -47,6 +47,7 @@ class ImageDetectionResponse(BaseModel):
     model_version: str = "ppe_fire_smoke_v1"
     device: str = "cpu"
     class_counts: Dict[str, int] = Field(default_factory=dict)
+    raw_detections: List[Dict[str, Any]] = Field(default_factory=list, description="Raw model detections before filtering")
 
 
 class VideoProcessingOptions(BaseModel):

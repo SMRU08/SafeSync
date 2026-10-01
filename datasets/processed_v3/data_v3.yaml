@@ -1,5 +1,5 @@
 # data_v3.yaml — SafeSync Curated Dataset (Phase 3 Hardened)
-path: D:/Additional/PROJECT/RAKSHYA-VISION/datasets/processed_v3
+path: D:/Additional/PROJECT/SafeSync/datasets/processed_v3
 train: images/train
 val: images/val
 test: images/test

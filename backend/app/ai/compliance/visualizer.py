@@ -78,6 +78,12 @@ class ComplianceVisualizer:
                     hstate = getattr(h, "state", "")
                     state = hstate.value.upper() if hasattr(hstate, "value") else str(hstate).upper()
 
+                # State gate: only render confirmed or high-confidence hazards
+                # Candidate/Detecting states must NOT appear on the live HUD
+                SHOW_STATES = {"CONFIRMED", "ACTIVE"}
+                if state not in SHOW_STATES and conf < 0.35:
+                    continue
+
                 # Distinct high-contrast colors: Fire=Crimson Red, Smoke=Bright Amber
                 color = (0, 0, 240) if cname == "fire" else (0, 140, 255)
                 bx1, by1, bx2, by2 = int(b[0]), int(b[1]), int(b[2]), int(b[3])

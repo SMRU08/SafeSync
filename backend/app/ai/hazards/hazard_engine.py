@@ -277,10 +277,17 @@ class HazardAnalysisEngine:
         raw_hazards: List[Dict[str, Any]],
         frame_shape: Tuple[int, int],
         camera_id: str = "camera_01",
-    ) -> HazardAnalysisResponse:
+        worker_boxes: Optional[List[Any]] = None,
+    ) -> "HazardAnalysisResponse":
         """
         Fast-path hazard evaluation using pre-computed model detections (Single-pass YOLO).
         Completely eliminates secondary YOLO neural network execution latency.
+
+        Args:
+            raw_hazards: List of detection dicts from compliance engine (class_name, bbox, confidence)
+            frame_shape: (height, width) of original frame
+            camera_id: Source camera identifier
+            worker_boxes: Optional list of worker bbox arrays [x1,y1,x2,y2] for smoke torso exclusion
         """
         self.frame_counter += 1
         h, w = frame_shape[:2]
@@ -316,6 +323,36 @@ class HazardAnalysisEngine:
                 continue
 
             zone_id = self.zone_manager.resolve_zone(camera_id, cx, cy, w, h)
+
+            # Worker-torso spatial exclusion: reject low-confidence smoke overlapping a worker body
+            # Rationale: skin/hair/clothing pixels are commonly misclassified as smoke at low confidence
+            if htype == HazardType.SMOKE and conf < 0.40 and worker_boxes:
+                torso_overlap = False
+                smoke_area = max(1.0, box_area)
+                for wb in worker_boxes:
+                    try:
+                        if hasattr(wb, "x1"):
+                            wx1, wy1, wx2, wy2 = float(wb.x1), float(wb.y1), float(wb.x2), float(wb.y2)
+                        elif isinstance(wb, (list, tuple)) and len(wb) >= 4:
+                            wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
+                        elif isinstance(wb, np.ndarray) and wb.size >= 4:
+                            wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
+                        else:
+                            continue
+                    except Exception:
+                        continue
+                    # Intersection area between smoke bbox and worker bbox
+                    ix1 = max(bx1, wx1)
+                    iy1 = max(by1, wy1)
+                    ix2 = min(bx2, wx2)
+                    iy2 = min(by2, wy2)
+                    inter = max(0.0, ix2 - ix1) * max(0.0, iy2 - iy1)
+                    if inter / smoke_area > 0.55:
+                        torso_overlap = True
+                        break
+                if torso_overlap:
+                    continue
+
             hazard_dets.append({
                 "hazard_type": htype,
                 "confidence": conf,

@@ -1,11 +1,11 @@
-active_production_model: ppe_fire_smoke_v4
+active_production_model: ppe_fire_smoke_v3
 models:
   ppe_fire_smoke_v3:
     model_name: ppe_fire_smoke_v3
     version: 3.0.0
     model_path: models/detection/ppe_fire_smoke_v3/weights/best.pt
-    sha256: 22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295
-    status: verified_fallback
+    sha256: 9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe
+    status: production
     classes:
       0: person
       1: helmet
@@ -15,13 +15,13 @@ models:
       5: fire
       6: smoke
     input_size:
-    - 448
-    - 448
+    - 384
+    - 384
     framework: Ultralytics YOLO (PyTorch)
-    created_date: '2026-09-29'
-    verified_date: '2026-09-29'
-    description: Phase 3.2 hardened multi-task detector with curated unpoisoned dataset,
-      corrected fire/smoke polygon coordinates, and full worker PPE co-occurrence.
+    created_date: '2026-10-01'
+    verified_date: '2026-10-01'
+    description: Hardened 7-class detector v3 trained on unified dataset (safesync
+      v4 unified dataset with hard negatives).
   ppe_fire_smoke_v2:
     model_name: ppe_fire_smoke_v2
     version: 2.0.0

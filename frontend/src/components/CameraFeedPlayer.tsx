@@ -448,9 +448,14 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
             );
           })}
 
-        {/* Dynamic Environmental Hazard HUD Overlays (Fire & Smoke) */}
+        {/* Dynamic Environmental Hazard HUD Overlays (Fire & Smoke) — Only confirmed/active hazards */}
         {isCameraOnline &&
-          hazards.map((hazard, idx) => {
+          hazards
+            .filter((h) => {
+              const st = (h.state || '').toUpperCase();
+              return st === 'CONFIRMED' || st === 'ACTIVE' || (!st && (h.confidence || 0) >= 0.35);
+            })
+            .map((hazard, idx) => {
             if (!hazard.bbox || hazard.bbox.length < 4) return null;
             const [x1, y1, x2, y2] = hazard.bbox;
             const nw = videoImgRef.current?.naturalWidth || 1280;

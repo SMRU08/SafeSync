@@ -1,5 +1,5 @@
 batch: 16
-data: D:/Additional/PROJECT/RAKSHYA-VISION/datasets/normalized/fire_smoke/data.yaml
+data: D:/Additional/PROJECT/SafeSync/datasets/normalized/fire_smoke/data.yaml
 device: cpu
 epochs: 2
 exist_ok: true
@@ -17,7 +17,7 @@ mosaic: 0.3
 name: candidate_v2
 optimizer: AdamW
 patience: 5
-project: D:/Additional/PROJECT/RAKSHYA-VISION/runs/train_hazard
+project: D:/Additional/PROJECT/SafeSync/runs/train_hazard
 seed: 42
 val: true
 warmup_epochs: 0.3

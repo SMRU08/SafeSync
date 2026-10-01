@@ -43,7 +43,7 @@ Listing obtained via `HfFileSystem` (`hf://buckets/smrutiranjannayakcs/PPE_Detec
 
 ## 3. Network Resilience & Synchronization Mechanism
 
-- **Client Implementation:** [`scripts/dataset/sync_hf_bucket.py`](file:///D:/Additional/PROJECT/RAKSHYA-VISION/scripts/dataset/sync_hf_bucket.py)
+- **Client Implementation:** [`scripts/dataset/sync_hf_bucket.py`](file:///D:/Additional/PROJECT/SafeSync/scripts/dataset/sync_hf_bucket.py)
 - **Protocol:** HTTP 206 Partial Content Range Requests (`bytes={downloaded_bytes}-`)
 - **Error Recovery:** A transient SSL handshake timeout occurred during the initial connection; the resumable stream automatically reconnected with exponential backoff and resumed from byte offset 243,269,632 without restarting from zero.
 - **Local Target Directory:** `data/raw/huggingface/PPE_Detection-bucket/`

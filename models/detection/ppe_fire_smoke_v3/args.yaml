@@ -1,8 +1,8 @@
 task: detect
 mode: train
-model: D:\Additional\PROJECT\RAKSHYA-VISION\models\detection\ppe_fire_smoke_v3\weights\last.pt
-data: D:\Additional\PROJECT\RAKSHYA-VISION\datasets\processed_v3\data_v3.yaml
-epochs: 3
+model: D:\Additional\PROJECT\SafeSync\models\detection\ppe_fire_smoke_v2\weights\best.pt
+data: D:\Additional\PROJECT\SafeSync\data\processed\safesync\dataset.yaml
+epochs: 2
 time: null
 patience: 100
 batch: 16
@@ -12,7 +12,7 @@ save_period: -1
 cache: false
 device: cpu
 workers: 0
-project: D:\Additional\PROJECT\RAKSHYA-VISION\models\detection
+project: D:\Additional\PROJECT\SafeSync\models\detection
 name: ppe_fire_smoke_v3
 exist_ok: true
 pretrained: true
@@ -25,7 +25,7 @@ single_cls: false
 rect: false
 cos_lr: false
 close_mosaic: 10
-resume: D:\Additional\PROJECT\RAKSHYA-VISION\models\detection\ppe_fire_smoke_v3\weights\last.pt
+resume: false
 amp: true
 fraction: 1.0
 profile: false
@@ -71,13 +71,13 @@ dynamic: false
 simplify: true
 opset: null
 workspace: null
-lr0: 0.01
+lr0: 0.008
 lrf: 0.01
 momentum: 0.937
 weight_decay: 0.0005
 warmup_epochs: 0.5
 warmup_momentum: 0.8
-warmup_bias_lr: 0.0
+warmup_bias_lr: 0.1
 distill_model: null
 dis: 6.0
 box: 7.5
@@ -93,9 +93,9 @@ dgrad: 0.5
 dlam: 1.0
 nbs: 64
 hsv_h: 0.015
-hsv_s: 0.5
+hsv_s: 0.6
 hsv_v: 0.4
-degrees: 0.0
+degrees: 15.0
 translate: 0.1
 scale: 0.5
 shear: 0.0
@@ -112,4 +112,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: tracktrack.yaml
-save_dir: D:\Additional\PROJECT\RAKSHYA-VISION\models\detection\ppe_fire_smoke_v3
+save_dir: D:\Additional\PROJECT\SafeSync\models\detection\ppe_fire_smoke_v3

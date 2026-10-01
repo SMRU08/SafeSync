@@ -20,8 +20,8 @@ hazard:
   smoke_candidate_confidence: 0.20
 
   # ── Stage 2: Confirmation Confidence ─────────────────────────────────────
-  fire_confirmation_confidence: 0.22
-  smoke_confirmation_confidence: 0.25
+  fire_confirmation_confidence: 0.25
+  smoke_confirmation_confidence: 0.35
 
   # ── Temporal Confirmation Parameters ─────────────────────────────────────
   confirmation_frames: 3

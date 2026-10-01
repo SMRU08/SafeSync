@@ -1,7 +1,8 @@
 {
   "model_name": "ppe_fire_smoke_v3",
-  "sha256": "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295",
-  "input_resolution": 448,
+  "sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+  "train_duration_seconds": 1566.3,
+  "input_resolution": 384,
   "classes": {
     "0": "person",
     "1": "helmet",
@@ -12,53 +13,109 @@
     "6": "smoke"
   },
   "val_metrics": {
-    "precision": 0.4188,
-    "recall": 0.4153,
-    "mAP50": 0.3604,
-    "mAP50_95": 0.2072,
-    "per_class_mAP50": {
-      "person": 0.3239,
-      "helmet": 0.3518,
-      "safety_vest": 0.4855,
-      "gloves": 0.0326,
-      "safety_footwear": 0.1003,
-      "fire": 0.0794,
-      "smoke": 0.0766
+    "precision": 0.4604,
+    "recall": 0.44,
+    "mAP50": 0.4089,
+    "mAP50_95": 0.1779,
+    "per_class": {
+      "person": {
+        "precision": 0.3848,
+        "recall": 0.6838,
+        "mAP50": 0.2051
+      },
+      "helmet": {
+        "precision": 0.5092,
+        "recall": 0.6715,
+        "mAP50": 0.2847
+      },
+      "safety_vest": {
+        "precision": 0.6681,
+        "recall": 0.7699,
+        "mAP50": 0.3841
+      },
+      "gloves": {
+        "precision": 0.2366,
+        "recall": 0.1625,
+        "mAP50": 0.0567
+      },
+      "safety_footwear": {
+        "precision": 0.368,
+        "recall": 0.4147,
+        "mAP50": 0.1332
+      },
+      "fire": {
+        "precision": 0.5026,
+        "recall": 0.1336,
+        "mAP50": 0.0817
+      },
+      "smoke": {
+        "precision": 0.5538,
+        "recall": 0.2437,
+        "mAP50": 0.0999
+      }
     }
   },
   "test_metrics": {
-    "precision": 0.4031,
-    "recall": 0.4434,
-    "mAP50": 0.3935,
-    "mAP50_95": 0.2344,
-    "per_class_mAP50": {
-      "person": 0.3536,
-      "helmet": 0.4061,
-      "safety_vest": 0.5247,
-      "gloves": 0.018,
-      "safety_footwear": 0.0789,
-      "fire": 0.1415,
-      "smoke": 0.1182
+    "precision": 0.4281,
+    "recall": 0.4651,
+    "mAP50": 0.4072,
+    "mAP50_95": 0.1771,
+    "per_class": {
+      "person": {
+        "precision": 0.3679,
+        "recall": 0.7464,
+        "mAP50": 0.2209
+      },
+      "helmet": {
+        "precision": 0.4495,
+        "recall": 0.7017,
+        "mAP50": 0.2707
+      },
+      "safety_vest": {
+        "precision": 0.6283,
+        "recall": 0.7886,
+        "mAP50": 0.4021
+      },
+      "gloves": {
+        "precision": 0.3108,
+        "recall": 0.2469,
+        "mAP50": 0.0872
+      },
+      "safety_footwear": {
+        "precision": 0.3547,
+        "recall": 0.3898,
+        "mAP50": 0.1179
+      },
+      "fire": {
+        "precision": 0.4422,
+        "recall": 0.203,
+        "mAP50": 0.0617
+      },
+      "smoke": {
+        "precision": 0.4434,
+        "recall": 0.1792,
+        "mAP50": 0.0791
+      }
     }
   },
   "resolution_benchmarks": {
-    "384": {
-      "mean_latency_ms": 38.7,
-      "fps": 25.8,
-      "p50_ms": 38.56,
-      "p95_ms": 42.25
+    "384x384": {
+      "mean_latency_ms": 38.0,
+      "fps": 26.3,
+      "p50_ms": 37.88,
+      "p95_ms": 42.1
     },
-    "448": {
-      "mean_latency_ms": 48.17,
-      "fps": 20.8,
-      "p50_ms": 46.84,
-      "p95_ms": 52.6
+    "448x448": {
+      "mean_latency_ms": 44.49,
+      "fps": 22.5,
+      "p50_ms": 44.48,
+      "p95_ms": 47.14
     },
-    "512": {
-      "mean_latency_ms": 59.22,
-      "fps": 16.9,
-      "p50_ms": 59.39,
-      "p95_ms": 64.05
+    "512x512": {
+      "mean_latency_ms": 48.51,
+      "fps": 20.6,
+      "p50_ms": 48.27,
+      "p95_ms": 51.38
     }
   }
 }

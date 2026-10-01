@@ -3,7 +3,7 @@
 **System:** SafeSync (AI Vision-Based Safety Monitoring System)  
 **Problem Statement:** PS06 — Prototype AI system detecting safety gear compliance & environmental hazards  
 **Target Domains:** Industrial manufacturing, construction sites, power generation, hazardous facilities  
-**Repository:** [https://github.com/SMRU08/RAKSHYA-VISION.git](https://github.com/SMRU08/RAKSHYA-VISION.git)  
+**Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)  
 **Documentation Index:** [`docs/README.md`](./docs/README.md)  
 
 ---

@@ -194,9 +194,10 @@ class Detector:
         results = model.predict(**predict_kwargs)
         latency_ms = (time.perf_counter() - t0) * 1000.0
 
-        # 4. Extract detections
+        # 4. Extract detections and capture raw model output
         detections: List[DetectionObject] = []
         class_counts: Dict[str, int] = {}
+        raw_detections_list: List[Dict[str, Any]] = []
 
         if results and len(results) > 0:
             boxes = results[0].boxes
@@ -205,6 +206,15 @@ class Detector:
                     cls_id = int(box.cls[0].item())
                     cls_name = model.names.get(cls_id, f"class_{cls_id}")
                     score = float(box.conf[0].item())
+                    coords = [round(c, 2) for c in box.xyxy[0].tolist()]
+
+                    # Always log raw model candidate before any threshold filtering or spatial pruning
+                    raw_detections_list.append({
+                        "class_id": cls_id,
+                        "class_name": cls_name,
+                        "confidence": round(score, 4),
+                        "bbox": coords,
+                    })
 
                     # Model class routing
                     low_name = cls_name.lower()
@@ -295,6 +305,14 @@ class Detector:
                 except Exception as p_err:
                     log.debug("Multi-person recall detection error: %s", p_err)
 
+        # Log raw model detections (Step 1 raw output trace)
+        if raw_detections_list:
+            log.info(
+                "[RAW YOLO] %d candidates (conf_min=%.2f): %s",
+                len(raw_detections_list), pred_conf,
+                ", ".join(f"{r['class_name']}:{r['confidence']:.2f}" for r in raw_detections_list)
+            )
+
         # 5. Build response
         response = ImageDetectionResponse(
             success=True,
@@ -306,6 +324,7 @@ class Detector:
             model_version=self.loader.config.get("model", {}).get("name", "ppe_fire_smoke_v1"),
             device=device,
             class_counts=class_counts,
+            raw_detections=raw_detections_list,
         )
 
         annotated_frame = None

@@ -20,6 +20,7 @@ from app.camera.schemas import (
     CameraStatus,
     CameraSourceType,
 )
+from app.ai.detection.model_loader import ModelLoader
 
 logger = logging.getLogger("camera_worker")
 
@@ -203,10 +204,20 @@ class CameraWorker:
                 try:
                     raw_haz = getattr(compliance_resp, "environmental_hazards", None)
                     if hasattr(self._hazard_engine, "process_raw_hazards") and raw_haz is not None:
+                        # Extract current worker bbox list for smoke torso-exclusion
+                        _worker_boxes = []
+                        try:
+                            for _w in compliance_resp.workers:
+                                _bb = getattr(_w, "bbox", None)
+                                if _bb is not None:
+                                    _worker_boxes.append(_bb)
+                        except Exception:
+                            pass
                         hazard_resp = self._hazard_engine.process_raw_hazards(
                             raw_hazards=raw_haz,
                             frame_shape=frame.shape[:2],
                             camera_id=self.camera_id,
+                            worker_boxes=_worker_boxes,
                         )
                     else:
                         hazard_resp, _, _ = self._hazard_engine.process_frame(
@@ -249,12 +260,9 @@ class CameraWorker:
                 self._latest_workers = compliance_resp.workers
                 self._latest_compliance_summary = compliance_resp.summary
                 self._latest_annotated_b64 = compliance_resp.annotated_image_base64
-                if hazard_resp is not None:
-                    self._latest_hazards = hazard_resp.hazards or []
-                    self.metrics.active_hazards = len(self._latest_hazards)
-                else:
-                    self._latest_hazards = []
-                    self.metrics.active_hazards = 0
+                if hazard_resp:
+                    self._latest_hazards = hazard_resp.hazards
+                    self.metrics.active_hazards = len(hazard_resp.hazards)
                 if safety_assessment:
                     self._latest_safety_assessment = safety_assessment
                 self.metrics.inference_latency_ms = round(ai_duration_ms, 2)
@@ -440,38 +448,16 @@ class CameraWorker:
     def get_status(self) -> CameraStatus:
         """Returns snapshot of current camera status and metrics."""
         with self._lock:
-            now = time.time()
             # Update uptime
-            if self._start_time and self.state in (CameraState.CONNECTED, CameraState.STREAMING):
-                self.metrics.uptime_seconds = round(now - self._start_time, 1)
-
-            # Compute last_frame_age_ms
-            age_ms = None
-            if self.metrics.last_successful_frame_timestamp:
-                age_ms = int((now - self.metrics.last_successful_frame_timestamp) * 1000)
-
-            # Dynamic state transition based on real frame delivery
-            current_state = self.state
-            if self.state in (CameraState.CONNECTED, CameraState.STREAMING):
-                if age_ms is not None and age_ms < 2000:
-                    current_state = CameraState.STREAMING
-                elif age_ms is not None and age_ms < 5000:
-                    current_state = CameraState.DEGRADED
-                elif age_ms is not None and age_ms >= 5000:
-                    current_state = CameraState.DEGRADED
-
-            is_streaming = (current_state == CameraState.STREAMING) or (age_ms is not None and age_ms < 2000)
+            if self._start_time and self.state == CameraState.CONNECTED:
+                self.metrics.uptime_seconds = round(time.time() - self._start_time, 1)
 
             # Determine human-friendly status string
-            if current_state == CameraState.STREAMING:
-                status_str = "streaming"
-            elif current_state == CameraState.CONNECTED:
+            if self.state in (CameraState.CONNECTED, CameraState.DEGRADED):
                 status_str = "online"
-            elif current_state == CameraState.DEGRADED:
-                status_str = "degraded"
-            elif current_state in (CameraState.CONNECTING, CameraState.RECONNECTING):
+            elif self.state in (CameraState.CONNECTING, CameraState.RECONNECTING):
                 status_str = "connecting"
-            elif current_state == CameraState.ERROR:
+            elif self.state == CameraState.ERROR:
                 status_str = "error"
             else:
                 status_str = "offline"
@@ -482,16 +468,6 @@ class CameraWorker:
                     from datetime import datetime, timezone
                     last_seen_iso = datetime.fromtimestamp(
                         self.metrics.last_successful_frame_timestamp, tz=timezone.utc
-                    ).isoformat()
-                except Exception:
-                    pass
-
-            last_attempt_iso = None
-            if self.metrics.last_attempt_timestamp:
-                try:
-                    from datetime import datetime, timezone
-                    last_attempt_iso = datetime.fromtimestamp(
-                        self.metrics.last_attempt_timestamp, tz=timezone.utc
                     ).isoformat()
                 except Exception:
                     pass
@@ -516,17 +492,9 @@ class CameraWorker:
                 source_type=self.config.source_type.value,
                 enabled=self.config.enabled,
                 speaker_enabled=self.speaker_enabled,
-                state=current_state,
+                state=self.state,
                 status=status_str,
-                connection_status=current_state.value.lower(),
-                is_streaming=is_streaming,
-                last_frame_age_ms=age_ms,
-                frame_id=self._frame_id,
-                last_frame_timestamp=self.metrics.last_successful_frame_timestamp,
-                last_attempt=last_attempt_iso,
-                last_attempt_timestamp=self.metrics.last_attempt_timestamp,
-                last_error=self.metrics.last_error,
-                retry_count=self.metrics.retry_count,
+                connection_status=self.state.value.lower(),
                 stream_url=f"/api/cameras/{self.camera_id}/stream",
                 fps=self.metrics.fps,
                 resolution=self.config.resolution or "1280x720",
@@ -649,46 +617,23 @@ class CameraWorker:
                 except Exception as e:
                     logger.debug("Error serializing worker in get_live_compliance: %s", e)
 
-            hazards_out = []
-            for idx, h in enumerate(self._latest_hazards):
-                try:
-                    if hasattr(h, "model_dump"):
-                        hd = h.model_dump()
-                    elif isinstance(h, dict):
-                        hd = dict(h)
-                    else:
-                        hd = vars(h).copy()
-
-                    if "hazard_id" not in hd:
-                        hd["hazard_id"] = str(hd.get("event_id", f"hazard_{idx+1}"))
-                    if "state" not in hd:
-                        hd["state"] = "ACTIVE"
-
-                    if "bbox" in hd:
-                        b = hd["bbox"]
-                        if isinstance(b, dict):
-                            hd["bbox"] = [
-                                float(b.get("x1", 0)),
-                                float(b.get("y1", 0)),
-                                float(b.get("x2", 0)),
-                                float(b.get("y2", 0)),
-                            ]
-                        if isinstance(hd["bbox"], list) and len(hd["bbox"]) >= 4:
-                            bx1, by1, bx2, by2 = hd["bbox"][:4]
-                            hd["normalized_bbox"] = [
-                                round(bx1 / max(1, fw), 4),
-                                round(by1 / max(1, fh), 4),
-                                round(bx2 / max(1, fw), 4),
-                                round(by2 / max(1, fh), 4),
-                            ]
-                    hazards_out.append(hd)
-                except Exception as e:
-                    logger.debug("Error serializing hazard in get_live_compliance: %s", e)
-
             track_telemetry = []
             if self._compliance_engine and hasattr(self._compliance_engine.tracker, "get_track_telemetry"):
                 try:
                     track_telemetry = self._compliance_engine.tracker.get_track_telemetry()
+                except Exception:
+                    pass
+
+            # Build hazards list for frontend
+            hazards_out = []
+            for h in self._latest_hazards:
+                try:
+                    if hasattr(h, "model_dump"):
+                        hazards_out.append(h.model_dump())
+                    elif isinstance(h, dict):
+                        hazards_out.append(dict(h))
+                    else:
+                        hazards_out.append(vars(h))
                 except Exception:
                     pass
 
@@ -703,6 +648,22 @@ class CameraWorker:
                 "summary": self._latest_compliance_summary.model_dump() if hasattr(self._latest_compliance_summary, "model_dump") else self._latest_compliance_summary,
                 "annotated_image_base64": self._latest_annotated_b64,
                 "timestamp": self._latest_frame_time,
+                "fps": self.metrics.fps,
+                "inference_latency_ms": self.metrics.inference_latency_ms,
+                "debug_telemetry": {
+                    "frame_id": self._frame_id,
+                    "fps": self.metrics.fps,
+                    "capture_fps": getattr(self.metrics, "capture_fps", self.metrics.fps),
+                    "inference_time_ms": self.metrics.inference_latency_ms,
+                    "active_workers": self.metrics.active_workers,
+                    "active_violations": self.metrics.active_violations,
+                    "active_hazards": self.metrics.active_hazards,
+                    "dropped_frames": getattr(self.metrics, "dropped_frames", 0),
+                    "dropped_ai_frames": getattr(self.metrics, "dropped_ai_frames", 0),
+                    "frame_queue_depth": getattr(self.metrics, "frame_queue_depth", 0),
+                    "model": getattr(ModelLoader.get_instance(), "config", {}).get("model", {}).get("name", "ppe_fire_smoke_v3"),
+                    "camera_state": self.state.value if hasattr(self.state, "value") else str(self.state),
+                },
             }
 
     def _open_capture(self) -> Optional[cv2.VideoCapture]:
@@ -765,18 +726,44 @@ class CameraWorker:
             if cap is None or not cap.isOpened():
                 return None
 
-            # Buffer flush optimization: set driver buffer size to 1 where supported
+            # ─── Latest-frame-wins: minimize IP camera buffering delay ───────────────────
+            # Mobile IP cameras (Android IP Webcam) buffer 5–6 seconds by default because
+            # OpenCV's MJPEG decoder accumulates frames in an internal ring buffer.
+            # Strategy: set buffer to 1 frame AND aggressively flush before entering the
+            # read loop so we start from the most recent frame, not a 5-second-old frame.
+
+            # Step 1: Set hardware buffer to absolute minimum
             try:
                 cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
             except Exception:
                 pass
 
-            # Flush any stale initial driver frames
-            try:
-                for _ in range(2):
-                    cap.grab()
-            except Exception:
-                pass
+            # Step 2: For network cameras (HTTP/RTSP), drain the internal OpenCV frame buffer
+            # by grabbing without decoding until the grab takes > 50ms (live frame) or
+            # we've drained at most 10 frames.
+            is_network = any(str(target_source).startswith(p) for p in ("http://", "https://", "rtsp://")) if not is_device_index else False
+            if is_network:
+                try:
+                    import time as _time
+                    _drained = 0
+                    while _drained < 10:
+                        _t0 = _time.perf_counter()
+                        cap.grab()
+                        _elapsed = (_time.perf_counter() - _t0) * 1000.0
+                        _drained += 1
+                        # If grab took >50ms we're no longer pulling buffered frames
+                        if _elapsed > 50.0:
+                            break
+                    logger.debug("Camera %s: drained %d buffered frames from stream buffer", self.camera_id, _drained)
+                except Exception:
+                    pass
+            else:
+                # Physical webcam: flush 2 initial frames for hardware warmup
+                try:
+                    for _ in range(2):
+                        cap.grab()
+                except Exception:
+                    pass
 
             # Optional: set camera resolution if specified and using physical device
             if is_device_index and self.config.resolution and "x" in self.config.resolution:
@@ -845,7 +832,7 @@ class CameraWorker:
                 # 1. Handle synthetic camera streams
                 if self.config.source_type == CameraSourceType.SYNTHETIC:
                     with self._lock:
-                        self.state = CameraState.STREAMING
+                        self.state = CameraState.CONNECTED
                     while not self._stop_event.is_set():
                         t0 = time.time()
                         frame = self._generate_synthetic_frame(self._frame_id)
@@ -900,20 +887,17 @@ class CameraWorker:
 
                     if cap is None or not cap.isOpened():
                         reconnect_attempts += 1
-                        now_attempt = time.time()
                         with self._lock:
                             self.metrics.reconnect_count = reconnect_attempts
-                            self.metrics.retry_count = reconnect_attempts
-                            self.metrics.last_attempt_timestamp = now_attempt
-                            self.metrics.last_error = f"Connection failed: host unreachable or stream offline at {self.safe_source}"
+                            self.metrics.last_error = f"Failed to connect to source: {self.safe_source}"
                             if reconnect_attempts >= policy.max_retries:
-                                self.state = CameraState.OFFLINE
+                                self.state = CameraState.ERROR
                             else:
                                 self.state = CameraState.RECONNECTING
 
                         if reconnect_attempts >= policy.max_retries:
                             logger.error(
-                                "Camera %s reached max retries (%d). Transitioning to OFFLINE.",
+                                "Camera %s reached max retries (%d). Stopping retry loop.",
                                 self.camera_id,
                                 policy.max_retries
                             )
@@ -939,12 +923,42 @@ class CameraWorker:
                         with self._lock:
                             self.state = CameraState.CONNECTED
                             self.metrics.last_error = None
-                            self.metrics.retry_count = 0
                         logger.info("Camera %s successfully connected.", self.camera_id)
 
                 # 3. Dedicated Read loop (runs at maximum camera FPS, never blocks for AI)
+                # For network cameras: drain buffered frames first to get the absolute latest frame.
+                # This eliminates the 5–6 second IP camera delay caused by OpenCV buffering.
+                _is_network_stream = (
+                    not isinstance(target_source if "target_source" in dir() else self.config.source, int)
+                    and any(str(self.config.source).startswith(p) for p in ("http://", "https://", "rtsp://"))
+                )
                 t_frame_start = time.time()
-                ret, frame = cap.read()
+
+                if _is_network_stream:
+                    # Drain-then-retrieve: grab (no decode) as fast as possible to skip stale frames,
+                    # then retrieve the last grabbed frame for decode + inference.
+                    _grabbed = False
+                    _skipped = 0
+                    _MAX_DRAIN = 8  # Never drain more than 8 frames per iteration to stay bounded
+                    while _skipped < _MAX_DRAIN:
+                        _t_grab = time.perf_counter()
+                        _ok = cap.grab()
+                        if not _ok:
+                            break
+                        _grabbed = True
+                        _elapsed_grab = (time.perf_counter() - _t_grab) * 1000.0
+                        _skipped += 1
+                        # If grab took > 40ms, this was a blocking live frame — stop draining
+                        if _elapsed_grab > 40.0:
+                            break
+                    if _grabbed:
+                        ret, frame = cap.retrieve()
+                        if _skipped > 1:
+                            logger.debug("Camera %s: skipped %d buffered frame(s) for latest-frame-wins", self.camera_id, _skipped - 1)
+                    else:
+                        ret, frame = False, None
+                else:
+                    ret, frame = cap.read()
 
                 if not ret or frame is None:
                     with self._lock:
@@ -982,7 +996,7 @@ class CameraWorker:
                         pass
 
                 with self._frame_cv:
-                    self.state = CameraState.STREAMING
+                    self.state = CameraState.CONNECTED
                     if is_shutter_blocked:
                         self.metrics.last_error = (
                             "Camera privacy shutter closed or disabled via laptop hotkey (e.g. F10 / Fn+F10 on Asus). Physical sensor is blocked."
@@ -1071,8 +1085,8 @@ class CameraWorker:
                 except Exception:
                     pass
             with self._lock:
-                if self.state not in (CameraState.ERROR, CameraState.DISABLED, CameraState.OFFLINE):
-                    self.state = CameraState.OFFLINE
+                if self.state not in (CameraState.ERROR, CameraState.DISABLED):
+                    self.state = CameraState.DISCONNECTED
             logger.info("CameraWorker capture loop exited for %s", self.camera_id)
 
     def _update_fps(self):

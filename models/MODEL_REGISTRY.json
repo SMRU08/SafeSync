@@ -1,15 +1,15 @@
 {
   "system": "SafeSync Safety Intelligence Pipeline",
-  "updated_at": "2026-09-29T19:00:00Z",
+  "updated_at": "2026-10-01T12:00:00Z",
   "models": {
     "ppe": {
-      "active_version": "ppe_v4",
+      "active_version": "ppe_v3",
       "versions": {
         "ppe_v3": {
           "path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
-          "sha256": "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295",
+          "sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
           "architecture": "yolov8n",
-          "image_size": 448,
+          "image_size": 384,
           "classes": {
             "0": "person",
             "1": "helmet",
@@ -31,10 +31,11 @@
           "datasets": [
             "ppe_safup",
             "ppec",
-            "d_fire_corrected",
+            "safety_ppe_4",
+            "d_fire",
             "hard_negatives"
           ],
-          "notes": "Unified hardened model v3 with person co-occurrence and corrected fire/smoke polygon parsing."
+          "notes": "Hardened v3 detector with balanced multi-class PPE and fire/smoke coverage."
         },
         "ppe_v1": {
           "path": "models/ppe/ppe_v1/weights/best.pt",
@@ -104,13 +105,13 @@
       }
     },
     "hazards": {
-      "active_version": "fire_smoke_v4",
+      "active_version": "fire_smoke_v3",
       "versions": {
         "fire_smoke_v3": {
           "path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
-          "sha256": "22d214402b2f7c9721eb7e3e7e9b46963f15ea07c9757566ec3700c66a75b295",
+          "sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
           "architecture": "yolov8n",
-          "image_size": 448,
+          "image_size": 384,
           "classes": {
             "5": "fire",
             "6": "smoke"
@@ -120,10 +121,10 @@
             "smoke": 0.2
           },
           "datasets": [
-            "d_fire_corrected",
+            "d_fire",
             "hard_negatives"
           ],
-          "notes": "Hardened fire and smoke detector v3 with clean background rejection."
+          "notes": "Hardened fire and smoke detector v3 with temporal confirmation gating."
         },
         "fire_smoke_v1": {
           "path": "models/hazards/fire_smoke_v1/weights/best.pt",
