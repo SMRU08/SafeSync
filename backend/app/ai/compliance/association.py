@@ -102,13 +102,13 @@ def verify_helmet_features(
             total = float(crop.shape[0] * crop.shape[1])
             shell_color_ratio = float(np.count_nonzero(m_yellow | m_red | m_white | m_blue | m_green)) / total
 
-            # If the model has high confidence (>=0.65), trust it directly without HSV gating
-            if confidence >= 0.65:
+            # If the model has very high confidence (>=0.75), trust it directly without HSV gating
+            if confidence >= 0.75:
                 return True
 
-            # If the crop lacks helmet shell colors, reject only if confidence is low (<0.50)
+            # If the crop lacks helmet shell colors, reject if confidence is below 0.65
             if shell_color_ratio < 0.05:
-                if confidence < 0.50:
+                if confidence < 0.65:
                     return False
 
     return True
@@ -186,7 +186,7 @@ def verify_safety_vest_features(
 
             # An industrial safety vest: accept high-confidence model detections directly
             is_valid_vest = (hivis_ratio >= 0.03) or (refl_ratio >= 0.015)
-            if not is_valid_vest and confidence < 0.45:
+            if not is_valid_vest and confidence < 0.65:
                 return False
 
     return True

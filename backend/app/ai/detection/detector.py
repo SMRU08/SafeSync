@@ -228,9 +228,18 @@ class Detector:
                         class_min = self.class_conf_thresholds.get(low_name)
                         if class_min is not None:
                             if conf is None or conf == self.default_conf:
+                                # Using default threshold — enforce per-class minimum
                                 req_conf = class_min
                             else:
-                                req_conf = max(conf, class_min)
+                                # Caller passed an explicit threshold; for environmental hazards
+                                # (fire, smoke) honour the caller's explicit lower threshold so
+                                # that test/pipeline code can use conf=0.20 to capture low-
+                                # confidence fire/smoke without being clamped up by the per-class
+                                # default. For PPE classes keep the stricter class minimum.
+                                if low_name in ("fire", "smoke"):
+                                    req_conf = conf_thresh
+                                else:
+                                    req_conf = max(conf_thresh, class_min)
 
                     if score < req_conf:
                         continue
