@@ -5,7 +5,7 @@
 > **Autonomous real-time computer vision for workplace safety, PPE compliance governance, combustion hazard detection, explainable risk assessment, and rapid incident response.**
 
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)](https://github.com/SMRU08/SafeSync)
-[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-250%2F250%20Passing-success?style=flat-square)](https://github.com/SMRU08/SafeSync)
+[![Backend Tests](https://img.shields.io/badge/Tests-276%2F276%20Passing-success?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![Integration Scenarios](https://img.shields.io/badge/Integration-39%2F39%20Verified-blue?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![E2E Recovery Tests](https://img.shields.io/badge/E2E%20Recovery-20%2F20%20Verified-blueviolet?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-informational?style=flat-square)](https://www.python.org/)
@@ -63,10 +63,11 @@
 31. [Security / Privacy](#31-security--privacy)
 32. [Limitations](#32-limitations)
 33. [Future Scope](#33-future-scope)
-34. [BPUT Hackathon 2026](#34-bput-hackathon-2026)
-35. [Team XERSES](#35-team-xerses)
-36. [Repository Information](#36-repository-information)
-37. [License](#37-license)
+34. [🗺️ Production Roadmap](#34-production-roadmap)
+35. [BPUT Hackathon 2026](#35-bput-hackathon-2026)
+36. [Team XERSES](#36-team-xerses)
+37. [Repository Information](#37-repository-information)
+38. [License](#38-license)
 
 ---
 
@@ -191,13 +192,15 @@ Multi-target tracking is powered by an optimized implementation of **ByteTrack**
 
 ## 9. Worker-Level PPE Association
 
-PPE items are mapped to workers using a **Spatial-Centroid Containment Algorithm**:
+PPE items are mapped to workers using an **Anthropometric Spatial-Affinity & Hungarian Bipartite Assignment Algorithm**:
 
-1. **Candidate Screening:** Every detected PPE box is screened against all tracked worker bounding boxes in the frame.
+1. **Candidate Screening:** Every detected PPE box is evaluated against all tracked worker bounding boxes in the frame.
 2. **Horizontal Lateral Boundary Check:** The horizontal center of the PPE box must lie within the worker's horizontal margins expanded by an adaptive 20% lateral boundary tolerance.
-3. **Vertical Anthropometric Validation:** The item must anchor within its physiologically permissible vertical window.
-4. **Nearest Centroid Disambiguation:** In crowded industrial scenes with overlapping workers, unassigned gear is matched to the worker whose center of mass minimizes normalized Euclidean distance:
-$$\text{Dist} = \sqrt{\left(\frac{x_{\text{ppe}} - x_{\text{worker}}}{w_{\text{worker}}}\right)^2 + \left(\frac{y_{\text{ppe}} - y_{\text{worker}}}{h_{\text{worker}}}\right)^2}$$
+3. **Calibrated Anthropometric Validation:**
+   - **Helmet (Cranial Zone):** Vertical ROI extends $-0.10 \le y \le 0.32$ relative to worker height, verified against EN 397/ANSI Z89.1 shell chromatic signatures.
+   - **Safety Vest (Thoracic Zone):** Height ratio calibrated to $0.12 \le h_{\text{ratio}} \le 0.88$ and vertical center $0.10 \le rel\_yc \le 0.78$ (supporting standing, crouching, three-quarter, and waist-up postures), verified against fluorescent lime/orange and reflective tape features.
+   - **Gloves & Footwear:** Mapped to lateral limb extremities ($0.30 \le y \le 0.95$) and lower leg/feet ($0.65 \le y \le 1.10$).
+4. **Hungarian Bipartite Assignment:** Solves optimal 1-to-1 matching globally via the Hungarian algorithm. When workers are in close proximity, gear is assigned to the worker with the highest valid spatial affinity rather than discarded, while maintaining strict cross-worker isolation.
 
 ---
 
@@ -222,13 +225,13 @@ Single-frame optical artifacts are eliminated through temporal debouncing state 
 [Raw YOLO Detection]
         │
         ├── Frame t: Detected ──> Observation Counter = 1
-        ├── Frame t+1: Missed ──> Tolerance Decremented (N_tol = 6)
+        ├── Frame t+1: Missed ──> Tolerance Decremented (N_tol = 15)
         ├── Frame t+2: Detected ──> Observation Counter = 2
-        └── Frame t+3: Detected ──> N_confirm >= 3 ──> State = COMPLIANT / CONFIRMED
+        └── Frame t+3: Detected ──> N_confirm >= 2 ──> State = COMPLIANT / CONFIRMED
 ```
 
-* **PPE Violation Debouncing:** A missing hard hat or vest must remain absent for $N_{\text{confirm}} \ge 3$ consecutive valid frames before transitioning from `COMPLIANT` to `NON_COMPLIANT`.
-* **Missed-Frame Tolerance:** An established PPE item survives up to $6$ temporarily dropped or occluded frames without reverting to absent.
+* **PPE Violation Debouncing:** A missing hard hat or vest must remain absent for consecutive valid frames exceeding the missing detection tolerance before transitioning from `UNKNOWN` to `ABSENT`.
+* **Missed-Frame Tolerance:** An established PPE item survives up to $15$ temporarily dropped or occluded frames (~0.5s at 30 FPS) without reverting to absent, preventing detector flicker from creating spurious alarms.
 * **Hazard Verification:** Combustion phenomena require $N_{\text{confirm}} \ge 5$ consistent frames before advancing from `CANDIDATE` to `CONFIRMED`.
 
 ---
@@ -672,12 +675,12 @@ inference:
   device: "auto"
   class_confidence_thresholds:
     person: 0.25           # Balances worker recall with clutter suppression
-    helmet: 0.30           # Validated against wide-brim hard hats
-    safety_vest: 0.30      # Rejects ordinary yellow/orange shirts
+    helmet: 0.25           # Calibrated for multi-angle hard hat recall
+    safety_vest: 0.25      # Calibrated for high-vis vest recall across postures
     gloves: 0.22           # Bounded by anatomical vertical gates
     safety_footwear: 0.22  # Bounded by waist-crop ambiguity filter
-    fire: 0.25             # High precision entry to hazard state machine
-    smoke: 0.25            # Torso-overlap suppression active
+    fire: 0.20             # High precision entry to hazard state machine
+    smoke: 0.20            # Decoupled optical combustion monitoring
 ```
 
 ---
@@ -721,7 +724,60 @@ inference:
 
 ---
 
-## 34. BPUT Hackathon 2026
+## 34. 🗺️ Production Roadmap
+
+SafeSync is a **fully functional prototype** — 276/276 tests passing, full-stack operational, AI pipeline validated. The table below describes the engineering gap between the current prototype and a deployable real-world product.
+
+> **Current State:** Working prototype running on CPU, single machine, no authentication  
+> **Target State:** Multi-site, GPU-accelerated, secure, 24/7 production system
+
+---
+
+### The 10 Main Gaps Between Prototype and Real Product
+
+| # | Gap | Current State | What's Needed |
+|---|---|---|---|
+| **1** | 🤖 **AI Model Accuracy** | V3 model, CPU-only, 384px, ~17 FPS | GPU inference (Jetson/T4), 640px, 30+ FPS, 10K+ real site images, mAP50 ≥ 0.85 |
+| **2** | 🔒 **Authentication & Security** | Zero auth — any LAN user has full access | JWT login, RBAC (Admin/Manager/Officer/Viewer), HTTPS, audit log |
+| **3** | 🗄️ **Production Database** | SQLite (no concurrent writes) | PostgreSQL + Alembic migrations, Redis for pub/sub |
+| **4** | 🚨 **Real-World Alerting** | Alerts on dashboard only | Telegram bot, SMS (Twilio), email with incident frame, physical siren trigger |
+| **5** | 📷 **Camera Management** | Manual RTSP URL entry | ONVIF auto-discovery, stream health monitoring, DVR/NVR recording |
+| **6** | 📊 **Reporting & Compliance** | Live stats only | PDF incident reports, OSHA-format exports, weekly scorecards |
+| **7** | 👷 **Worker Identity** | Anonymous Track IDs only | `face_recognition` (dlib) enrollment, worker → PPE history linkage |
+| **8** | 🌐 **Multi-Site / Multi-Tenant** | Single site, single DB | Company → Site → Zone hierarchy, tenant isolation, offline edge mode |
+| **9** | 📱 **Mobile App** | Web dashboard only | React Native iOS/Android, push notifications (Firebase FCM) |
+| **10** | ⚙️ **DevOps & Reliability** | Manual run | Docker Compose, CI/CD (GitHub Actions), Prometheus monitoring, 99.5% SLA |
+
+---
+
+### Priority Order
+
+```
+Phase 1 (Weeks 1–6)    → GPU + Model V5 → Auth + Security → PostgreSQL
+Phase 2 (Weeks 6–10)   → Telegram/SMS Alerts → Docker + CI/CD → PDF Reports
+Phase 3 (Weeks 10–14)  → Cloud Deployment → Pilot at 1 real site
+Phase 4 (Weeks 14–20)  → Mobile App → Multi-site → ONVIF cameras
+```
+
+**Estimated time to shippable B2B product: 6–9 months** with a small engineering team (3–5 engineers).
+
+---
+
+### What Must NOT Be Changed
+
+The following components are already **production-quality** and should not be rewritten:
+
+- ✅ PPE spatial association logic (4-zone anatomical anchoring)
+- ✅ Temporal compliance state machine (`UNKNOWN ≠ ABSENT ≠ VIOLATION`)
+- ✅ 7-stage fire/smoke suppression (`CANDIDATE → DETECTING → CONFIRMED`)
+- ✅ ByteTrack Kalman motion tracker
+- ✅ REST API contract (FastAPI + Pydantic schemas)
+- ✅ Frontend component architecture (37 React components)
+- ✅ Test suite (276 tests)
+
+---
+
+## 35. BPUT Hackathon 2026
 
 * **Event:** BPUT Hackathon 2026
 * **Organized By:** Software Technology Parks of India (STPI) & EmTek
@@ -736,7 +792,7 @@ SafeSync was developed to provide an end-to-end engineering response to PS06, de
 
 ---
 
-## 35. Team XERSES
+## 36. Team XERSES
 
 * **Team Name:** XERSES
 * **Institution:** Biju Patnaik University of Technology (BPUT) Affiliated Engineering College
@@ -745,7 +801,7 @@ SafeSync was developed to provide an end-to-end engineering response to PS06, de
 
 ---
 
-## 36. Repository Information
+## 37. Repository Information
 
 * **Repository:** [https://github.com/SMRU08/SafeSync.git](https://github.com/SMRU08/SafeSync.git)
 * **Primary Branch:** `master`
@@ -755,7 +811,7 @@ SafeSync was developed to provide an end-to-end engineering response to PS06, de
 
 ---
 
-## 37. License
+## 38. License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for full details.
 

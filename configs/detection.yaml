@@ -16,8 +16,8 @@ inference:
   half: false           # FP16 (requires GPU)
   class_confidence_thresholds:
     person: 0.25
-    helmet: 0.38
-    safety_vest: 0.38
+    helmet: 0.25
+    safety_vest: 0.25
     gloves: 0.22
     safety_footwear: 0.22
     fire: 0.20

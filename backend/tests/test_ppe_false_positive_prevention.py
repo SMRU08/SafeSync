@@ -124,12 +124,12 @@ def test_anatomical_misplaced_helmet_box_rejected():
 
 
 def test_per_class_confidence_filtering():
-    """Verify Detector enforces per-class thresholds: helmet (0.38), vest (0.38), person (0.25)."""
+    """Verify Detector enforces per-class thresholds: helmet (0.25), vest (0.25), person (0.25)."""
     det = Detector()
     # Check that class_conf_thresholds loaded from configs/detection.yaml
     assert "helmet" in det.class_conf_thresholds
-    assert det.class_conf_thresholds["helmet"] >= 0.35
-    assert det.class_conf_thresholds["safety_vest"] >= 0.35
+    assert det.class_conf_thresholds["helmet"] == 0.25
+    assert det.class_conf_thresholds["safety_vest"] == 0.25
     assert det.class_conf_thresholds["person"] <= 0.30
 
 
@@ -201,9 +201,9 @@ def test_temporal_tracker_confirms_absent_for_unprotected_worker(monkeypatch):
 
     monkeypatch.setattr(engine.detector, "detect_image", lambda *args, **kwargs: (mock_resp, None))
 
-    # Process 6 consecutive frames (missing_detection_tolerance is 5)
+    # Process consecutive frames past missing_detection_tolerance (15 frames)
     last_resp = None
-    for _ in range(6):
+    for _ in range(16):
         resp, _, _ = engine.process_frame(frame_no_ppe, annotate=False)
         last_resp = resp
 
@@ -211,7 +211,7 @@ def test_temporal_tracker_confirms_absent_for_unprotected_worker(monkeypatch):
     assert len(last_resp.workers) >= 1, "Tracked worker must be identified"
     worker = last_resp.workers[0]
 
-    # Helmet and vest must NOT be PRESENT; after 5+ missed frames, confirmed ABSENT
+    # Helmet and vest must NOT be PRESENT; after 15+ missed frames, confirmed ABSENT
     assert worker.ppe["helmet"] == PPEState.ABSENT, f"Expected ABSENT, got {worker.ppe['helmet']}"
     assert worker.ppe["safety_vest"] == PPEState.ABSENT, f"Expected ABSENT, got {worker.ppe['safety_vest']}"
     assert worker.overall_status == OverallComplianceState.NON_COMPLIANT, "Worker without PPE must be NON_COMPLIANT"

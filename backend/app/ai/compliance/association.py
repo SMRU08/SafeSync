@@ -140,15 +140,15 @@ def verify_safety_vest_features(
     ph = max(1.0, py2 - py1)
     pw = max(1.0, px2 - px1)
 
-    # 1. Anatomical height ratio
+    # 1. Anatomical height ratio (supports full-body, three-quarter, waist-up, and crouching workers)
     h_ratio = ph / wh
-    if h_ratio < 0.14 or h_ratio > 0.65:
+    if h_ratio < 0.12 or h_ratio > 0.88:
         return False
 
     # 2. Torso zone: vest center relative to top of worker
     pyc = (py1 + py2) / 2.0
     rel_yc = (pyc - wy1) / wh
-    if rel_yc < 0.12 or rel_yc > 0.68:
+    if rel_yc < 0.10 or rel_yc > 0.78:
         return False
 
     # 3. Relative width
@@ -334,7 +334,7 @@ class SpatialPPEAssociator:
             if rel_yc < -0.15 or rel_yc > 0.32:
                 return 0.0
         elif item_type == PPEItemType.SAFETY_VEST:
-            if rel_yc < 0.12 or rel_yc > 0.70:
+            if rel_yc < 0.10 or rel_yc > 0.78:
                 return 0.0
         elif item_type == PPEItemType.GLOVES:
             if rel_yc < 0.20 or rel_yc > 1.05:
@@ -528,15 +528,18 @@ class SpatialPPEAssociator:
             for r, c in zip(row_ind, col_ind):
                 aff = affinity_matrix[r, c]
                 if cost_matrix[r, c] < 0.85 and aff >= 0.15:
-                    # Check for ambiguity with other workers (prevent cross-contamination)
-                    ambiguous = False
+                    # Multi-worker contention resolution:
+                    # When workers are in close proximity, assign the PPE item to the
+                    # worker with the highest spatial affinity rather than discarding it.
+                    # Hungarian assignment preserves strict 1-to-1 worker/PPE isolation.
+                    is_highest_affinity = True
                     if num_workers > 1:
                         other_affs = [affinity_matrix[other_r, c] for other_r in range(num_workers) if other_r != r]
                         max_other = max(other_affs) if other_affs else 0.0
-                        if max_other > 0.20 and (aff - max_other) < 0.08:
-                            ambiguous = True
+                        if aff < max_other:
+                            is_highest_affinity = False
 
-                    if not ambiguous:
+                    if is_highest_affinity:
                         tid = worker_ids[r]
                         matched_item = items[c].copy()
                         matched_item["association_score"] = round(float(aff), 3)

@@ -36,7 +36,7 @@ association:
 
 temporal:
   confirmation_frames: 2         # Frames required to confirm PRESENT
-  missing_detection_tolerance: 6 # Tolerated missed detections before transitioning to ABSENT (increased from 2 to reduce flicker)
+  missing_detection_tolerance: 15 # Tolerated missed detections before transitioning to ABSENT (~0.5s at 30 FPS to eliminate flicker violations)
   history_window_frames: 30      # Sliding history window per active worker track
   prune_lost_after_frames: 60    # Purge worker history after 60 frames of inactivity
 
