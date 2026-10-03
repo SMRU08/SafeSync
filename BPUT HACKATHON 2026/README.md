@@ -7,8 +7,7 @@
 > **Category:** Software  
 > **Team ID:** BH26PS06T049  
 > **Team Name:** XERSES  
-> **College / Institution:** BPUT Affiliated Engineering Institution *Synergy Institute of Engineering and Technology, Dhenkanal
-*  
+> **College / Institution:** Synergy Institute of Engineering and Technology, Dhenkanal
 > **Department:** Department of Computer Science & Engineering
 > **Repository:** [https://github.com/SMRU08/SafeSync](https://github.com/SMRU08/SafeSync)
 
