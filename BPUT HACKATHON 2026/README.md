@@ -42,8 +42,8 @@ This document contains the **complete, PPT-ready content for all 6 slides** requ
 * **Category:** Software
 * **Team ID:** `BH26PS06T049`
 * **Team Name:** `XERSES`
-* **College / Institution:** BPUT Affiliated Engineering Institution *(e.g., [Insert College Name])*
-* **Department:** Department of Computer Science & Engineering / Information Technology
+* **College / Institution:** Synergy Institute of Engineering and Technology, Dhenkanal
+* **Department:** Department of Computer Science & Engineering
 * **Tagline:** *"Smart Vision. Safe Workers. Faster Response."*
 
 ---
@@ -327,66 +327,67 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 **Multi-Tier Impact, Benefits & Real-World Applications**
 
 ---
+# Impact & Benefits
 
-### Target Users / Beneficiaries
-* **Industrial Workers & Technicians:** Protected continuously against head injuries, lacerations, foot trauma, and combustion hazards.
-* **EHS (Environment, Health & Safety) Officers:** Replaces tedious manual clipboard checks with continuous automated oversight.
-* **Control Room Operators:** Single-screen situational awareness with prioritized incident queues and visual HUD overlays.
-* **Plant Directors & Enterprise Executives:** Auditable, immutable compliance records for regulatory inspections and lower insurance risk.
+## Target Users / Beneficiaries
 
----
-
-### Expected Impact
-* **Zero Fatalities Goal:** Real-time intervention before hazardous exposure leads to catastrophic workplace accidents.
-* **80%+ Reduction in PPE Infractions:** Consistent automated monitoring eliminates the "inspector-leaves-gear-comes-off" habit.
-* **Up to 90% Faster Fire Response:** Optical detection alerts site teams to open flames within seconds, long before ceiling smoke detectors trigger.
-* **Complete Audit Readiness:** 100% of safety incidents backed by cryptographic visual evidence snapshots.
+- **Industrial Workers & Technicians** — Continuous monitoring of required PPE such as helmets, safety vests, gloves, and safety footwear.
+- **HSE / Safety Officers** — Real-time visibility into worker safety compliance and potential hazards.
+- **Site Supervisors & Managers** — Faster identification of safety risks across multiple workers and camera feeds.
+- **Industrial Facility Operators** — Automated situational awareness through AI-powered CCTV monitoring.
+- **Safety & Compliance Teams** — Auditable incident and compliance information for inspections and safety management.
 
 ---
 
-### Key Benefits
+## Expected Impact
 
-#### Social Benefits
-* **Protects Human Life:** Guards workers in high-risk sectors (construction, mining, petrochemical, manufacturing).
-* **Fosters Safety Culture:** Encourages peer adherence and transparent safety accountability on the shop floor.
-* **Family Security:** Ensures industrial breadwinners return home safely every day.
-
-#### Economic Benefits
-* **Downtime Prevention:** Early optical fire detection prevents multi-million dollar structural facility losses.
-* **Regulatory Fine Avoidance:** Ensures continuous statutory compliance with OSHA and ISO standards.
-* **Lower Insurance Premiums:** Verifiable safety logs reduce commercial insurance underwriting risk.
-
-#### Educational Benefits
-* **Transparent Risk Scores:** Deterministic 0–100 risk scoring shows workers and supervisors why an alert was triggered.
-* **Incident Review Data:** Visual evidence snapshots provide empirical training material for company safety briefings.
-
-#### Environmental Benefits
-* **Prevents Chemical Releases:** Rapid fire detection in petrochemical plants stops combustion before hazardous storage tanks rupture.
-* **Suppresses Toxic Plumes:** Immediate fire alerts minimize prolonged toxic smoke emission into surrounding communities.
-
-#### Technological Benefits
-* **Commodity Edge AI:** Proves that enterprise-grade computer vision safety governance can run on standard CPUs without cloud dependency.
-* **Zero Latency Accumulation:** Bounded queue architecture demonstrates zero-lag streaming on live camera networks.
+- **Real-Time Safety Awareness** — Continuously analyzes camera feeds to identify PPE compliance and potential fire/smoke hazards.
+- **Early Risk Identification** — Helps identify safety-related conditions before they develop into larger incidents.
+- **Reduced Manual Monitoring** — Supports safety teams by automating continuous visual inspection.
+- **Multi-Worker Monitoring** — Tracks and associates PPE with individual workers while preventing cross-worker PPE assignment.
+- **False-Alarm Reduction** — Temporal validation and uncertainty-aware compliance logic prevent temporary detection failures from immediately becoming violations.
+- **Scalable Monitoring** — Provides an architecture that can be extended from a single-camera prototype to multi-camera environments.
 
 ---
 
-### Real-World Applications
-1. **Construction & Infrastructure:** Monitoring hard hats and high-visibility vests across sprawling outdoor job sites.
-2. **Oil & Gas Refineries & Petrochemical:** Continuous optical flame/smoke detection combined with mandatory PPE governance.
-3. **Steel, Metallurgy & Heavy Manufacturing:** Ensuring protective boots, vests, and helmets near blast furnaces and heavy machinery.
-4. **Logistics Hubs & Port Terminals:** High-visibility vest tracking around active container cranes and forklift traffic.
-5. **Mining Operations:** Monitoring safety gear adherence in surface excavation and processing facilities.
+## Key Benefits
 
----
+### Safety Benefits
 
-### Long-Term Impact and Scalability
-* SafeSync establishes a **universal, software-defined safety standard** that scales from a single workshop webcam to a 500-camera industrial complex, transforming passive surveillance into an active life-saving governance engine.
+- Continuous AI-assisted PPE monitoring.
+- Helmet, safety vest, gloves, and safety footwear detection.
+- Fire and smoke hazard monitoring.
+- `UNKNOWN` state prevents uncertain observations from being incorrectly treated as confirmed violations.
+- Temporal validation reduces false safety violations caused by temporary detection loss.
 
----
+### Economic Benefits
 
-### Short Instruction About What Should Be Highlighted
-* Connect the technology directly to **human impact**: *"Every worker deserves to return home safe."*
-* Emphasize the **economic return**: SafeSync pays for itself through prevented downtime, eliminated regulatory fines, and reduced insurance premiums.
+- Reduces the need for continuous manual visual monitoring.
+- Supports scalable camera-based safety monitoring.
+- CPU-based inference reduces dependence on dedicated GPU hardware for the prototype.
+- Helps safety teams focus their attention on events requiring human intervention.
+
+### Operational Benefits
+
+- Real-time worker-level PPE compliance monitoring.
+- Multi-worker tracking and PPE association.
+- Real-time dashboard for safety status and incidents.
+- Automated incident and event recording.
+- Supports live camera and recorded-video analysis.
+
+### Environmental Benefits
+
+- Enables digital safety monitoring instead of paper-based inspection workflows.
+- Supports centralized digital records of safety events and compliance observations.
+- Can operate on existing camera infrastructure, reducing the need for additional dedicated sensing hardware.
+
+### Technological Benefits
+
+- Combines YOLOv8n, ByteTrack, Hungarian bipartite matching, and temporal validation.
+- CPU-based edge-oriented AI architecture.
+- Real-time FastAPI/WebSocket communication.
+- SQLite WAL-based local persistence.
+- Modular architecture supporting future AI models and additional PPE categories.
 
 ---
 
@@ -446,7 +447,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 
 ---
 
-### Reference Links (Consolidated for Copy-Paste)
+### Reference Links 
 * SafeSync Project: `https://github.com/SMRU08/SafeSync`
 * YOLOv8 Research: `https://github.com/ultralytics/ultralytics`
 * ByteTrack Paper: `https://arxiv.org/abs/2110.06864`
@@ -456,22 +457,3 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 * ISO 45001 Standard: `https://www.iso.org/standard/63787.html`
 
 ---
-
-### Short Instruction About What Should Be Highlighted
-* Emphasize the **academic rigor and empirical validation** behind SafeSync.
-* Mention that the system was trained and benchmarked on **over 22,000 curated real-world images** aligned with strict **OSHA and ISO standards**.
-* Direct the judges to your open-source repository at `https://github.com/SMRU08/SafeSync` for complete code, logs, and benchmark reproduction.
-
----
-
-## PRESENTATION DELIVERY CHECKLIST & FAQ FOR JUDGES
-
-| Anticipated Jury Question | Recommended Winning Answer |
-|---|---|
-| **"Why not run two models: one for PPE and one for Fire?"** | *"Running two models doubles inference latency from 32ms to 65ms+ per frame, which drops throughput below real-time on CPU. SafeSync solves this with a unified 7-class single-pass detector that extracts both workers, gear, and hazards simultaneously."* |
-| **"What happens if a worker is kneeling or hidden behind a machine?"** | *"Traditional systems falsely trigger a missing boots violation. SafeSync implements strict $\text{UNKNOWN} \ne \text{ABSENT}$ logic. If limbs are occluded or clipped by image borders, the system assigns an `UNKNOWN` status, preventing embarrassing false alarms."* |
-| **"How do you prevent false alarms from factory steam or welding torches?"** | *"We trained SafeSync with over 1,200 curated hard-negative distractor images (steam exhaust, welder glare, orange machinery). In addition, our 5-frame temporal state machine ensures transient sparks or steam vents never trigger an evacuation siren."* |
-| **"Can small factories afford this?"** | *"Yes! SafeSync requires zero new sensor installations and runs on existing CCTV feeds using standard, low-cost office PC hardware without expensive GPUs."* |
-
----
-*Created for Team XERSES — BPUT HACKATHON 2026 Submission.*
