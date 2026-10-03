@@ -55,23 +55,6 @@ This document contains the **complete, PPT-ready content for all 6 slides** requ
 * **Edge-Optimized Efficiency:** Engineered to run on standard commercial CPUs without requiring dedicated cloud GPUs.
 
 ---
-
-### Slide Layout & Visual Suggestions
-* **Theme:** Industrial Navy Blue / Slate Dark Theme (`#0F172A` background, `#0EA5E9` cyan borders, `#F59E0B` amber warning accents).
-* **Header Logos:** 
-  1. BPUT Hackathon 2026 Logo (Top Left)
-  2. STPI & EmTek Partner Logos (Top Right)
-  3. SafeSync Project Badge & Team XERSES Logo (Center)
-* **Visual Reference:** Dark industrial facility background with subtle digital bounding-box HUD overlay.
-
----
-
-### Short Instruction About What Should Be Highlighted
-* Introduce your team name (**XERSES**) and Team ID (**BH26PS06T049**) clearly.
-* Emphasize that **SafeSync** addresses Problem Statement **PS06** by converting passive, unmonitored factory CCTV cameras into an active, intelligent safety governance system that detects missing gear and early combustion in real time.
-
----
-
 ## SLIDE 2 — IDEA TITLE & PROPOSED SOLUTION
 
 ### Slide Title
