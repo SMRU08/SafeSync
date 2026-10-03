@@ -12,14 +12,6 @@
 > **Repository:** [https://github.com/SMRU08/SafeSync](https://github.com/SMRU08/SafeSync)
 
 ---
-  ┌────────────────────────────────────────────────────────────────────────────────────────┐
-  │                                   PRESENTATION SLIDES                                  │
-  ├──────────────┬──────────────┬──────────────┬──────────────┬──────────────┬─────────────┤
-  │   SLIDE 1    │   SLIDE 2    │   SLIDE 3    │   SLIDE 4    │   SLIDE 5    │   SLIDE 6   │
-  │  Title Page  │  Idea Title  │  Technical   │ Feasibility  │   Impact &   │ Research &  │
-  │              │  & Solution  │   Approach   │ & Viability  │   Benefits   │ References  │
-  └──────────────┴──────────────┴──────────────┴──────────────┴──────────────┴─────────────┘
-```
 
 ---
 
