@@ -12,16 +12,6 @@
 > **Repository:** [https://github.com/SMRU08/SafeSync](https://github.com/SMRU08/SafeSync)
 
 ---
-
-## Structure & Usage Guide
-This document contains the **complete, PPT-ready content for all 6 slides** required for the **BPUT HACKATHON 2026** presentation.
-- Open PowerPoint.
-- Read each slide section sequentially.
-- Copy the structured text, bullet points, and data tables directly into your presentation template.
-- Insert the referenced diagrams and repository screenshot assets.
-- Review the **Short Instruction About What Should Be Highlighted** for each slide to prepare your speaking pitch.
-
-```
   ┌────────────────────────────────────────────────────────────────────────────────────────┐
   │                                   PRESENTATION SLIDES                                  │
   ├──────────────┬──────────────┬──────────────┬──────────────┬──────────────┬─────────────┤
