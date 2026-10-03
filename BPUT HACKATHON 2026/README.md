@@ -9,20 +9,6 @@
 > **Team Name:** XERSES  
 > **Target Event:** BPUT HACKATHON 2026 (Organized by BPUT in partnership with STPI & EmTek)  
 > **Repository:** [https://github.com/SMRU08/SafeSync](https://github.com/SMRU08/SafeSync)
-
----
-
-## How to Use This Document
-This document is the **single source of truth** for creating your 6-slide PowerPoint presentation (`.pptx`) for **BPUT HACKATHON 2026**.
-- Open your PowerPoint software.
-- Navigate sequentially from **Slide 1** to **Slide 6**.
-- Directly copy the **PPT-Ready Text** into the respective slide title and content text boxes.
-- Insert the recommended **Visuals, Flowcharts, or Screenshots** referenced from the project repository.
-- Review the **Presenter Notes & Highlight Guidance** for speaking points during the hackathon pitch.
-
----
-
-```
   ┌────────────────────────────────────────────────────────────────────────┐
   │                           PRESENTATION FLOW                            │
   ├──────────────┬──────────────┬──────────────┬──────────────┬────────────┤
@@ -41,8 +27,6 @@ This document is the **single source of truth** for creating your 6-slide PowerP
 *Grand Finale Presentation — Track: Smart Automation*
 
 ---
-
-### 2. PPT-Ready Text (Copy-Paste directly into Slide 1)
 
 * **Problem Statement ID:** `PS06`
 * **Problem Statement Title:** AI-Powered Real-Time Industrial Workplace Safety Monitoring, 4-Point PPE Compliance, and Optical Fire/Smoke Detection
@@ -166,9 +150,6 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 **Technical Approach & Implementation Methodology**
 
 ---
-
-### 2. PPT-Ready Text (Copy-Paste directly into Slide 3)
-
 #### 1. Core Technology Stack
 * **AI & Computer Vision:** 
   - **Ultralytics YOLOv8n:** Lightweight anchor-free neural detector (3.01M parameters, 8.2 GFLOPs at 384×384 input resolution) optimized for high-speed edge CPU execution.
@@ -252,10 +233,6 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 ### 1. Slide Title
 **Feasibility, Edge Viability & Risk Mitigation**
 
----
-
-### 2. PPT-Ready Text (Copy-Paste directly into Slide 4)
-
 #### 1. Technical & Commercial Feasibility
 * **Zero Dedicated Hardware Barrier:** Validated on standard commodity laptops (Intel Core i5-13420H CPU, 16 GB RAM) delivering **24.85 ms P50 inference** and **~18 to 25.1 FPS**. No \$2,000+ discrete GPU is required for active deployment.
 * **Seamless Retrofit Integration:** Plugs into existing analog/digital CCTV networks via RTSP, HTTP/MJPEG, or USB interfaces. Eliminates the capital expense of installing proprietary IoT sensors.
@@ -303,10 +280,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 ### 1. Slide Title
 **Impact, Industrial Benefits & Market Potential**
 
----
-
-### 2. PPT-Ready Text (Copy-Paste directly into Slide 5)
-
+--
 #### 1. Multi-Tier Stakeholder Impact & Benefits
 * **For Industrial Workers (Life Safety):**
   - Continuous protection against head trauma, lacerations, foot injuries, and burns.
@@ -366,7 +340,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 
 ---
 
-### 2. PPT-Ready Text (Copy-Paste directly into Slide 6)
+
 
 #### 1. Peer-Reviewed Academic & Technical Foundations
 * **Ultralytics YOLOv8 (2023):** Jocher, G., Chaurasia, A., & Qiu, J. — *Anchor-Free Real-Time Object Detection Framework*. Provides state-of-the-art parameter efficiency, decoupled head design, and high edge inference throughput. (`https://github.com/ultralytics/ultralytics`)
@@ -395,16 +369,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 
 ---
 
-### 4. Slide Layout & Visual Suggestions
-* **Layout:** 3-column or 3-box structured layout:
-  - **Left Box:** Foundational Research Papers (with publication citations).
-  - **Center Box:** Curated Dataset Breakdown (with image counts and purpose).
-  - **Right Box:** Regulatory Safety Standards (OSHA, ISO, EN/ANSI) & Repository Link.
-* **Visual to Place:** 
-  - SafeSync GitHub Repository QR Code or URL badge.
-  - Dataset Preview Collage: `reports/dataset_preview/preview_safup_00441.jpg` or `reports/dataset_preview/preview_dfire_00604.jpg`.
 
----
 
 ### 5. Presenter Highlight Guidance
 * **What to Highlight:** 
@@ -412,16 +377,4 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
   - State that SafeSync was not trained on synthetic toy data, but on over 22,000 carefully curated real-world images aligned with strict OSHA and ISO safety standards.
   - Direct the judges to your open-source repository at `https://github.com/SMRU08/SafeSync` for complete code, logs, and benchmark reproduction.
 
----
-
-## PRESENTATION DELIVERY CHECKLIST & FAQ FOR JUDGES
-
-| Anticipated Jury Question | Recommended Winning Answer |
-|---|---|
-| **"Why not run two models: one for PPE and one for Fire?"** | *"Running two models doubles inference latency from 25ms to 50ms+ per frame, which drops throughput below real-time on CPU. SafeSync solves this with a unified 7-class single-pass detector that extracts both workers, gear, and hazards simultaneously."* |
-| **"What happens if a worker is kneeling or hidden behind a machine?"** | *"Traditional systems falsely trigger a missing boots violation. SafeSync implements strict `UNKNOWN != ABSENT` logic. If limbs are occluded or clipped by image borders, the system assigns an `UNKNOWN` status, preventing embarrassing false alarms."* |
-| **"How do you prevent false alarms from factory steam or welding torches?"** | *"We trained SafeSync with over 1,200 curated hard-negative distractor images (steam exhaust, welder glare, orange machinery). In addition, our 5-frame temporal state machine ensures transient smoke or sparks never trigger an evacuation siren."* |
-| **"Can small factories afford this?"** | *"Yes! SafeSync requires zero new sensor installations and runs on existing CCTV feeds using standard, low-cost office PC hardware without expensive GPUs."* |
-
----
-*Created for Team XERSES — BPUT HACKATHON 2026 Submission.*
+--
