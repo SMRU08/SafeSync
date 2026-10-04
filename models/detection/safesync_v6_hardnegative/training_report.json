@@ -1,0 +1,87 @@
+{
+  "model_name": "safesync_v6_hardnegative",
+  "base_model": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\ppe_fire_smoke_v3\\weights\\best.pt",
+  "dataset": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\v6_candidate\\data_v6.yaml",
+  "total_images": 5862,
+  "train_images": 4541,
+  "val_images": 752,
+  "test_images": 569,
+  "epochs": 15,
+  "batch_size": 16,
+  "imgsz": 384,
+  "device": "cpu",
+  "training_duration_s": 10933.9,
+  "weights_path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v6_hardnegative\\weights\\best.pt",
+  "sha256": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+  "overall_metrics": {
+    "precision": 0.7278,
+    "recall": 0.5995,
+    "mAP50": 0.6749,
+    "mAP50_95": 0.3883
+  },
+  "per_class_metrics": {
+    "person": {
+      "class_id": 0,
+      "precision": 0.6637,
+      "recall": 0.7573,
+      "mAP50": 0.7935,
+      "mAP50_95": 0.467,
+      "ground_truth_count": 239,
+      "prediction_count": 273
+    },
+    "helmet": {
+      "class_id": 1,
+      "precision": 0.8395,
+      "recall": 0.7443,
+      "mAP50": 0.7847,
+      "mAP50_95": 0.5556,
+      "ground_truth_count": 1189,
+      "prediction_count": 1054
+    },
+    "safety_vest": {
+      "class_id": 2,
+      "precision": 0.7331,
+      "recall": 0.6959,
+      "mAP50": 0.7573,
+      "mAP50_95": 0.4817,
+      "ground_truth_count": 171,
+      "prediction_count": 162
+    },
+    "gloves": {
+      "class_id": 3,
+      "precision": 0.8065,
+      "recall": 0.6741,
+      "mAP50": 0.7337,
+      "mAP50_95": 0.3444,
+      "ground_truth_count": 136,
+      "prediction_count": 114
+    },
+    "safety_footwear": {
+      "class_id": 4,
+      "precision": 0.9033,
+      "recall": 0.6188,
+      "mAP50": 0.725,
+      "mAP50_95": 0.4194,
+      "ground_truth_count": 151,
+      "prediction_count": 103
+    },
+    "fire": {
+      "class_id": 5,
+      "precision": 0.5824,
+      "recall": 0.4529,
+      "mAP50": 0.505,
+      "mAP50_95": 0.2452,
+      "ground_truth_count": 488,
+      "prediction_count": 379
+    },
+    "smoke": {
+      "class_id": 6,
+      "precision": 0.566,
+      "recall": 0.2532,
+      "mAP50": 0.4254,
+      "mAP50_95": 0.2045,
+      "ground_truth_count": 233,
+      "prediction_count": 104
+    }
+  }
+}

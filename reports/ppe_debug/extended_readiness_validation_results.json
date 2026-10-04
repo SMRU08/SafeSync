@@ -1,0 +1,93 @@
+{
+  "status": "COMPLETED",
+  "duration_seconds": 1800.72,
+  "duration_minutes": 30.01,
+  "total_frames_processed": 6843,
+  "dropped_frames": 0,
+  "fps": {
+    "average": 12.77,
+    "median_p50": 14.83,
+    "minimum": 0.08
+  },
+  "latency_e2e_ms": {
+    "mean": 262.0,
+    "p50": 67.45,
+    "p95": 1391.31,
+    "max": 13324.19
+  },
+  "latency_infer_ms": {
+    "mean": 32.5
+  },
+  "resources": {
+    "initial_rss_mb": 319.9,
+    "peak_rss_mb": 523.6,
+    "final_rss_mb": 193.8,
+    "rss_growth_mb": -126.2,
+    "memory_leak_detected": false,
+    "average_cpu_pct": 68.9,
+    "peak_cpu_pct": 99.8
+  },
+  "periods": {
+    "period_1_first5min": {
+      "frames": 1963,
+      "avg_latency_ms": 152.56,
+      "avg_fps": 11.06,
+      "rss_mb": 519.4
+    },
+    "period_2_middle": {
+      "frames": 1166,
+      "avg_latency_ms": 1028.19,
+      "avg_fps": 3.08,
+      "rss_mb": 309.33
+    },
+    "period_3_final5min": {
+      "frames": 3714,
+      "avg_latency_ms": 79.31,
+      "avg_fps": 16.71,
+      "rss_mb": 192.2
+    },
+    "fps_degradation": false
+  },
+  "ppe_counts": {
+    "helmet": {
+      "PRESENT": 732,
+      "ABSENT": 0,
+      "UNKNOWN": 1471
+    },
+    "safety_vest": {
+      "PRESENT": 854,
+      "ABSENT": 0,
+      "UNKNOWN": 1349
+    },
+    "gloves": {
+      "PRESENT": 0,
+      "ABSENT": 0,
+      "UNKNOWN": 2203
+    },
+    "safety_footwear": {
+      "PRESENT": 488,
+      "ABSENT": 0,
+      "UNKNOWN": 1715
+    }
+  },
+  "total_workers_observed": 2203,
+  "false_violations_count": 0,
+  "multi_worker": {
+    "scenes_observed": 246,
+    "workers_observed": 738,
+    "correct_associations": 738,
+    "cross_worker_contamination": 0
+  },
+  "fire_smoke": {
+    "unexpected_fire_fp": 0,
+    "unexpected_smoke_fp": 0
+  },
+  "stability_errors": {
+    "camera_disconnects": 0,
+    "camera_reconnects": 0,
+    "backend_errors": 0,
+    "db_errors": 0,
+    "websocket_errors": 0,
+    "crashes": 0
+  }
+}

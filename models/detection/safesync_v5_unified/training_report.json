@@ -1,0 +1,31 @@
+{
+  "model_name": "safesync_v5_unified",
+  "base_model": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\ppe_fire_smoke_v3\\weights\\best.pt",
+  "dataset": "D:\\Additional\\PROJECT\\SafeSync\\data.yaml",
+  "total_images": 10673,
+  "train_images": 7857,
+  "val_images": 1111,
+  "test_images": 1705,
+  "epochs": 1,
+  "batch_size": 16,
+  "imgsz": 384,
+  "device": "cpu",
+  "training_duration_s": 1194.7,
+  "weights_path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v5_unified\\weights\\best.pt",
+  "sha256": "b2e554beb39de075e586afd120db3079f5c24f3b4b6165f5601125ed74c8a44b",
+  "metrics": {
+    "mAP50": 0.4368,
+    "mAP50_95": 0.2274,
+    "precision": 0.5238,
+    "recall": 0.4295,
+    "class_mAP50": {
+      "person": 0.1919,
+      "helmet": 0.4071,
+      "safety_vest": 0.2993,
+      "gloves": 0.2352,
+      "safety_footwear": 0.3072,
+      "fire": 0.101,
+      "smoke": 0.0499
+    }
+  }
+}

@@ -94,6 +94,8 @@ export interface WorkerTrack {
     safety_footwear: PPEPresence;
   };
   overall_compliant: boolean;
+  /** Validated tri-state already present in the backend payload (WorkerTrack.overall_status). */
+  overall_status?: 'COMPLIANT' | 'NON_COMPLIANT' | 'UNKNOWN';
   active_frames: number;
   dwell_seconds?: number;
   confidence?: number;

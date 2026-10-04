@@ -1,0 +1,424 @@
+{
+  "timestamp": "2026-10-02T07:37:36.701456+00:00",
+  "total_frames_evaluated": 240,
+  "live_webcam_frames": 60,
+  "cctv_simulation_frames": 180,
+  "models": {
+    "v3_production": {
+      "name": "ppe_fire_smoke_v3",
+      "sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+      "role": "PRODUCTION_ACTIVE",
+      "detections_total": {
+        "safety_vest": 120,
+        "person": 225,
+        "helmet": 105,
+        "safety_footwear": 105,
+        "gloves": 15,
+        "fire": 45,
+        "smoke": 15
+      },
+      "avg_confidence": {
+        "safety_vest": 0.639,
+        "person": 0.408,
+        "helmet": 0.472,
+        "safety_footwear": 0.269,
+        "gloves": 0.296,
+        "fire": 0.372,
+        "smoke": 0.327
+      },
+      "latency_ms": {
+        "mean": 59.02,
+        "p50": 25.0,
+        "p95": 78.62
+      },
+      "fps": 16.9
+    },
+    "v6_shadow": {
+      "name": "safesync_v6_hardnegative",
+      "sha256": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+      "role": "SHADOW_PASSIVE_ISOLATED",
+      "detections_total": {
+        "helmet": 105,
+        "safety_vest": 60,
+        "person": 105,
+        "gloves": 105,
+        "safety_footwear": 75,
+        "fire": 15
+      },
+      "avg_confidence": {
+        "helmet": 0.694,
+        "safety_vest": 0.632,
+        "person": 0.604,
+        "gloves": 0.609,
+        "safety_footwear": 0.467,
+        "fire": 0.468
+      },
+      "latency_ms": {
+        "mean": 39.91,
+        "p50": 24.85,
+        "p95": 72.94
+      },
+      "fps": 25.1
+    }
+  },
+  "false_positive_instances": [],
+  "missed_detection_instances": [
+    {
+      "frame_id": 165,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 166,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 167,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 168,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 169,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 170,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 171,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 172,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 173,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 174,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 175,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 176,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 177,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 178,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 179,
+      "model": "V6",
+      "target": "fire",
+      "scene": "Active Fire Flame Core"
+    },
+    {
+      "frame_id": 180,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 181,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 182,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 183,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 184,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 185,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 186,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 187,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 188,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 189,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 190,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 191,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 192,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 193,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    },
+    {
+      "frame_id": 194,
+      "model": "V6",
+      "target": "smoke",
+      "scene": "Distinct Smoke Plume Column"
+    }
+  ],
+  "key_visual_snapshots": [
+    {
+      "scene": "Live Camera Feed (Frame 1)",
+      "category": "Live_Webcam",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_Live_Webcam_live_webcam_0000.jpg",
+      "filename": "shadow_snapshot_Live_Webcam_live_webcam_0000.jpg",
+      "v3_detections": {},
+      "v6_detections": {}
+    },
+    {
+      "scene": "Multi-Worker PPE Collaboration",
+      "category": "PPE_Multi",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_PPE_Multi_safup_00002.jpg",
+      "filename": "shadow_snapshot_PPE_Multi_safup_00002.jpg",
+      "v3_detections": {
+        "safety_vest": 4,
+        "person": 6,
+        "helmet": 5,
+        "safety_footwear": 1
+      },
+      "v6_detections": {
+        "helmet": 4,
+        "safety_vest": 1,
+        "person": 1
+      }
+    },
+    {
+      "scene": "Single Worker Full PPE (Gloves+Boots)",
+      "category": "PPE_Full",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_PPE_Full_safup_00010.jpg",
+      "filename": "shadow_snapshot_PPE_Full_safup_00010.jpg",
+      "v3_detections": {
+        "safety_vest": 1,
+        "helmet": 1,
+        "person": 1,
+        "safety_footwear": 1
+      },
+      "v6_detections": {
+        "gloves": 3,
+        "safety_vest": 1,
+        "person": 1,
+        "helmet": 1,
+        "safety_footwear": 1
+      }
+    },
+    {
+      "scene": "Technician with Gloves & Boots",
+      "category": "PPE_Detail",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_PPE_Detail_ppec_00078.jpg",
+      "filename": "shadow_snapshot_PPE_Detail_ppec_00078.jpg",
+      "v3_detections": {
+        "person": 1,
+        "safety_footwear": 1
+      },
+      "v6_detections": {
+        "person": 1,
+        "gloves": 1,
+        "safety_footwear": 2
+      }
+    },
+    {
+      "scene": "Industrial Steam Pipe Distractor",
+      "category": "HardNegative_Steam",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_HardNegative_Steam_hneg_00004.jpg",
+      "filename": "shadow_snapshot_HardNegative_Steam_hneg_00004.jpg",
+      "v3_detections": {
+        "safety_vest": 2,
+        "person": 1,
+        "safety_footwear": 2
+      },
+      "v6_detections": {
+        "gloves": 1,
+        "person": 1,
+        "safety_vest": 1
+      }
+    },
+    {
+      "scene": "Specular Sun Glare on Metal",
+      "category": "HardNegative_Glare",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_HardNegative_Glare_hneg_00008.jpg",
+      "filename": "shadow_snapshot_HardNegative_Glare_hneg_00008.jpg",
+      "v3_detections": {
+        "person": 2,
+        "gloves": 1
+      },
+      "v6_detections": {
+        "helmet": 1,
+        "person": 1
+      }
+    },
+    {
+      "scene": "Construction Dust Cloud Plume",
+      "category": "HardNegative_Dust",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_HardNegative_Dust_hneg_00041.jpg",
+      "filename": "shadow_snapshot_HardNegative_Dust_hneg_00041.jpg",
+      "v3_detections": {},
+      "v6_detections": {}
+    },
+    {
+      "scene": "Yellow CAT Excavator Surface",
+      "category": "HardNegative_Machinery",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_HardNegative_Machinery_hneg_00061.jpg",
+      "filename": "shadow_snapshot_HardNegative_Machinery_hneg_00061.jpg",
+      "v3_detections": {
+        "person": 2
+      },
+      "v6_detections": {}
+    },
+    {
+      "scene": "Active Fire Flame Core",
+      "category": "Hazard_Fire",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_Hazard_Fire_dfire_00000.jpg",
+      "filename": "shadow_snapshot_Hazard_Fire_dfire_00000.jpg",
+      "v3_detections": {
+        "fire": 2
+      },
+      "v6_detections": {}
+    },
+    {
+      "scene": "Distinct Smoke Plume Column",
+      "category": "Hazard_Smoke",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_Hazard_Smoke_dfire_00013.jpg",
+      "filename": "shadow_snapshot_Hazard_Smoke_dfire_00013.jpg",
+      "v3_detections": {
+        "smoke": 1
+      },
+      "v6_detections": {}
+    },
+    {
+      "scene": "Mixed Combustion & Smoke",
+      "category": "Hazard_Combined",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_Hazard_Combined_dfire_00006.jpg",
+      "filename": "shadow_snapshot_Hazard_Combined_dfire_00006.jpg",
+      "v3_detections": {
+        "fire": 1
+      },
+      "v6_detections": {
+        "fire": 1
+      }
+    },
+    {
+      "scene": "Distant Worker in Field",
+      "category": "PPE_Distant",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_PPE_Distant_safup_00012.jpg",
+      "filename": "shadow_snapshot_PPE_Distant_safup_00012.jpg",
+      "v3_detections": {
+        "safety_vest": 1,
+        "helmet": 1,
+        "person": 1,
+        "safety_footwear": 2
+      },
+      "v6_detections": {
+        "safety_vest": 1,
+        "person": 1,
+        "safety_footwear": 2,
+        "gloves": 2,
+        "helmet": 1
+      }
+    },
+    {
+      "scene": "Industrial Facility Worker",
+      "category": "PPE_Facility",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\reports\\shadow_mode_visuals\\shadow_snapshot_PPE_Facility_ppec_00001.jpg",
+      "filename": "shadow_snapshot_PPE_Facility_ppec_00001.jpg",
+      "v3_detections": {
+        "person": 1
+      },
+      "v6_detections": {
+        "person": 1
+      }
+    }
+  ],
+  "side_by_side_video": "D:\\Additional\\PROJECT\\SafeSync\\outputs\\detection\\videos\\shadow_mode_v3_vs_v6_comparison.mp4",
+  "logs": {
+    "v3_log": "D:\\Additional\\PROJECT\\SafeSync\\outputs\\detection\\logs\\v3_production_predictions.jsonl",
+    "v6_log": "D:\\Additional\\PROJECT\\SafeSync\\outputs\\detection\\logs\\v6_shadow_predictions.jsonl"
+  }
+}

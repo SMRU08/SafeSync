@@ -1,0 +1,139 @@
+{
+  "sensor_results": [
+    {
+      "name": "Sensor 01 (Orange Vest Rear)",
+      "workers": [
+        {
+          "track_id": 1,
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 2,
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 4,
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 5,
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 3,
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 6,
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "name": "Sensor 02 (Frontal Full-PPE Blue Helmet)",
+      "workers": [
+        {
+          "track_id": 1,
+          "helmet": "UNKNOWN",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 5,
+          "helmet": "UNKNOWN",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 2,
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 3,
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 4,
+          "helmet": "UNKNOWN",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "PRESENT",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 6,
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        }
+      ]
+    },
+    {
+      "name": "Sensor 03 (Angled Waist-Up Orange Vest)",
+      "workers": [
+        {
+          "track_id": 1,
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 2,
+          "helmet": "UNKNOWN",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        },
+        {
+          "track_id": 3,
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "status": "UNKNOWN"
+        }
+      ]
+    }
+  ]
+}

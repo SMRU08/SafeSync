@@ -1,0 +1,679 @@
+{
+  "timestamp": "2026-10-01T18:47:13Z",
+  "v3": {
+    "name": "ppe_fire_smoke_v3",
+    "weights_path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\ppe_fire_smoke_v3\\weights\\best.pt",
+    "overall_metrics": {
+      "precision": 0.3092,
+      "recall": 0.3242,
+      "mAP50": 0.2577,
+      "mAP50_95": 0.1175
+    },
+    "per_class_metrics": {
+      "person": {
+        "class_id": 0,
+        "precision": 0.1431,
+        "recall": 0.5858,
+        "mAP50": 0.1937,
+        "mAP50_95": 0.0873,
+        "ground_truth_count": 239,
+        "prediction_count": 978
+      },
+      "helmet": {
+        "class_id": 1,
+        "precision": 0.5418,
+        "recall": 0.4654,
+        "mAP50": 0.4218,
+        "mAP50_95": 0.1211,
+        "ground_truth_count": 1189,
+        "prediction_count": 1021
+      },
+      "safety_vest": {
+        "class_id": 2,
+        "precision": 0.2903,
+        "recall": 0.713,
+        "mAP50": 0.465,
+        "mAP50_95": 0.2765,
+        "ground_truth_count": 171,
+        "prediction_count": 420
+      },
+      "gloves": {
+        "class_id": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "mAP50": 0.0937,
+        "mAP50_95": 0.0356,
+        "ground_truth_count": 136,
+        "prediction_count": 0
+      },
+      "safety_footwear": {
+        "class_id": 4,
+        "precision": 0.5286,
+        "recall": 0.4636,
+        "mAP50": 0.4619,
+        "mAP50_95": 0.2592,
+        "ground_truth_count": 151,
+        "prediction_count": 132
+      },
+      "fire": {
+        "class_id": 5,
+        "precision": 0.3484,
+        "recall": 0.0287,
+        "mAP50": 0.111,
+        "mAP50_95": 0.0302,
+        "ground_truth_count": 488,
+        "prediction_count": 40
+      },
+      "smoke": {
+        "class_id": 6,
+        "precision": 0.3122,
+        "recall": 0.0129,
+        "mAP50": 0.0564,
+        "mAP50_95": 0.0129,
+        "ground_truth_count": 233,
+        "prediction_count": 10
+      }
+    },
+    "latency_cpu": {
+      "mean_ms": 29.62,
+      "median_p50_ms": 29.32,
+      "p95_ms": 31.86,
+      "min_ms": 26.98,
+      "max_ms": 38.44,
+      "fps_throughput": 33.8
+    },
+    "realworld_scenarios": {
+      "total_scenarios": 24,
+      "passed": 18,
+      "pass_rate_pct": 75.0,
+      "scenarios": [
+        {
+          "id": 1,
+          "group": "PPE",
+          "name": "Worker facing camera in full PPE",
+          "passed": true,
+          "detected_classes": {
+            "person": 10,
+            "safety_vest": 4,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 2,
+          "group": "PPE",
+          "name": "Worker walking away / back to camera",
+          "passed": true,
+          "detected_classes": {
+            "person": 10,
+            "safety_vest": 4,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 3,
+          "group": "PPE",
+          "name": "Worker crouching / bending over",
+          "passed": true,
+          "detected_classes": {
+            "helmet": 7,
+            "safety_vest": 3,
+            "person": 7,
+            "gloves": 1
+          }
+        },
+        {
+          "id": 4,
+          "group": "PPE",
+          "name": "Worker partially occluded (upper body)",
+          "passed": true,
+          "detected_classes": {
+            "person": 7,
+            "gloves": 2,
+            "helmet": 5,
+            "safety_footwear": 17
+          }
+        },
+        {
+          "id": 5,
+          "group": "PPE",
+          "name": "Worker without helmet wearing vest",
+          "passed": true,
+          "detected_classes": {
+            "person": 4,
+            "safety_vest": 2
+          }
+        },
+        {
+          "id": 6,
+          "group": "PPE",
+          "name": "Worker wearing civilian cap (not helmet)",
+          "passed": true,
+          "detected_classes": {
+            "person": 7,
+            "gloves": 2,
+            "helmet": 5,
+            "safety_footwear": 17
+          }
+        },
+        {
+          "id": 7,
+          "group": "PPE",
+          "name": "Worker wearing bright hoodie (not vest)",
+          "passed": true,
+          "detected_classes": {
+            "person": 7,
+            "gloves": 2,
+            "helmet": 5,
+            "safety_footwear": 17
+          }
+        },
+        {
+          "id": 8,
+          "group": "PPE",
+          "name": "Multiple workers in frame (3-5 workers)",
+          "passed": true,
+          "detected_classes": {
+            "person": 7,
+            "gloves": 2,
+            "helmet": 5,
+            "safety_footwear": 17
+          }
+        },
+        {
+          "id": 9,
+          "group": "PPE",
+          "name": "Worker at distance (>10m)",
+          "passed": true,
+          "detected_classes": {
+            "person": 7,
+            "gloves": 2,
+            "helmet": 5,
+            "safety_footwear": 17
+          }
+        },
+        {
+          "id": 10,
+          "group": "PPE",
+          "name": "Worker in low light / shadow",
+          "passed": true,
+          "detected_classes": {
+            "person": 7,
+            "gloves": 2,
+            "helmet": 5,
+            "safety_footwear": 17
+          }
+        },
+        {
+          "id": 11,
+          "group": "PPE",
+          "name": "Hard hat without worker (no false person)",
+          "passed": true,
+          "detected_classes": {
+            "helmet": 8,
+            "safety_vest": 3,
+            "person": 6
+          }
+        },
+        {
+          "id": 12,
+          "group": "PPE",
+          "name": "Safety vest without worker (no false person)",
+          "passed": false,
+          "detected_classes": {
+            "safety_vest": 4,
+            "person": 4,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 13,
+          "group": "Hazard",
+          "name": "Open flame / fire indoor",
+          "passed": false,
+          "detected_classes": {
+            "fire": 1
+          }
+        },
+        {
+          "id": 14,
+          "group": "Hazard",
+          "name": "Outdoor bonfire / controlled burn",
+          "passed": false,
+          "detected_classes": {
+            "fire": 1
+          }
+        },
+        {
+          "id": 15,
+          "group": "Hazard",
+          "name": "Dense white smoke plume",
+          "passed": false,
+          "detected_classes": {
+            "fire": 1,
+            "smoke": 2
+          }
+        },
+        {
+          "id": 16,
+          "group": "Hazard",
+          "name": "Thin dark / grey smoke column",
+          "passed": false,
+          "detected_classes": {
+            "fire": 1,
+            "smoke": 2
+          }
+        },
+        {
+          "id": 17,
+          "group": "Hazard",
+          "name": "Concurrent fire and smoke (bipartite)",
+          "passed": true,
+          "detected_classes": {
+            "fire": 3
+          }
+        },
+        {
+          "id": 18,
+          "group": "HardNegative",
+          "name": "Orange/yellow safety vest (zero fire FP)",
+          "passed": false,
+          "detected_classes": {
+            "safety_vest": 4,
+            "person": 4,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 19,
+          "group": "HardNegative",
+          "name": "Sunlight glare / metallic reflection",
+          "passed": true,
+          "detected_classes": {
+            "safety_vest": 1,
+            "person": 6,
+            "safety_footwear": 2,
+            "gloves": 2
+          }
+        },
+        {
+          "id": 20,
+          "group": "HardNegative",
+          "name": "Industrial steam / water vapor pipe",
+          "passed": true,
+          "detected_classes": {
+            "safety_vest": 1,
+            "person": 6,
+            "safety_footwear": 2,
+            "gloves": 2
+          }
+        },
+        {
+          "id": 21,
+          "group": "HardNegative",
+          "name": "Red emergency exit sign / red light",
+          "passed": true,
+          "detected_classes": {
+            "safety_vest": 1,
+            "person": 6,
+            "safety_footwear": 2,
+            "gloves": 2
+          }
+        },
+        {
+          "id": 22,
+          "group": "HardNegative",
+          "name": "Dust cloud / construction earthmoving",
+          "passed": true,
+          "detected_classes": {
+            "safety_vest": 1,
+            "person": 6,
+            "safety_footwear": 2,
+            "gloves": 2
+          }
+        },
+        {
+          "id": 23,
+          "group": "HardNegative",
+          "name": "Orange traffic cone / barrier barrel",
+          "passed": true,
+          "detected_classes": {
+            "safety_vest": 1,
+            "person": 6,
+            "safety_footwear": 2,
+            "gloves": 2
+          }
+        },
+        {
+          "id": 24,
+          "group": "HardNegative",
+          "name": "Yellow excavator / machinery surface",
+          "passed": true,
+          "detected_classes": {
+            "safety_vest": 1,
+            "person": 6,
+            "safety_footwear": 2,
+            "gloves": 2
+          }
+        }
+      ]
+    }
+  },
+  "v5": {
+    "name": "safesync_v5_unified",
+    "weights_path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v5_unified\\weights\\best.pt",
+    "overall_metrics": {
+      "precision": 0.5238,
+      "recall": 0.4295,
+      "mAP50": 0.4368,
+      "mAP50_95": 0.2274
+    },
+    "per_class_metrics": {
+      "person": {
+        "class_id": 0,
+        "precision": 0.606,
+        "recall": 0.2594,
+        "mAP50": 0.414,
+        "mAP50_95": 0.1919,
+        "ground_truth_count": 239,
+        "prediction_count": 102
+      },
+      "helmet": {
+        "class_id": 1,
+        "precision": 0.558,
+        "recall": 0.6897,
+        "mAP50": 0.663,
+        "mAP50_95": 0.4071,
+        "ground_truth_count": 1189,
+        "prediction_count": 1469
+      },
+      "safety_vest": {
+        "class_id": 2,
+        "precision": 0.796,
+        "recall": 0.3424,
+        "mAP50": 0.4966,
+        "mAP50_95": 0.2993,
+        "ground_truth_count": 171,
+        "prediction_count": 74
+      },
+      "gloves": {
+        "class_id": 3,
+        "precision": 0.6691,
+        "recall": 0.5441,
+        "mAP50": 0.5547,
+        "mAP50_95": 0.2352,
+        "ground_truth_count": 136,
+        "prediction_count": 111
+      },
+      "safety_footwear": {
+        "class_id": 4,
+        "precision": 0.5153,
+        "recall": 0.5629,
+        "mAP50": 0.5416,
+        "mAP50_95": 0.3072,
+        "ground_truth_count": 151,
+        "prediction_count": 165
+      },
+      "fire": {
+        "class_id": 5,
+        "precision": 0.4075,
+        "recall": 0.2172,
+        "mAP50": 0.2614,
+        "mAP50_95": 0.101,
+        "ground_truth_count": 488,
+        "prediction_count": 260
+      },
+      "smoke": {
+        "class_id": 6,
+        "precision": 0.1144,
+        "recall": 0.3906,
+        "mAP50": 0.1259,
+        "mAP50_95": 0.0499,
+        "ground_truth_count": 233,
+        "prediction_count": 796
+      }
+    },
+    "latency_cpu": {
+      "mean_ms": 29.05,
+      "median_p50_ms": 29.0,
+      "p95_ms": 31.1,
+      "min_ms": 25.4,
+      "max_ms": 32.21,
+      "fps_throughput": 34.4
+    },
+    "realworld_scenarios": {
+      "total_scenarios": 24,
+      "passed": 5,
+      "pass_rate_pct": 20.8,
+      "scenarios": [
+        {
+          "id": 1,
+          "group": "PPE",
+          "name": "Worker facing camera in full PPE",
+          "passed": true,
+          "detected_classes": {
+            "helmet": 8,
+            "gloves": 5,
+            "person": 1
+          }
+        },
+        {
+          "id": 2,
+          "group": "PPE",
+          "name": "Worker walking away / back to camera",
+          "passed": true,
+          "detected_classes": {
+            "helmet": 8,
+            "gloves": 5,
+            "person": 1
+          }
+        },
+        {
+          "id": 3,
+          "group": "PPE",
+          "name": "Worker crouching / bending over",
+          "passed": true,
+          "detected_classes": {
+            "helmet": 9
+          }
+        },
+        {
+          "id": 4,
+          "group": "PPE",
+          "name": "Worker partially occluded (upper body)",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 5,
+          "group": "PPE",
+          "name": "Worker without helmet wearing vest",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 6,
+          "group": "PPE",
+          "name": "Worker wearing civilian cap (not helmet)",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 7,
+          "group": "PPE",
+          "name": "Worker wearing bright hoodie (not vest)",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 8,
+          "group": "PPE",
+          "name": "Multiple workers in frame (3-5 workers)",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 9,
+          "group": "PPE",
+          "name": "Worker at distance (>10m)",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 10,
+          "group": "PPE",
+          "name": "Worker in low light / shadow",
+          "passed": false,
+          "detected_classes": {
+            "helmet": 1
+          }
+        },
+        {
+          "id": 11,
+          "group": "PPE",
+          "name": "Hard hat without worker (no false person)",
+          "passed": true,
+          "detected_classes": {
+            "helmet": 8
+          }
+        },
+        {
+          "id": 12,
+          "group": "PPE",
+          "name": "Safety vest without worker (no false person)",
+          "passed": false,
+          "detected_classes": {
+            "person": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 13,
+          "group": "Hazard",
+          "name": "Open flame / fire indoor",
+          "passed": false,
+          "detected_classes": {
+            "fire": 2
+          }
+        },
+        {
+          "id": 14,
+          "group": "Hazard",
+          "name": "Outdoor bonfire / controlled burn",
+          "passed": false,
+          "detected_classes": {
+            "fire": 2
+          }
+        },
+        {
+          "id": 15,
+          "group": "Hazard",
+          "name": "Dense white smoke plume",
+          "passed": false,
+          "detected_classes": {
+            "fire": 1
+          }
+        },
+        {
+          "id": 16,
+          "group": "Hazard",
+          "name": "Thin dark / grey smoke column",
+          "passed": false,
+          "detected_classes": {
+            "fire": 1
+          }
+        },
+        {
+          "id": 17,
+          "group": "Hazard",
+          "name": "Concurrent fire and smoke (bipartite)",
+          "passed": true,
+          "detected_classes": {
+            "fire": 3
+          }
+        },
+        {
+          "id": 18,
+          "group": "HardNegative",
+          "name": "Orange/yellow safety vest (zero fire FP)",
+          "passed": false,
+          "detected_classes": {
+            "person": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 19,
+          "group": "HardNegative",
+          "name": "Sunlight glare / metallic reflection",
+          "passed": false,
+          "detected_classes": {
+            "smoke": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 20,
+          "group": "HardNegative",
+          "name": "Industrial steam / water vapor pipe",
+          "passed": false,
+          "detected_classes": {
+            "smoke": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 21,
+          "group": "HardNegative",
+          "name": "Red emergency exit sign / red light",
+          "passed": false,
+          "detected_classes": {
+            "smoke": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 22,
+          "group": "HardNegative",
+          "name": "Dust cloud / construction earthmoving",
+          "passed": false,
+          "detected_classes": {
+            "smoke": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 23,
+          "group": "HardNegative",
+          "name": "Orange traffic cone / barrier barrel",
+          "passed": false,
+          "detected_classes": {
+            "smoke": 2,
+            "helmet": 3
+          }
+        },
+        {
+          "id": 24,
+          "group": "HardNegative",
+          "name": "Yellow excavator / machinery surface",
+          "passed": false,
+          "detected_classes": {
+            "smoke": 2,
+            "helmet": 3
+          }
+        }
+      ]
+    }
+  }
+}

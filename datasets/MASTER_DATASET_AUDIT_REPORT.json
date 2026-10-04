@@ -1,0 +1,491 @@
+{
+  "timestamp": "2026-10-01T18:35:11Z",
+  "raw_inventory": [
+    {
+      "name": "bangga_ppe",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\bangga_ppe",
+      "type": "raw_directory",
+      "images_count": 19158,
+      "labels_count": 19160,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\bangga_ppe\\data.yaml",
+      "classes": [
+        "Boots",
+        "Ear Protectors",
+        "Ear-protection",
+        "Glasses",
+        "Glove",
+        "Gloves",
+        "Helmet",
+        "Mask",
+        "Person",
+        "Safety_shoes",
+        "Shoes",
+        "Vest",
+        "Without Ear Protectors",
+        "Without Glass",
+        "Without Glove",
+        "Without Helmet",
+        "Without Mask",
+        "Without Shoes",
+        "Without Vest"
+      ],
+      "approx_size_mb": 952.5
+    },
+    {
+      "name": "construction_ppe",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe",
+      "type": "raw_directory",
+      "images_count": 1124,
+      "labels_count": 1126,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\construction_ppe\\data.yaml",
+      "classes": [
+        "hat",
+        "no hat",
+        "no vest",
+        "vest"
+      ],
+      "approx_size_mb": 58.7
+    },
+    {
+      "name": "d_fire",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\d_fire",
+      "type": "raw_directory",
+      "images_count": 4632,
+      "labels_count": 4633,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\d_fire\\data.yaml",
+      "classes": [
+        "Fire",
+        "Smoke"
+      ],
+      "approx_size_mb": 152.0
+    },
+    {
+      "name": "datacluster",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\datacluster",
+      "type": "raw_directory",
+      "images_count": 0,
+      "labels_count": 0,
+      "splits": [],
+      "yaml_file": "None",
+      "classes": {},
+      "approx_size_mb": 0.0
+    },
+    {
+      "name": "hard_hat_workers",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers",
+      "type": "raw_directory",
+      "images_count": 7035,
+      "labels_count": 7037,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\hard_hat_workers\\data.yaml",
+      "classes": [
+        "head",
+        "helmet",
+        "person"
+      ],
+      "approx_size_mb": 227.3
+    },
+    {
+      "name": "ppe_detection_compliance",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance",
+      "type": "raw_directory",
+      "images_count": 9663,
+      "labels_count": 9665,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_detection_compliance\\data.yaml",
+      "classes": [
+        "Boots",
+        "Gloves",
+        "Goggles",
+        "Helmet",
+        "Mask",
+        "NO-Boots",
+        "NO-Gloves",
+        "NO-Goggles",
+        "NO-Helmet",
+        "NO-Mask",
+        "NO-Vest",
+        "Person",
+        "Vest"
+      ],
+      "approx_size_mb": 471.4
+    },
+    {
+      "name": "ppe_safup",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_safup",
+      "type": "raw_directory",
+      "images_count": 4254,
+      "labels_count": 4256,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_safup\\data.yaml",
+      "classes": [
+        "Hardhat",
+        "NO-Hardhat",
+        "NO-Safety Vest",
+        "Person",
+        "Safety Vest"
+      ],
+      "approx_size_mb": 264.1
+    },
+    {
+      "name": "ppe_shikk",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_shikk",
+      "type": "raw_directory",
+      "images_count": 259,
+      "labels_count": 261,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ppe_shikk\\data.yaml",
+      "classes": [
+        "Glass",
+        "Glasses",
+        "Gloves",
+        "Goggles",
+        "Helmet",
+        "Mask",
+        "No-Helmet",
+        "No-Vest",
+        "Person",
+        "Safety-Boot",
+        "Safety-Vest",
+        "Safety_shoes",
+        "Vest",
+        "combination",
+        "face_mask",
+        "face_nomask",
+        "glasses",
+        "hand_glove",
+        "hand_noglove",
+        "head_helmet",
+        "head_nohelmet",
+        "helmet",
+        "no helmet",
+        "no vest",
+        "no-vest",
+        "person",
+        "protective_suit",
+        "shoes",
+        "vest",
+        "worker"
+      ],
+      "approx_size_mb": 14.3
+    },
+    {
+      "name": "safety_ppe",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\safety_ppe",
+      "type": "raw_directory",
+      "images_count": 6629,
+      "labels_count": 6631,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\safety_ppe\\data.yaml",
+      "classes": [
+        "No_BreathingApparatus",
+        "No_Glove",
+        "No_Goggles",
+        "No_Harness",
+        "No_Helmet",
+        "No_Shoe",
+        "Person"
+      ],
+      "approx_size_mb": 313.9
+    },
+    {
+      "name": "safety_ppe_4",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\safety_ppe_4",
+      "type": "raw_directory",
+      "images_count": 5079,
+      "labels_count": 5081,
+      "splits": [
+        "test",
+        "train",
+        "valid"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\safety_ppe_4\\data.yaml",
+      "classes": [
+        "boots",
+        "gloves",
+        "goggles",
+        "helmet",
+        "no-boots",
+        "no-gloves",
+        "no-goggles",
+        "no-helmet",
+        "no-vest",
+        "vest"
+      ],
+      "approx_size_mb": 292.7
+    },
+    {
+      "name": "ultralytics_construction_ppe",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ultralytics_construction_ppe",
+      "type": "raw_directory",
+      "images_count": 1416,
+      "labels_count": 1426,
+      "splits": [
+        "test",
+        "train",
+        "val"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\raw\\ultralytics_construction_ppe\\data.yaml",
+      "classes": {
+        "0": "helmet",
+        "1": "gloves",
+        "2": "vest",
+        "3": "boots",
+        "4": "goggles",
+        "5": "none",
+        "6": "Person",
+        "7": "no_helmet",
+        "8": "no_goggle",
+        "9": "no_gloves",
+        "10": "no_boots"
+      },
+      "approx_size_mb": 137.1
+    },
+    {
+      "name": "construction-ppe",
+      "path": "D:\\Additional\\PROJECT\\nd\\construction-ppe.ndjson",
+      "type": "ndjson_export",
+      "images_count": 1416,
+      "labels_count": 1416,
+      "splits": [
+        "test",
+        "train",
+        "val"
+      ],
+      "yaml_file": "Embedded in NDJSON metadata",
+      "classes": {
+        "0": "helmet",
+        "1": "gloves",
+        "2": "vest",
+        "3": "boots",
+        "4": "goggles",
+        "5": "none",
+        "6": "Person",
+        "7": "no_helmet",
+        "8": "no_goggle",
+        "9": "no_gloves",
+        "10": "no_boots"
+      },
+      "approx_size_mb": 0.7
+    },
+    {
+      "name": "fire-smoke-detectionv3iyolov8",
+      "path": "D:\\Additional\\PROJECT\\nd\\fire-smoke-detectionv3iyolov8.ndjson",
+      "type": "ndjson_export",
+      "images_count": 1029,
+      "labels_count": 1029,
+      "splits": [
+        "test",
+        "train",
+        "val"
+      ],
+      "yaml_file": "Embedded in NDJSON metadata",
+      "classes": {
+        "0": "fire",
+        "1": "smoke"
+      },
+      "approx_size_mb": 0.4
+    },
+    {
+      "name": "helmetdata",
+      "path": "D:\\Additional\\PROJECT\\nd\\helmetdata.ndjson",
+      "type": "ndjson_export",
+      "images_count": 8228,
+      "labels_count": 8228,
+      "splits": [
+        "test",
+        "train",
+        "val"
+      ],
+      "yaml_file": "Embedded in NDJSON metadata",
+      "classes": {
+        "0": "helmet",
+        "1": "no_helmet"
+      },
+      "approx_size_mb": 5.9
+    },
+    {
+      "name": "SafeSync_Unified_10k",
+      "path": "D:\\Additional\\PROJECT\\SafeSync\\datasets",
+      "type": "yolo_unified",
+      "images_count": 10673,
+      "labels_count": 10673,
+      "splits": [
+        "train",
+        "val",
+        "test"
+      ],
+      "yaml_file": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\data.yaml",
+      "classes": {
+        "0": "person",
+        "1": "helmet",
+        "2": "safety_vest",
+        "3": "gloves",
+        "4": "safety_footwear",
+        "5": "fire",
+        "6": "smoke"
+      },
+      "approx_size_mb": 1280.8
+    }
+  ],
+  "organized_counts": {
+    "helmet": {
+      "train": 3315,
+      "val": 461,
+      "test": 400
+    },
+    "safety_vest": {
+      "train": 828,
+      "val": 109,
+      "test": 111
+    },
+    "fire": {
+      "train": 720,
+      "val": 205,
+      "test": 103
+    },
+    "safety_footwear": {
+      "train": 530,
+      "val": 64,
+      "test": 75
+    },
+    "gloves": {
+      "train": 562,
+      "val": 68,
+      "test": 75
+    },
+    "construction_ppe": {
+      "train": 1132,
+      "val": 143,
+      "test": 141
+    }
+  },
+  "audit_results": {
+    "construction_ppe": {
+      "total_images": 1416,
+      "total_labels": 1416,
+      "missing_labels": 0,
+      "missing_images": 0,
+      "empty_labels": 4,
+      "invalid_boxes": 0,
+      "corrupt_images": 0,
+      "yaml_valid": true,
+      "class_distribution": {
+        "1": 1734,
+        "0": 2245,
+        "2": 1618,
+        "3": 1445,
+        "4": 1597
+      }
+    },
+    "fire": {
+      "total_images": 1028,
+      "total_labels": 1028,
+      "missing_labels": 0,
+      "missing_images": 0,
+      "empty_labels": 0,
+      "invalid_boxes": 0,
+      "corrupt_images": 0,
+      "yaml_valid": true,
+      "class_distribution": {
+        "5": 2387,
+        "6": 1071
+      }
+    },
+    "gloves": {
+      "total_images": 705,
+      "total_labels": 705,
+      "missing_labels": 0,
+      "missing_images": 0,
+      "empty_labels": 0,
+      "invalid_boxes": 0,
+      "corrupt_images": 0,
+      "yaml_valid": true,
+      "class_distribution": {
+        "3": 1445
+      }
+    },
+    "helmet": {
+      "total_images": 4176,
+      "total_labels": 4176,
+      "missing_labels": 0,
+      "missing_images": 0,
+      "empty_labels": 0,
+      "invalid_boxes": 0,
+      "corrupt_images": 0,
+      "yaml_valid": true,
+      "class_distribution": {
+        "1": 10703
+      }
+    },
+    "safety_footwear": {
+      "total_images": 669,
+      "total_labels": 669,
+      "missing_labels": 0,
+      "missing_images": 0,
+      "empty_labels": 0,
+      "invalid_boxes": 0,
+      "corrupt_images": 0,
+      "yaml_valid": true,
+      "class_distribution": {
+        "4": 1597
+      }
+    },
+    "safety_vest": {
+      "total_images": 1048,
+      "total_labels": 1048,
+      "missing_labels": 0,
+      "missing_images": 0,
+      "empty_labels": 0,
+      "invalid_boxes": 0,
+      "corrupt_images": 0,
+      "yaml_valid": true,
+      "class_distribution": {
+        "2": 1618
+      }
+    }
+  },
+  "cross_duplicates": {
+    "gloves <-> helmet": 670,
+    "gloves <-> safety_footwear": 14,
+    "gloves <-> safety_vest": 7,
+    "helmet <-> safety_vest": 268,
+    "helmet <-> safety_footwear": 81,
+    "safety_footwear <-> safety_vest": 14
+  }
+}

@@ -22,17 +22,87 @@ except ImportError:
     )
 
 # Colors in BGR
-COLOR_WORKER_BOX = (255, 200, 0)      # Bright Amber
-COLOR_COMPLIANT = (50, 205, 50)       # Lime Green
-COLOR_NON_COMPLIANT = (60, 60, 220)   # Crimson Red
-COLOR_UNKNOWN = (0, 215, 255)         # Warm Yellow / Orange
+COLOR_WORKER_BOX = (255, 200, 0)      # Bright Amber (legacy; person box now uses status color)
+COLOR_COMPLIANT = (94, 197, 34)       # #22C55E  Green  — SAFE / COMPLIANT
+COLOR_NON_COMPLIANT = (68, 68, 239)   # #EF4444  Red    — CONFIRMED VIOLATION
+COLOR_UNKNOWN = (11, 158, 245)        # #F59E0B  Amber  — UNKNOWN / VISIBILITY LIMITED
 
 # PPE checklist state markers
 MARKERS = {
-    PPEState.PRESENT: ("[+]", (50, 205, 50)),     # Green check
-    PPEState.ABSENT: ("[-]", (60, 60, 220)),      # Red cross
-    PPEState.UNKNOWN: ("[?]", (0, 215, 255)),     # Yellow question mark
+    PPEState.PRESENT: ("[+]", COLOR_COMPLIANT),      # Green check
+    PPEState.ABSENT: ("[-]", COLOR_NON_COMPLIANT),   # Red cross
+    PPEState.UNKNOWN: ("[?]", COLOR_UNKNOWN),        # Amber question mark
 }
+
+PPE_DISPLAY_NAMES = {
+    "helmet": "Helmet",
+    "safety_vest": "Vest",
+    "gloves": "Gloves",
+    "safety_footwear": "Footwear",
+}
+
+# Display states (visual only — derived from the validated overall_status)
+DISPLAY_SAFE = "SAFE"
+DISPLAY_UNKNOWN = "UNKNOWN"
+DISPLAY_VIOLATION = "VIOLATION"
+
+
+def _state_value(state: Any) -> str:
+    return str(getattr(state, "value", state)).upper()
+
+
+def resolve_worker_display(worker: WorkerTrack) -> Dict[str, Any]:
+    """
+    Maps a worker's FINAL, temporally-validated compliance state to box display data.
+
+    This is a pure visualization mapping. It never re-derives compliance from raw
+    detections. The authoritative input is ``worker.overall_status``, which the
+    TemporalComplianceTracker computes with priority ABSENT > UNKNOWN > PRESENT
+    (after the configured missing-detection tolerance).
+
+    Priority:
+        NON_COMPLIANT  -> RED    "CONFIRMED VIOLATION"  (+ missing items)
+        UNKNOWN        -> AMBER  "UNKNOWN"              (+ limited-visibility items)
+        COMPLIANT      -> GREEN  "SAFE"
+    UNKNOWN is never mapped to RED.
+    """
+    status = worker.overall_status
+    ppe = worker.ppe or {}
+
+    absent = [PPE_DISPLAY_NAMES[k] for k in PPE_DISPLAY_NAMES if _state_value(ppe.get(k, "UNKNOWN")) == "ABSENT"]
+    unknown = [PPE_DISPLAY_NAMES[k] for k in PPE_DISPLAY_NAMES if _state_value(ppe.get(k, "UNKNOWN")) == "UNKNOWN"]
+
+    # Priority 1: CONFIRMED VIOLATION / ABSENT -> RED
+    if status == OverallComplianceState.NON_COMPLIANT or len(absent) > 0:
+        return {
+            "display_state": DISPLAY_VIOLATION,
+            "color": COLOR_NON_COMPLIANT,
+            "label": "CONFIRMED VIOLATION",
+            "detail": f"Missing: {', '.join(absent)}" if absent else "",
+            "missing_items": absent,
+            "unknown_items": unknown,
+        }
+
+    # Priority 2: ANY PPE = UNKNOWN (or worker overall_status is UNKNOWN) -> AMBER / YELLOW
+    if status == OverallComplianceState.UNKNOWN or len(unknown) > 0:
+        return {
+            "display_state": DISPLAY_UNKNOWN,
+            "color": COLOR_UNKNOWN,
+            "label": "UNKNOWN",
+            "detail": f"{', '.join(unknown)} visibility limited" if unknown else "Visibility limited",
+            "missing_items": [],
+            "unknown_items": unknown,
+        }
+
+    # Priority 3: ALL required PPE = PRESENT -> GREEN
+    return {
+        "display_state": DISPLAY_SAFE,
+        "color": COLOR_COMPLIANT,
+        "label": "SAFE",
+        "detail": "",
+        "missing_items": [],
+        "unknown_items": [],
+    }
 
 
 class ComplianceVisualizer:
@@ -115,25 +185,23 @@ class ComplianceVisualizer:
             wb = worker.bbox
             x1, y1, x2, y2 = wb.x1, wb.y1, wb.x2, wb.y2
 
-            # Determine badge color by overall status
-            if worker.overall_status == OverallComplianceState.COMPLIANT:
-                badge_color = COLOR_COMPLIANT
-            elif worker.overall_status == OverallComplianceState.NON_COMPLIANT:
-                badge_color = COLOR_NON_COMPLIANT
-            else:
-                badge_color = COLOR_UNKNOWN
+            # Resolve display from the FINAL validated worker state (never raw detections)
+            display = resolve_worker_display(worker)
+            badge_color = display["color"]
+            box_thickness = 3 if display["display_state"] == DISPLAY_VIOLATION else 2
 
-            # Draw worker person box
-            cv2.rectangle(out, (x1, y1), (x2, y2), COLOR_WORKER_BOX, 2)
+            # Draw COMPLETE worker person box in the worker's own status color
+            cv2.rectangle(out, (x1, y1), (x2, y2), badge_color, box_thickness)
 
             if not self.show_hud:
                 # Simple track label only
-                lbl = f"Worker #{worker.track_id}"
+                lbl = f"Worker #{worker.track_id} {display['label']}"
                 cv2.putText(out, lbl, (x1, max(15, y1 - 5)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, badge_color, 2)
                 continue
 
             # ─── Render Information Card (HUD) ───
-            header_text = f"Worker #{worker.track_id} [{worker.overall_status.value}]"
+            header_text = f"Worker #{worker.track_id} {display['label']}"
+            detail_text = display["detail"]
             h_text, _ = MARKERS.get(worker.ppe.get("helmet", PPEState.UNKNOWN), ("[?]", COLOR_UNKNOWN))
             v_text, _ = MARKERS.get(worker.ppe.get("safety_vest", PPEState.UNKNOWN), ("[?]", COLOR_UNKNOWN))
             g_text, _ = MARKERS.get(worker.ppe.get("gloves", PPEState.UNKNOWN), ("[?]", COLOR_UNKNOWN))
@@ -143,8 +211,8 @@ class ComplianceVisualizer:
             line2 = f"H:{h_text} V:{v_text} G:{g_text} F:{f_text}"
 
             # Calculate HUD background dimensions
-            card_w = max(190, max(len(line1), len(line2)) * 8 + 10)
-            card_h = 42
+            card_w = max(190, max(len(line1), len(line2), len(detail_text)) * 8 + 10)
+            card_h = 58 if detail_text else 42
 
             # Place card above worker box if space permits, otherwise inside/below
             card_y1 = y1 - card_h - 4
@@ -186,5 +254,12 @@ class ComplianceVisualizer:
                 txt = f"{prefix}{symbol} "
                 cv2.putText(out, txt, (cursor_x, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.38, sym_col, 1, cv2.LINE_AA)
                 cursor_x += len(txt) * 7 + 2
+
+            # Draw Line 3 (Detail): "Missing: Helmet" (RED) or "Footwear visibility limited" (UNKNOWN)
+            if detail_text:
+                cv2.putText(
+                    out, detail_text, (card_x1 + 6, card_y1 + 51),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.38, badge_color, 1, cv2.LINE_AA
+                )
 
         return out

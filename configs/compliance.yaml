@@ -43,8 +43,8 @@ temporal:
 required_ppe:
   helmet: true
   safety_vest: true
-  gloves: false                  # Monitored, but not globally mandatory to prevent spurious UNKNOWN in upper-body views
-  safety_footwear: false         # Monitored, but not globally mandatory to allow half-body / desk / mobile camera feeds
+  gloves: true                   # Evaluated as ABSENT when hands visible, UNKNOWN when occluded/bust
+  safety_footwear: true          # Evaluated as ABSENT when feet visible, UNKNOWN when feet out of frame
 
 occlusion:
   edge_margin_px: 30             # Boundary cutoff margin (increased from 10 to 30 for generous half-body detection)

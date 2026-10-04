@@ -184,7 +184,7 @@ class TemporalComplianceTracker:
                             details_str = f"Temporary detection drop ({c_missed}/{self.missing_detection_tolerance} tolerance frames)"
                         else:
                             self._confirmed_state[track_id][item_type] = PPEState.UNKNOWN
-                            details_str = f"Unconfirmed ({c_missed} frames missing)"
+                            details_str = f"Absence candidate ({c_missed}/{self.missing_detection_tolerance} validation frames)"
 
                 c_missed = self._consecutive_missed[track_id][item_type]
                 obs = PPEObservation(

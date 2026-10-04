@@ -34,6 +34,11 @@ import {
   analyzeCameraUpload,
   toggleCameraSpeaker,
 } from '../services/api';
+import { resolveWorkerDisplay } from '../utils/workerDisplay';
+
+/** Tri-state PPE marker: UNKNOWN is never shown as missing. */
+const ppeMarker = (state?: string) =>
+  state === 'PRESENT' ? '✅' : state === 'ABSENT' ? '❌' : '❔';
 
 interface CamerasViewProps {
   cameras: CameraConfig[];
@@ -661,27 +666,31 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
                                 #{w.track_id}
                               </td>
                               <td className="py-2 px-3">
-                                <span
-                                  className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                                    w.overall_compliant
-                                      ? 'bg-emerald-50 text-emerald-700'
-                                      : 'bg-rose-50 text-rose-700'
-                                  }`}
-                                >
-                                  {w.overall_compliant ? 'COMPLIANT' : 'VIOLATION'}
-                                </span>
+                                {(() => {
+                                  const d = resolveWorkerDisplay(w);
+                                  return (
+                                    <span
+                                      className="px-1.5 py-0.5 rounded text-[10px] font-bold text-white"
+                                      style={{ backgroundColor: d.color }}
+                                      title={d.detail || undefined}
+                                    >
+                                      {d.label}
+                                      {d.detail ? ` — ${d.detail}` : ''}
+                                    </span>
+                                  );
+                                })()}
                               </td>
                               <td className="py-2 px-3 font-mono">
-                                {w.ppe_status?.helmet === 'PRESENT' ? '✅' : '❌'}
+                                {ppeMarker(w.ppe_status?.helmet)}
                               </td>
                               <td className="py-2 px-3 font-mono">
-                                {w.ppe_status?.safety_vest === 'PRESENT' ? '✅' : '❌'}
+                                {ppeMarker(w.ppe_status?.safety_vest)}
                               </td>
                               <td className="py-2 px-3 font-mono">
-                                {w.ppe_status?.gloves === 'PRESENT' ? '✅' : '❌'}
+                                {ppeMarker(w.ppe_status?.gloves)}
                               </td>
                               <td className="py-2 px-3 font-mono">
-                                {w.ppe_status?.safety_footwear === 'PRESENT' ? '✅' : '❌'}
+                                {ppeMarker(w.ppe_status?.safety_footwear)}
                               </td>
                             </tr>
                           ))}

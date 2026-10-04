@@ -356,6 +356,24 @@ class SpatialPPEAssociator:
         affinity = 0.6 * containment + 0.4 * proximity_score
         return float(affinity)
 
+    def is_anatomical_region_visible(
+        self,
+        worker_idx: int,
+        worker_boxes: List[np.ndarray],
+        item_type: PPEItemType,
+        img_shape: Tuple[int, int],
+    ) -> bool:
+        """
+        Determines whether the relevant anatomical body region for a given PPE type
+        is sufficiently visible for reliable PPE detection/absence assessment.
+
+        Returns:
+            True if the anatomical region is sufficiently observable.
+            False if the region is occluded by another worker, clipped by image borders,
+                  cropped by camera framing (e.g., waist-up), or below minimum resolution.
+        """
+        return not self.detect_occlusion(worker_idx, worker_boxes, item_type, img_shape)
+
     def detect_occlusion(
         self,
         worker_idx: int,
@@ -364,73 +382,112 @@ class SpatialPPEAssociator:
         img_shape: Tuple[int, int],
     ) -> bool:
         """
-        Determines whether a worker's anatomical zone for a given PPE type is occluded
-        either by frame boundary clipping or by overlapping adjacent workers.
+        Determines whether a worker's anatomical zone for a given PPE type is occluded,
+        clipped by frame boundary, cropped by camera framing (e.g., bust / waist-up),
+        or below reliable visual resolution.
 
-        Frame boundary occlusion logic:
-        - HELMET: head severed at top frame boundary
-        - GLOVES / SAFETY_FOOTWEAR: lower body (hands/feet) clipped at bottom or lateral
-        - Any type: severe lateral clipping (< 25px visible width)
-        - Half-body workers (wh/ww < 2.0): lower body not in frame → GLOVES and SAFETY_FOOTWEAR UNKNOWN
+        Core Semantics:
+        - UNKNOWN is reserved ONLY for insufficient visual evidence (occluded, clipped, distant, bust/waist-up).
+        - A clearly visible normal person with sufficient anatomical visibility must NOT be occluded.
+        - When detect_occlusion returns False, an undetected PPE item transitions to ABSENT candidate,
+          becoming confirmed ABSENT after the standard 15-frame temporal validation window.
         """
         img_h, img_w = img_shape[:2]
         wb = worker_boxes[worker_idx]
         wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
         wh = max(1.0, wy2 - wy1)
         ww = max(1.0, wx2 - wx1)
+        aspect_ratio = wh / ww
 
-        zone = self.get_body_zone(wb, item_type)
-        zx1, zy1, zx2, zy2 = zone
+        # ─── 1. General Resolution & Lateral Boundary Clipping ───
+        # Tiny / distant worker below minimum reliable resolution for any PPE
+        if wh < 65 or ww < 20:
+            return True
 
-        # --- Frame boundary clipping checks ---
-        margin = max(25, int(img_w * 0.04))
+        # Severe lateral frame edge clipping (worker body sliced at left or right frame edge)
+        if (wx1 <= 5 or wx2 >= (img_w - 5)) and ww < 35:
+            return True
 
-        # Helmet: head/cranium severed at top frame edge
+        # ─── 2. PPE-Specific Anatomical Zone & Framing Checks ───
         if item_type == PPEItemType.HELMET:
-            if wy1 <= margin and (zy2 - zy1) < 25:
-                return True  # Only head visible at top of frame → cranium clipped
+            # Head / cranium occupies top ~25% of body box
+            # Top frame border cutoff: head is touching or severed by upper image edge
+            if wy1 <= 5:
+                return True
+            # Severe lateral clipping of head
+            if (wx1 <= 5 or wx2 >= (img_w - 5)) and ww < 30:
+                return True
+            # Cranium zone for multi-worker overlap: top 25% of height
+            zx1, zy1, zx2, zy2 = wx1, wy1, wx2, wy1 + 0.25 * wh
 
-        # Safety footwear: feet cut off at bottom frame edge
-        if item_type == PPEItemType.SAFETY_FOOTWEAR:
-            if zy2 >= (img_h - margin) or wy2 >= (img_h - margin):
-                return True  # Feet zone extends to or below frame bottom
+        elif item_type == PPEItemType.SAFETY_VEST:
+            # Torso region: 15% to 65% of body height
+            if wh < 70 or ww < 25:
+                return True
+            # Worker entering/exiting: only head in frame (wy1 >= img_h - 50) or top edge exit (wy2 <= 40)
+            if wy1 >= (img_h - 50) or wy2 <= 40:
+                return True
+            if wh < 60 and wy1 <= 5:
+                return True  # Head only, no torso
+            if (wx1 <= 5 or wx2 >= (img_w - 5)) and ww < 30:
+                return True
+            # Torso zone for multi-worker overlap: 15% to 65%
+            zx1, zy1, zx2, zy2 = wx1, wy1 + 0.15 * wh, wx2, wy1 + 0.65 * wh
 
-        # Gloves: hands (lower-arm zone) clipped at bottom or lateral edges
-        if item_type == PPEItemType.GLOVES:
-            if zy2 >= (img_h - margin) or wy2 >= (img_h - margin):
-                return True  # Gloves zone clipped at bottom
+        elif item_type == PPEItemType.GLOVES:
+            # Hands / wrists / forearms: extremities requiring higher visual resolution
+            # Distant person: hands cannot be resolved reliably (Example 6)
+            if wh < 120 or ww < 35:
+                return True
+            # Bust / close-up shot cropped above hands (Example 3)
+            if aspect_ratio < 1.35:
+                return True
+            # Worker cropped at waist by bottom frame boundary
+            if wy2 >= (img_h - 10) and aspect_ratio < 1.70:
+                return True
+            if (wx1 <= 5 or wx2 >= (img_w - 5)) and ww < 45:
+                return True
+            # Hand / forearm zone for multi-worker overlap: 30% to 85%
+            zx1, zy1, zx2, zy2 = wx1 - 0.10 * ww, wy1 + 0.30 * wh, wx2 + 0.10 * ww, wy1 + 0.85 * wh
 
-        # Lateral clipping: body severely cut off at either side
-        if (wx1 <= margin and ww < 40) or (wx2 >= (img_w - margin) and ww < 40):
-            return True
+        elif item_type == PPEItemType.SAFETY_FOOTWEAR:
+            # Feet / lower legs: bottom 70% to 100% of standing body
+            if wh < 90 or ww < 25:
+                return True
+            # Feet outside frame: person visible from head to knees/shins (Example 4)
+            # If the worker box touches or hits the bottom frame edge, feet are cut off
+            if wy2 >= (img_h - 5):
+                return True
+            # Waist-up / Half-body camera framing (Example 3 & test cases with wh/ww ~ 1.25)
+            if aspect_ratio < 1.65:
+                return True
+            # Lower body partially clipped near bottom edge
+            if wy2 >= (img_h - 25) and aspect_ratio < 2.0:
+                return True
+            if (wx1 <= 5 or wx2 >= (img_w - 5)) and ww < 25:
+                return True
+            # Feet zone for multi-worker overlap: bottom 30% of height
+            zx1, zy1, zx2, zy2 = wx1, wy1 + 0.70 * wh, wx2, wy2
 
-        # Half-body detection: worker height-to-width ratio < 2.0 suggests lower body is off frame
-        # (Standing adult: wh/ww ≈ 2.5–4.0; if ratio < 2.0 → bottom of body is not in frame)
-        if wh / ww < 2.0:
-            if item_type in (PPEItemType.SAFETY_FOOTWEAR, PPEItemType.GLOVES):
-                return True  # Lower body not visible
+        else:
+            return False
 
-        # --- Frame boundary check on the body zone itself ---
-        if zy2 > img_h - 2 or zy1 < 0:
-            return True
-        if zx2 > img_w - 2 or zx1 < 0:
-            return True
-
-        # --- Occlusion by other workers ---
+        # ─── 3. Multi-Worker Inter-Person Occlusion Check ───
+        # Check whether another worker overlaps the target worker's anatomical zone
         zone_area = max(1.0, (zx2 - zx1) * (zy2 - zy1))
+        thresh = 0.40 if item_type == PPEItemType.GLOVES else self.inter_person_overlap_thresh
         for j, other_wb in enumerate(worker_boxes):
             if j == worker_idx:
                 continue
-            # Overlap between this worker's zone and other worker's body
-            ox1 = max(zx1, other_wb[0])
-            oy1 = max(zy1, other_wb[1])
-            ox2 = min(zx2, other_wb[2])
-            oy2 = min(zy2, other_wb[3])
+            ox1 = max(zx1, float(other_wb[0]))
+            oy1 = max(zy1, float(other_wb[1]))
+            ox2 = min(zx2, float(other_wb[2]))
+            oy2 = min(zy2, float(other_wb[3]))
 
             ow = max(0.0, ox2 - ox1)
             oh = max(0.0, oy2 - oy1)
-            inter = ow * oh
-            if (inter / zone_area) >= self.inter_person_overlap_thresh:
+            inter_area = ow * oh
+            if (inter_area / zone_area) >= thresh:
                 return True
 
         return False

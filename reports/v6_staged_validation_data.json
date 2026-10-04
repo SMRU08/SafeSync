@@ -1,0 +1,167 @@
+{
+  "v3_sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+  "v6_sha256": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+  "v3_latency_p50_ms": 30.84,
+  "v6_latency_p50_ms": 28.22,
+  "visual_results": [
+    {
+      "category": "Steam / Industrial Pipe (Negative)",
+      "target": "steam_pipe",
+      "image_name": "hneg_00004.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_steam_pipe.jpg",
+      "v3_predictions": {
+        "safety_vest (0.75)": 1,
+        "person (0.33)": 1,
+        "safety_footwear (0.27)": 1,
+        "safety_footwear (0.26)": 1
+      },
+      "v6_predictions": {
+        "safety_vest (0.72)": 1,
+        "person (0.49)": 1,
+        "gloves (0.42)": 1,
+        "gloves (0.32)": 1,
+        "safety_footwear (0.28)": 1,
+        "safety_footwear (0.26)": 1
+      }
+    },
+    {
+      "category": "Metallic Siding / Sun Glare (Negative)",
+      "target": "metallic_glare",
+      "image_name": "hneg_00008.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_metallic_glare.jpg",
+      "v3_predictions": {
+        "person (0.34)": 1,
+        "person (0.27)": 1,
+        "gloves (0.26)": 1
+      },
+      "v6_predictions": {
+        "helmet (0.60)": 1
+      }
+    },
+    {
+      "category": "Construction Earthmoving Dust (Negative)",
+      "target": "dust_cloud",
+      "image_name": "hneg_00041.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_dust_cloud.jpg",
+      "v3_predictions": {},
+      "v6_predictions": {}
+    },
+    {
+      "category": "Yellow Excavator Surface (Negative)",
+      "target": "excavator_surface",
+      "image_name": "hneg_00061.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_excavator_surface.jpg",
+      "v3_predictions": {
+        "person (0.43)": 1
+      },
+      "v6_predictions": {}
+    },
+    {
+      "category": "Active Fire & Small Flame",
+      "target": "small_fire",
+      "image_name": "dfire_00000.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_small_fire.jpg",
+      "v3_predictions": {
+        "fire (0.57)": 1
+      },
+      "v6_predictions": {
+        "fire (0.32)": 1,
+        "fire (0.21)": 1
+      }
+    },
+    {
+      "category": "Combustion Smoke Plume",
+      "target": "smoke_plume",
+      "image_name": "dfire_00010.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_smoke_plume.jpg",
+      "v3_predictions": {
+        "smoke (0.22)": 1
+      },
+      "v6_predictions": {}
+    },
+    {
+      "category": "Worker with Gloves & Safety Footwear",
+      "target": "gloves_and_footwear",
+      "image_name": "ppec_00078.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_gloves_and_footwear.jpg",
+      "v3_predictions": {
+        "person (0.55)": 1,
+        "safety_footwear (0.27)": 1,
+        "safety_footwear (0.25)": 1
+      },
+      "v6_predictions": {
+        "person (0.66)": 1,
+        "gloves (0.45)": 1
+      }
+    },
+    {
+      "category": "Multiple Workers in Safety Vests & Helmets",
+      "target": "multi_worker_ppe",
+      "image_name": "safup_00002.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_multi_worker_ppe.jpg",
+      "v3_predictions": {
+        "safety_vest (0.86)": 1,
+        "safety_vest (0.60)": 1,
+        "safety_vest (0.59)": 1,
+        "person (0.57)": 1,
+        "person (0.51)": 1,
+        "person (0.42)": 1,
+        "helmet (0.39)": 1,
+        "helmet (0.35)": 1,
+        "person (0.34)": 1,
+        "person (0.25)": 1,
+        "person (0.23)": 1
+      },
+      "v6_predictions": {
+        "safety_vest (0.72)": 1,
+        "safety_vest (0.68)": 1,
+        "helmet (0.68)": 1,
+        "person (0.60)": 1,
+        "helmet (0.53)": 1,
+        "person (0.52)": 1,
+        "person (0.51)": 1,
+        "helmet (0.51)": 1,
+        "safety_vest (0.46)": 1,
+        "gloves (0.46)": 1,
+        "person (0.34)": 1,
+        "gloves (0.31)": 1,
+        "helmet (0.31)": 1,
+        "person (0.29)": 1
+      }
+    },
+    {
+      "category": "Single Worker in Full PPE",
+      "target": "single_worker_ppe",
+      "image_name": "safup_00010.jpg",
+      "visual_file": "D:\\Additional\\PROJECT\\SafeSync\\reports\\staged_validation_visuals\\comparison_single_worker_ppe.jpg",
+      "v3_predictions": {
+        "safety_vest (0.73)": 1,
+        "helmet (0.56)": 1,
+        "person (0.46)": 1,
+        "safety_footwear (0.22)": 1
+      },
+      "v6_predictions": {
+        "gloves (0.88)": 1,
+        "gloves (0.86)": 1,
+        "safety_vest (0.84)": 1,
+        "person (0.80)": 1,
+        "helmet (0.68)": 1,
+        "safety_footwear (0.38)": 1,
+        "safety_footwear (0.28)": 1
+      }
+    }
+  ],
+  "video_results": {
+    "video_file": "D:\\Additional\\PROJECT\\SafeSync\\outputs\\detection\\videos\\test_safety_detected.mp4",
+    "total_frames": 120,
+    "sampled_frames_count": 5,
+    "v3_detections": {
+      "helmet": 10,
+      "person": 7
+    },
+    "v6_detections": {
+      "helmet": 13,
+      "person": 4
+    }
+  }
+}

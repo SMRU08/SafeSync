@@ -1,0 +1,16 @@
+{
+  "model_name": "construction_ppe_v1",
+  "base_model": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\ppe_fire_smoke_v3\\weights\\best.pt",
+  "dataset": "D:\\Additional\\PROJECT\\SafeSync\\datasets\\normalized\\construction_ppe\\data.yaml",
+  "epochs": 1,
+  "imgsz": 384,
+  "training_duration_s": 392.1,
+  "sha256": "213211bc55ae23492d909d2ca76ec419ffbd551f7bad24ca02c6252198086462",
+  "weights_path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\construction_ppe_v1\\weights\\best.pt",
+  "metrics": {
+    "mAP50": 0.6719,
+    "mAP50_95": 0.3361,
+    "precision": 0.7223,
+    "recall": 0.6235
+  }
+}

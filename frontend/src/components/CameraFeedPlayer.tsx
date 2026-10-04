@@ -18,6 +18,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { CameraConfig, WorkerTrack, PPEPresence, HazardEventDetail } from '../types';
+import { resolveWorkerDisplay } from '../utils/workerDisplay';
 import { API_BASE_URL } from '../utils/constants';
 import { reconnectCamera } from '../services/api';
 
@@ -411,9 +412,10 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
             const widthPx = hasBounds ? (nx2 - nx1) * videoBounds.width : (nx2 - nx1) * 100;
             const heightPx = hasBounds ? (ny2 - ny1) * videoBounds.height : (ny2 - ny1) * 100;
 
-            const isCompliant = worker.overall_compliant;
-            const borderColor = isCompliant ? 'border-emerald-500' : 'border-rose-500';
-            const badgeBg = isCompliant ? 'bg-emerald-600' : 'bg-rose-600';
+            // Color from the FINAL validated worker state (never raw detections).
+            // UNKNOWN ≠ VIOLATION: amber, not red.
+            const display = resolveWorkerDisplay(worker);
+            const stateColor = display.color;
 
             return (
               <div
@@ -425,23 +427,34 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                   width: hasBounds ? `${widthPx}px` : `${widthPx}%`,
                   height: hasBounds ? `${heightPx}px` : `${heightPx}%`,
                 }}
+                data-worker-state={display.state}
               >
-                <div className={`w-full h-full border-2 ${borderColor} relative shadow-sm`}>
-                  {/* Worker ID Tag — Shortened minimal format [Camera Initial]-[W][Worker_Number] */}
+                <div
+                  className={`w-full h-full ${display.state === 'VIOLATION' ? 'border-[3px]' : 'border-2'} relative shadow-sm`}
+                  style={{ borderColor: stateColor }}
+                >
+                  {/* Worker ID Tag — Shortened minimal format [Camera Initial]-[W][Worker_Number] + status */}
                   <div
-                    className={`absolute -top-4 left-0 ${badgeBg} text-white text-[8px] font-bold px-1 rounded-t whitespace-nowrap`}
+                    className="absolute -top-4 left-0 text-white text-[8px] font-bold px-1 rounded-t whitespace-nowrap"
+                    style={{ backgroundColor: stateColor }}
                   >
-                    {getCameraShortTag(activeCamera)}-W{worker.track_id}
+                    {getCameraShortTag(activeCamera)}-W{worker.track_id} · {display.label}
                   </div>
 
                   {/* Itemized PPE Inspection Box */}
                   <div
-                    className={`absolute top-0 -right-28 bg-black/85 backdrop-blur-sm border ${borderColor} text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight space-y-0.5 shadow-md`}
+                    className="absolute top-0 -right-28 bg-black/85 backdrop-blur-sm border text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight space-y-0.5 shadow-md"
+                    style={{ borderColor: stateColor }}
                   >
                     {renderPPEItem('Helmet', worker.ppe_status?.helmet)}
                     {renderPPEItem('Vest', worker.ppe_status?.safety_vest)}
                     {renderPPEItem('Gloves', worker.ppe_status?.gloves)}
                     {renderPPEItem('Shoes', worker.ppe_status?.safety_footwear)}
+                    {display.detail && (
+                      <div className="pt-0.5 font-bold" style={{ color: stateColor }}>
+                        {display.detail}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -76,6 +76,13 @@ datasets/processed/labels/
 datasets/processed_v3/images/
 datasets/processed_v3/labels/
 datasets/staging/
+datasets/categories/
+datasets/images/
+datasets/labels/
+datasets/organized/
+datasets/v6_candidate/
+datasets/data.yaml
+data.yaml
 
 # Training artifacts & runs
 runs/
@@ -107,3 +114,7 @@ outputs/evidence/*
 !outputs/evidence/.gitkeep
 outputs/logs/*
 !outputs/logs/.gitkeep
+# Cleanup and Archival additions
+archive/
+outputs/detection/logs/*.jsonl
+*.jsonl

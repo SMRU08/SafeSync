@@ -1,0 +1,470 @@
+{
+  "v3_sha": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+  "v6_sha": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+  "total_frames_evaluated": 16,
+  "total_workers_evaluated": 20,
+  "unexpected_fire_smoke": 0,
+  "mean_latency_ms": 482.39,
+  "mean_fps": 2.07,
+  "temporal_unknown_preserved": true,
+  "temporal_absent_confirmed": true,
+  "multi_worker_tested": 3,
+  "cross_worker_contamination": 0,
+  "frames": [
+    {
+      "id": "view_01_frontal",
+      "scenario": "Frontal worker",
+      "file": "cppe_00065.jpg",
+      "resolution": "1024x768",
+      "latency_ms": 278.25,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            388,
+            332,
+            582,
+            767
+          ],
+          "helmet": "PRESENT",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_02_angled",
+      "scenario": "Slightly angled worker (~30\u00b0)",
+      "file": "cppe_00047.jpg",
+      "resolution": "640x640",
+      "latency_ms": 333.9,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            278,
+            71,
+            481,
+            504
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "PRESENT",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_03_side",
+      "scenario": "Side worker (~45\u201390\u00b0)",
+      "file": "cppe_00081.jpg",
+      "resolution": "640x640",
+      "latency_ms": 310.87,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            229,
+            124,
+            444,
+            606
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "PRESENT",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_04_rear",
+      "scenario": "Rear worker",
+      "file": "cppe_00103.jpg",
+      "resolution": "640x640",
+      "latency_ms": 306.3,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            207,
+            165,
+            455,
+            633
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "PRESENT",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_05_waist_up",
+      "scenario": "Waist-up worker",
+      "file": "cppe_00147.jpg",
+      "resolution": "768x1024",
+      "latency_ms": 267.32,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            237,
+            260,
+            485,
+            793
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_06_full_body",
+      "scenario": "Full-body worker",
+      "file": "cppe_00136.jpg",
+      "resolution": "640x640",
+      "latency_ms": 305.24,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            168,
+            2,
+            441,
+            548
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "PRESENT",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_07_multi_2w",
+      "scenario": "Multiple workers (2 workers)",
+      "file": "cppe_00026.jpg",
+      "resolution": "640x640",
+      "latency_ms": 361.97,
+      "workers_detected": 3,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            43,
+            164,
+            192,
+            500
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        },
+        {
+          "track_id": 2,
+          "bbox": [
+            276,
+            182,
+            433,
+            502
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        },
+        {
+          "track_id": 3,
+          "bbox": [
+            136,
+            170,
+            325,
+            502
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_08_multi_3w",
+      "scenario": "Multiple workers (3 workers)",
+      "file": "cppe_00013.jpg",
+      "resolution": "640x640",
+      "latency_ms": 337.22,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            2,
+            69,
+            639,
+            640
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_09_multi_4w",
+      "scenario": "Multiple workers (4+ workers)",
+      "file": "cppe_00004.jpg",
+      "resolution": "1024x762",
+      "latency_ms": 272.32,
+      "workers_detected": 3,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            626,
+            77,
+            960,
+            762
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        },
+        {
+          "track_id": 2,
+          "bbox": [
+            88,
+            108,
+            488,
+            762
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        },
+        {
+          "track_id": 3,
+          "bbox": [
+            369,
+            24,
+            653,
+            762
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_10_occluded",
+      "scenario": "Worker partially occluded",
+      "file": "cppe_00076.jpg",
+      "resolution": "1023x768",
+      "latency_ms": 264.1,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            414,
+            77,
+            1023,
+            768
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_11_distance",
+      "scenario": "Worker at moderate distance",
+      "file": "cppe_00095.jpg",
+      "resolution": "768x1024",
+      "latency_ms": 296.85,
+      "workers_detected": 2,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            2,
+            93,
+            531,
+            1019
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        },
+        {
+          "track_id": 2,
+          "bbox": [
+            363,
+            11,
+            766,
+            1021
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_12_visible_helmet",
+      "scenario": "Worker with clearly visible helmet",
+      "file": "cppe_00066.jpg",
+      "resolution": "640x640",
+      "latency_ms": 324.04,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            149,
+            110,
+            475,
+            639
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_13_visible_vest",
+      "scenario": "Worker with clearly visible vest",
+      "file": "cppe_00185.jpg",
+      "resolution": "1024x683",
+      "latency_ms": 260.52,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            211,
+            24,
+            1015,
+            681
+          ],
+          "helmet": "UNKNOWN",
+          "vest": "UNKNOWN",
+          "gloves": "UNKNOWN",
+          "footwear": "UNKNOWN",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_14_visible_gloves",
+      "scenario": "Worker with visible gloves",
+      "file": "cppe_00172.jpg",
+      "resolution": "640x640",
+      "latency_ms": 320.12,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            142,
+            2,
+            521,
+            616
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "PRESENT",
+          "footwear": "PRESENT",
+          "overall_status": "COMPLIANT"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_15_visible_boots",
+      "scenario": "Worker with visible safety footwear",
+      "file": "cppe_00182.jpg",
+      "resolution": "640x640",
+      "latency_ms": 373.89,
+      "workers_detected": 1,
+      "workers": [
+        {
+          "track_id": 1,
+          "bbox": [
+            142,
+            0,
+            499,
+            532
+          ],
+          "helmet": "PRESENT",
+          "vest": "PRESENT",
+          "gloves": "UNKNOWN",
+          "footwear": "PRESENT",
+          "overall_status": "UNKNOWN"
+        }
+      ],
+      "fire_smoke_detected": 0
+    },
+    {
+      "id": "view_16_live_webcam",
+      "scenario": "Live Camera Sensor (CCTV/Webcam)",
+      "file": "LIVE_WEBCAM_SENSOR",
+      "resolution": "640x480",
+      "latency_ms": 235.79,
+      "workers_detected": 0,
+      "workers": [],
+      "fire_smoke_detected": 0
+    }
+  ]
+}
