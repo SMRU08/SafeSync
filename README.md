@@ -1,4 +1,4 @@
-# SafeSync
+### SafeSync
 
 ### AI Vision-Based Industrial Safety Monitoring System
 
