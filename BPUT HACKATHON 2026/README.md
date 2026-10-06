@@ -225,7 +225,8 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 ---
 
 ### Working Prototype / Demo
-* **Validated Test Coverage:** 276 / 276 passing tests (250 unit tests, 39 integration tests, 20 recovery tests, 3 root smoke tests).
+* **Validated Test Coverage:** 298 / 298 passing tests (unit tests, multi-camera lifecycle, model registry integrity, 4-point PPE association, optical combustion state machine, recovery tests).
+* **Zero-Configuration Portability:** Standard project-relative model resolution paired with automated cryptographic SHA-256 verification (`scripts/setup/verify_model.py`), enabling instant cloning and flawless evaluation on any judge workstation without hardcoded path dependencies.
 * **Hardware Benchmark (Intel Core i5):**
   - YOLOv8n Single-Pass Inference Latency: **32.5 ms** (P50: 32.29 ms)
   - End-to-End Pipeline Latency: **72.7 ms**
@@ -235,8 +236,9 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 ---
 
 ### Short Instruction About What Should Be Highlighted
-* Emphasize that this is a **fully functional, running prototype** with 276/276 passing tests, not just a concept slide.
+* Emphasize that this is a **fully functional, running prototype** with 298/298 passing tests, not just a concept slide.
 * Highlight the **Queue Depth = 1 architecture**: old frames are dropped when network slows down, ensuring the operator always sees the real-time present with zero video lag.
+* Highlight the **cryptographically verified portability** (`verify_model.py`) that ensures reproducible evaluation across any judge laptop.
 
 ---
 

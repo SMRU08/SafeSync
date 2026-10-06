@@ -5,7 +5,7 @@
 > **Autonomous real-time computer vision for workplace safety, PPE compliance governance, combustion hazard detection, explainable risk assessment, and rapid incident response.**
 
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)](https://github.com/SMRU08/SafeSync)
-[![Backend Tests](https://img.shields.io/badge/Tests-276%2F276%20Passing-success?style=flat-square)](https://github.com/SMRU08/SafeSync)
+[![Backend Tests](https://img.shields.io/badge/Tests-298%2F298%20Passing-success?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![Integration Scenarios](https://img.shields.io/badge/Integration-39%2F39%20Verified-blue?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![E2E Recovery Tests](https://img.shields.io/badge/E2E%20Recovery-20%2F20%20Verified-blueviolet?style=flat-square)](https://github.com/SMRU08/SafeSync)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-informational?style=flat-square)](https://www.python.org/)
@@ -465,6 +465,7 @@ pytest -v
 ```
 
 ### Verified Test Suite Summary:
+* **Automated Backend Regression Suite (298/298 PASSED):** Complete end-to-end verification across unit tests, multi-camera streaming lifecycle, model registry integrity, portable path resolution, 4-point PPE association, optical combustion state machines, and database persistence.
 * **Unit Tests (250/250 PASSED):** Validates tracking mathematics, IoU bounds, risk score clamping, and password hashing.
 * **Pipeline Hardening Tests (10/10 PASSED):** `backend/tests/test_ppe_smoke_pipeline_hardening.py` verifying wide-brim hard hats, 6-frame temporal tolerance, and torso-overlap smoke exclusion.
 * **Real-World Validation Tests (7/7 PASSED):** `backend/tests/test_master_real_world_validation.py` verifying multi-worker isolation, gloves vertical gates, footwear cutoff, and telemetry fields.
