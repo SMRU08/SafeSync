@@ -94,6 +94,8 @@ models/**/*.engine
 models/**/*.h5
 models/**/*.tflite
 models/detection/*_backup/
+models/detection/safesync_glove_detector/
+!models/**/.gitkeep
 
 # IDE & OS
 .vscode/
@@ -118,3 +120,7 @@ outputs/logs/*
 archive/
 outputs/detection/logs/*.jsonl
 *.jsonl
+scratch/
+outputs/hazards/
+outputs/glove_verification/
+datasets/glove_detector/

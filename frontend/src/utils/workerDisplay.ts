@@ -17,7 +17,7 @@ export type WorkerDisplayState = 'SAFE' | 'UNKNOWN' | 'VIOLATION';
 
 export const WORKER_STATE_COLORS: Record<WorkerDisplayState, string> = {
   SAFE: '#22C55E',
-  UNKNOWN: '#F59E0B',
+  UNKNOWN: '#F5B942',
   VIOLATION: '#EF4444',
 };
 

@@ -509,8 +509,39 @@ cd SafeSync
    pip install -r requirements.txt
    ```
 
-3. **Verify Model Checkpoint:**
-   Ensure `models/detection/ppe_fire_smoke_v3/weights/best.pt` exists and matches SHA-256 `9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe`.
+3. **Portable Model Setup & Cryptographic Verification:**
+   Because binary weights files (`*.pt`) are excluded from Git tracking via `.gitignore` per repository storage best practices, cloned repositories require placing the production model weights in the designated project-relative directory:
+
+   * **Required Model:** SafeSync V3 Production Model (`ppe_fire_smoke_v3` - YOLOv8n)
+   * **Exact Destination Path:** `models/detection/ppe_fire_smoke_v3/weights/best.pt`
+   * **Required SHA-256 Checksum:** `9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe`
+
+   ```bash
+   # Ensure directory exists (preserves .gitkeep):
+   mkdir -p models/detection/ppe_fire_smoke_v3/weights
+
+   # Place best.pt into models/detection/ppe_fire_smoke_v3/weights/
+   # Then verify SHA-256 integrity using the automated setup tool:
+   python scripts/setup/verify_model.py
+   ```
+
+   **Automated Verification Tool Output:**
+   ```text
+   ======================================================================
+   SAFESYNC — PRODUCTION MODEL SETUP & INTEGRITY VERIFICATION
+   ======================================================================
+   Project Root:         <Your-Repo-Root>
+   Target Relative Path: models/detection/ppe_fire_smoke_v3/weights/best.pt
+   Expected SHA-256:     9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe
+   ----------------------------------------------------------------------
+   Model File Found:     YES (6,210,730 bytes)
+   Computing SHA-256 checksum...
+   Actual SHA-256:       9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe
+
+   [SUCCESS] SHA-256 INTEGRITY VERIFIED!
+   SafeSync V3 production model is ready for real-time AI inference.
+   ======================================================================
+   ```
 
 ---
 

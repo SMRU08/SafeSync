@@ -124,8 +124,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./safesync.db"
 
     # Paths
-    MODEL_DIRECTORY: str = "../../models"
-    DATASET_DIRECTORY: str = "../../datasets"
+    MODEL_DIRECTORY: str = "models"
+    DATASET_DIRECTORY: str = "datasets"
     MODEL_REGISTRY_PATH: str = "models/registry/model_registry.yaml"
     CAMERA_CONFIG_PATH: str = "configs/cameras.yaml"
 

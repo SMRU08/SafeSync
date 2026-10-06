@@ -15,10 +15,11 @@ import {
   BarChart3,
   Activity,
   Settings,
-  UserCheck,
   Shield,
   PanelLeftClose,
   PanelLeftOpen,
+  DoorOpen,
+  Award,
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -35,10 +36,12 @@ export type ActiveTab =
 
 interface SidebarProps {
   activeTab: ActiveTab;
-  onTabChange: (tab: ActiveTab) => void;
+  onTabChange: (tab: ActiveTab, cameraSubTab?: 'matrix' | 'entry_gate') => void;
+  cameraSubTab?: 'matrix' | 'entry_gate';
   activeAlertsCount?: number;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  onOpenDemoGuide?: () => void;
 }
 
 interface NavItem {
@@ -52,9 +55,11 @@ interface NavItem {
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
+  cameraSubTab = 'matrix',
   activeAlertsCount = 0,
   isCollapsed: controlledCollapsed,
   onToggleCollapse,
+  onOpenDemoGuide,
 }) => {
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
@@ -72,7 +77,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'live-monitor', label: 'Live Monitor', icon: Tv },
     { id: 'cameras', label: 'Cameras', icon: Camera },
     { id: 'workers', label: 'Workers & PPE', icon: Users },
-    { id: 'attendance', label: 'Attendance', icon: UserCheck, iconColor: 'text-emerald-400' },
     { id: 'hazards', label: 'Fire & Smoke', icon: Flame, iconColor: 'text-amber-400' },
     {
       id: 'alerts',
@@ -123,6 +127,73 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {navItems.map((item) => {
           const isActive = activeTab === item.id;
           const Icon = item.icon;
+
+          if (item.id === 'cameras') {
+            return (
+              <div key={item.id} className="space-y-1">
+                <button
+                  onClick={() => onTabChange(item.id, 'matrix')}
+                  title={isCollapsed ? item.label : undefined}
+                  className={`group w-full flex items-center ${
+                    isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2.5'
+                  } rounded-xl font-medium text-xs cursor-pointer transition-all duration-200 ease-out transform hover:-translate-y-0.5 relative ${
+                    isActive && cameraSubTab !== 'entry_gate'
+                      ? 'bg-gradient-to-r from-sky-600 via-sky-600 to-sky-700 text-white shadow-lg shadow-sky-600/30 border border-sky-400/30 font-semibold'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/70 border border-transparent hover:border-slate-700/60'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon
+                      className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                        isActive && cameraSubTab !== 'entry_gate'
+                          ? 'text-white'
+                          : item.iconColor || 'text-slate-400 group-hover:text-sky-400'
+                      }`}
+                    />
+                    {!isCollapsed && <span className="tracking-tight truncate">{item.label}</span>}
+                  </div>
+
+                  {typeof item.badge === 'number' && item.badge > 0 && (
+                    <span
+                      className={`${
+                        isCollapsed
+                          ? 'absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500'
+                          : 'px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold font-mono'
+                      } shadow-sm animate-pulse`}
+                    >
+                      {!isCollapsed && (item.badge > 99 ? '99+' : item.badge)}
+                    </span>
+                  )}
+                </button>
+
+                {/* Section 5: Cameras └── Entry Gate */}
+                {!isCollapsed && (
+                  <div className="pl-6 pr-1 space-y-0.5 animate-in fade-in duration-150">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTabChange('cameras', 'entry_gate');
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition cursor-pointer ${
+                        isActive && cameraSubTab === 'entry_gate'
+                          ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-600 font-mono text-[10px]">└──</span>
+                        <DoorOpen className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Entry Gate</span>
+                      </div>
+                      <span className="text-[9px] font-mono px-1 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                        ACCESS
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          }
 
           return (
             <button
@@ -181,6 +252,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </p>
               </div>
             </div>
+
+            {onOpenDemoGuide && (
+              <button
+                onClick={onOpenDemoGuide}
+                className="w-full mt-2.5 py-1.5 px-2 rounded-lg bg-sky-600/20 hover:bg-sky-600/35 border border-sky-500/40 text-sky-300 text-[10px] font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
+              >
+                <Award className="w-3.5 h-3.5 text-sky-400" />
+                <span>Hackathon Guide &amp; Arch</span>
+              </button>
+            )}
           </div>
         </div>
       )}

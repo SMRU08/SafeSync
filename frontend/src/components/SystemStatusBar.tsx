@@ -6,9 +6,6 @@
 
 import React from 'react';
 import {
-  Cpu,
-  Database,
-  Radio,
   Camera,
   Shield,
 } from 'lucide-react';
@@ -54,11 +51,11 @@ export const SystemStatusBar: React.FC<SystemStatusBarProps> = ({
           title="Click to view detailed system health"
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
+            className={`w-2 h-2 rounded-full ${
               isApiOnline && isAiReady && isDbConnected ? 'bg-emerald-500' : 'bg-amber-500'
             }`}
           />
-          <span className="font-semibold text-slate-300">SafeSync SOC</span>
+          <span className="font-bold text-slate-200">SafeSync Core</span>
         </div>
 
         <div className="h-3 w-px bg-slate-800" />
@@ -66,48 +63,48 @@ export const SystemStatusBar: React.FC<SystemStatusBarProps> = ({
         {/* API Indicator */}
         <div
           onClick={() => onNavigate?.('health')}
-          className="flex items-center gap-1 cursor-pointer hover:text-slate-200 transition"
+          className="flex items-center gap-1.5 cursor-pointer hover:text-slate-200 transition"
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${isApiOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-          <span>API:</span>
-          <span className={isApiOnline ? 'text-emerald-400' : 'text-rose-400'}>
-            {isApiOnline ? 'OK' : 'DOWN'}
+          <span className={`w-1.5 h-1.5 rounded-full ${isApiOnline ? 'bg-emerald-500' : apiStatus === 'checking' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+          <span className="font-semibold text-slate-300">API:</span>
+          <span className={isApiOnline ? 'text-emerald-400 font-mono' : 'text-rose-400 font-mono'}>
+            {apiStatus === 'online' ? 'OK' : apiStatus === 'checking' ? 'CHECKING' : apiStatus === 'offline' ? 'DOWN' : 'UNKNOWN'}
           </span>
         </div>
 
-        {/* AI Engine Indicator */}
+        {/* AI Ready Indicator */}
         <div
           onClick={() => onNavigate?.('health')}
-          className="flex items-center gap-1 cursor-pointer hover:text-slate-200 transition"
+          className="flex items-center gap-1.5 cursor-pointer hover:text-slate-200 transition"
         >
-          <Cpu className="w-3 h-3 text-slate-500" />
-          <span>AI:</span>
-          <span className={isAiReady ? 'text-emerald-400' : 'text-amber-400'}>
-            {isAiReady ? aiEngineStatus : 'Standby'}
+          <span className={`w-1.5 h-1.5 rounded-full ${isAiReady ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+          <span className="font-semibold text-slate-300">AI:</span>
+          <span className={isAiReady ? 'text-emerald-400 font-mono' : 'text-amber-400 font-mono'}>
+            {isAiReady ? 'Ready' : aiEngineStatus || 'Standby'}
           </span>
         </div>
 
-        {/* DB Indicator */}
+        {/* DB WAL Indicator */}
         <div
           onClick={() => onNavigate?.('health')}
-          className="flex items-center gap-1 cursor-pointer hover:text-slate-200 transition"
+          className="flex items-center gap-1.5 cursor-pointer hover:text-slate-200 transition"
         >
-          <Database className="w-3 h-3 text-slate-500" />
-          <span>DB:</span>
-          <span className={isDbConnected ? 'text-emerald-400' : 'text-rose-400'}>
-            {isDbConnected ? 'WAL' : 'OFFLINE'}
+          <span className={`w-1.5 h-1.5 rounded-full ${isDbConnected ? 'bg-emerald-500' : databaseStatus === 'checking' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+          <span className="font-semibold text-slate-300">DB:</span>
+          <span className={isDbConnected ? 'text-emerald-400 font-mono' : 'text-rose-400 font-mono'}>
+            {isDbConnected ? 'WAL' : databaseStatus === 'checking' ? 'SYNC' : 'OFFLINE'}
           </span>
         </div>
 
-        {/* WS Stream */}
+        {/* WebSocket Stream */}
         <div
           onClick={() => onNavigate?.('health')}
-          className="flex items-center gap-1 cursor-pointer hover:text-slate-200 transition hidden sm:flex"
+          className="flex items-center gap-1.5 cursor-pointer hover:text-slate-200 transition hidden sm:flex"
         >
-          <Radio className="w-3 h-3 text-slate-500" />
-          <span>WS:</span>
-          <span className={isWsConnected ? 'text-sky-400' : 'text-rose-400'}>
-            {wsStatus}
+          <span className={`w-1.5 h-1.5 rounded-full ${isWsConnected ? 'bg-sky-400' : 'bg-rose-500'}`} />
+          <span className="font-semibold text-slate-300">WebSocket:</span>
+          <span className={isWsConnected ? 'text-sky-400 font-mono' : 'text-rose-400 font-mono'}>
+            {wsStatus || '—'}
           </span>
         </div>
 

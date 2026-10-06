@@ -146,6 +146,10 @@ export async function fetchComplianceConfig(): Promise<any> {
   return request<any>('/api/compliance/config');
 }
 
+export async function fetchPPEZonePolicies(): Promise<any> {
+  return request<any>('/api/compliance/ppe-zones');
+}
+
 export async function fetchHazardConfig(): Promise<any> {
   return request<any>('/api/hazards/config');
 }
@@ -240,6 +244,10 @@ export async function toggleCameraSpeaker(cameraId: string, enabled: boolean): P
 export async function fetchAudioAlerts(cameraId?: string, limit: number = 50): Promise<any[]> {
   const qs = cameraId ? `?camera_id=${cameraId}&limit=${limit}` : `?limit=${limit}`;
   return request<any[]>(`/api/audio/alerts${qs}`);
+}
+
+export async function fetchAlertProvidersStatus(): Promise<Record<string, any>> {
+  return request<Record<string, any>>('/api/alerts/providers/status');
 }
 
 // ─── Real-Time Analytics & Maintenance ─────────────────────────────────────

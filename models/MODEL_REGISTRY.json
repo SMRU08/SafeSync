@@ -117,8 +117,8 @@
             "6": "smoke"
           },
           "operating_thresholds": {
-            "fire": 0.2,
-            "smoke": 0.2
+            "fire": 0.18,
+            "smoke": 0.16
           },
           "datasets": [
             "d_fire",

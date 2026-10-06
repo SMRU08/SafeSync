@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, ChevronDown, RefreshCw, Sun, Moon } from 'lucide-react';
+import { Search, Bell, ChevronDown, RefreshCw, Sun, Moon, Award, Sparkles } from 'lucide-react';
 import { WebSocketStatus } from '../hooks/useWebSocket';
 
 export interface TopHeaderProps {
@@ -21,6 +21,9 @@ export interface TopHeaderProps {
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
   onNavigateHealth?: () => void;
+  isDemoMode?: boolean;
+  onToggleDemoMode?: () => void;
+  onOpenDemoGuide?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -36,6 +39,9 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   theme = 'dark',
   onToggleTheme,
   onNavigateHealth,
+  isDemoMode = false,
+  onToggleDemoMode,
+  onOpenDemoGuide,
 }) => {
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -221,9 +227,37 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <button
             onClick={onToggleTheme}
             title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Industrial Mode'}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-sky-400" />}
+          </button>
+        )}
+
+        {/* Hackathon Guide & Architecture Trigger */}
+        {onOpenDemoGuide && (
+          <button
+            onClick={onOpenDemoGuide}
+            className="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/40 border border-sky-500/40 text-sky-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+            title="Open Hackathon Demo Guide & System Architecture"
+          >
+            <Award className="w-3.5 h-3.5 text-sky-400" />
+            <span className="hidden sm:inline">Guide &amp; Arch</span>
+          </button>
+        )}
+
+        {/* Demo Mode Toggle */}
+        {onToggleDemoMode && (
+          <button
+            onClick={onToggleDemoMode}
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
+              isDemoMode
+                ? 'bg-amber-500/25 text-amber-300 border-amber-500/50 shadow-sm'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+            }`}
+            title={isDemoMode ? 'Demo Mode Active — Click to return to Live Mode' : 'Switch to Hackathon Pre-Recorded Demo Mode'}
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${isDemoMode ? 'text-amber-400 animate-spin' : 'text-slate-500'}`} style={isDemoMode ? { animationDuration: '4s' } : undefined} />
+            <span className="hidden md:inline">{isDemoMode ? 'Demo Mode' : 'Live Mode'}</span>
           </button>
         )}
 

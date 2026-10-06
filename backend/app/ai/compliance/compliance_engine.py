@@ -112,6 +112,7 @@ class WorkerComplianceEngine:
         confidence_threshold: float = 0.20,
         annotate: bool = True,
         zone_id: str = "UNKNOWN",
+        imgsz: Optional[int] = None,
     ) -> Tuple[ComplianceAnalysisResponse, np.ndarray, Dict[str, float]]:
         """
         Processes a single video or camera frame.
@@ -131,6 +132,7 @@ class WorkerComplianceEngine:
         det_response, _ = self.detector.detect_image(
             frame,
             conf=confidence_threshold,
+            imgsz=imgsz,
             annotate=False,
         )
         t_detect = (time.perf_counter() - t0) * 1000.0

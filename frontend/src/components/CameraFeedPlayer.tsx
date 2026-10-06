@@ -29,6 +29,8 @@ interface CameraFeedPlayerProps {
   workers?: WorkerTrack[];
   hazards?: HazardEventDetail[];
   onRefresh?: () => void;
+  selectedWorkerId?: number | null;
+  onSelectWorker?: (workerId: number) => void;
 }
 
 const getCameraShortTag = (camera?: CameraConfig | null): string => {
@@ -51,6 +53,8 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   workers = [],
   hazards = [],
   onRefresh,
+  selectedWorkerId = null,
+  onSelectWorker,
 }) => {
   const [activeCamId, setActiveCamId] = useState<string>(
     selectedCameraId || (cameras[0]?.camera_id ?? 'camera_01')
@@ -108,7 +112,27 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   useEffect(() => {
     updateVideoBounds();
     window.addEventListener('resize', updateVideoBounds);
-    return () => window.removeEventListener('resize', updateVideoBounds);
+
+    let observer: ResizeObserver | null = null;
+    if (viewportRef.current && typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        updateVideoBounds();
+      });
+      observer.observe(viewportRef.current);
+    }
+
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+      setTimeout(updateVideoBounds, 50);
+      setTimeout(updateVideoBounds, 200);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    return () => {
+      window.removeEventListener('resize', updateVideoBounds);
+      if (observer) observer.disconnect();
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, [updateVideoBounds]);
 
   useEffect(() => {
@@ -384,9 +408,41 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
         )}
 
         {/* Date-Time Stamp Top Right */}
-        <div className="absolute top-2.5 right-3 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white font-mono-nums border border-white/10">
-          {new Date().toISOString().replace('T', ' ').substring(0, 19)}
+        <div className="absolute top-2.5 right-3 z-30 bg-black/75 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white font-mono-nums border border-white/10 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>{new Date().toISOString().replace('T', ' ').substring(0, 19)}</span>
         </div>
+
+        {/* P0 Environmental Hazard Alert HUD Banner — Strictly Decoupled from Workers */}
+        {isCameraOnline && (
+          (() => {
+            const activeHazardsList = hazards.filter((h) => {
+              const st = (h.state || '').toUpperCase();
+              return st === 'CONFIRMED' || st === 'ACTIVE' || (!st && (h.confidence || 0) >= 0.35);
+            });
+            const hasFire = activeHazardsList.some((h) => h.hazard_type.toLowerCase() === 'fire');
+            const hasSmoke = activeHazardsList.some((h) => h.hazard_type.toLowerCase() === 'smoke');
+
+            if (!hasFire && !hasSmoke) return null;
+
+            return (
+              <div className="absolute top-2.5 left-3 z-30 flex items-center gap-2 pointer-events-none">
+                {hasFire && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FF5A36] text-white text-[11px] font-black uppercase tracking-wider shadow-lg animate-pulse border border-white/20">
+                    <Flame className="w-3.5 h-3.5 animate-bounce" />
+                    <span>P0 CRITICAL &bull; FIRE DETECTED</span>
+                  </div>
+                )}
+                {hasSmoke && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#F59E0B] text-black text-[11px] font-black uppercase tracking-wider shadow-lg animate-pulse border border-white/20">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>P0 HAZARD &bull; SMOKE DETECTED</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()
+        )}
 
         {/* Dynamic Worker Inspection HUD Overlays */}
         {isCameraOnline &&
@@ -413,14 +469,19 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
             const heightPx = hasBounds ? (ny2 - ny1) * videoBounds.height : (ny2 - ny1) * 100;
 
             // Color from the FINAL validated worker state (never raw detections).
-            // UNKNOWN ≠ VIOLATION: amber, not red.
+            // UNKNOWN ≠ VIOLATION: amber (#F5B942), not red (#EF4444).
             const display = resolveWorkerDisplay(worker);
             const stateColor = display.color;
+            const isSelected = worker.track_id === selectedWorkerId;
 
             return (
               <div
                 key={worker.track_id}
-                className="absolute pointer-events-none transition-all duration-150"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectWorker?.(worker.track_id);
+                }}
+                className="absolute pointer-events-auto cursor-pointer transition-all duration-150 group/box z-20"
                 style={{
                   left: hasBounds ? `${leftPx}px` : `${leftPx}%`,
                   top: hasBounds ? `${topPx}px` : `${topPx}%`,
@@ -430,21 +491,38 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                 data-worker-state={display.state}
               >
                 <div
-                  className={`w-full h-full ${display.state === 'VIOLATION' ? 'border-[3px]' : 'border-2'} relative shadow-sm`}
+                  className={`w-full h-full relative transition-all ${
+                    display.state === 'VIOLATION' ? 'border-[3px]' : 'border-2'
+                  } ${
+                    isSelected
+                      ? 'ring-2 ring-white ring-offset-2 ring-offset-black/70 shadow-[0_0_15px_rgba(255,255,255,0.7)]'
+                      : 'hover:border-white shadow-sm'
+                  }`}
                   style={{ borderColor: stateColor }}
                 >
-                  {/* Worker ID Tag — Shortened minimal format [Camera Initial]-[W][Worker_Number] + status */}
+                  {/* Worker ID Tag — [Camera Initial]-[W][Worker_Number] · [Status] */}
                   <div
-                    className="absolute -top-4 left-0 text-white text-[8px] font-bold px-1 rounded-t whitespace-nowrap"
+                    className="absolute -top-4 left-0 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-t whitespace-nowrap flex items-center gap-1 shadow-sm"
                     style={{ backgroundColor: stateColor }}
                   >
-                    {getCameraShortTag(activeCamera)}-W{worker.track_id} · {display.label}
+                    <span>{getCameraShortTag(activeCamera)}-W{worker.track_id}</span>
+                    <span>&bull;</span>
+                    <span>
+                      {display.state === 'SAFE' ? '✓ SAFE' : display.state === 'UNKNOWN' ? '? UNKNOWN' : '! VIOLATION'}
+                    </span>
+                    {isSelected && (
+                      <span className="ml-0.5 bg-white text-black px-1 rounded text-[7px] font-extrabold uppercase tracking-tight">
+                        ACTIVE
+                      </span>
+                    )}
                   </div>
 
                   {/* Itemized PPE Inspection Box */}
                   <div
-                    className="absolute top-0 -right-28 bg-black/85 backdrop-blur-sm border text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight space-y-0.5 shadow-md"
-                    style={{ borderColor: stateColor }}
+                    className={`absolute top-0 -right-28 bg-black/90 backdrop-blur-sm border text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight space-y-0.5 shadow-md pointer-events-none transition-opacity ${
+                      isSelected ? 'opacity-100 z-30' : 'opacity-90 group-hover/box:opacity-100 z-10'
+                    }`}
+                    style={{ borderColor: isSelected ? '#ffffff' : stateColor }}
                   >
                     {renderPPEItem('Helmet', worker.ppe_status?.helmet)}
                     {renderPPEItem('Vest', worker.ppe_status?.safety_vest)}
@@ -498,7 +576,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
             return (
               <div
                 key={hazard.event_id || hazard.hazard_id || `hazard-${idx}`}
-                className="absolute pointer-events-none transition-all duration-150 animate-pulse"
+                className="absolute pointer-events-none transition-all duration-150 animate-pulse z-15"
                 style={{
                   left: hasBounds ? `${leftPx}px` : `${leftPx}%`,
                   top: hasBounds ? `${topPx}px` : `${topPx}%`,
@@ -519,12 +597,12 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
           })}
 
         {/* Bottom Stream Telemetry Strip */}
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-2.5 flex items-center justify-between text-white text-[10px]">
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-2.5 flex items-center justify-between text-white text-[10px] z-25">
           <div className="flex items-center gap-3 font-mono-nums">
             <span>
               FPS:{' '}
               <strong className={activeCamera.metrics?.fps && activeCamera.metrics.fps > 0 ? 'text-slate-200' : 'text-slate-400'}>
-                {activeCamera.metrics?.fps != null ? activeCamera.metrics.fps.toFixed(1) : '0.0'}
+                {activeCamera.metrics?.fps != null && activeCamera.metrics.fps > 0 ? activeCamera.metrics.fps.toFixed(1) : '—'}
               </strong>
             </span>
             <span className="text-slate-500">|</span>
@@ -533,7 +611,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
               <strong className={activeCamera.metrics?.inference_latency_ms ? 'text-slate-200' : 'text-slate-400'}>
                 {activeCamera.metrics?.inference_latency_ms != null && activeCamera.metrics.inference_latency_ms > 0
                   ? `${activeCamera.metrics.inference_latency_ms.toFixed(0)} ms`
-                  : 'N/A'}
+                  : '—'}
               </strong>
             </span>
             <span className="text-slate-500">|</span>

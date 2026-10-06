@@ -100,8 +100,13 @@ export interface WorkerTrack {
   dwell_seconds?: number;
   confidence?: number;
   first_seen?: string;
+  timestamp?: string;
   zone_id?: string;
+  camera_id?: string;
+  camera_name?: string;
   missing_items?: string[];
+  is_partially_occluded?: boolean;
+  ppe_details?: Record<string, any>;
 }
 
 export interface ComplianceSummary {
@@ -190,6 +195,9 @@ export interface CameraConfig {
     latency_ms?: number;
     summary?: any;
   };
+  purpose?: 'ENTRY_GATE' | 'PRODUCTION_FLOOR' | 'HAZARD_ZONE' | 'GENERAL_MONITORING' | string;
+  coverage_status?: 'GOOD' | 'LIMITED' | 'INSUFFICIENT' | 'UNKNOWN';
+  configured_view?: 'FRONTAL' | 'ANGLED' | 'WAIST_UP' | 'FULL_BODY' | 'OVERHEAD' | 'UNKNOWN' | string;
 }
 
 export interface ZoneConfig {

@@ -237,7 +237,7 @@ class Detector:
                                 # confidence fire/smoke without being clamped up by the per-class
                                 # default. For PPE classes keep the stricter class minimum.
                                 if low_name in ("fire", "smoke"):
-                                    req_conf = conf_thresh
+                                    req_conf = min(conf_thresh, class_min)
                                 else:
                                     req_conf = max(conf_thresh, class_min)
 

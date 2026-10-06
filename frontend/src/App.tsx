@@ -24,6 +24,9 @@ import { WorkerRegistrationModal } from './components/WorkerRegistrationModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { NotificationDrawer } from './components/NotificationDrawer';
 import { SystemStatusBar } from './components/SystemStatusBar';
+import { DemoTopBanner, DemoScenarioId } from './components/DemoTopBanner';
+import { HackathonDemoModal } from './components/HackathonDemoModal';
+import { DEMO_SCENARIOS } from './utils/demoScenarios';
 import { useSafetyData } from './hooks/useSafetyData';
 import { useWebSocket } from './hooks/useWebSocket';
 import { Alert, Incident } from './types';
@@ -38,6 +41,12 @@ export const App: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [cameraSubTab, setCameraSubTab] = useState<'matrix' | 'entry_gate'>('matrix');
+
+  // Hackathon Demo Mode State (Phase 10)
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+  const [demoScenario, setDemoScenario] = useState<DemoScenarioId>('safe_worker');
+  const [isDemoGuideOpen, setIsDemoGuideOpen] = useState<boolean>(false);
 
   // Theme Management (Default Dark Industrial Mode, with Light mode support & persistence)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -90,7 +99,10 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
-      if (
+      if (hash === 'cameras/entry-gate' || hash === 'entry-gate') {
+        setActiveTab('cameras');
+        setCameraSubTab('entry_gate');
+      } else if (
         hash === 'overview' ||
         hash === 'live-monitor' ||
         hash === 'cameras' ||
@@ -103,6 +115,7 @@ export const App: React.FC = () => {
         hash === 'settings'
       ) {
         setActiveTab(hash as ActiveTab);
+        if (hash === 'cameras') setCameraSubTab('matrix');
       }
     };
 
@@ -111,13 +124,27 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
-  const handleTabChange = (tab: ActiveTab) => {
+  const handleTabChange = (tab: ActiveTab, subTab?: 'matrix' | 'entry_gate') => {
     setActiveTab(tab);
-    window.location.hash = tab;
+    if (tab === 'cameras' && subTab) {
+      setCameraSubTab(subTab);
+      window.location.hash = subTab === 'entry_gate' ? 'cameras/entry-gate' : 'cameras';
+    } else {
+      if (tab === 'cameras') {
+        setCameraSubTab('matrix');
+      }
+      window.location.hash = tab;
+    }
   };
 
-  const activeAlertsCount =
-    summary?.active_alerts ?? alerts.filter((a) => a.status === 'ACTIVE').length;
+  // Effective scenario data in Demo Mode (Phase 10)
+  const currentScenario = isDemoMode ? DEMO_SCENARIOS[demoScenario] : null;
+  const effectiveAlerts = currentScenario ? currentScenario.alerts : alerts;
+  const effectiveHazards = currentScenario ? currentScenario.hazards : hazards;
+
+  const activeAlertsCount = isDemoMode && currentScenario
+    ? effectiveAlerts.filter((a) => a.status === 'ACTIVE').length
+    : (summary?.active_alerts ?? alerts.filter((a) => a.status === 'ACTIVE').length);
 
   const handleOpenIncident = (incidentId: string) => {
     const found = incidents.find((inc) => inc.incident_id === incidentId);
@@ -158,20 +185,59 @@ export const App: React.FC = () => {
         theme={theme}
         onToggleTheme={toggleTheme}
         onNavigateHealth={() => handleTabChange('health')}
+        isDemoMode={isDemoMode}
+        onToggleDemoMode={() => setIsDemoMode((prev) => !prev)}
+        onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
       />
+
+      {/* ─── DEMO MODE TOP BANNER (Phase 10) ───────────────────────────────── */}
+      {isDemoMode && (
+        <DemoTopBanner
+          activeScenario={demoScenario}
+          onSelectScenario={(scId: DemoScenarioId) => setDemoScenario(scId)}
+          onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
+          onExitDemo={() => setIsDemoMode(false)}
+        />
+      )}
+
+      {/* ─── GLOBAL BACKEND-OFFLINE BANNER (Honest Failover) ────────────────── */}
+      {status?.backend === 'offline' && !isDemoMode && (
+        <div className="w-full px-4 py-2 bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-b border-rose-500/40 text-xs font-semibold text-rose-200 flex items-center justify-between z-30 select-none shadow-md">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 animate-pulse" />
+            <span>
+              <strong className="text-white">SAFESYNC BACKEND UNAVAILABLE</strong> &mdash; Live monitoring cannot currently be confirmed.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => refreshAll()}
+              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 text-[11px] font-bold transition cursor-pointer"
+            >
+              RETRY
+            </button>
+            <button
+              onClick={() => setIsDemoMode(true)}
+              className="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black transition cursor-pointer shadow-sm"
+            >
+              EXPLORE IN DEMO MODE
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ─── CRITICAL ALERT BANNER (Sticky, pulsing red) ─────────────────────── */}
       {(() => {
-        const fireHazard = hazards.find(
+        const fireHazard = effectiveHazards.find(
           (h) => h.hazard_type === 'fire' && (h.state === 'CONFIRMED' || h.state === 'ACTIVE')
         );
-        const smokeHazard = hazards.find(
+        const smokeHazard = effectiveHazards.find(
           (h) => h.hazard_type === 'smoke' && (h.state === 'CONFIRMED' || h.state === 'ACTIVE')
         );
-        const evaluatingHazard = hazards.find(
+        const evaluatingHazard = effectiveHazards.find(
           (h) => h.state === 'CANDIDATE' || h.state === 'DETECTING'
         );
-        const criticalAlert = alerts.find(
+        const criticalAlert = effectiveAlerts.find(
           (a) => a.status === 'ACTIVE' && (a.severity === 'CRITICAL' || a.severity === 'HIGH')
         );
         const bannerText = fireHazard
@@ -248,9 +314,11 @@ export const App: React.FC = () => {
         <Sidebar
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          cameraSubTab={cameraSubTab}
           activeAlertsCount={activeAlertsCount}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+          onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
         />
 
         {/* Main Content Router Surface */}
@@ -259,8 +327,8 @@ export const App: React.FC = () => {
             {activeTab === 'overview' && (
               <OverviewView
                 summary={summary}
-                alerts={alerts}
-                hazards={hazards}
+                alerts={effectiveAlerts}
+                hazards={effectiveHazards}
                 cameras={cameras}
                 onNavigate={handleTabChange}
                 onSelectAlert={(a) => setSelectedAlert(a)}
@@ -277,6 +345,9 @@ export const App: React.FC = () => {
                 cameras={cameras}
                 onRefresh={refreshAll}
                 onNavigateCameras={() => handleTabChange('cameras')}
+                isDemoMode={isDemoMode}
+                demoScenario={demoScenario}
+                onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
               />
             )}
 
@@ -286,12 +357,18 @@ export const App: React.FC = () => {
                 hazardConfig={hazardConfig}
                 onRefreshCameras={refreshAll}
                 onToggleSpeaker={handleToggleSpeaker}
+                initialSubTab={cameraSubTab}
+                onSubTabChange={setCameraSubTab}
               />
             )}
 
             {activeTab === 'workers' && (
               <WorkersView
                 complianceConfig={complianceConfig}
+                cameras={cameras}
+                alerts={alerts}
+                incidents={incidents}
+                onNavigate={handleTabChange}
                 onOpenEnrollModal={() => setIsEnrollModalOpen(true)}
               />
             )}
@@ -301,13 +378,22 @@ export const App: React.FC = () => {
             )}
 
             {activeTab === 'hazards' && (
-              <HazardsView hazards={hazards} hazardConfig={hazardConfig} />
+              <HazardsView
+                hazards={effectiveHazards}
+                hazardConfig={hazardConfig}
+                cameras={cameras}
+                onNavigate={handleTabChange}
+                onSelectIncident={handleOpenIncident}
+                onRefresh={refreshAll}
+                isBackendHealthy={status?.backend === 'healthy'}
+              />
             )}
 
             {activeTab === 'alerts' && (
               <AlertsView
-                alerts={alerts}
+                alerts={effectiveAlerts}
                 incidents={incidents}
+                cameras={cameras}
                 summary={summary}
                 onAcknowledge={handleAcknowledge}
                 onResolve={handleResolve}
@@ -315,6 +401,7 @@ export const App: React.FC = () => {
                 onRefresh={refreshAll}
                 onSelectAlert={(a) => setSelectedAlert(a)}
                 onSelectIncident={handleOpenIncident}
+                onNavigate={handleTabChange}
               />
             )}
 
@@ -324,6 +411,7 @@ export const App: React.FC = () => {
                 incidents={incidents}
                 summary={summary}
                 analyticsData={analyticsData}
+                cameras={cameras}
                 onRefresh={refreshAll}
               />
             )}
@@ -334,6 +422,8 @@ export const App: React.FC = () => {
               <SettingsView
                 complianceConfig={complianceConfig}
                 hazardConfig={hazardConfig}
+                cameras={cameras}
+                onNavigate={handleTabChange}
               />
             )}
           </div>
@@ -408,6 +498,20 @@ export const App: React.FC = () => {
           setIsEnrollModalOpen(false);
           refreshAll();
         }}
+      />
+
+      {/* ─── Hackathon Demo & Architecture Guide Modal (Phase 10) ──────────── */}
+      <HackathonDemoModal
+        isOpen={isDemoGuideOpen}
+        onClose={() => setIsDemoGuideOpen(false)}
+        onSelectDemoScenario={(scId: DemoScenarioId) => {
+          setIsDemoMode(true);
+          setDemoScenario(scId);
+        }}
+        onNavigateTab={(tab) => handleTabChange(tab as ActiveTab)}
+        activeScenario={demoScenario}
+        isDemoMode={isDemoMode}
+        onToggleDemoMode={(enable) => setIsDemoMode(enable)}
       />
     </div>
   );

@@ -16,15 +16,15 @@ hazard:
   # ── Stage 1: Candidate Detection Confidence ──────────────────────────────
   # Minimum confidence to even enter the tracking pipeline as a CANDIDATE.
   # Below this threshold, detections are silently discarded before tracking.
-  fire_candidate_confidence: 0.20
-  smoke_candidate_confidence: 0.20
+  fire_candidate_confidence: 0.18
+  smoke_candidate_confidence: 0.16
 
   # ── Stage 2: Confirmation Confidence ─────────────────────────────────────
-  fire_confirmation_confidence: 0.25
-  smoke_confirmation_confidence: 0.35
+  fire_confirmation_confidence: 0.22
+  smoke_confirmation_confidence: 0.20
 
   # ── Temporal Confirmation Parameters ─────────────────────────────────────
-  confirmation_frames: 3
+  confirmation_frames: 2
 
   # Minimum ratio of detected frames in the confirmation window.
   minimum_observation_ratio: 0.50
@@ -43,13 +43,13 @@ hazard:
 
   # ── Spatial Consistency Validation ───────────────────────────────────────
   # Maximum normalized centroid displacement allowed across consecutive frames.
-  # 0.15 = centroid may not jump more than 15% of frame diagonal between frames.
+  # 0.25 allows natural billowing of smoke plumes and flickering flame contours.
   # Rejects random "teleporting" detections from reflections or artifacts.
-  max_centroid_jump_normalized: 0.18
+  max_centroid_jump_normalized: 0.25
 
   # Minimum IoU for a detection to be matched as spatially consistent with
   # the previous bbox. Used alongside centroid check.
-  spatial_iou_min: 0.12
+  spatial_iou_min: 0.10
 
   # Minimum number of spatially CONSISTENT detections before state can
   # advance beyond CANDIDATE. Requires at least 2 consistent observations.
@@ -58,10 +58,7 @@ hazard:
   # ── Minimum Area Threshold ────────────────────────────────────────────────
   # Minimum bounding box area (pixels²) for a detection to be considered.
   # Rejects sub-pixel artifacts and compression noise.
-  # At 640×480: 30×30 px = 900 px² minimum
-  # At 1280×720: adjust accordingly — use relative threshold:
-  #   min_area_fraction of total frame area.
-  min_area_fraction: 0.0010   # 0.10% of frame area minimum (e.g., 614 px² at 640×480)
+  min_area_fraction: 0.0005   # 0.05% of frame area minimum (supports distant fires & smoke)
 
 tracking:
   tracker: "spatial_centroid"

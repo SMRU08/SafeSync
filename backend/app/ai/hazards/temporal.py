@@ -63,8 +63,8 @@ class TemporalHazardStateMachine:
         h_cfg = cfg.get("hazard", {})
 
         # ── Temporal confirmation ────────────────────────────────────────────
-        self.confirmation_frames = int(h_cfg.get("confirmation_frames", 8))
-        self.minimum_observation_ratio = float(h_cfg.get("minimum_observation_ratio", 0.65))
+        self.confirmation_frames = int(h_cfg.get("confirmation_frames", 2))
+        self.minimum_observation_ratio = float(h_cfg.get("minimum_observation_ratio", 0.50))
 
         # ── Per-type gap tolerance (DETECTING → CANDIDATE decay) ─────────────
         self.smoke_max_gap_frames = int(h_cfg.get("smoke_max_gap_frames", 4))
@@ -76,15 +76,15 @@ class TemporalHazardStateMachine:
 
         # ── Confirmation confidence gate ─────────────────────────────────────
         self.fire_confirmation_confidence = float(
-            h_cfg.get("fire_confirmation_confidence", 0.40)
+            h_cfg.get("fire_confirmation_confidence", 0.22)
         )
         self.smoke_confirmation_confidence = float(
-            h_cfg.get("smoke_confirmation_confidence", 0.45)
+            h_cfg.get("smoke_confirmation_confidence", 0.20)
         )
 
         # ── Spatial consistency parameters ───────────────────────────────────
         self.max_centroid_jump = float(
-            h_cfg.get("max_centroid_jump_normalized", 0.18)
+            h_cfg.get("max_centroid_jump_normalized", 0.25)
         )
         self.min_consistent_detections = int(
             h_cfg.get("min_consistent_detections", 2)

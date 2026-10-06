@@ -121,34 +121,52 @@ class ModelLoader:
         else:
             log.warning(f"Detection config not found at {self.config_path}, using defaults")
             self._config = {
-                "model": {"path": "models/detection/ppe_fire_smoke_v2/weights/best.pt"},
-                "inference": {"confidence_threshold": 0.25, "iou_threshold": 0.45, "image_size": 384, "device": "auto"},
+                "model": {"path": "models/detection/ppe_fire_smoke_v3/weights/best.pt"},
+                "inference": {"confidence_threshold": 0.20, "iou_threshold": 0.45, "image_size": 384, "device": "auto"},
             }
         return self._config
 
     def resolve_model_path(self, override_path: Optional[str] = None, target_status: str = "production") -> str:
         """
-        Resolves absolute path to model weights.
+        Resolves absolute path to model weights portably relative to the SafeSync project root.
         If override_path is given, uses it directly (or resolves relative to ROOT).
         Otherwise resolves the production model registered in the registry.
+        Guarantees that machine-specific paths from other computers are normalized.
         """
         if override_path:
             raw_path = override_path
         else:
             try:
                 entry = get_model_entry_from_registry(target_status, self.registry_path)
-                raw_path = entry.get("model_path") or entry.get("file", "models/detection/ppe_fire_smoke_v2/weights/best.pt")
+                raw_path = entry.get("model_path") or entry.get("file", "models/detection/ppe_fire_smoke_v3/weights/best.pt")
             except Exception as e:
                 log.warning(f"Registry lookup failed ({e}), falling back to detection config path.")
-                raw_path = self._config.get("model", {}).get("path", "models/detection/ppe_fire_smoke_v2/weights/best.pt")
+                raw_path = self._config.get("model", {}).get("path", "models/detection/ppe_fire_smoke_v3/weights/best.pt")
 
-        if os.path.isabs(raw_path):
-            abs_path = raw_path
+        raw_norm = str(raw_path).replace("\\", "/")
+
+        # If raw_path contains 'models/...', strip any foreign computer drive/path prefix
+        idx = raw_norm.lower().find("models/")
+        if idx != -1:
+            rel_subpath = raw_norm[idx:]
+            abs_path = os.path.normpath(os.path.join(ROOT, rel_subpath))
+        elif os.path.isabs(raw_path):
+            abs_path = os.path.normpath(raw_path)
         else:
             abs_path = os.path.normpath(os.path.join(ROOT, raw_path))
 
         if not os.path.isfile(abs_path):
-            raise FileNotFoundError(f"Detection model weights file not found at: {abs_path}")
+            try:
+                rel_display = os.path.relpath(abs_path, ROOT).replace("\\", "/")
+            except Exception:
+                rel_display = "models/detection/ppe_fire_smoke_v3/weights/best.pt"
+            raise FileNotFoundError(
+                f"Detection model weights file not found: '{rel_display}'.\n"
+                f"Resolved destination path: {abs_path}\n"
+                f"SafeSync requires the production V3 weights placed at:\n"
+                f"  models/detection/ppe_fire_smoke_v3/weights/best.pt\n"
+                f"Expected SHA-256: 9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe"
+            )
 
         return abs_path
 
@@ -325,6 +343,20 @@ class ModelLoader:
 
     @property
     def model_path(self) -> Optional[str]:
+        """Returns the portable project-relative path to the active model weights."""
+        if self._loaded_path:
+            try:
+                rel = os.path.relpath(self._loaded_path, ROOT).replace("\\", "/")
+                if not rel.startswith(".."):
+                    return rel
+            except Exception:
+                pass
+            return str(self._loaded_path).replace("\\", "/")
+        return "models/detection/ppe_fire_smoke_v3/weights/best.pt"
+
+    @property
+    def absolute_model_path(self) -> Optional[str]:
+        """Returns the host-specific absolute path to the active model weights."""
         return self._loaded_path
 
     @property

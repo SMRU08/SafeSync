@@ -148,10 +148,18 @@ class ComplianceVisualizer:
                     hstate = getattr(h, "state", "")
                     state = hstate.value.upper() if hasattr(hstate, "value") else str(hstate).upper()
 
-                # State gate: only render confirmed or high-confidence hazards
-                # Candidate/Detecting states must NOT appear on the live HUD
-                SHOW_STATES = {"CONFIRMED", "ACTIVE"}
-                if state not in SHOW_STATES and conf < 0.35:
+                # State gate: skip cleared or inactive hazard states
+                if state in {"CLEARED", "NO_HAZARD"}:
+                    continue
+
+                # If explicitly in early temporal tracking states (CANDIDATE / DETECTING),
+                # suppress from HUD unless high-confidence (>= 0.35).
+                # Confirmed / Active tracks or raw detections (state == "") are rendered.
+                if state in {"CANDIDATE", "DETECTING"} and conf < 0.35:
+                    continue
+
+                min_thresh = 0.16 if cname == "smoke" else 0.18
+                if conf < min_thresh:
                     continue
 
                 # Distinct high-contrast colors: Fire=Crimson Red, Smoke=Bright Amber
@@ -159,7 +167,7 @@ class ComplianceVisualizer:
                 bx1, by1, bx2, by2 = int(b[0]), int(b[1]), int(b[2]), int(b[3])
                 cv2.rectangle(out, (bx1, by1), (bx2, by2), color, 3)
 
-                state_str = f" [{state}]" if state and state not in ("NO_HAZARD", "") else ""
+                state_str = f" [{state}]" if state and state not in ("NO_HAZARD", "", "CONFIRMED", "ACTIVE") else ""
                 lbl = f"{cname.upper()}{state_str} {conf:.2f}"
 
                 # Render background badge pill for label legibility

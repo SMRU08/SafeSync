@@ -78,10 +78,10 @@ class HazardAnalysisEngine:
 
         # Detection thresholds
         h_cfg = self.config.get("hazard", {})
-        self.default_conf = float(h_cfg.get("confidence_threshold", 0.25))
-        self.fire_candidate_conf = float(h_cfg.get("fire_candidate_confidence", h_cfg.get("fire_confidence", 0.30)))
-        self.smoke_candidate_conf = float(h_cfg.get("smoke_candidate_confidence", h_cfg.get("smoke_confidence", 0.35)))
-        self.min_area_fraction = float(h_cfg.get("min_area_fraction", 0.0010))
+        self.default_conf = float(h_cfg.get("confidence_threshold", 0.18))
+        self.fire_candidate_conf = float(h_cfg.get("fire_candidate_confidence", h_cfg.get("fire_confidence", 0.18)))
+        self.smoke_candidate_conf = float(h_cfg.get("smoke_candidate_confidence", h_cfg.get("smoke_confidence", 0.16)))
+        self.min_area_fraction = float(h_cfg.get("min_area_fraction", 0.0005))
 
         # Backward compatibility aliases
         self.fire_conf = self.fire_candidate_conf
@@ -314,6 +314,26 @@ class HazardAnalysisEngine:
             if (box_area / total_frame_area) < self.min_area_fraction:
                 continue
 
+            # Torso exclusion: filter low-confidence smoke heavily inside worker torso (e.g. dark shirts)
+            if worker_boxes and htype == HazardType.SMOKE and conf < 0.40:
+                is_torso_fp = False
+                for wb in worker_boxes:
+                    if isinstance(wb, (list, tuple, np.ndarray)):
+                        wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
+                    else:
+                        wx1, wy1, wx2, wy2 = float(wb.x1), float(wb.y1), float(wb.x2), float(wb.y2)
+                    ix1 = max(bx1, wx1)
+                    iy1 = max(by1, wy1)
+                    ix2 = min(bx2, wx2)
+                    iy2 = min(by2, wy2)
+                    if ix2 > ix1 and iy2 > iy1:
+                        inter = (ix2 - ix1) * (iy2 - iy1)
+                        if (inter / max(1.0, box_area)) > 0.55:
+                            is_torso_fp = True
+                            break
+                if is_torso_fp:
+                    continue
+
             cx = (bx1 + bx2) / 2.0
             cy = (by1 + by2) / 2.0
 
@@ -323,35 +343,6 @@ class HazardAnalysisEngine:
                 continue
 
             zone_id = self.zone_manager.resolve_zone(camera_id, cx, cy, w, h)
-
-            # Worker-torso spatial exclusion: reject low-confidence smoke overlapping a worker body
-            # Rationale: skin/hair/clothing pixels are commonly misclassified as smoke at low confidence
-            if htype == HazardType.SMOKE and conf < 0.40 and worker_boxes:
-                torso_overlap = False
-                smoke_area = max(1.0, box_area)
-                for wb in worker_boxes:
-                    try:
-                        if hasattr(wb, "x1"):
-                            wx1, wy1, wx2, wy2 = float(wb.x1), float(wb.y1), float(wb.x2), float(wb.y2)
-                        elif isinstance(wb, (list, tuple)) and len(wb) >= 4:
-                            wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
-                        elif isinstance(wb, np.ndarray) and wb.size >= 4:
-                            wx1, wy1, wx2, wy2 = float(wb[0]), float(wb[1]), float(wb[2]), float(wb[3])
-                        else:
-                            continue
-                    except Exception:
-                        continue
-                    # Intersection area between smoke bbox and worker bbox
-                    ix1 = max(bx1, wx1)
-                    iy1 = max(by1, wy1)
-                    ix2 = min(bx2, wx2)
-                    iy2 = min(by2, wy2)
-                    inter = max(0.0, ix2 - ix1) * max(0.0, iy2 - iy1)
-                    if inter / smoke_area > 0.55:
-                        torso_overlap = True
-                        break
-                if torso_overlap:
-                    continue
 
             hazard_dets.append({
                 "hazard_type": htype,

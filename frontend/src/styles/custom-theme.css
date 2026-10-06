@@ -3,31 +3,34 @@
 /* ─── Industrial SOC Theme System ─────────────────────────────────────────── */
 :root {
   /* Default: Dark Industrial SOC */
-  --bg-primary: #070b14;
-  --bg-secondary: #090e1a;
-  --bg-surface: #0c1424;
-  --bg-elevated: #111d35;
-  --bg-card: rgba(12, 20, 36, 0.85);
+  --bg-primary: #07111F;
+  --bg-secondary: #0D1B2A;
+  --bg-surface: #0D1B2A;
+  --bg-elevated: #12263A;
+  --bg-card: rgba(13, 27, 42, 0.9);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #E8F0F7;
+  --text-secondary: #8FA3B8;
+  --text-muted: #64748B;
 
-  --border-subtle: rgba(51, 65, 85, 0.5);
-  --border-active: rgba(56, 189, 248, 0.4);
-  --border-card: rgba(51, 65, 85, 0.6);
+  --border-subtle: #20344A;
+  --border-active: #2388FF;
+  --border-card: #20344A;
 
   /* Semantic Operations Colors */
-  --status-online: #10b981;
-  --status-warning: #f59e0b;
-  --status-critical: #ef4444;
-  --status-info: #0284c7;
-  --status-offline: #64748b;
+  --status-safe: #22C55E;
+  --status-unknown: #F5B942;
+  --status-violation: #EF4444;
+  --status-fire: #FF5A36;
+  --status-smoke: #F59E0B;
+  --status-info: #2388FF;
 
-  --accent-cyan: #38bdf8;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
+  --accent-primary: #2388FF;
+  --accent-safe: #22C55E;
+  --accent-unknown: #F5B942;
+  --accent-violation: #EF4444;
+  --accent-fire: #FF5A36;
+  --accent-smoke: #F59E0B;
 }
 
 /* Light Industrial Control Room Theme */

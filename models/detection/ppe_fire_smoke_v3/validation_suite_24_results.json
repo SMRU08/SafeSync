@@ -1,7 +1,7 @@
 {
   "timestamp": "2026-09-29T09:46:15Z",
   "model_version": "ppe_fire_smoke_v3",
-  "model_path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\ppe_fire_smoke_v3\\weights\\best.pt",
+  "model_path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
   "total_scenarios": 24,
   "scenarios_passed": 24,
   "pass_rate_percent": 100.0,

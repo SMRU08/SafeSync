@@ -25,7 +25,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
   const [cameraId, setCameraId] = useState('');
   const [sourceType, setSourceType] = useState<'usb' | 'rtsp' | 'http' | 'synthetic'>('usb');
   const [source, setSource] = useState('0');
-  const [httpHost, setHttpHost] = useState('192.168.137.166');
+  const [httpHost, setHttpHost] = useState('');
   const [httpPort, setHttpPort] = useState('8080');
   const [httpPath, setHttpPath] = useState('/video');
   const [location, setLocation] = useState('');
@@ -70,7 +70,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
       setCameraId('');
       setSourceType('usb');
       setSource('0');
-      setHttpHost('192.168.137.166');
+      setHttpHost('');
       setHttpPort('8080');
       setHttpPath('/video');
       setLocation('');
@@ -85,8 +85,12 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
 
   const updateHttpUrl = (host: string, port: string, path: string) => {
     const cleanHost = host.trim();
-    const cleanPort = port.trim();
-    const cleanPath = path.startsWith('/') ? path.trim() : `/${path.trim()}`;
+    if (!cleanHost) {
+      setSource('');
+      return;
+    }
+    const cleanPort = port.trim() || '8080';
+    const cleanPath = path.startsWith('/') ? path.trim() : `/${path.trim() || 'video'}`;
     const assembled = `http://${cleanHost}:${cleanPort}${cleanPath}`;
     setSource(assembled);
   };
@@ -102,6 +106,13 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
   };
 
   const handleTestConnection = async () => {
+    if (sourceType === 'http' && !httpHost.trim()) {
+      setTestResult({
+        success: false,
+        message: 'Enter the phone IP address before testing.',
+      });
+      return;
+    }
     setIsTesting(true);
     setTestResult(null);
     try {
@@ -129,6 +140,10 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (sourceType === 'http' && !httpHost.trim()) {
+      setSubmitError('Enter the phone IP address.');
+      return;
+    }
     if (!name.trim() || !cameraId.trim() || !source.trim()) {
       setSubmitError('Please fill in Camera Name, ID, and Source.');
       return;
@@ -281,6 +296,7 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                 }}
                 className="w-full px-3 py-1.5 rounded-md border border-slate-300 focus:outline-none focus:ring-1 focus:ring-sky-500 bg-white text-slate-900"
               >
+                <option value="entry_gate" className="bg-white text-slate-900">Entry Gate (Main Entry)</option>
                 <option value="production_floor" className="bg-white text-slate-900">Production Floor</option>
                 <option value="storage_area" className="bg-white text-slate-900">Storage Area</option>
                 <option value="loading_dock" className="bg-white text-slate-900">Loading Dock</option>
@@ -323,9 +339,14 @@ export const AddCameraModal: React.FC<AddCameraModalProps> = ({
                       setHttpHost(e.target.value);
                       updateHttpUrl(e.target.value, httpPort, httpPath);
                     }}
-                    placeholder="e.g. 192.168.1.100 or 10.57.213.x"
+                    placeholder="Enter phone IPv4 address"
                     className="w-full px-2 py-1 rounded border border-slate-300 font-mono text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   />
+                  {!httpHost.trim() && (
+                    <span className="block text-[10px] text-amber-600 font-medium mt-0.5">
+                      Enter the phone IP address.
+                    </span>
+                  )}
                 </div>
                 <div className="col-span-3">
                   <label className="block text-[10px] text-slate-600 font-semibold mb-0.5">Port</label>
