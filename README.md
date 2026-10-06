@@ -339,7 +339,6 @@ flowchart TD
         TRACK --> ASSOC
         ASSOC --> TEMP
     end
-
     subgraph GOVERNANCE["3. Governance & Risk Engine"]
         RISK["Explainable Risk Calculator (0-100 Score)"]
         POLICY["Zone PPE Policy Engine (configs/ppe_zones.yaml)"]
