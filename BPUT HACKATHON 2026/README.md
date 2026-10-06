@@ -12,7 +12,6 @@
 > **Repository:** [https://github.com/SMRU08/SafeSync](https://github.com/SMRU08/SafeSync)
 
 ---
-
 ---
 
 ## SLIDE 1 — TITLE PAGE
