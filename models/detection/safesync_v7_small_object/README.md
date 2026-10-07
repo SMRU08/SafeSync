@@ -3,7 +3,8 @@
 > **STATUS:** EXPERIMENTAL | NOT PRODUCTION | NOT ACTIVE | NOT USED BY RUNTIME  
 > **Active Production Model:** `ppe_fire_smoke_v3` (SHA-256: `9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe`)  
 > **Shadow Evaluation Model:** `safesync_v6_hardnegative` (SHA-256: `c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc`)  
-> **Training Status:** NOT TRAINED YET (Preparation & Curation Phase Completed)  
+> **Training Status:** CONTROLLED RUN 1 COMPLETED (`weights/best.pt`; SHA-256: `5a4e37fb381c318f4dd88a5bc7e80d43489c9e8fbf566f8b2024813ad2da9334`)  
+> **Evaluation Verdict:** **YELLOW** (Gloves recall tripled 3.0×, hard-negative FPs reduced by 91.9%; overall recall needs multi-epoch convergence; V3 remains production)  
 > **Dataset Audit Status:** **GREEN — READY FOR CONTROLLED V7 TRAINING** (6,163 curated images, 14,926 canonical bounding boxes, 2,178 gloves, 2,454 footwear, 347 hard negatives, 0 test set leakage)  
 
 ---
@@ -36,6 +37,14 @@ The candidate dataset at `datasets/v7_candidate/` has been curated, deduplicated
 - **Hard-Negative Distractors:** 347 empty frames (300 preserved from V3)
 - **Test Benchmark Leakage:** 0.00% (409 SHA-256 exclusion hashes enforced)
 - **Audit Verification:** See `models/detection/safesync_v7_small_object/evaluation/v7_dataset_audit.md` for full report.
+
+### 1.2 First Controlled Run Results (EXP_V7_01 Summary):
+- **Base Checkpoint:** `yolov8n.pt`
+- **Resolution:** 384×384 | **Batch:** 16 | **Optimizer:** SGD (`lr0=0.01`)
+- **Weights Generated:** `weights/best.pt` (`5a4e37fb381c...`), `weights/last.pt` (`27f17624e9de...`)
+- **Key Gains:** Glove recall tripled from 0.0282 to 0.0845; hard-negative distractor FPs reduced from 805 to 65 (-91.9%); CPU latency 40.64 ms (24.6 FPS).
+- **Trade-offs:** Overall convergence across large objects requires further training epochs before staging.
+- **Verdict:** **YELLOW** (V3 remains active production, V6 remains shadow). Full report in `EXPERIMENT_RESULTS.md`.
 
 ---
 

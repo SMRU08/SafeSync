@@ -7,6 +7,7 @@ val: images/val
 test: images/test
 
 # Canonical 7-Class Ontology (Strict Invariant)
+nc: 7
 names:
   0: person
   1: helmet

@@ -1,0 +1,234 @@
+{
+  "timestamp": "2026-10-07T16:20:02Z",
+  "v7_checkpoint": {
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v7_small_object\\weights\\best.pt",
+    "sha256": "5a4e37fb381c318f4dd88a5bc7e80d43489c9e8fbf566f8b2024813ad2da9334"
+  },
+  "production_lock": {
+    "v3_sha": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+    "v6_sha": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+    "status": "UNTOUCHED"
+  },
+  "val_pr_metrics": {
+    "precision": 0.2084,
+    "recall": 0.2068,
+    "map50": 0.138,
+    "map50_95": 0.0629
+  },
+  "test_comparison": {
+    "v3": {
+      "total": {
+        "tp": 683,
+        "fp": 717,
+        "fn": 552,
+        "precision": 0.4879,
+        "recall": 0.553,
+        "f1": 0.5184
+      },
+      "per_class": {
+        "person": {
+          "tp": 154,
+          "fp": 250,
+          "fn": 74,
+          "gt": 228,
+          "precision": 0.3812,
+          "recall": 0.6754,
+          "f1": 0.4873
+        },
+        "helmet": {
+          "tp": 200,
+          "fp": 149,
+          "fn": 75,
+          "gt": 275,
+          "precision": 0.5731,
+          "recall": 0.7273,
+          "f1": 0.641
+        },
+        "safety_vest": {
+          "tp": 246,
+          "fp": 134,
+          "fn": 65,
+          "gt": 311,
+          "precision": 0.6474,
+          "recall": 0.791,
+          "f1": 0.712
+        },
+        "gloves": {
+          "tp": 2,
+          "fp": 40,
+          "fn": 69,
+          "gt": 71,
+          "precision": 0.0476,
+          "recall": 0.0282,
+          "f1": 0.0354
+        },
+        "safety_footwear": {
+          "tp": 41,
+          "fp": 117,
+          "fn": 104,
+          "gt": 145,
+          "precision": 0.2595,
+          "recall": 0.2828,
+          "f1": 0.2706
+        },
+        "fire": {
+          "tp": 19,
+          "fp": 14,
+          "fn": 80,
+          "gt": 99,
+          "precision": 0.5758,
+          "recall": 0.1919,
+          "f1": 0.2879
+        },
+        "smoke": {
+          "tp": 21,
+          "fp": 13,
+          "fn": 85,
+          "gt": 106,
+          "precision": 0.6176,
+          "recall": 0.1981,
+          "f1": 0.3
+        }
+      }
+    },
+    "v7": {
+      "total": {
+        "tp": 138,
+        "fp": 190,
+        "fn": 1097,
+        "precision": 0.4207,
+        "recall": 0.1117,
+        "f1": 0.1766
+      },
+      "per_class": {
+        "person": {
+          "tp": 37,
+          "fp": 36,
+          "fn": 191,
+          "gt": 228,
+          "precision": 0.5068,
+          "recall": 0.1623,
+          "f1": 0.2458
+        },
+        "helmet": {
+          "tp": 75,
+          "fp": 13,
+          "fn": 200,
+          "gt": 275,
+          "precision": 0.8523,
+          "recall": 0.2727,
+          "f1": 0.4132
+        },
+        "safety_vest": {
+          "tp": 11,
+          "fp": 23,
+          "fn": 300,
+          "gt": 311,
+          "precision": 0.3235,
+          "recall": 0.0354,
+          "f1": 0.0638
+        },
+        "gloves": {
+          "tp": 6,
+          "fp": 86,
+          "fn": 65,
+          "gt": 71,
+          "precision": 0.0652,
+          "recall": 0.0845,
+          "f1": 0.0736
+        },
+        "safety_footwear": {
+          "tp": 0,
+          "fp": 4,
+          "fn": 145,
+          "gt": 145,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "fire": {
+          "tp": 8,
+          "fp": 27,
+          "fn": 91,
+          "gt": 99,
+          "precision": 0.2286,
+          "recall": 0.0808,
+          "f1": 0.1194
+        },
+        "smoke": {
+          "tp": 1,
+          "fp": 1,
+          "fn": 105,
+          "gt": 106,
+          "precision": 0.5,
+          "recall": 0.0094,
+          "f1": 0.0185
+        }
+      }
+    }
+  },
+  "hard_negatives": {
+    "v3": {
+      "total_images": 253,
+      "images_with_fp": 230,
+      "total_fps": 805,
+      "fp_rate": 0.9091,
+      "fp_by_class": {
+        "person": 385,
+        "helmet": 182,
+        "safety_vest": 130,
+        "gloves": 46,
+        "safety_footwear": 62,
+        "fire": 0,
+        "smoke": 0
+      }
+    },
+    "v7": {
+      "total_images": 253,
+      "images_with_fp": 51,
+      "total_fps": 65,
+      "fp_rate": 0.2016,
+      "fp_by_class": {
+        "person": 17,
+        "helmet": 13,
+        "safety_vest": 25,
+        "gloves": 6,
+        "safety_footwear": 4,
+        "fire": 0,
+        "smoke": 0
+      }
+    }
+  },
+  "speed_benchmarks": {
+    "v3_384": {
+      "imgsz": 384,
+      "mean_ms": 42.17,
+      "p50_ms": 40.31,
+      "p95_ms": 49.98,
+      "fps": 23.7
+    },
+    "v7_384": {
+      "imgsz": 384,
+      "mean_ms": 40.64,
+      "p50_ms": 41.54,
+      "p95_ms": 44.39,
+      "fps": 24.6
+    },
+    "v7_448": {
+      "imgsz": 448,
+      "mean_ms": 45.25,
+      "p50_ms": 45.11,
+      "p95_ms": 48.95,
+      "fps": 22.1
+    },
+    "v7_512": {
+      "imgsz": 512,
+      "mean_ms": 51.37,
+      "p50_ms": 51.29,
+      "p95_ms": 55.58,
+      "fps": 19.5
+    }
+  },
+  "scenarios_passed": "16/16",
+  "verdict": "YELLOW"
+}
