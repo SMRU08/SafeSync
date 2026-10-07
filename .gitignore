@@ -89,7 +89,10 @@ datasets/data.yaml
 data.yaml
 
 # Training artifacts & runs
-runs/
+/runs/
+models/detection/safesync_v7_small_object/runs/**/weights/
+models/detection/safesync_v7_small_object/runs/**/*.jpg
+models/detection/safesync_v7_small_object/runs/**/*.png
 *.pt
 models/**/*.pt
 models/**/*.pth

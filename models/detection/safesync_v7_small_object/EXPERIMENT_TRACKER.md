@@ -12,8 +12,8 @@
 |---|---|:---:|:---:|:---:|---|---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
 | *BASELINE_V3* | `processed_v3` | 640 | 100 | 16 | YOLOv8n (Standard) | Default Mosaic+Fliplr | Standard | Box=7.5, Cls=0.5, DFL=1.5 | 0.3785 | 0.4610 | 0.5223 | 0.4897 | 0.0986 | 0.2966 | 0.1414 | 0.2453 | 754 | 590 | 42.57 ms (384) | 23.5 | 12/12 PASS | **ACTIVE PRODUCTION** |
 | *SHADOW_V6* | `v6_candidate` | 640 | 100 | 16 | YOLOv8n (HardNeg) | HardNeg Suppression | Weighted | Box=7.5, Cls=0.5, DFL=1.5 | 0.2612 | 0.3598 | 0.4332 | 0.3931 | 0.1831 | 0.2966 | 0.2323 | 0.0755 | 952 | 700 | 42.30 ms (384) | 23.6 | 12/12 PASS | **ACTIVE SHADOW** |
-| `EXP_V7_01` | `v7_candidate` | 384 | 3 | 16 | YOLOv8n (Controlled) | Mosaic+Mixup+CopyPaste | Curated Small-Obj | Box=7.5, Cls=0.5, DFL=1.5 | 0.138 | 0.4207 | 0.1117 | 0.1766 | 0.0845 | 0.0 | 0.0808 | 0.0094 | 190 | 1097 | 40.64 ms | 24.6 | 16/16 PASS | **YELLOW** |
-| `EXP_V7_02` | *Pending* | 640 | 120 | 16 | YOLOv8s (Exploratory) | Scale Crop + Mosaic | Balanced 7-class | Small-object Loss Boost | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *TBD* | *PLANNED* |
+| `EXP_V7_01` | `v7_candidate` | 384 | 1 | 16 | YOLOv8n (Run 1 Exploratory) | Mosaic+Mixup+CopyPaste | Curated Small-Obj | Box=7.5, Cls=0.5, DFL=1.5 | 0.138 | 0.4207 | 0.1117 | 0.1766 | 0.0845 | 0.0 | 0.0808 | 0.0094 | 190 | 1097 | 40.64 ms | 24.6 | 16/16 PASS | **YELLOW** |
+| `EXP_V7_02` | `v7_candidate` | 384 | 3 | 16 | YOLOv8n (Run 2 Multi-Epoch) | Mosaic+Mixup+CopyPaste | Curated Small-Obj | Box=7.5, Cls=0.5, DFL=1.5 | 0.3744 | 0.4737 | 0.43 | 0.4508 | 0.1549 | 0.0552 | 0.1414 | 0.1792 | 590 | 704 | 27.88 ms | 35.9 | 16/16 PASS | **YELLOW** |
 
 ---
 

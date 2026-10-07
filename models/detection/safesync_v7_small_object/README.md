@@ -38,13 +38,27 @@ The candidate dataset at `datasets/v7_candidate/` has been curated, deduplicated
 - **Test Benchmark Leakage:** 0.00% (409 SHA-256 exclusion hashes enforced)
 - **Audit Verification:** See `models/detection/safesync_v7_small_object/evaluation/v7_dataset_audit.md` for full report.
 
-### 1.2 First Controlled Run Results (EXP_V7_01 Summary):
+### 1.2 First Controlled Run Results (EXP_V7_01 Summary — 1 Epoch):
 - **Base Checkpoint:** `yolov8n.pt`
 - **Resolution:** 384×384 | **Batch:** 16 | **Optimizer:** SGD (`lr0=0.01`)
-- **Weights Generated:** `weights/best.pt` (`5a4e37fb381c...`), `weights/last.pt` (`27f17624e9de...`)
+- **Weights Generated:** `runs/run1/weights/best.pt` (`5a4e37fb381c...`)
 - **Key Gains:** Glove recall tripled from 0.0282 to 0.0845; hard-negative distractor FPs reduced from 805 to 65 (-91.9%); CPU latency 40.64 ms (24.6 FPS).
 - **Trade-offs:** Overall convergence across large objects requires further training epochs before staging.
 - **Verdict:** **YELLOW** (V3 remains active production, V6 remains shadow). Full report in `EXPERIMENT_RESULTS.md`.
+
+### 1.3 Controlled Run 2 Results (EXP_V7_02 Summary — Multi-Epoch Convergence):
+- **Base Checkpoint:** `yolov8n.pt`
+- **Resolution:** 384×384 | **Batch:** 16 | **Epochs:** 3 | **Optimizer:** SGD (`lr0=0.01`, `momentum=0.937`)
+- **Weights Generated:** `runs/run2/weights/best.pt` (`5b5304e0f704cd7024ae1eea68ad5e0614c21194363a0f7d01285d4d6a7ea722`)
+- **Key Gains:**
+  - **Gloves (Class 3):** Recall surged to **0.1549 (11 TP)** — **5.5× higher than V3 (2 TP)** and nearly double Run 1 (6 TP).
+  - **Vest (Class 2):** Recall completely recovered to **0.7878 (245 TP)**, reaching parity with V3's 246 TP.
+  - **Footwear (Class 4):** Emerged with **8 TP** (up from 0 TP in Run 1).
+  - **Overall TP:** Surged from 138 in Run 1 to **531 TP in Run 2 (+284% increase)**; overall recall reached **0.4300**.
+  - **Distractor Safety:** 0 false fire alarms, 0 false smoke alarms; 40.1% fewer overall FPs than V3 (482 vs 805).
+  - **Edge CPU Throughput:** **35.9 FPS** (27.88 ms mean latency) — fully real-time.
+- **Trade-offs:** Footwear recall (0.0552) still below V3 baseline (0.2828).
+- **Verdict:** **YELLOW** (Multi-epoch convergence hypothesis confirmed; V3 remains active production, V6 shadow, V7 experimental). Full report in `runs/run2/RUN2_REPORT.md`.
 
 ---
 
