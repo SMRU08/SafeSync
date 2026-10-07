@@ -1,0 +1,21 @@
+# dataset.yaml — SafeSync V7 Candidate Dataset Definition (Phase A Specification)
+# STATUS: EXPERIMENTAL PREPARATION — NO DATA OVERWRITES APPLIED
+
+path: D:/Additional/PROJECT/SafeSync/datasets/v7_candidate
+train: images/train
+val: images/val
+test: images/test
+
+# Canonical 7-Class Ontology (Strict Invariant)
+names:
+  0: person
+  1: helmet
+  2: safety_vest
+  3: gloves
+  4: safety_footwear
+  5: fire
+  6: smoke
+
+# Class Absence Rule:
+# Absence (no_helmet, no_vest, no_gloves, no_footwear) MUST NEVER be modeled as detector classes.
+# Absence is derived deterministically by SafeSync's Compliance & Spatial Association Engine.

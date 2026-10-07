@@ -296,6 +296,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 * **Multi-Camera Expansion:** Modular architecture allows adding camera feeds independently.
 * **Edge Hardware Migration:** Ready for INT8 TensorRT deployment on NVIDIA Jetson Orin Nano for sub-10ms edge processing.
 * **SCADA / PLC Integration:** Planned Modbus TCP / OPC-UA relays to automatically halt hazardous machinery when unequipped workers approach.
+* **Future Optimization Roadmap:** Small-object PPE detection improvement for gloves and footwear (V7 experimental research tracks).
 
 ---
 

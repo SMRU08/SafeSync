@@ -422,6 +422,12 @@ A comprehensive empirical benchmark was conducted across all 9 trained model che
 * **Production Integrity:** V3 production weights and configuration remain 100% locked and unchanged.
 * **Full Benchmark Documentation:** See [`MODEL_BENCHMARK_SUMMARY.md`](MODEL_BENCHMARK_SUMMARY.md) and [`reports/model_benchmark/`](reports/model_benchmark/).
 
+### V7 Experimental Roadmap (Research & Preparation Phase):
+* **Production Status:** `ppe_fire_smoke_v3` (V3) remains the sole active production model (SHA-256: `9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe`). No production model replacement has occurred.
+* **Shadow Status:** `safesync_v6_hardnegative` (V6) remains the shadow evaluation model (SHA-256: `c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc`).
+* **V7 Objective:** Experimental research targeting **small-object PPE detection improvement** (specifically gloves, safety footwear, distant workers, and partial occlusions) while strictly preserving V3's high helmet/vest recall, fire/smoke robustness, and edge CPU throughput ($\ge 20$ FPS).
+* **Training Status:** **V7 has NOT been trained yet.** The repository is in Phase A (specification, experiment tracking, and isolated dataset space preparation in `models/detection/safesync_v7_small_object/` and `datasets/v7_candidate/`). Zero unverified performance claims are made.
+
 ---
 
 ## 20. Dataset Information

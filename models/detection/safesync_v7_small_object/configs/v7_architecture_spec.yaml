@@ -1,0 +1,44 @@
+# SafeSync V7 Candidate Architecture Specification
+# STATUS: EXPERIMENTAL / SPECIFICATION ONLY — NOT APPLIED TO PRODUCTION RUNTIME
+
+experiment_name: safesync_v7_small_object
+base_model: yolov8n.pt
+classes:
+  count: 7
+  names:
+    0: person
+    1: helmet
+    2: safety_vest
+    3: gloves
+    4: safety_footwear
+    5: fire
+    6: smoke
+
+target_input_size: 640
+target_inference_size_edge: 384
+
+loss_weighting:
+  box: 7.5
+  cls: 0.5
+  dfl: 1.5
+  small_object_scale_multiplier: 1.8 # Target experimental hyperparameter
+
+augmentation_plan:
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  degrees: 0.0
+  translate: 0.1
+  scale: 0.5
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.5
+  mosaic: 1.0
+  mixup: 0.1
+  copy_paste: 0.1
+
+target_hardware:
+  cpu_edge: Intel Core i5 / AMD Ryzen 5
+  target_fps_384: ">= 20.0"
+  target_latency_384: "<= 50.0 ms"
