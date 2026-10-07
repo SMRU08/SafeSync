@@ -31,6 +31,7 @@ interface CameraFeedPlayerProps {
   onRefresh?: () => void;
   selectedWorkerId?: number | null;
   onSelectWorker?: (workerId: number) => void;
+  isEntryGate?: boolean;
 }
 
 const getCameraShortTag = (camera?: CameraConfig | null): string => {
@@ -55,6 +56,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   onRefresh,
   selectedWorkerId = null,
   onSelectWorker,
+  isEntryGate = false,
 }) => {
   const [activeCamId, setActiveCamId] = useState<string>(
     selectedCameraId || (cameras[0]?.camera_id ?? 'camera_01')
@@ -226,10 +228,50 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
     );
   };
 
+  const isGate = Boolean(
+    isEntryGate ||
+      (activeCamera.zone_id &&
+        ['entry_gate', 'entry', 'gate'].includes(activeCamera.zone_id.toLowerCase())) ||
+      (activeCamera.camera_id && activeCamera.camera_id.toLowerCase().includes('gate'))
+  );
+
   const streamUrl =
     streamType === 'mjpeg' && !isPaused
-      ? `${API_BASE_URL}/api/cameras/${activeCamId}/stream`
-      : `${API_BASE_URL}/api/cameras/${activeCamId}/snapshot?t=${snapshotTimestamp}`;
+      ? `${API_BASE_URL}/api/cameras/${activeCamId}/stream${isGate ? '?annotated=false' : ''}`
+      : `${API_BASE_URL}/api/cameras/${activeCamId}/snapshot?t=${snapshotTimestamp}${isGate ? '&annotated=false' : ''}`;
+
+  // Count rendered boxes for Entry Gate diagnostic verification
+  const renderedWorkerCount = isCameraOnline
+    ? workers.filter((w) => w.bbox && w.bbox.length >= 4).length
+    : 0;
+  const renderedPpeCount = isCameraOnline && isGate
+    ? workers.reduce((acc, w) => {
+        if (!w.ppe_details || typeof w.ppe_details !== 'object') return acc;
+        return (
+          acc +
+          Object.values(w.ppe_details).filter(
+            (obs: any) => obs && obs.bbox && obs.bbox.length >= 4
+          ).length
+        );
+      }, 0)
+    : 0;
+  const renderedHazardCount = isCameraOnline
+    ? hazards.filter((h) => {
+        const st = (h.state || '').toUpperCase();
+        return (
+          (st === 'CONFIRMED' || st === 'ACTIVE' || (!st && (h.confidence || 0) >= 0.35)) &&
+          h.bbox &&
+          h.bbox.length >= 4
+        );
+      }).length
+    : 0;
+  const totalRenderedCount = renderedWorkerCount + renderedPpeCount + renderedHazardCount;
+
+  useEffect(() => {
+    if (isGate && isCameraOnline) {
+      console.log(`[ENTRY GATE] FRONTEND RENDERED: ${totalRenderedCount}`);
+    }
+  }, [isGate, isCameraOnline, totalRenderedCount]);
 
   return (
     <div
@@ -537,6 +579,68 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                 </div>
               </div>
             );
+          })}
+
+        {/* Isolated Entry Gate Individual PPE Bounding Boxes (1 box per real object) */}
+        {isCameraOnline &&
+          isGate &&
+          workers.flatMap((worker) => {
+            if (!worker.ppe_details || typeof worker.ppe_details !== 'object') return [];
+            const ppeMetaMap: Record<string, { label: string; border: string; bg: string }> = {
+              helmet: { label: 'HELMET', border: 'border-yellow-400', bg: 'bg-yellow-400 text-black' },
+              safety_vest: { label: 'VEST', border: 'border-emerald-400', bg: 'bg-emerald-400 text-black' },
+              gloves: { label: 'GLOVES', border: 'border-purple-400', bg: 'bg-purple-400 text-black' },
+              safety_footwear: { label: 'FOOTWEAR', border: 'border-orange-400', bg: 'bg-orange-400 text-black' },
+            };
+
+            return Object.entries(worker.ppe_details).map(([itemKey, obs]: [string, any]) => {
+              if (!obs || !obs.bbox || obs.bbox.length < 4) return null;
+              const meta = ppeMetaMap[itemKey] || {
+                label: itemKey.toUpperCase(),
+                border: 'border-cyan-400',
+                bg: 'bg-cyan-400 text-black',
+              };
+              const [px1, py1, px2, py2] = obs.bbox;
+              const nw = videoImgRef.current?.naturalWidth || 1280;
+              const nh = videoImgRef.current?.naturalHeight || 720;
+
+              let pnx1 = obs.normalized_bbox ? obs.normalized_bbox[0] : (px1 > 1 ? px1 / nw : px1);
+              let pny1 = obs.normalized_bbox ? obs.normalized_bbox[1] : (py1 > 1 ? py1 / nh : py1);
+              let pnx2 = obs.normalized_bbox ? obs.normalized_bbox[2] : (px2 > 1 ? px2 / nw : px2);
+              let pny2 = obs.normalized_bbox ? obs.normalized_bbox[3] : (py2 > 1 ? py2 / nh : py2);
+
+              pnx1 = Math.max(0, Math.min(1, pnx1));
+              pny1 = Math.max(0, Math.min(1, pny1));
+              pnx2 = Math.max(pnx1 + 0.01, Math.min(1, pnx2));
+              pny2 = Math.max(pny1 + 0.01, Math.min(1, pny2));
+
+              const hasBounds = videoBounds.width > 0 && videoBounds.height > 0;
+              const leftPx = hasBounds ? videoBounds.offsetX + pnx1 * videoBounds.width : pnx1 * 100;
+              const topPx = hasBounds ? videoBounds.offsetY + pny1 * videoBounds.height : pny1 * 100;
+              const widthPx = hasBounds ? (pnx2 - pnx1) * videoBounds.width : (pnx2 - pnx1) * 100;
+              const heightPx = hasBounds ? (pny2 - pny1) * videoBounds.height : (pny2 - pny1) * 100;
+
+              return (
+                <div
+                  key={`ppe-${worker.track_id}-${itemKey}`}
+                  className="absolute pointer-events-none transition-all duration-150 z-25"
+                  style={{
+                    left: hasBounds ? `${leftPx}px` : `${leftPx}%`,
+                    top: hasBounds ? `${topPx}px` : `${topPx}%`,
+                    width: hasBounds ? `${widthPx}px` : `${widthPx}%`,
+                    height: hasBounds ? `${heightPx}px` : `${heightPx}%`,
+                  }}
+                >
+                  <div className={`w-full h-full border ${meta.border} relative`}>
+                    <div
+                      className={`absolute -top-3.5 left-0 ${meta.bg} text-[7px] font-black px-1 py-0.2 rounded-t uppercase whitespace-nowrap shadow-sm`}
+                    >
+                      {meta.label}
+                    </div>
+                  </div>
+                </div>
+              );
+            });
           })}
 
         {/* Dynamic Environmental Hazard HUD Overlays (Fire & Smoke) — Only confirmed/active hazards */}

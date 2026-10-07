@@ -148,6 +148,23 @@ export const EntryGateView: React.FC<EntryGateViewProps> = ({
             if (Array.isArray(data.hazards)) {
               setHazards(data.hazards);
             }
+            const receivedWorkersCount = Array.isArray(data.workers) ? data.workers.length : 0;
+            let receivedPpeCount = 0;
+            if (Array.isArray(data.workers)) {
+              for (const w of data.workers) {
+                if (w.ppe_details && typeof w.ppe_details === 'object') {
+                  receivedPpeCount += Object.values(w.ppe_details).filter(
+                    (obs: any) => obs && obs.bbox && obs.bbox.length >= 4
+                  ).length;
+                }
+              }
+            }
+            const receivedHazardsCount = Array.isArray(data.hazards) ? data.hazards.length : 0;
+            console.log(
+              `[ENTRY GATE] FRONTEND RECEIVED: ${
+                receivedWorkersCount + receivedPpeCount + receivedHazardsCount
+              }`
+            );
           }
         }
       } catch {
@@ -466,6 +483,7 @@ export const EntryGateView: React.FC<EntryGateViewProps> = ({
             onRefresh={onRefreshCameras}
             selectedWorkerId={selectedWorkerId}
             onSelectWorker={setSelectedWorkerId}
+            isEntryGate={true}
           />
 
           {/* Multi-Worker Quick Selector Strip (Section 26 & 27) */}

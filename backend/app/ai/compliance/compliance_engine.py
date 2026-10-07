@@ -61,7 +61,80 @@ def load_compliance_config(path: str = CONFIG_PATH) -> Dict[str, Any]:
     if os.path.isfile(path):
         with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
-    return {}
+def deduplicate_entry_gate_detections(detections: List[Any]) -> List[Any]:
+    """
+    Entry Gate Only: Guarantees that ONE real object receives ONE final bounding box.
+    Performs intra-class spatial suppression (IoU >= 0.40 or containment >= 0.70)
+    for detections of the same class, retaining only the highest-confidence detection.
+    Different classes (Person vs Helmet vs Vest vs Gloves etc.) are NEVER suppressed against each other.
+    Distinct workers/objects at different locations remain completely independent.
+    """
+    if not detections:
+        return []
+
+    by_class: Dict[str, List[Any]] = {}
+    for d in detections:
+        cname = str(getattr(d, "class_name", "")).lower()
+        by_class.setdefault(cname, []).append(d)
+
+    deduped: List[Any] = []
+    for cname, class_dets in by_class.items():
+        if len(class_dets) <= 1:
+            deduped.extend(class_dets)
+            continue
+
+        # Sort by confidence descending
+        sorted_dets = sorted(class_dets, key=lambda x: float(getattr(x, "confidence", 0.0)), reverse=True)
+        kept: List[Any] = []
+
+        for cand in sorted_dets:
+            cb = getattr(cand, "bbox", None)
+            if hasattr(cb, "x1"):
+                cx1, cy1, cx2, cy2 = float(cb.x1), float(cb.y1), float(cb.x2), float(cb.y2)
+            elif isinstance(cb, (list, tuple)) and len(cb) >= 4:
+                cx1, cy1, cx2, cy2 = float(cb[0]), float(cb[1]), float(cb[2]), float(cb[3])
+            else:
+                kept.append(cand)
+                continue
+
+            c_area = max(1.0, float((cx2 - cx1) * (cy2 - cy1)))
+            suppressed = False
+
+            for k in kept:
+                kb = getattr(k, "bbox", None)
+                if hasattr(kb, "x1"):
+                    kx1, ky1, kx2, ky2 = float(kb.x1), float(kb.y1), float(kb.x2), float(kb.y2)
+                elif isinstance(kb, (list, tuple)) and len(kb) >= 4:
+                    kx1, ky1, kx2, ky2 = float(kb[0]), float(kb[1]), float(kb[2]), float(kb[3])
+                else:
+                    continue
+
+                k_area = max(1.0, float((kx2 - kx1) * (ky2 - ky1)))
+
+                ix1 = max(cx1, kx1)
+                iy1 = max(cy1, ky1)
+                ix2 = min(cx2, kx2)
+                iy2 = min(cy2, ky2)
+                iw = max(0.0, ix2 - ix1)
+                ih = max(0.0, iy2 - iy1)
+                inter = iw * ih
+
+                if inter > 0:
+                    union = c_area + k_area - inter
+                    iou = inter / union if union > 0 else 0.0
+                    containment = inter / min(c_area, k_area)
+
+                    # Same physical object rule:
+                    if iou >= 0.40 or containment >= 0.70:
+                        suppressed = True
+                        break
+
+            if not suppressed:
+                kept.append(cand)
+
+        deduped.extend(kept)
+
+    return deduped
 
 
 class WorkerComplianceEngine:
@@ -137,13 +210,29 @@ class WorkerComplianceEngine:
         )
         t_detect = (time.perf_counter() - t0) * 1000.0
 
+        is_entry_gate = (zone_id or "").lower() in ("entry_gate", "entry", "gate")
+
+        # Entry Gate Diagnostic Logging: Raw model candidates
+        raw_candidates_count = len(getattr(det_response, "raw_detections", [])) or len(det_response.detections)
+        if is_entry_gate:
+            import logging
+            logging.getLogger("compliance_engine").info("[ENTRY GATE] RAW DETECTIONS: %d", raw_candidates_count)
+
+        # Isolated Entry Gate same-object intra-class deduplication
+        if is_entry_gate:
+            detections_to_process = deduplicate_entry_gate_detections(det_response.detections)
+            import logging
+            logging.getLogger("compliance_engine").info("[ENTRY GATE] AFTER NMS: %d", len(detections_to_process))
+        else:
+            detections_to_process = det_response.detections
+
         # Separate detections into: persons, PPE items, environmental hazards
         person_dets = []
         ppe_dets = []
         hazards = []
 
         min_area = self.config.get("tracking", {}).get("min_box_area", 400)
-        for obj in det_response.detections:
+        for obj in detections_to_process:
             cname = obj.class_name.lower()
             b = [obj.bbox.x1, obj.bbox.y1, obj.bbox.x2, obj.bbox.y2]
             if cname == "person":
@@ -206,6 +295,10 @@ class WorkerComplianceEngine:
         self.temporal_tracker.prune_stale_tracks()
         t_temp = (time.perf_counter() - t3) * 1000.0
 
+        if is_entry_gate:
+            import logging
+            logging.getLogger("compliance_engine").info("[ENTRY GATE] AFTER TRACKING: %d", len(worker_tracks))
+
         # 5. Summarize compliance statistics
         summary = ComplianceSummary(
             total_workers=len(worker_tracks),
@@ -225,7 +318,7 @@ class WorkerComplianceEngine:
         b64_img = None
         if annotate:
             annotated_frame = self.visualizer.draw_frame(
-                frame, worker_tracks, unassociated_ppe, hazards
+                frame, worker_tracks, unassociated_ppe, hazards, is_entry_gate=is_entry_gate
             )
             b64_img = encode_image_base64(annotated_frame)
 

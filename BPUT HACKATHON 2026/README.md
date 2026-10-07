@@ -80,6 +80,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 * **Tamper-evident visual evidence capture** with SHA-256 cryptographic hashing.
 * **Explainable 0–100 risk scoring engine** based on severity, duration, and worker density.
 * **Full-stack real-time operator HUD** with sub-100ms WebSocket updates and SQLite WAL persistence.
+* **Automated Entry Gate optical checkpoint** featuring instant tri-state access authorization (ALLOW / VERIFY / DENY) and clean 1-to-1 object bounding box deduplication.
 
 ---
 

@@ -246,11 +246,13 @@ class CameraWorker:
             visualizer = getattr(self._compliance_engine, "visualizer", None) if self._compliance_engine else None
             if visualizer and hazard_resp and hazard_resp.hazards:
                 try:
+                    is_eg = (self.config.zone_id or "").lower() in ("entry_gate", "entry", "gate") or "gate" in self.camera_id.lower()
                     annotated_frame = visualizer.draw_frame(
                         frame,
                         compliance_resp.workers,
                         unassociated_ppe=None,
                         hazards=hazard_resp.hazards,
+                        is_entry_gate=is_eg,
                     )
                 except Exception as viz_err:
                     logger.debug("Hazard overlay generation skipped: %s", viz_err)
@@ -530,7 +532,8 @@ class CameraWorker:
         # Fast non-blocking overlay: render newest AI detections on newest camera frame
         if visualizer and (workers or hazards):
             try:
-                annotated_fresh = visualizer.draw_frame(raw, workers, unassociated_ppe=None, hazards=hazards)
+                is_eg = (self.config.zone_id or "").lower() in ("entry_gate", "entry", "gate") or "gate" in self.camera_id.lower()
+                annotated_fresh = visualizer.draw_frame(raw, workers, unassociated_ppe=None, hazards=hazards, is_entry_gate=is_eg)
                 return annotated_fresh, ts
             except Exception:
                 pass
@@ -570,7 +573,8 @@ class CameraWorker:
 
         if visualizer and (workers or hazards):
             try:
-                annotated_fresh = visualizer.draw_frame(raw, workers, unassociated_ppe=None, hazards=hazards)
+                is_eg = (self.config.zone_id or "").lower() in ("entry_gate", "entry", "gate") or "gate" in self.camera_id.lower()
+                annotated_fresh = visualizer.draw_frame(raw, workers, unassociated_ppe=None, hazards=hazards, is_entry_gate=is_eg)
                 return annotated_fresh, fid, fts
             except Exception:
                 pass
@@ -613,6 +617,26 @@ class CameraWorker:
                                 round(bx2 / max(1, fw), 4),
                                 round(by2 / max(1, fh), 4),
                             ]
+                    if "ppe_details" in wd and isinstance(wd["ppe_details"], dict):
+                        for p_key, p_obs in wd["ppe_details"].items():
+                            if isinstance(p_obs, dict) and p_obs.get("bbox"):
+                                p_b = p_obs["bbox"]
+                                if isinstance(p_b, dict):
+                                    px1 = float(p_b.get("x1", 0))
+                                    py1 = float(p_b.get("y1", 0))
+                                    px2 = float(p_b.get("x2", 0))
+                                    py2 = float(p_b.get("y2", 0))
+                                elif isinstance(p_b, (list, tuple)) and len(p_b) >= 4:
+                                    px1, py1, px2, py2 = [float(v) for v in p_b[:4]]
+                                else:
+                                    continue
+                                p_obs["bbox"] = [px1, py1, px2, py2]
+                                p_obs["normalized_bbox"] = [
+                                    round(px1 / max(1, fw), 4),
+                                    round(py1 / max(1, fh), 4),
+                                    round(px2 / max(1, fw), 4),
+                                    round(py2 / max(1, fh), 4),
+                                ]
                     workers_out.append(wd)
                 except Exception as e:
                     logger.debug("Error serializing worker in get_live_compliance: %s", e)

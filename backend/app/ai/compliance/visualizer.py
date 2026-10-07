@@ -119,14 +119,17 @@ class ComplianceVisualizer:
         workers: List[WorkerTrack],
         unassociated_ppe: Optional[List[Dict[str, Any]]] = None,
         hazards: Optional[List[Dict[str, Any]]] = None,
+        is_entry_gate: bool = False,
     ) -> np.ndarray:
         """
         Renders worker tracking and compliance HUD onto a copy of the input image.
+        For Entry Gate: guarantees exactly ONE box per real object (Worker, Helmet, Vest, Gloves, Footwear, Fire, Smoke).
         """
         out = image.copy()
 
         # 1. Render environmental hazards (fire, smoke) if present (clean pass-through and validated tracks)
         if hazards:
+            rendered_hazard_boxes = []
             for h in hazards:
                 if isinstance(h, dict):
                     b = h.get("bbox", [0, 0, 0, 0])
@@ -162,6 +165,31 @@ class ComplianceVisualizer:
                 if conf < min_thresh:
                     continue
 
+                # Same-object hazard deduplication for Entry Gate
+                if is_entry_gate:
+                    bx1, by1, bx2, by2 = float(b[0]), float(b[1]), float(b[2]), float(b[3])
+                    curr_area = max(1.0, (bx2 - bx1) * (by2 - by1))
+                    is_dup = False
+                    for prev_cname, prev_b in rendered_hazard_boxes:
+                        if prev_cname == cname:
+                            ix1 = max(bx1, prev_b[0])
+                            iy1 = max(by1, prev_b[1])
+                            ix2 = min(bx2, prev_b[2])
+                            iy2 = min(by2, prev_b[3])
+                            iw = max(0.0, ix2 - ix1)
+                            ih = max(0.0, iy2 - iy1)
+                            inter = iw * ih
+                            if inter > 0:
+                                prev_area = max(1.0, (prev_b[2] - prev_b[0]) * (prev_b[3] - prev_b[1]))
+                                iou = inter / (curr_area + prev_area - inter)
+                                cont = inter / min(curr_area, prev_area)
+                                if iou >= 0.40 or cont >= 0.70:
+                                    is_dup = True
+                                    break
+                    if is_dup:
+                        continue
+                    rendered_hazard_boxes.append((cname, [bx1, by1, bx2, by2]))
+
                 # Distinct high-contrast colors: Fire=Crimson Red, Smoke=Bright Amber
                 color = (0, 0, 240) if cname == "fire" else (0, 140, 255)
                 bx1, by1, bx2, by2 = int(b[0]), int(b[1]), int(b[2]), int(b[3])
@@ -181,8 +209,8 @@ class ComplianceVisualizer:
                     cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1, cv2.LINE_AA
                 )
 
-        # 2. Render unassociated PPE in thin dashed/gray boxes
-        if unassociated_ppe:
+        # 2. Render unassociated PPE in thin dashed/gray boxes (suppressed for Entry Gate to prevent duplicates)
+        if unassociated_ppe and not is_entry_gate:
             for ppe in unassociated_ppe:
                 b = ppe.get("bbox", [0, 0, 0, 0])
                 cname = ppe.get("class_name", "ppe")
@@ -200,6 +228,32 @@ class ComplianceVisualizer:
 
             # Draw COMPLETE worker person box in the worker's own status color
             cv2.rectangle(out, (x1, y1), (x2, y2), badge_color, box_thickness)
+
+            # For Entry Gate: render exact single bounding box for each present PPE item
+            if is_entry_gate and hasattr(worker, "ppe_details") and worker.ppe_details:
+                ppe_palette = {
+                    "helmet": ((0, 215, 255), "HELMET"),          # Bright Yellow / Gold
+                    "safety_vest": ((0, 255, 127), "VEST"),       # Spring Green
+                    "gloves": ((238, 130, 238), "GLOVES"),        # Violet
+                    "safety_footwear": ((42, 42, 165), "FOOTWEAR"),# Brown / Khaki
+                }
+                for item_key, (item_col, item_tag) in ppe_palette.items():
+                    obs = worker.ppe_details.get(item_key)
+                    if obs and getattr(obs, "bbox", None) is not None:
+                        p_box = obs.bbox
+                        if hasattr(p_box, "x1"):
+                            px1, py1, px2, py2 = int(p_box.x1), int(p_box.y1), int(p_box.x2), int(p_box.y2)
+                        elif isinstance(p_box, (list, tuple)) and len(p_box) >= 4:
+                            px1, py1, px2, py2 = int(p_box[0]), int(p_box[1]), int(p_box[2]), int(p_box[3])
+                        else:
+                            continue
+                        if px2 > px1 and py2 > py1:
+                            cv2.rectangle(out, (px1, py1), (px2, py2), item_col, 2)
+                            obs_conf = getattr(obs, "confidence", None)
+                            p_lbl = f"{item_tag} {obs_conf:.2f}" if obs_conf else item_tag
+                            (ptw, pth), _ = cv2.getTextSize(p_lbl, cv2.FONT_HERSHEY_SIMPLEX, 0.35, 1)
+                            cv2.rectangle(out, (px1, max(0, py1 - pth - 4)), (px1 + ptw + 4, py1), item_col, -1)
+                            cv2.putText(out, p_lbl, (px1 + 2, py1 - 2), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 0), 1, cv2.LINE_AA)
 
             if not self.show_hud:
                 # Simple track label only

@@ -276,8 +276,10 @@ async def analyze_camera_frame(
             )
 
     try:
+        cam_cfg = manager.configs.get(camera_id)
+        cam_zone = cam_cfg.zone_id if cam_cfg else "UNKNOWN"
         compliance_resp, annotated_frame, latencies = engine.process_frame(
-            frame, confidence_threshold=0.20, annotate=True
+            frame, confidence_threshold=0.20, annotate=True, zone_id=cam_zone
         )
 
         _, encoded_img = cv2.imencode(".jpg", annotated_frame)
