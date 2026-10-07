@@ -414,6 +414,14 @@ SafeSync runs the retrained production model `ppe_fire_smoke_v3`:
   6: smoke
   ```
 
+### Repository Model Benchmark & Architectural Comparison (Evaluation-Only):
+A comprehensive empirical benchmark was conducted across all 9 trained model checkpoints present in the repository evaluated on the common held-out test suite (`datasets/processed_v3/data_v3.yaml`, 410 images, 1,235 annotations):
+* **Production Model V3 (`ppe_fire_smoke_v3`):** Verified as the top-performing unified model, delivering the highest overall Recall (**0.4681**) and mAP50 (**0.3785**) with the lowest False Negatives (**590**) and fastest edge CPU latency (**36.12 ms at 384×384 / 27.7 FPS**).
+* **Shadow Model V6 (`safesync_v6_hardnegative`):** Serves as hard-negative distractor evaluation baseline (SHA-256: `c47705a2c27c...`).
+* **Architectural Combination Analysis:** Evaluated Option A (Single Unified V3) vs Option B (Multi-Model Pipeline) vs Option C (Retrained V7 Proposal). Confirmed that single unified V3 provides the optimal accuracy/latency trade-off without CPU throughput degradation.
+* **Production Integrity:** V3 production weights and configuration remain 100% locked and unchanged.
+* **Full Benchmark Documentation:** See [`MODEL_BENCHMARK_SUMMARY.md`](MODEL_BENCHMARK_SUMMARY.md) and [`reports/model_benchmark/`](reports/model_benchmark/).
+
 ---
 
 ## 20. Dataset Information

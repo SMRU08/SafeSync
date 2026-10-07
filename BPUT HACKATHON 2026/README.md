@@ -254,7 +254,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 * **Zero Discrete GPU Dependency:** Runs at real-time speeds (~13–17 FPS, 32.5 ms inference) on commodity Intel Core i5 processors.
 * **Low Memory Footprint:** Operates under 200 MB RSS memory; verified zero memory leak over 6,800+ continuous frames.
 * **Non-Blocking Architecture:** Asynchronous FastAPI backend + SQLite WAL mode enables concurrent reading and writing without locking.
-* **Comprehensive Test Suite:** 276 automated regression tests ensure mathematical bounds and state machines remain stable.
+* **Comprehensive Test Suite:** 306 automated regression tests ensure mathematical bounds, entry gate deduplication, and state machines remain stable.
 
 ---
 
@@ -396,6 +396,7 @@ SafeSync is an end-to-end, real-time AI computer vision system designed to conti
 * **Construction Site Safety (CSS):** 9,451 multi-class images used as the primary source for full-body PPE annotations (`helmet`, `vest`, `gloves`, `footwear`).
 * **D-Fire Benchmark:** 4,480 images of open flame plumes and expanding smoke clouds.
 * **SafeSync Hard-Negative Distractor Suite:** 1,200 curated hard-negative samples of steam vents, welder glare, orange machinery, and airborne dust to guarantee 0% false positive hazard rates.
+* **Empirical Multi-Model Repository Benchmark:** 9 model checkpoints independently evaluated across 410 held-out test images; confirms production V3 model achieves the optimal trade-off of 0.4681 recall, 36.1 ms edge CPU inference, and 0% false alarms on industrial distractors (see `MODEL_BENCHMARK_SUMMARY.md`).
 
 ---
 

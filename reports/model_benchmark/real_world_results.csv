@@ -1,0 +1,57 @@
+Model,Alias,Challenge ID,Scenario Name,Category,Expected Classes,Detected Classes,Pass Status,Evaluation Detail
+ppe_fire_smoke_v3,V3 (Production),CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear","safety_vest, helmet",PASS,"Detected 2/4 expected: ['helmet', 'safety_vest']"
+ppe_fire_smoke_v3,V3 (Production),CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest","safety_vest, helmet, person",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+ppe_fire_smoke_v3,V3 (Production),CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest","helmet, safety_vest",PASS,"Detected 2/3 expected: ['helmet', 'safety_vest']"
+ppe_fire_smoke_v3,V3 (Production),CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest","safety_vest, helmet, person",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+ppe_fire_smoke_v3,V3 (Production),CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,"smoke, fire",PASS,Detected 1/1 expected: ['fire']
+ppe_fire_smoke_v3,V3 (Production),CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,smoke,PASS,Detected 1/1 expected: ['smoke']
+ppe_fire_smoke_v3,V3 (Production),CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",None,FAIL,Detected 0/2 expected: []
+ppe_fire_smoke_v3,V3 (Production),CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,None,FAIL,Detected 0/1 expected: []
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear","gloves, helmet, safety_vest, safety_footwear, person",PASS,"Detected 4/4 expected: ['person', 'helmet', 'safety_vest', 'safety_footwear']"
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest","safety_vest, helmet, person",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest","helmet, safety_vest",PASS,"Detected 2/3 expected: ['helmet', 'safety_vest']"
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest","helmet, safety_footwear",PASS,Detected 1/3 expected: ['helmet']
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,"smoke, fire",PASS,Detected 1/1 expected: ['fire']
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,None,FAIL,Detected 0/1 expected: []
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",fire,PASS,Detected 1/2 expected: ['fire']
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,None,FAIL,Detected 0/1 expected: []
+safesync_v5_unified,V5 (Unified Candidate),CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear","helmet, safety_footwear, smoke",PASS,"Detected 2/4 expected: ['helmet', 'safety_footwear']"
+safesync_v5_unified,V5 (Unified Candidate),CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest","helmet, gloves",PASS,Detected 1/3 expected: ['helmet']
+safesync_v5_unified,V5 (Unified Candidate),CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest",helmet,PASS,Detected 1/3 expected: ['helmet']
+safesync_v5_unified,V5 (Unified Candidate),CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest","helmet, smoke",PASS,Detected 1/3 expected: ['helmet']
+safesync_v5_unified,V5 (Unified Candidate),CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,fire,PASS,Detected 1/1 expected: ['fire']
+safesync_v5_unified,V5 (Unified Candidate),CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,None,FAIL,Detected 0/1 expected: []
+safesync_v5_unified,V5 (Unified Candidate),CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",smoke,PASS,Detected 1/2 expected: ['smoke']
+safesync_v5_unified,V5 (Unified Candidate),CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,None,FAIL,Detected 0/1 expected: []
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear","safety_vest, person, helmet",PASS,"Detected 3/4 expected: ['person', 'helmet', 'safety_vest']"
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest","safety_vest, helmet, person",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest",safety_vest,PASS,Detected 1/3 expected: ['safety_vest']
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest","safety_vest, helmet, person",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,smoke,FAIL,Detected 0/1 expected: []
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,smoke,PASS,Detected 1/1 expected: ['smoke']
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",fire,PASS,Detected 1/2 expected: ['fire']
+ppe_fire_smoke_v4,V4 (Experimental),CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,None,FAIL,Detected 0/1 expected: []
+construction_ppe_v1,Construction PPE V1,CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear","helmet, safety_vest, person",PASS,"Detected 3/4 expected: ['person', 'helmet', 'safety_vest']"
+construction_ppe_v1,Construction PPE V1,CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest","safety_vest, helmet, person, gloves",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+construction_ppe_v1,Construction PPE V1,CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest","helmet, person",PASS,"Detected 2/3 expected: ['person', 'helmet']"
+construction_ppe_v1,Construction PPE V1,CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest","person, helmet, safety_vest",PASS,"Detected 3/3 expected: ['person', 'helmet', 'safety_vest']"
+construction_ppe_v1,Construction PPE V1,CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,None,FAIL,Detected 0/1 expected: []
+construction_ppe_v1,Construction PPE V1,CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,None,FAIL,Detected 0/1 expected: []
+construction_ppe_v1,Construction PPE V1,CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",None,FAIL,Detected 0/2 expected: []
+construction_ppe_v1,Construction PPE V1,CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,None,FAIL,Detected 0/1 expected: []
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear",smoke,FAIL,Detected 0/4 expected: []
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest",smoke,FAIL,Detected 0/3 expected: []
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest",smoke,FAIL,Detected 0/3 expected: []
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest",smoke,FAIL,Detected 0/3 expected: []
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,smoke,FAIL,Detected 0/1 expected: []
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,smoke,PASS,Detected 1/1 expected: ['smoke']
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",smoke,PASS,Detected 1/2 expected: ['smoke']
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,smoke,PASS,Detected 1/1 expected: ['smoke']
+safesync_glove_detector,Glove Specialist V1,CHAL_01,Frontal Full-Body Worker,PPE Pose,"person, helmet, safety_vest, safety_footwear",gloves,FAIL,Detected 0/4 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_02,Multi-Worker Crowded Scene,Multi-Worker,"person, helmet, safety_vest",gloves,FAIL,Detected 0/3 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_03,Angled / Crouched Worker,PPE Pose,"person, helmet, safety_vest",None,FAIL,Detected 0/3 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_04,Waist-Up Cropped Worker,Cropped Framing,"person, helmet, safety_vest",gloves,FAIL,Detected 0/3 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_06,Open Flame Phenomenon,Combustion Fire,fire,None,FAIL,Detected 0/1 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_07,Atmospheric Smoke Plume,Combustion Smoke,smoke,gloves,FAIL,Detected 0/1 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_08,Dual Fire + Smoke Chamber,Combustion Fire+Smoke,"fire, smoke",None,FAIL,Detected 0/2 expected: []
+safesync_glove_detector,Glove Specialist V1,CHAL_10,Person + Smoke Co-existence,Combined Hazard+Worker,smoke,None,FAIL,Detected 0/1 expected: []
