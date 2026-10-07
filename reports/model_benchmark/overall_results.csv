@@ -1,10 +1,10 @@
-Model Name,Display Alias,Status,Type,Precision,Recall,mAP50,mAP50-95,Total GT Objects,True Positives,False Positives,False Negatives
-ppe_fire_smoke_v3,V3 (Production),production,unified_7class,0.3877,0.4681,0.3785,0.1595,1235,645,754,590
-safesync_v6_hardnegative,V6 (Shadow/HardNeg),shadow,unified_7class,0.3366,0.345,0.2612,0.12,1235,535,952,700
-safesync_v5_unified,V5 (Unified Candidate),experimental,unified_7class,0.2592,0.23,0.1415,0.0538,1235,257,1518,978
-ppe_fire_smoke_v4,V4 (Experimental),experimental,unified_7class,0.3902,0.4518,0.3995,0.2198,1235,620,436,615
-ppe_fire_smoke_v2,V2 (Legacy),legacy,unified_7class,0.2208,0.3071,0.1842,0.069,1235,364,935,871
-ppe_fire_smoke_v1,V1 (Legacy),legacy,unified_7class,0.401,0.162,0.0843,0.0301,1235,122,395,1113
-construction_ppe_v1,Construction PPE V1,experimental,unified_7class,0.5463,0.2799,0.2223,0.0954,1235,526,1269,709
-fire_smoke_candidate_v2,Fire/Smoke Specialist V2,experimental,specialist_hazard,0.0014,0.2195,0.0,0.0,205,45,31046,160
-safesync_glove_detector,Glove Specialist V1,experimental,specialist_glove,0.024,0.169,0.0,0.0,71,12,489,59
+Model Name,Display Alias,Status,Type,YOLO_Val_mAP50,YOLO_Val_mAP50_95,YOLO_Val_Mean_Precision,YOLO_Val_Mean_Recall,Total_GT_Objects,Op_True_Positives,Op_False_Positives,Op_False_Negatives,Op_Micro_Precision,Op_Micro_Recall,Op_Macro_Precision,Op_Macro_Recall,Op_Micro_F1
+ppe_fire_smoke_v3,V3 (Production),production,unified_7class,0.3785,0.1595,0.3877,0.4681,1235,645,754,590,0.461,0.5223,0.4241,0.3997,0.4897
+safesync_v6_hardnegative,V6 (Shadow/HardNeg),shadow,unified_7class,0.2612,0.12,0.3366,0.345,1235,535,952,700,0.3598,0.4332,0.3267,0.3434,0.3931
+safesync_v5_unified,V5 (Unified Candidate),experimental,unified_7class,0.1415,0.0538,0.2592,0.23,1235,257,1518,978,0.1448,0.2081,0.307,0.171,0.1708
+ppe_fire_smoke_v4,V4 (Experimental),experimental,unified_7class,0.3995,0.2198,0.3902,0.4518,1235,620,436,615,0.5871,0.502,0.4866,0.3689,0.5412
+ppe_fire_smoke_v2,V2 (Legacy),legacy,unified_7class,0.1842,0.069,0.2208,0.3071,1235,364,935,871,0.2802,0.2947,0.2494,0.2449,0.2873
+ppe_fire_smoke_v1,V1 (Legacy),legacy,unified_7class,0.0843,0.0301,0.401,0.162,1235,122,395,1113,0.236,0.0988,0.153,0.0917,0.1393
+construction_ppe_v1,Construction PPE V1,experimental,unified_7class,0.2223,0.0954,0.5463,0.2799,1235,526,1269,709,0.293,0.4259,0.2152,0.3037,0.3472
+fire_smoke_candidate_v2,Fire/Smoke Specialist V2,experimental,specialist_hazard,0.0,0.0,0.0,0.0,205,45,31046,160,0.0014,0.2195,0.0007,0.2123,0.0029
+safesync_glove_detector,Glove Specialist V1,experimental,specialist_glove,0.0,0.0,0.0,0.0,71,12,489,59,0.024,0.169,0.024,0.169,0.042
