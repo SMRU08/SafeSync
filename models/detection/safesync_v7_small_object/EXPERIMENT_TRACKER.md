@@ -26,3 +26,4 @@ For every future training run, engineers must record:
 4. **Hardware Specifications:** Document training GPU, batch size, and total GPU hours.
 5. **Exact Artifact Checksum:** Record the SHA-256 of the generated `best.pt`.
 6. **Dual-Paradigm Benchmark Results:** Execute `verify_benchmark_pipeline.py` and populate the exact columns above.
+| `EXP_V7_03` | `v7_candidate` | 384 | 3 | 16 | YOLOv8n (Run 3 Continuation) | Mosaic+Mixup+CopyPaste | Curated Small-Obj | Box=7.5, Cls=0.5, DFL=1.5, lr0=0.005 | 0.4532 | 0.5247 | 0.5425 | 0.5334 | 0.1549 | 0.1793 | 0.1515 | 0.3396 | 607 | 565 | 35.22 ms | 28.4 | 16/16 PASS | **YELLOW** |

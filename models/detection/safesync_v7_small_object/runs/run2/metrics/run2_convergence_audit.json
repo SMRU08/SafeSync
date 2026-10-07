@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-10-07T23:25:00Z",
+  "checkpoints_verified": {
+    "v3_sha": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+    "v6_sha": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+    "run2_sha": "5b5304e0f704cd7024ae1eea68ad5e0614c21194363a0f7d01285d4d6a7ea722"
+  },
+  "epochs": [
+    {
+      "epoch": 1.0,
+      "time": 654.275,
+      "train/box_loss": 1.59437,
+      "train/cls_loss": 3.02808,
+      "train/dfl_loss": 1.49225,
+      "metrics/precision(B)": 0.39708,
+      "metrics/recall(B)": 0.32856,
+      "metrics/mAP50(B)": 0.25621,
+      "metrics/mAP50-95(B)": 0.13788,
+      "val/box_loss": 1.62548,
+      "val/cls_loss": 2.63197,
+      "val/dfl_loss": 1.56807,
+      "lr/pg0": 0.00498366,
+      "lr/pg1": 0.00498366,
+      "lr/pg2": 0.0551471
+    },
+    {
+      "epoch": 2.0,
+      "time": 1275.9,
+      "train/box_loss": 1.61096,
+      "train/cls_loss": 2.2661,
+      "train/dfl_loss": 1.48596,
+      "metrics/precision(B)": 0.34433,
+      "metrics/recall(B)": 0.34302,
+      "metrics/mAP50(B)": 0.26292,
+      "metrics/mAP50-95(B)": 0.14022,
+      "val/box_loss": 1.69042,
+      "val/cls_loss": 2.52636,
+      "val/dfl_loss": 1.56128,
+      "lr/pg0": 0.00668905,
+      "lr/pg1": 0.00668905,
+      "lr/pg2": 0.00685245
+    },
+    {
+      "epoch": 3.0,
+      "time": 1874.74,
+      "train/box_loss": 1.5945,
+      "train/cls_loss": 2.10624,
+      "train/dfl_loss": 1.45415,
+      "metrics/precision(B)": 0.46378,
+      "metrics/recall(B)": 0.44683,
+      "metrics/mAP50(B)": 0.37442,
+      "metrics/mAP50-95(B)": 0.2018,
+      "val/box_loss": 1.54964,
+      "val/cls_loss": 2.0788,
+      "val/dfl_loss": 1.44683,
+      "lr/pg0": 0.0034,
+      "lr/pg1": 0.0034,
+      "lr/pg2": 0.0034
+    }
+  ],
+  "diagnostics": {
+    "qA_recall_improving": true,
+    "qB_map50_improving": true,
+    "qC_map50_95_improving": true,
+    "val_cls_loss_dropping": true,
+    "val_box_loss_dropping": true,
+    "is_overfitting": false,
+    "convergence_status": "IMPROVING",
+    "run3_decision": "TRAIN"
+  }
+}

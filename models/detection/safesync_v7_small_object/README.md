@@ -60,6 +60,22 @@ The candidate dataset at `datasets/v7_candidate/` has been curated, deduplicated
 - **Trade-offs:** Footwear recall (0.0552) still below V3 baseline (0.2828).
 - **Verdict:** **YELLOW** (Multi-epoch convergence hypothesis confirmed; V3 remains active production, V6 shadow, V7 experimental). Full report in `runs/run2/RUN2_REPORT.md`.
 
+### 1.4 Controlled Run 3 Results (EXP_V7_03 Summary — Continuation Convergence):
+- **Base Checkpoint:** `runs/run2/weights/best.pt` (`5b5304e0f704...`)
+- **Resolution:** 384×384 | **Batch:** 16 | **Epochs:** 3 (Cumulative 6 Epochs) | **Optimizer:** SGD (`lr0=0.005`, `momentum=0.937`)
+- **Weights Generated:** `runs/run3/weights/best.pt` (`d725767535e9bd56586620378b4411a443b7fd17653625f2d8a2886b63aaf218`)
+- **Key Gains:**
+  - **Overall Precision & F1:** Precision reached **0.5247** (beating V3's 0.4879) and F1 reached **0.5334** (beating V3's 0.5184).
+  - **Overall Recall:** Reached **0.5425 (670 TP)**, narrowing the gap with V3 (0.5530 / 683 TP) to just 1.05%.
+  - **Footwear (Class 4):** Surged from 8 TP to **26 TP (+225% gain)**; precision reached **0.3095** (higher than V3's 0.2595); recall reached **0.1793**.
+  - **Gloves (Class 3):** Maintained **0.1549 recall (11 TP)** — **5.5× higher than V3 (2 TP)**, with higher precision (0.1692 vs 0.0476) and fewer false positives (54 vs 75).
+  - **Vest (Class 2):** Recall reached **0.8167 (254 TP)**, exceeding V3 (0.7910 / 246 TP).
+  - **Smoke Hazard (Class 6):** Recall surged to **0.3396 (36 TP)** vs V3's 0.1981 (21 TP).
+  - **Distractor Safety:** 0 false fire alarms, 0 false smoke alarms on industrial steam/glare; 210 fewer total FPs than V3 (595 vs 805).
+  - **Edge CPU Throughput:** **28.4 FPS** (35.22 ms mean latency) — fully real-time ($\ge 20$ FPS).
+- **Trade-offs:** Footwear recall (0.1793) remains below V3 baseline (0.2828).
+- **Verdict:** **YELLOW** (Strong convergence observed, outperforming V3 in Precision, F1, Gloves, Vest, Smoke, and Distractor FP suppression, but Footwear recall gap requires architectural small-object feature enhancements before production promotion; V3 remains active production, V6 shadow, V7 experimental). Full report in `runs/run3/RUN3_REPORT.md`.
+
 ---
 
 ## 2. Canonical 7-Class Ontology (Strict Invariant)

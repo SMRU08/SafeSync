@@ -1,0 +1,102 @@
+{
+  "experiment_name": "safesync_v7_run3_continuation_convergence",
+  "status": "RUN3_TRAINED_EXPERIMENTAL",
+  "start_time": "2026-10-07 23:35:03",
+  "end_time": "2026-10-08 00:14:56",
+  "duration_seconds": 2393.36,
+  "duration_minutes": 39.89,
+  "starting_checkpoint": {
+    "path": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v7_small_object\\runs\\run2\\weights\\best.pt",
+    "sha256": "5b5304e0f704cd7024ae1eea68ad5e0614c21194363a0f7d01285d4d6a7ea722"
+  },
+  "environment": {
+    "python_version": "3.13.15",
+    "pytorch_version": "2.14.0+cpu",
+    "ultralytics_version": "8.4.156",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "physical_cores": 8,
+    "logical_cores": 12,
+    "ram_gb": 15.59,
+    "device": "cpu",
+    "cuda_available": false
+  },
+  "hyperparameters": {
+    "epochs": 3,
+    "batch_size": 16,
+    "imgsz": 384,
+    "optimizer": "SGD",
+    "lr0": 0.005,
+    "momentum": 0.937,
+    "box": 7.5,
+    "cls": 0.5,
+    "dfl": 1.5,
+    "seed": 42
+  },
+  "checkpoints": {
+    "run3_best_pt": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v7_small_object\\runs\\run3\\weights\\best.pt",
+    "run3_best_sha256": "d725767535e9bd56586620378b4411a443b7fd17653625f2d8a2886b63aaf218",
+    "run3_last_pt": "D:\\Additional\\PROJECT\\SafeSync\\models\\detection\\safesync_v7_small_object\\runs\\run3\\weights\\last.pt",
+    "run3_last_sha256": "f9a58f3e1894f3823bfc35fdce278a7ce06777d9ef7024e064edae945094b20a",
+    "run2_best_sha256": "5b5304e0f704cd7024ae1eea68ad5e0614c21194363a0f7d01285d4d6a7ea722",
+    "run1_best_sha256": "5a4e37fb381c318f4dd88a5bc7e80d43489c9e8fbf566f8b2024813ad2da9334"
+  },
+  "production_lock": {
+    "v3_sha": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+    "v6_sha": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
+    "status": "UNTOUCHED"
+  },
+  "epoch_metrics": [
+    {
+      "epoch": 1.0,
+      "time": 857.61,
+      "train/box_loss": 1.49369,
+      "train/cls_loss": 1.89881,
+      "train/dfl_loss": 1.40068,
+      "metrics/precision(B)": 0.48018,
+      "metrics/recall(B)": 0.49038,
+      "metrics/mAP50(B)": 0.42934,
+      "metrics/mAP50-95(B)": 0.24553,
+      "val/box_loss": 1.4855,
+      "val/cls_loss": 1.83994,
+      "val/dfl_loss": 1.38006,
+      "lr/pg0": 0.00249183,
+      "lr/pg1": 0.00249183,
+      "lr/pg2": 0.0526552
+    },
+    {
+      "epoch": 2.0,
+      "time": 1639.61,
+      "train/box_loss": 1.44072,
+      "train/cls_loss": 1.77774,
+      "train/dfl_loss": 1.35514,
+      "metrics/precision(B)": 0.47008,
+      "metrics/recall(B)": 0.47267,
+      "metrics/mAP50(B)": 0.41706,
+      "metrics/mAP50-95(B)": 0.2306,
+      "val/box_loss": 1.48345,
+      "val/cls_loss": 1.94159,
+      "val/dfl_loss": 1.39501,
+      "lr/pg0": 0.00334453,
+      "lr/pg1": 0.00334453,
+      "lr/pg2": 0.00350792
+    },
+    {
+      "epoch": 3.0,
+      "time": 2307.16,
+      "train/box_loss": 1.41816,
+      "train/cls_loss": 1.72559,
+      "train/dfl_loss": 1.34221,
+      "metrics/precision(B)": 0.52656,
+      "metrics/recall(B)": 0.49642,
+      "metrics/mAP50(B)": 0.45358,
+      "metrics/mAP50-95(B)": 0.26502,
+      "val/box_loss": 1.41997,
+      "val/cls_loss": 1.68807,
+      "val/dfl_loss": 1.35716,
+      "lr/pg0": 0.0017,
+      "lr/pg1": 0.0017,
+      "lr/pg2": 0.0017
+    }
+  ]
+}
