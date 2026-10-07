@@ -1,7 +1,7 @@
 Dataset,Split,Images,Labeled,Empty,Total_Boxes,Boxes_Per_Image
-v7_candidate,train,0,0,0,0,0.0
-v7_candidate,val,0,0,0,0,0.0
-v7_candidate,test,0,0,0,0,0.0
+v7_candidate,train,4891,4630,261,11700,2.39
+v7_candidate,val,862,811,51,1991,2.31
+v7_candidate,test,410,375,35,1235,3.01
 processed_v3,train,2870,2655,215,7851,2.74
 processed_v3,val,820,770,50,2338,2.85
 processed_v3,test,410,375,35,1235,3.01

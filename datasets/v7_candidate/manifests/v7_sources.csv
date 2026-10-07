@@ -1,0 +1,7 @@
+Source Name,Contributed Images,Hard Negatives,License
+glove_detector,763,58,Proprietary SafeSync Glove Lab
+processed_v3/test,410,35,Proprietary SafeSync Curation (Frozen Benchmark)
+processed_v3/train,2845,212,Proprietary SafeSync Curation
+processed_v3/val,795,42,Proprietary SafeSync Curation
+raw/bangga_ppe,1000,0,CC BY 4.0 (Roboflow Universe)
+raw/d_fire,350,0,Academic Research Benchmark (Pedro et al.)

@@ -1,233 +1,233 @@
 {
-  "timestamp": "2026-10-07T18:50:00Z",
+  "timestamp": "2026-10-07T19:35:00Z",
   "production_lock": {
     "v3_sha": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
     "v6_sha": "c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc",
     "status": "LOCKED_MATCH"
   },
   "v7_candidate_audit": {
-    "total_images": 0,
-    "total_labels": 0,
-    "total_boxes": 0,
-    "labeled_images": 0,
-    "empty_images": 0,
-    "boxes_per_image": 0.0,
-    "labeled_pct": 0.0,
-    "empty_pct": 0.0,
+    "total_images": 6163,
+    "total_labels": 6163,
+    "total_boxes": 14926,
+    "labeled_images": 5816,
+    "empty_images": 347,
+    "boxes_per_image": 2.422,
+    "labeled_pct": 94.37,
+    "empty_pct": 5.63,
     "invalid_labels": 0,
     "orphan_images": 0,
     "orphan_labels": 0,
     "forbidden_classes": {},
     "splits": {
       "train": {
-        "images": 0,
-        "labels": 0,
-        "labeled": 0,
-        "empty": 0,
-        "boxes": 0,
+        "images": 4891,
+        "labels": 4891,
+        "labeled": 4630,
+        "empty": 261,
+        "boxes": 11700,
         "orphan_images": 0,
         "orphan_labels": 0
       },
       "val": {
-        "images": 0,
-        "labels": 0,
-        "labeled": 0,
-        "empty": 0,
-        "boxes": 0,
+        "images": 862,
+        "labels": 862,
+        "labeled": 811,
+        "empty": 51,
+        "boxes": 1991,
         "orphan_images": 0,
         "orphan_labels": 0
       },
       "test": {
-        "images": 0,
-        "labels": 0,
-        "labeled": 0,
-        "empty": 0,
-        "boxes": 0,
+        "images": 410,
+        "labels": 410,
+        "labeled": 375,
+        "empty": 35,
+        "boxes": 1235,
         "orphan_images": 0,
         "orphan_labels": 0
       }
     },
     "class_boxes": {
       "person": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1734,
+        "val": 280,
+        "test": 228,
+        "total": 2242
       },
       "helmet": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1966,
+        "val": 280,
+        "test": 275,
+        "total": 2521
       },
       "safety_vest": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 2484,
+        "val": 363,
+        "test": 311,
+        "total": 3158
       },
       "gloves": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1779,
+        "val": 328,
+        "test": 71,
+        "total": 2178
       },
       "safety_footwear": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1911,
+        "val": 398,
+        "test": 145,
+        "total": 2454
       },
       "fire": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 896,
+        "val": 142,
+        "test": 99,
+        "total": 1137
       },
       "smoke": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 930,
+        "val": 200,
+        "test": 106,
+        "total": 1236
       }
     },
     "class_img_counts": {
       "person": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1217,
+        "val": 199,
+        "test": 151,
+        "total": 1567
       },
       "helmet": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1303,
+        "val": 208,
+        "test": 165,
+        "total": 1676
       },
       "safety_vest": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1562,
+        "val": 258,
+        "test": 189,
+        "total": 2009
       },
       "gloves": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 891,
+        "val": 164,
+        "test": 33,
+        "total": 1088
       },
       "safety_footwear": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 1103,
+        "val": 207,
+        "test": 43,
+        "total": 1353
       },
       "fire": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 398,
+        "val": 83,
+        "test": 35,
+        "total": 516
       },
       "smoke": {
-        "train": 0,
-        "val": 0,
-        "test": 0,
-        "total": 0
+        "train": 653,
+        "val": 127,
+        "test": 70,
+        "total": 850
       }
     },
     "area_buckets": {
       "person": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 99,
+        "0.5-1%": 49,
+        "1-2%": 68,
+        "2-5%": 146,
+        ">5%": 1880
       },
       "helmet": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 462,
+        "0.5-1%": 538,
+        "1-2%": 615,
+        "2-5%": 550,
+        ">5%": 356
       },
       "safety_vest": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 191,
+        "0.5-1%": 163,
+        "1-2%": 267,
+        "2-5%": 860,
+        ">5%": 1677
       },
       "gloves": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 531,
+        "0.5-1%": 762,
+        "1-2%": 485,
+        "2-5%": 218,
+        ">5%": 182
       },
       "safety_footwear": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 404,
+        "0.5-1%": 313,
+        "1-2%": 222,
+        "2-5%": 240,
+        ">5%": 1275
       },
       "fire": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 572,
+        "0.5-1%": 134,
+        "1-2%": 122,
+        "2-5%": 141,
+        ">5%": 168
       },
       "smoke": {
-        "<0.5%": 0,
-        "0.5-1%": 0,
-        "1-2%": 0,
-        "2-5%": 0,
-        ">5%": 0
+        "<0.5%": 274,
+        "0.5-1%": 175,
+        "1-2%": 231,
+        "2-5%": 260,
+        ">5%": 296
       }
     },
     "wh_stats": {
       "person": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.3588,
+        "mean_h": 0.6466,
+        "mean_area": 0.2698,
+        "median_area": 0.2372
       },
       "helmet": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.1449,
+        "mean_h": 0.1394,
+        "mean_area": 0.0273,
+        "median_area": 0.0136
       },
       "safety_vest": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.2234,
+        "mean_h": 0.3113,
+        "mean_area": 0.0901,
+        "median_area": 0.0527
       },
       "gloves": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.1108,
+        "mean_h": 0.1246,
+        "mean_area": 0.021,
+        "median_area": 0.0083
       },
       "safety_footwear": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.3155,
+        "mean_h": 0.3198,
+        "mean_area": 0.1483,
+        "median_area": 0.0636
       },
       "fire": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.1239,
+        "mean_h": 0.1021,
+        "mean_area": 0.0213,
+        "median_area": 0.0049
       },
       "smoke": {
-        "mean_w": 0.0,
-        "mean_h": 0.0,
-        "mean_area": 0.0,
-        "median_area": 0.0
+        "mean_w": 0.2133,
+        "mean_h": 0.1297,
+        "mean_area": 0.0371,
+        "median_area": 0.0169
       }
     },
     "leakage": {
@@ -518,6 +518,6 @@
       "license": "CC BY 4.0"
     }
   ],
-  "readiness_verdict": "RED",
-  "readiness_summary": "DATASET NOT SAFE FOR TRAINING: datasets/v7_candidate/ currently contains scaffolding only (0 images, 0 labels). Population from candidate sources must be conducted with hash deduplication against frozen test benchmark."
+  "readiness_verdict": "GREEN",
+  "readiness_summary": "DATASET VALIDATED & SAFE FOR CONTROLLED V7 TRAINING: datasets/v7_candidate/ contains 6,163 deduplicated images and 14,926 canonical bounding boxes with zero invalid labels, zero test-set leakage, and substantial glove (2,178 boxes, +206.3% vs V3) and footwear (2,454 boxes, +155.1% vs V3) representation."
 }

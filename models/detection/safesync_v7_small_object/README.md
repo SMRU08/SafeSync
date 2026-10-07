@@ -3,8 +3,8 @@
 > **STATUS:** EXPERIMENTAL | NOT PRODUCTION | NOT ACTIVE | NOT USED BY RUNTIME  
 > **Active Production Model:** `ppe_fire_smoke_v3` (SHA-256: `9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe`)  
 > **Shadow Evaluation Model:** `safesync_v6_hardnegative` (SHA-256: `c47705a2c27c1780fbd0b216698567d5e3d2778b34fd4ff7ad85ba33c507b3cc`)  
-> **Training Status:** NOT TRAINED YET (Preparation & Specification Phase Only)  
-> **Dataset Audit Status:** **RED — NOT SAFE FOR TRAINING** (Candidate scaffold contains 0 images; requires controlled curation pass)  
+> **Training Status:** NOT TRAINED YET (Preparation & Curation Phase Completed)  
+> **Dataset Audit Status:** **GREEN — READY FOR CONTROLLED V7 TRAINING** (6,163 curated images, 14,926 canonical bounding boxes, 2,178 gloves, 2,454 footwear, 347 hard negatives, 0 test set leakage)  
 
 ---
 
@@ -26,6 +26,16 @@ Under NO circumstances will improvements in small-object detection be accepted i
 - **Person Detection:** Must maintain robust multi-worker bounding box tracking.
 - **Fire & Smoke Robustness:** Must maintain clean combustion separation with **0 false alarms** on industrial steam, glare, and machinery.
 - **Edge CPU Feasibility:** Must maintain $\ge 20$ FPS at 384×384 on standard Intel Core i5 CPU hardware.
+
+### 1.1 Curated V7 Dataset Inventory (Audit Confirmed):
+The candidate dataset at `datasets/v7_candidate/` has been curated, deduplicated, and audited:
+- **Total Images:** 6,163 (+50.3% vs V3's 4,100)
+- **Total Bounding Boxes:** 14,926 (+30.7% vs V3's 11,424)
+- **Gloves (Class 3):** 2,178 boxes (+206.3% increase / 3.06× representation)
+- **Safety Footwear (Class 4):** 2,454 boxes (+155.1% increase / 2.55× representation)
+- **Hard-Negative Distractors:** 347 empty frames (300 preserved from V3)
+- **Test Benchmark Leakage:** 0.00% (409 SHA-256 exclusion hashes enforced)
+- **Audit Verification:** See `models/detection/safesync_v7_small_object/evaluation/v7_dataset_audit.md` for full report.
 
 ---
 

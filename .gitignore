@@ -81,6 +81,10 @@ datasets/images/
 datasets/labels/
 datasets/organized/
 datasets/v6_candidate/
+datasets/v7_candidate/images/
+datasets/v7_candidate/labels/
+datasets/v7_candidate/hard_negatives/*
+!datasets/v7_candidate/hard_negatives/.gitkeep
 datasets/data.yaml
 data.yaml
 
