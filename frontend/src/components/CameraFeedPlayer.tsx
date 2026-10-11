@@ -32,6 +32,7 @@ interface CameraFeedPlayerProps {
   selectedWorkerId?: number | null;
   onSelectWorker?: (workerId: number) => void;
   isEntryGate?: boolean;
+  showDebugPPE?: boolean;
 }
 
 const getCameraShortTag = (camera?: CameraConfig | null): string => {
@@ -57,6 +58,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
   selectedWorkerId = null,
   onSelectWorker,
   isEntryGate = false,
+  showDebugPPE = false,
 }) => {
   const [activeCamId, setActiveCamId] = useState<string>(
     selectedCameraId || (cameras[0]?.camera_id ?? 'camera_01')
@@ -141,8 +143,30 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
     if (selectedCameraId && selectedCameraId !== activeCamId) {
       setActiveCamId(selectedCameraId);
       setHasStreamError(false);
+      setStreamType('mjpeg');
     }
-  }, [selectedCameraId]);
+  }, [selectedCameraId, activeCamId]);
+
+  // Fallback snapshot polling interval when stream falls back to snapshot mode
+  useEffect(() => {
+    if (streamType === 'snapshot' && !isPaused && !hasStreamError) {
+      const interval = setInterval(() => {
+        setSnapshotTimestamp(Date.now());
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [streamType, isPaused, hasStreamError]);
+
+  // Transient stream error auto-recovery
+  useEffect(() => {
+    if (hasStreamError) {
+      const timer = setTimeout(() => {
+        setHasStreamError(false);
+        setStreamType('mjpeg');
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasStreamError]);
 
   const activeCamera =
     cameras.find((c) => c.camera_id === activeCamId) ||
@@ -162,22 +186,29 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
   const cameraState = activeCamera.state;
   const isConnecting = cameraState === 'CONNECTING' || cameraState === 'RECONNECTING' || isReconnecting;
+  const statusStr = String(activeCamera.status || '').toLowerCase();
+  const stateStr = String(activeCamera.state || '').toUpperCase();
+  const isOnlineState =
+    activeCamera.is_streaming === true ||
+    stateStr === 'STREAMING' ||
+    stateStr === 'ONLINE' ||
+    stateStr === 'CONNECTED' ||
+    statusStr === 'online' ||
+    statusStr === 'streaming' ||
+    statusStr === 'active';
   const isCameraOnline =
     !isConnecting &&
-    (activeCamera.is_streaming === true ||
-      activeCamera.state === 'STREAMING' ||
-      activeCamera.status === 'streaming' ||
-      ((activeCamera.state === 'CONNECTED' || activeCamera.status === 'ACTIVE') &&
-        (activeCamera.last_frame_age_ms == null || activeCamera.last_frame_age_ms < 3000)));
+    (isOnlineState &&
+      (activeCamera.last_frame_age_ms == null || activeCamera.last_frame_age_ms < 5000));
 
   const isStale =
     !isConnecting &&
     activeCamera.last_frame_age_ms != null &&
-    activeCamera.last_frame_age_ms > 3000;
+    activeCamera.last_frame_age_ms > 5000;
 
   const isDegraded =
     activeCamera.state === 'DEGRADED' ||
-    (!isStale && activeCamera.last_frame_age_ms != null && activeCamera.last_frame_age_ms > 2000);
+    (!isStale && activeCamera.last_frame_age_ms != null && activeCamera.last_frame_age_ms > 3000);
 
   const isOffline =
     cameraState === 'OFFLINE' ||
@@ -203,7 +234,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
         <div className="flex items-center justify-between gap-2">
           <span>{label}:</span>
           <span className="text-emerald-400 font-bold flex items-center gap-0.5">
-            <Check className="w-2.5 h-2.5" /> Present
+            <Check className="w-2.5 h-2.5" /> PRESENT
           </span>
         </div>
       );
@@ -213,7 +244,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
         <div className="flex items-center justify-between gap-2">
           <span>{label}:</span>
           <span className="text-rose-400 font-bold flex items-center gap-0.5">
-            <X className="w-2.5 h-2.5" /> Absent
+            <X className="w-2.5 h-2.5" /> ABSENT
           </span>
         </div>
       );
@@ -221,8 +252,8 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
     return (
       <div className="flex items-center justify-between gap-2 text-slate-400">
         <span>{label}:</span>
-        <span className="font-medium flex items-center gap-0.5">
-          <Minus className="w-2.5 h-2.5" /> Unknown
+        <span className="font-medium flex items-center gap-0.5 text-amber-400">
+          <Minus className="w-2.5 h-2.5" /> UNKNOWN
         </span>
       </div>
     );
@@ -237,8 +268,8 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
   const streamUrl =
     streamType === 'mjpeg' && !isPaused
-      ? `${API_BASE_URL}/api/cameras/${activeCamId}/stream${isGate ? '?annotated=false' : ''}`
-      : `${API_BASE_URL}/api/cameras/${activeCamId}/snapshot?t=${snapshotTimestamp}${isGate ? '&annotated=false' : ''}`;
+      ? `${API_BASE_URL}/api/cameras/${activeCamId}/stream?annotated=false`
+      : `${API_BASE_URL}/api/cameras/${activeCamId}/snapshot?t=${snapshotTimestamp}&annotated=false`;
 
   // Count rendered boxes for Entry Gate diagnostic verification
   const renderedWorkerCount = isCameraOnline
@@ -306,6 +337,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
                 setActiveCamId(newId);
                 onSelectCamera?.(newId);
                 setHasStreamError(false);
+                setStreamType('mjpeg');
               }}
               className="text-xs bg-slate-800 border border-slate-600 text-slate-300 rounded-md py-1 pl-2.5 pr-7 font-medium focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
             >
@@ -381,7 +413,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
       {/* Feed Viewport */}
       <div ref={viewportRef} className="relative bg-slate-950 aspect-[16/9] w-full overflow-hidden select-none group flex items-center justify-center">
-        {hasStreamError || !isCameraOnline || isStale ? (
+        {hasStreamError || (cameraState === 'DISABLED') ? (
           <div className="flex flex-col items-center justify-center text-slate-400 p-6 text-center">
             {isConnecting ? (
               <RefreshCw className="w-10 h-10 text-sky-400 mb-2 animate-spin" />
@@ -414,6 +446,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
               onClick={async () => {
                 setIsReconnecting(true);
                 setHasStreamError(false);
+                setStreamType('mjpeg');
                 try {
                   await reconnectCamera(activeCamId);
                 } catch (err) {
@@ -441,6 +474,7 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
               if (streamType === 'mjpeg') {
                 // Fallback to snapshot polling
                 setStreamType('snapshot');
+                setSnapshotTimestamp(Date.now());
               } else {
                 setHasStreamError(true);
               }
@@ -561,15 +595,20 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
 
                   {/* Itemized PPE Inspection Box */}
                   <div
-                    className={`absolute top-0 -right-28 bg-black/90 backdrop-blur-sm border text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight space-y-0.5 shadow-md pointer-events-none transition-opacity ${
+                    className={`absolute top-0 ${
+                      (worker.normalized_bbox && worker.normalized_bbox[2] > 0.72) ||
+                      (hasBounds && leftPx + widthPx > videoBounds.width - 130)
+                        ? '-left-28'
+                        : '-right-28'
+                    } bg-black/90 backdrop-blur-sm border text-white text-[8px] rounded px-1.5 py-1 whitespace-nowrap leading-tight space-y-0.5 shadow-md pointer-events-none transition-opacity ${
                       isSelected ? 'opacity-100 z-30' : 'opacity-90 group-hover/box:opacity-100 z-10'
                     }`}
                     style={{ borderColor: isSelected ? '#ffffff' : stateColor }}
                   >
                     {renderPPEItem('Helmet', worker.ppe_status?.helmet)}
-                    {renderPPEItem('Vest', worker.ppe_status?.safety_vest)}
+                    {renderPPEItem('Safety Vest', worker.ppe_status?.safety_vest)}
                     {renderPPEItem('Gloves', worker.ppe_status?.gloves)}
-                    {renderPPEItem('Shoes', worker.ppe_status?.safety_footwear)}
+                    {renderPPEItem('Safety Footwear', worker.ppe_status?.safety_footwear)}
                     {display.detail && (
                       <div className="pt-0.5 font-bold" style={{ color: stateColor }}>
                         {display.detail}
@@ -581,9 +620,9 @@ export const CameraFeedPlayer: React.FC<CameraFeedPlayerProps> = ({
             );
           })}
 
-        {/* Isolated Entry Gate Individual PPE Bounding Boxes (1 box per real object) */}
+        {/* Optional Debug Mode Individual PPE Bounding Boxes (1 box per real object) */}
         {isCameraOnline &&
-          isGate &&
+          showDebugPPE &&
           workers.flatMap((worker) => {
             if (!worker.ppe_details || typeof worker.ppe_details !== 'object') return [];
             const ppeMetaMap: Record<string, { label: string; border: string; bg: string }> = {

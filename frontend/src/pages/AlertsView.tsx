@@ -304,11 +304,96 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
         )}
       </div>
 
-      {/* ─── Summary Strip: P0, P1, P2, P3 (Section 13, 28, 45) ─────────────── */}
+      {/* ─── Fire / Smoke UI State (Section 20) ──────────────────────────────── */}
+      {priorityCounts.p0 === 0 ? (
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-emerald-500/20 text-[#22C55E]">
+              <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
+            </div>
+            <div>
+              <span className="font-bold text-white text-xs block">
+                NO ACTIVE FIRE/SMOKE HAZARD
+              </span>
+              <span className="text-[11px] text-emerald-400 font-medium">
+                All monitored optical and decoupled thermal channels are secure and normal.
+              </span>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-[#22C55E] border border-emerald-500/30 font-bold uppercase">
+            STATUS: NORMAL / SECURE
+          </span>
+        </div>
+      ) : (
+        <div className="p-4 rounded-xl bg-[#FF5A36]/15 border border-[#FF5A36]/50 text-white text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shadow-[#FF5A36]/20 animate-pulse">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-[#FF5A36]/30 text-[#FF5A36]">
+              <Flame className="w-5 h-5 animate-bounce" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-white text-sm uppercase tracking-wide">
+                  P0 CRITICAL: ACTIVE FIRE / SMOKE DETECTED
+                </span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-600 text-white">
+                  EVACUATION PROTOCOL
+                </span>
+              </div>
+              <span className="text-xs text-rose-200 mt-0.5 block">
+                Emergency thermal event confirmed. Decoupled alarm active across affected zones.
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setPriorityFilter('P0');
+              setActiveTab('ALL');
+            }}
+            className="px-3.5 py-1.5 rounded-lg bg-[#FF5A36] hover:bg-[#FF5A36]/90 text-white font-black text-xs uppercase cursor-pointer transition shadow-sm"
+          >
+            Filter P0 Alerts ({priorityCounts.p0})
+          </button>
+        </div>
+      )}
+
+      {/* ─── Summary Strip: Total, P0 Critical, P2 PPE, Resolved (Section 18) ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* P0: Fire / Smoke Emergency */}
+        {/* Total Alerts */}
         <div
-          onClick={() => setPriorityFilter(priorityFilter === 'P0' ? 'ALL' : 'P0')}
+          onClick={() => {
+            setPriorityFilter('ALL');
+            setActiveTab('ALL');
+            setTypeFilter('ALL');
+          }}
+          className={`p-4 rounded-xl border transition-all cursor-pointer ${
+            priorityFilter === 'ALL' && activeTab === 'ALL'
+              ? 'bg-sky-500/10 border-sky-500/60 ring-2 ring-sky-500'
+              : 'bg-[#0D1B2A] border-[#20344A] hover:border-sky-500/40'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black uppercase tracking-wider text-sky-400">
+              TOTAL ALERTS
+            </span>
+            <AlertTriangle className="w-4 h-4 text-sky-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-black font-mono text-white">
+              {uniqueAlerts.length}
+            </span>
+            <span className="text-[11px] text-[#8FA3B8]">Recorded</span>
+          </div>
+          <p className="text-[10px] text-[#8FA3B8] mt-1">
+            All priority levels in event log
+          </p>
+        </div>
+
+        {/* P0 Critical: Fire / Smoke Emergency */}
+        <div
+          onClick={() => {
+            setPriorityFilter(priorityFilter === 'P0' ? 'ALL' : 'P0');
+            setActiveTab('ALL');
+          }}
           className={`p-4 rounded-xl border transition-all cursor-pointer ${
             priorityCounts.p0 > 0
               ? 'bg-[#FF5A36]/15 border-[#FF5A36]/60 shadow-lg shadow-[#FF5A36]/20'
@@ -317,7 +402,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase tracking-wider text-[#FF5A36]">
-              P0 EMERGENCY
+              P0 CRITICAL (FIRE/SMOKE)
             </span>
             <Flame className={`w-4 h-4 ${priorityCounts.p0 > 0 ? 'text-[#FF5A36] animate-pulse' : 'text-[#8FA3B8]'}`} />
           </div>
@@ -328,39 +413,16 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
             <span className="text-[11px] text-[#8FA3B8]">Active Critical</span>
           </div>
           <p className="text-[10px] text-[#8FA3B8] mt-1">
-            Fire combustion &amp; emergency hazard layer
+            Fire combustion &amp; smoke plume layer
           </p>
         </div>
 
-        {/* P1: Severe Safety Event */}
+        {/* P2 Warning: Confirmed PPE Violation */}
         <div
-          onClick={() => setPriorityFilter(priorityFilter === 'P1' ? 'ALL' : 'P1')}
-          className={`p-4 rounded-xl border transition-all cursor-pointer ${
-            priorityCounts.p1 > 0
-              ? 'bg-orange-500/10 border-orange-500/40'
-              : 'bg-[#0D1B2A] border-[#20344A] hover:border-orange-500/40'
-          } ${priorityFilter === 'P1' ? 'ring-2 ring-orange-500' : ''}`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-[#F97316]">
-              P1 SEVERE
-            </span>
-            <AlertTriangle className={`w-4 h-4 ${priorityCounts.p1 > 0 ? 'text-[#F97316]' : 'text-[#8FA3B8]'}`} />
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black font-mono text-white">
-              {priorityCounts.p1}
-            </span>
-            <span className="text-[11px] text-[#8FA3B8]">Severe Events</span>
-          </div>
-          <p className="text-[10px] text-[#8FA3B8] mt-1">
-            Multi-person or perimeter hazard events
-          </p>
-        </div>
-
-        {/* P2: Confirmed PPE Violation */}
-        <div
-          onClick={() => setPriorityFilter(priorityFilter === 'P2' ? 'ALL' : 'P2')}
+          onClick={() => {
+            setPriorityFilter(priorityFilter === 'P2' ? 'ALL' : 'P2');
+            setActiveTab('ALL');
+          }}
           className={`p-4 rounded-xl border transition-all cursor-pointer ${
             priorityCounts.p2 > 0
               ? 'bg-rose-500/10 border-rose-500/40'
@@ -369,7 +431,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase tracking-wider text-[#EF4444]">
-              P2 PPE VIOLATION
+              P2 WARNING (PPE)
             </span>
             <HardHat className={`w-4 h-4 ${priorityCounts.p2 > 0 ? 'text-[#EF4444]' : 'text-[#8FA3B8]'}`} />
           </div>
@@ -380,31 +442,36 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
             <span className="text-[11px] text-[#8FA3B8]">Confirmed Absent</span>
           </div>
           <p className="text-[10px] text-[#8FA3B8] mt-1">
-            Confirmed missing helmet/vest/gloves/boots
+            Missing helmet / vest / gloves / footwear
           </p>
         </div>
 
-        {/* P3: System & Informational */}
+        {/* Resolved Alerts */}
         <div
-          onClick={() => setPriorityFilter(priorityFilter === 'P3' ? 'ALL' : 'P3')}
+          onClick={() => {
+            setActiveTab(activeTab === 'RESOLVED' ? 'ALL' : 'RESOLVED');
+            setPriorityFilter('ALL');
+          }}
           className={`p-4 rounded-xl border transition-all cursor-pointer ${
-            'bg-[#0D1B2A] border-[#20344A] hover:border-[#38BDF8]/40'
-          } ${priorityFilter === 'P3' ? 'ring-2 ring-[#38BDF8]' : ''}`}
+            activeTab === 'RESOLVED'
+              ? 'bg-emerald-500/10 border-emerald-500/60 ring-2 ring-emerald-500'
+              : 'bg-[#0D1B2A] border-[#20344A] hover:border-emerald-500/40'
+          }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-[#38BDF8]">
-              P3 SYSTEM
+            <span className="text-[11px] font-black uppercase tracking-wider text-[#22C55E]">
+              RESOLVED
             </span>
-            <ShieldAlert className="w-4 h-4 text-[#38BDF8]" />
+            <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-black font-mono text-white">
-              {priorityCounts.p3}
+              {statusCounts.RESOLVED}
             </span>
-            <span className="text-[11px] text-[#8FA3B8]">Advisories</span>
+            <span className="text-[11px] text-[#8FA3B8]">Closed</span>
           </div>
           <p className="text-[10px] text-[#8FA3B8] mt-1">
-            Camera telemetry &amp; heartbeat notifications
+            Successfully remediated incidents
           </p>
         </div>
       </div>
@@ -446,28 +513,96 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
       <div className="rounded-2xl bg-[#0D1B2A] border border-[#20344A] overflow-hidden flex flex-col">
         {/* Top Control Bar: Status Tabs & Priority Buttons */}
         <div className="p-4 bg-[#12263A] border-b border-[#20344A] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          {/* Status Tab Navigation */}
+          {/* Section 18 Filter Tabs: [ All ] [ P0 Fire/Smoke ] [ P2 PPE ] [ Active ] [ Resolved ] */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {(['ACTIVE', 'ACKNOWLEDGED', 'RESOLVED', 'ALL'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
-                  activeTab === tab
-                    ? 'bg-[#2388FF] text-white shadow-xs'
-                    : 'text-[#8FA3B8] hover:text-white hover:bg-[#20344A]'
-                }`}
-              >
-                <span>{tab}</span>
-                <span
-                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                    activeTab === tab ? 'bg-[#0D1B2A] text-white' : 'bg-[#07111F] text-[#8FA3B8]'
-                  }`}
-                >
-                  {statusCounts[tab]}
-                </span>
-              </button>
-            ))}
+            <button
+              onClick={() => {
+                setActiveTab('ALL');
+                setPriorityFilter('ALL');
+                setTypeFilter('ALL');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                activeTab === 'ALL' && priorityFilter === 'ALL'
+                  ? 'bg-[#2388FF] text-white shadow-xs'
+                  : 'text-[#8FA3B8] hover:text-white hover:bg-[#20344A]'
+              }`}
+            >
+              <span>All</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/30">
+                {uniqueAlerts.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                setPriorityFilter('P0');
+                setActiveTab('ALL');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                priorityFilter === 'P0'
+                  ? 'bg-[#FF5A36] text-white shadow-xs'
+                  : 'text-[#FF5A36] hover:bg-[#FF5A36]/10'
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5" />
+              <span>P0 Fire/Smoke</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/30">
+                {priorityCounts.p0}
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                setPriorityFilter('P2');
+                setActiveTab('ALL');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                priorityFilter === 'P2'
+                  ? 'bg-[#EF4444] text-white shadow-xs'
+                  : 'text-[#EF4444] hover:bg-rose-500/10'
+              }`}
+            >
+              <HardHat className="w-3.5 h-3.5" />
+              <span>P2 PPE</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/30">
+                {priorityCounts.p2}
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('ACTIVE');
+                setPriorityFilter('ALL');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                activeTab === 'ACTIVE' && priorityFilter === 'ALL'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                  : 'text-amber-400 hover:bg-amber-500/10'
+              }`}
+            >
+              <span>Active</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/30">
+                {statusCounts.ACTIVE}
+              </span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('RESOLVED');
+                setPriorityFilter('ALL');
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                activeTab === 'RESOLVED' && priorityFilter === 'ALL'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-emerald-400 hover:bg-emerald-500/10'
+              }`}
+            >
+              <Check className="w-3.5 h-3.5" />
+              <span>Resolved</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-black/30">
+                {statusCounts.RESOLVED}
+              </span>
+            </button>
           </div>
 
           {/* Priority Quick Filter & Format Toggle */}
@@ -734,6 +869,16 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
                               <span>Resolve</span>
                             </button>
                           )}
+
+                          {/* View Details Action (Section 18) */}
+                          <button
+                            onClick={() => onSelectAlert?.(alert)}
+                            className="px-2.5 py-1 rounded bg-[#07111F] hover:bg-[#12263A] border border-[#20344A] text-slate-300 hover:text-white text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer"
+                            title="View Full Alert Audit Trail"
+                          >
+                            <ExternalLink className="w-3 h-3 text-[#2388FF]" />
+                            <span>View Details</span>
+                          </button>
 
                           {/* View Incident File Action */}
                           {alert.incident_id && onSelectIncident && (

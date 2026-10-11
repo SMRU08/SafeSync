@@ -71,8 +71,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   onResolve,
   onRefresh,
 }) => {
+  const defaultCam = cameras.find((c) => c.camera_id === 'cam_live_webcam') || cameras.find((c) => c.enabled !== false) || cameras[0];
   const [selectedCameraId, setSelectedCameraId] = useState<string>(
-    cameras[0]?.camera_id || 'camera_01'
+    defaultCam?.camera_id || 'cam_live_webcam'
   );
   const [liveWorkers, setLiveWorkers] = useState<WorkerTrack[]>([]);
   const [liveHazards, setLiveHazards] = useState<HazardEventDetail[]>([]);
@@ -83,46 +84,70 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const [isError, setIsError] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
-  // Poll live compliance data
-  const fetchLiveData = useCallback(async () => {
+  // Fast polling for live camera compliance overlays (250ms)
+  useEffect(() => {
+    let isMounted = true;
+    let isFetching = false;
+
+    // Immediately clear stale state when switching cameras
+    setLiveWorkers([]);
+    setLiveHazards([]);
+
+    const pollLiveCompliance = async () => {
+      if (isFetching) return;
+      isFetching = true;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/compliance/live?camera_id=${encodeURIComponent(selectedCameraId)}`);
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          if (data && isMounted) {
+            if (Array.isArray(data.workers)) setLiveWorkers(data.workers);
+            if (Array.isArray(data.hazards)) setLiveHazards(data.hazards);
+            if (data.summary) setComplianceSummary(data.summary);
+          }
+          setIsError(false);
+        }
+      } catch {
+        // tolerate dropout
+      } finally {
+        isFetching = false;
+      }
+    };
+
+    pollLiveCompliance();
+    const interval = setInterval(pollLiveCompliance, 250);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [selectedCameraId]);
+
+  // Slower background poll for system health and incidents (2000ms)
+  const fetchAuxiliaryData = useCallback(async () => {
     try {
-      const [compRes, healthRes, incRes] = await Promise.allSettled([
-        fetch(`${API_BASE_URL}/api/compliance/live`),
+      const [healthRes, incRes] = await Promise.allSettled([
         fetchSystemHealth(),
         fetchIncidents('ACTIVE', 10),
       ]);
 
-      if (compRes.status === 'fulfilled' && compRes.value.ok) {
-        const data = await compRes.value.json();
-        if (data) {
-          if (Array.isArray(data.workers)) setLiveWorkers(data.workers);
-          if (Array.isArray(data.hazards)) setLiveHazards(data.hazards);
-          if (data.summary) setComplianceSummary(data.summary);
-        }
-        setIsError(false);
-      } else if (compRes.status === 'rejected') {
-        setIsError(true);
-      }
-
       if (healthRes.status === 'fulfilled') {
         setHealthData(healthRes.value);
       }
-
       if (incRes.status === 'fulfilled') {
         setRecentEvents(incRes.value);
       }
     } catch {
-      setIsError(true);
+      // tolerate dropout
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchLiveData();
-    const interval = setInterval(fetchLiveData, 1500);
+    fetchAuxiliaryData();
+    const interval = setInterval(fetchAuxiliaryData, 2000);
     return () => clearInterval(interval);
-  }, [fetchLiveData]);
+  }, [fetchAuxiliaryData]);
 
   // Keep selected camera synced if cameras change
   useEffect(() => {
@@ -140,17 +165,29 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         // tolerate
       }
     }
-    await fetchLiveData();
+    await fetchAuxiliaryData();
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/compliance/live?camera_id=${encodeURIComponent(selectedCameraId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          if (Array.isArray(data.workers)) setLiveWorkers(data.workers);
+          if (Array.isArray(data.hazards)) setLiveHazards(data.hazards);
+          if (data.summary) setComplianceSummary(data.summary);
+        }
+      }
+    } catch {
+      // tolerate
+    }
     setIsRefreshing(false);
   };
 
   // Evaluate Camera Aggregations
-  const totalCameras = cameras.length;
   const activeCameras = cameras.filter(
     (c) => c.enabled && (c.state === 'CONNECTED' || c.state === 'STREAMING' || c.status === 'ACTIVE')
   ).length;
 
-  // Evaluate Real Worker State Counts (Tri-state priority: VIOLATION > UNKNOWN > SAFE)
+  // Evaluate Worker State Counts (Tri-state priority: VIOLATION > UNKNOWN > SAFE)
   const workerDisplays = liveWorkers.map((w) => resolveWorkerDisplay(w));
   const safeWorkersCount = workerDisplays.filter((d) => d.state === 'SAFE').length;
   const unknownWorkersCount = workerDisplays.filter((d) => d.state === 'UNKNOWN').length;
@@ -158,17 +195,15 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
   const totalTrackedWorkers = liveWorkers.length;
 
   // Real Thermal Hazard Counts (Synchronized with hazards & alerts)
-  const allHazards = liveHazards.length > 0 ? liveHazards : hazards;
   const activeAlerts = alerts.filter((a) => a.status === 'ACTIVE');
-  const fireEvents = allHazards.filter(
+  const fireEvents = (liveHazards.length > 0 ? liveHazards : hazards).filter(
     (h) => h.hazard_type === 'fire' && (h.state === 'ACTIVE' || h.state === 'CONFIRMED')
   );
-  const smokeEvents = allHazards.filter(
+  const smokeEvents = (liveHazards.length > 0 ? liveHazards : hazards).filter(
     (h) => h.hazard_type === 'smoke' && (h.state === 'ACTIVE' || h.state === 'CONFIRMED')
   );
   const fireEventsCount = fireEvents.length + alerts.filter((a) => a.status === 'ACTIVE' && a.event_type.includes('FIRE')).length;
   const smokeEventsCount = smokeEvents.length + alerts.filter((a) => a.status === 'ACTIVE' && a.event_type.includes('SMOKE')).length;
-  const activeAlertsCount = activeAlerts.length;
 
   // System Status Evaluator (ONLINE / DEGRADED / OFFLINE)
   const systemStatus: 'ONLINE' | 'DEGRADED' | 'OFFLINE' = isError
@@ -348,161 +383,116 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
         </div>
       )}
 
-      {/* ─── 2. TOP KPI CARDS (Section 6 & 7 — 8 Clean Real-Data Cards) ────── */}
-      <section className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-2.5">
-        {/* Card 1: ACTIVE CAMERAS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Active Cameras</span>
-            <div className="p-1 rounded bg-sky-500/10 text-sky-400">
-              <Camera className="w-3 h-3" />
+      {/* ─── 2. TOP KPI CARDS (Section 14: 4 Clean Top Cards: SAFE / UNKNOWN / VIOLATIONS / FIRE-SMOKE) ─── */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Card 1: WORKERS SAFE */}
+        <div className="glass-card p-4 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
+          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-2">
+            <span className="font-bold text-[11px] uppercase tracking-wider text-[#8FA3B8]">
+              Workers Safe
+            </span>
+            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-[#22C55E]">
+              <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-xl font-black text-white font-mono-nums leading-none">
-              {isLoading ? '—' : activeCameras}
-              <span className="text-xs text-[#8FA3B8] font-normal ml-1">/{totalCameras}</span>
-            </div>
-            <div className="text-[10px] text-[#22C55E] font-semibold mt-1 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
-              {activeCameras > 0 ? 'ONLINE' : 'STANDBY'}
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: TRACKED WORKERS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Tracked Workers</span>
-            <div className="p-1 rounded bg-sky-500/10 text-sky-400">
-              <Users className="w-3 h-3" />
-            </div>
-          </div>
-          <div>
-            <div className="text-xl font-black text-sky-400 font-mono-nums leading-none">
-              {isLoading ? '—' : totalTrackedWorkers}
-            </div>
-            <div className="text-[10px] text-[#8FA3B8] mt-1">
-              {totalTrackedWorkers > 0 ? 'In camera view' : 'No workers'}
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: SAFE WORKERS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Safe Workers</span>
-            <div className="p-1 rounded bg-emerald-500/10 text-[#22C55E]">
-              <ShieldCheck className="w-3 h-3" />
-            </div>
-          </div>
-          <div>
-            <div className="text-xl font-black text-[#22C55E] font-mono-nums leading-none">
+            <div className="text-2xl font-black text-[#22C55E] font-mono-nums leading-none">
               {isLoading ? '—' : totalTrackedWorkers > 0 ? safeWorkersCount : '—'}
             </div>
-            <div className="text-[10px] text-[#8FA3B8] mt-1">
-              {totalTrackedWorkers > 0 ? 'Full PPE confirmed' : '—'}
+            <div className="text-[11px] text-[#8FA3B8] mt-2 flex items-center justify-between">
+              <span>{totalTrackedWorkers > 0 ? 'Full PPE confirmed' : 'No verified detection'}</span>
+              <span className="text-[10px] font-semibold text-[#22C55E] bg-[#22C55E]/10 px-1.5 py-0.5 rounded border border-[#22C55E]/20">
+                COMPLIANT
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Card 4: UNKNOWN (VISIBILITY LIMITED) */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Unknown</span>
-            <div className="p-1 rounded bg-amber-500/10 text-[#F5B942]">
-              <HelpCircle className="w-3 h-3" />
+        {/* Card 2: WORKERS UNKNOWN */}
+        <div className="glass-card p-4 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
+          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-2">
+            <span className="font-bold text-[11px] uppercase tracking-wider text-[#8FA3B8]">
+              Workers Unknown
+            </span>
+            <div className="p-1.5 rounded-lg bg-amber-500/10 text-[#F5B942]">
+              <HelpCircle className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-xl font-black text-[#F5B942] font-mono-nums leading-none">
+            <div className="text-2xl font-black text-[#F5B942] font-mono-nums leading-none">
               {isLoading ? '—' : totalTrackedWorkers > 0 ? unknownWorkersCount : '—'}
             </div>
-            <div className="text-[10px] text-[#8FA3B8] mt-1">
-              {totalTrackedWorkers > 0 ? 'Visibility limited' : '—'}
+            <div className="text-[11px] text-[#8FA3B8] mt-2 flex items-center justify-between">
+              <span>{totalTrackedWorkers > 0 ? 'Visibility limited' : '—'}</span>
+              <span className="text-[10px] font-semibold text-[#F5B942] bg-[#F5B942]/10 px-1.5 py-0.5 rounded border border-[#F5B942]/20">
+                NON-PUNITIVE
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Card 5: CONFIRMED VIOLATIONS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Violations</span>
-            <div className="p-1 rounded bg-rose-500/10 text-[#EF4444]">
-              <ShieldAlert className="w-3 h-3" />
+        {/* Card 3: VIOLATIONS */}
+        <div className="glass-card p-4 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
+          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-2">
+            <span className="font-bold text-[11px] uppercase tracking-wider text-[#8FA3B8]">
+              Violations
+            </span>
+            <div className="p-1.5 rounded-lg bg-rose-500/10 text-[#EF4444]">
+              <ShieldAlert className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className={`text-xl font-black font-mono-nums leading-none ${violationWorkersCount > 0 ? 'text-[#EF4444]' : 'text-white'}`}>
-              {isLoading ? '—' : totalTrackedWorkers > 0 ? violationWorkersCount : '0'}
+            <div className={`text-2xl font-black font-mono-nums leading-none ${violationWorkersCount > 0 ? 'text-[#EF4444]' : 'text-white'}`}>
+              {isLoading ? '—' : totalTrackedWorkers > 0 ? violationWorkersCount : '—'}
             </div>
-            <div className="text-[10px] text-[#8FA3B8] mt-1">
-              {violationWorkersCount > 0 ? 'Confirmed absent' : 'Zero infractions'}
+            <div className="text-[11px] text-[#8FA3B8] mt-2 flex items-center justify-between">
+              <span>
+                {totalTrackedWorkers > 0
+                  ? (violationWorkersCount > 0 ? 'Confirmed absent gear' : 'Zero infractions')
+                  : 'No verified detection'}
+              </span>
+              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+                violationWorkersCount > 0
+                  ? 'text-[#EF4444] bg-[#EF4444]/10 border-[#EF4444]/20'
+                  : 'text-slate-400 bg-slate-800 border-slate-700'
+              }`}>
+                DEBOUNCED
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Card 6: FIRE EVENTS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Fire Events</span>
-            <div className="p-1 rounded bg-rose-500/10 text-[#FF5A36]">
-              <Flame className="w-3 h-3" />
+        {/* Card 4: FIRE / SMOKE HAZARDS */}
+        <div className="glass-card p-4 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
+          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-2">
+            <span className="font-bold text-[11px] uppercase tracking-wider text-[#8FA3B8]">
+              Fire / Smoke Hazards
+            </span>
+            <div className="p-1.5 rounded-lg bg-orange-500/10 text-[#FF5A36]">
+              <Flame className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className={`text-xl font-black font-mono-nums leading-none ${fireEventsCount > 0 ? 'text-[#FF5A36] animate-pulse' : 'text-white'}`}>
-              {isLoading ? '—' : fireEventsCount}
+            <div className={`text-2xl font-black font-mono-nums leading-none ${
+              fireEventsCount + smokeEventsCount > 0 ? 'text-[#FF5A36] animate-pulse' : 'text-[#22C55E]'
+            }`}>
+              {fireEventsCount + smokeEventsCount > 0
+                ? `${fireEventsCount + smokeEventsCount} ACTIVE`
+                : 'CLEAR'}
             </div>
-            <div className="text-[10px] mt-1 font-semibold">
-              {fireEventsCount > 0 ? (
-                <span className="text-[#FF5A36] flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A36] animate-ping" />
-                  DETECTED
-                </span>
-              ) : (
-                <span className="text-[#22C55E]">● CLEAR</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Card 7: SMOKE EVENTS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Smoke Events</span>
-            <div className="p-1 rounded bg-amber-500/10 text-[#F59E0B]">
-              <CloudRain className="w-3 h-3" />
-            </div>
-          </div>
-          <div>
-            <div className={`text-xl font-black font-mono-nums leading-none ${smokeEventsCount > 0 ? 'text-[#F59E0B] animate-pulse' : 'text-white'}`}>
-              {isLoading ? '—' : smokeEventsCount}
-            </div>
-            <div className="text-[10px] mt-1 font-semibold">
-              {smokeEventsCount > 0 ? (
-                <span className="text-[#F59E0B]">● DETECTED</span>
-              ) : (
-                <span className="text-[#22C55E]">● CLEAR</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Card 8: ACTIVE ALERTS */}
-        <div className="glass-card p-3 rounded-xl flex flex-col justify-between hover:border-[#20344A]/80 transition">
-          <div className="flex items-center justify-between text-[#8FA3B8] text-xs mb-1.5">
-            <span className="font-semibold text-[10px] uppercase tracking-wider">Active Alerts</span>
-            <div className="p-1 rounded bg-sky-500/10 text-[#2388FF]">
-              <AlertTriangle className="w-3 h-3" />
-            </div>
-          </div>
-          <div>
-            <div className={`text-xl font-black font-mono-nums leading-none ${activeAlertsCount > 0 ? 'text-amber-400' : 'text-white'}`}>
-              {isLoading ? '—' : activeAlertsCount}
-            </div>
-            <div className="text-[10px] text-[#8FA3B8] mt-1">
-              {activeAlertsCount > 0 ? `${activeAlertsCount} Unresolved` : 'Normal state'}
+            <div className="text-[11px] mt-2 flex items-center justify-between">
+              <span className="text-[#8FA3B8]">
+                {fireEventsCount + smokeEventsCount > 0
+                  ? 'Immediate safety protocol'
+                  : 'All monitored zones safe'}
+              </span>
+              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+                fireEventsCount + smokeEventsCount > 0
+                  ? 'text-[#FF5A36] bg-[#FF5A36]/10 border-[#FF5A36]/20'
+                  : 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/20'
+              }`}>
+                {fireEventsCount + smokeEventsCount > 0 ? 'P0 CRITICAL' : 'SECURE'}
+              </span>
             </div>
           </div>
         </div>
@@ -551,21 +541,28 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
         {/* ─── Left / Center Column (8 Cols): Video, Hazards, Cameras, Events ─── */}
         <div className="xl:col-span-8 space-y-5">
-          {/* Section: LIVE MONITOR (Section 10 & 11) */}
+          {/* Section: LIVE MONITOR */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Tv className="w-4 h-4 text-[#2388FF]" />
                 <h2 className="font-bold text-xs text-white tracking-wide uppercase">
-                  LIVE MONITOR &mdash; {currentCamera?.name || selectedCameraId}
+                  {`LIVE MONITOR — ${currentCamera?.name || selectedCameraId}`}
                 </h2>
-                <span className={`text-[10px] font-mono font-bold px-2 py-0.2 rounded-full border ${currentCamStatus.color}`}>
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${currentCamStatus.color}`}>
                   {currentCamStatus.label}
                 </span>
               </div>
               <div className="text-[11px] text-[#8FA3B8] font-mono flex items-center gap-3">
-                <span>Location: <strong className="text-white">{currentCamera?.zone_id || 'production_floor'}</strong></span>
-                <span>Workers: <strong className="text-white">{liveWorkers.length}</strong></span>
+                <span>
+                  Location:{' '}
+                  <strong className="text-white">
+                    {currentCamera?.zone_id || 'production_floor'}
+                  </strong>
+                </span>
+                <span>
+                  Workers: <strong className="text-white">{liveWorkers.length}</strong>
+                </span>
               </div>
             </div>
 
@@ -728,7 +725,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               </button>
             </div>
 
-            {alerts.length === 0 && recentEvents.length === 0 ? (
+            {activeAlerts.length === 0 && recentEvents.length === 0 ? (
               <div className="p-6 text-center text-xs text-[#8FA3B8]">
                 NO RECENT SAFETY EVENTS
               </div>
@@ -745,7 +742,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#20344A]/60">
-                    {alerts.slice(0, 5).map((a) => (
+                    {activeAlerts.slice(0, 5).map((a: Alert) => (
                       <tr
                         key={a.alert_id}
                         onClick={() => onSelectAlert(a)}
@@ -818,9 +815,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
               <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-center">
                 <span className="text-[10px] font-bold text-rose-400 uppercase block">VIOLATION</span>
                 <span className="text-lg font-black text-rose-400 font-mono-nums block mt-0.5">
-                  {totalTrackedWorkers > 0 ? violationWorkersCount : '0'}
+                  {totalTrackedWorkers > 0 ? violationWorkersCount : '—'}
                 </span>
-                <span className="text-[9px] text-[#8FA3B8]">Missing gear</span>
+                <span className="text-[9px] text-[#8FA3B8]">{totalTrackedWorkers > 0 ? 'Missing gear' : 'No workers'}</span>
               </div>
             </div>
           </div>
@@ -844,11 +841,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
 
             <div className="p-3 space-y-2.5 max-h-72 overflow-y-auto">
               {liveWorkers.length === 0 ? (
-                <div className="p-6 text-center text-xs text-[#8FA3B8] italic">
-                  NO WORKERS DETECTED
+                <div className="p-6 text-center text-xs text-[#8FA3B8] italic font-mono">
+                  NO VERIFIED DETECTION
                 </div>
               ) : (
-                liveWorkers.map((worker) => {
+                liveWorkers.map((worker: WorkerTrack) => {
                   const display = resolveWorkerDisplay(worker);
                   const ppe = worker.ppe_status || {
                     helmet: 'UNKNOWN',

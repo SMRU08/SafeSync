@@ -192,6 +192,65 @@ def verify_safety_vest_features(
     return True
 
 
+def verify_gloves_features(
+    worker_box: np.ndarray,
+    glove_box: np.ndarray,
+    frame: Optional[np.ndarray] = None,
+    confidence: float = 0.0,
+    img_shape: Optional[Tuple[int, int]] = None,
+) -> bool:
+    """
+    Validates candidate glove detection against human arm/hand anatomy and bare skin rejection:
+    1. Anatomical vertical zone: Hand/glove center relative to worker top must be between 0.18 and 1.05.
+    2. Relative size constraints: Glove height <= 0.35 of worker height, width <= 0.50 of worker width.
+    3. Chromatic skin rejection (when frame is available):
+       Rejects bare hand patches that exhibit predominant bare skin color without glove material.
+    """
+    wx1, wy1, wx2, wy2 = [float(v) for v in worker_box]
+    gx1, gy1, gx2, gy2 = [float(v) for v in glove_box]
+
+    wh = max(1.0, wy2 - wy1)
+    ww = max(1.0, wx2 - wx1)
+    gh = max(1.0, gy2 - gy1)
+    gw = max(1.0, gx2 - gx1)
+
+    # 1. Anatomical vertical zone (hands and forearms occupy 0.18 to 1.05 of worker height)
+    gyc = (gy1 + gy2) / 2.0
+    rel_yc = (gyc - wy1) / wh
+    if rel_yc < 0.18 or rel_yc > 1.05:
+        return False
+
+    # 2. Relative size constraints
+    if (gh / wh) > 0.35 or (gw / ww) > 0.50:
+        return False
+
+    # 3. Chromatic bare skin rejection (rejects bare hands falsely detected as gloves)
+    if frame is not None and frame.size > 0:
+        ih, iw = frame.shape[:2]
+        ix1 = max(0, min(iw - 1, int(gx1)))
+        iy1 = max(0, min(ih - 1, int(gy1)))
+        ix2 = max(ix1 + 1, min(iw, int(gx2)))
+        iy2 = max(iy1 + 1, min(ih, int(gy2)))
+
+        crop = frame[iy1:iy2, ix1:ix2]
+        if crop.size >= 25:
+            hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+            h, s, v = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
+            skin_mask = ((h <= 24) | (h >= 166)) & (s >= 28) & (s <= 185) & (v >= 60) & (v <= 250)
+            total_px = float(crop.shape[0] * crop.shape[1])
+            skin_ratio = float(np.count_nonzero(skin_mask)) / total_px
+
+            # High model confidence (>= 0.75) overrides skin check (e.g. skin-toned/tan leather gloves)
+            if confidence >= 0.75:
+                return True
+
+            # If crop is predominantly bare skin (> 48%), reject as bare hand
+            if skin_ratio > 0.48:
+                return False
+
+    return True
+
+
 class SpatialPPEAssociator:
     """
     Associates detected PPE items with specific tracked workers based on
@@ -284,6 +343,11 @@ class SpatialPPEAssociator:
                 return 0.0
         elif item_type == PPEItemType.SAFETY_VEST:
             if not verify_safety_vest_features(
+                worker_box, ppe_box, frame=frame, confidence=confidence, img_shape=img_shape
+            ):
+                return 0.0
+        elif item_type == PPEItemType.GLOVES:
+            if not verify_gloves_features(
                 worker_box, ppe_box, frame=frame, confidence=confidence, img_shape=img_shape
             ):
                 return 0.0

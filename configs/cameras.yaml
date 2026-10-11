@@ -1,118 +1,436 @@
-# configs/cameras.yaml — SafeSync Phase 10 Step 5
-# Camera and Zone Metadata Configuration
-# Supports RTSP, USB webcams, recorded video files, and synthetic streams.
-# Passwords must be referenced via environment variables, never hardcoded in plaintext.
-
 cameras:
-  - id: "camera_01"
-    name: "CCTV - Production Floor South"
-    zone_id: "production_floor"
-    source: "0"  # USB or integrated webcam index 0, or rtsp:// stream
-    source_type: "usb"  # "rtsp", "usb", "file", "synthetic"
-    enabled: true
-    fps_target: 30
-    resolution: "640x480"
-    timeout_seconds: 5.0
-    reconnect_policy:
-      max_retries: 5
-      initial_delay_seconds: 1.0
-      max_delay_seconds: 15.0
-
-  - id: "camera_02"
-    name: "Mobile Phone Camera"
-    zone_id: "storage_area"
-    source: "http://192.168.137.166:8080/video"
-    source_type: "http"
-    enabled: true
-    fps_target: 25
-    resolution: "1920x1080"
-    timeout_seconds: 5.0
-    reconnect_policy:
-      max_retries: 5
-      initial_delay_seconds: 1.0
-      max_delay_seconds: 10.0
-
-  - id: "camera_03"
-    name: "CCTV - High Voltage Electrical Room"
-    zone_id: "electrical_room"
-    source: "synthetic://electrical_room"
-    source_type: "synthetic"
-    enabled: false
-    fps_target: 20
-    resolution: "640x480"
-    timeout_seconds: 3.0
-    reconnect_policy:
-      max_retries: 5
-      initial_delay_seconds: 1.0
-      max_delay_seconds: 10.0
-
-  - id: "camera_04"
-    name: "CCTV - Loading Dock Outer"
-    zone_id: "loading_dock"
-    source: "rtsp://${CAMERA_USERNAME}:${CAMERA_PASSWORD}@192.168.1.104:554/stream1"
-    source_type: "rtsp"
-    enabled: false
-    fps_target: 25
-    resolution: "1920x1080"
-    timeout_seconds: 5.0
-    reconnect_policy:
-      max_retries: 10
-      initial_delay_seconds: 2.0
-      max_delay_seconds: 30.0
-
-  # Camera 05: Android Phone via IP Webcam or DroidCam (HTTP Stream over Wi-Fi)
-  # To use: Install "IP Webcam" app on Android, tap "Start Server", set IP address below, and change enabled: true
-  # - id: "camera_android_wifi"
-  #   name: "Android Phone Cam (Wi-Fi Stream)"
-  #   zone_id: "production_floor"
-  #   source: "http://192.168.1.100:8080/video"
-  #   source_type: "http"
-  #   enabled: false
-  #   fps_target: 20
-  #   resolution: "1280x720"
-  #   timeout_seconds: 5.0
-  #   reconnect_policy:
-  #     max_retries: 5
-  #     initial_delay_seconds: 1.0
-  #     max_delay_seconds: 10.0
-
-  # Camera 06: Android Phone via USB Cable (DirectShow UVC device index)
-  # To use: Connect phone via USB -> Select "Webcam" mode on Android notification -> set source: "1" (or device index)
-  # - id: "camera_android_usb"
-  #   name: "Android Phone Cam (USB Webcam)"
-  #   zone_id: "production_floor"
-  #   source: "1"
-  #   source_type: "usb"
-  #   enabled: false
-  #   fps_target: 30
-  #   resolution: "1280x720"
-  #   timeout_seconds: 5.0
-  #   reconnect_policy:
-  #     max_retries: 5
-  #     initial_delay_seconds: 1.0
-  #     max_delay_seconds: 10.0
-
+- id: cam_live_webcam
+  name: "CAM-LIVE \u2022 Physical Live Webcam"
+  zone_id: production_floor
+  location: Live Inspection Station
+  source: '0'
+  source_type: usb
+  enabled: true
+  fps_target: 30
+  resolution: 640x480
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_01
+  name: "CAM-01 \u2022 Production Assembly South"
+  zone_id: production_floor
+  location: Fabrication Bay A1
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_131951_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_02
+  name: "CAM-02 \u2022 Fabrication Line North"
+  zone_id: production_floor
+  location: Sheet Metal Station
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_132045_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_03
+  name: "CAM-03 \u2022 Heavy Machinery Unit"
+  zone_id: production_floor
+  location: Press & Stamping Bay
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_132102_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 30
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_04
+  name: "CAM-04 \u2022 Multi-Worker Inspection"
+  zone_id: production_floor
+  location: QA Audit Station
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_132240_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 30
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_05
+  name: "CAM-05 \u2022 Warehouse Storage Corridor"
+  zone_id: storage_area
+  location: Aisle 4 Storage Racks
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_132302_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_06
+  name: "CAM-06 \u2022 Industrial Bay Thermal & Smoke"
+  zone_id: hazard_zone
+  location: Exhaust & Ventilation Shaft
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_132435_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_07
+  name: "CAM-07 \u2022 Turnstile Entry Gate Access"
+  zone_id: entry_gate
+  location: Main Facility Turnstiles
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_132820_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 28
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_08
+  name: "CAM-08 \u2022 Loading Dock Receiving Bay"
+  zone_id: loading_dock
+  location: Cargo Bay 1
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_133226_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_09
+  name: "CAM-09 \u2022 High Voltage Electrical Room"
+  zone_id: electrical_room
+  location: Substation Switchgear
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_133238_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 30
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_10
+  name: "CAM-10 \u2022 Assembly Compliant Station"
+  zone_id: production_floor
+  location: Precision Electronics Assembly
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_133245_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_11
+  name: "CAM-11 \u2022 Facility Maintenance Corridor"
+  zone_id: production_floor
+  location: Utility Passage North
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_133302_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 30
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_12
+  name: "CAM-12 \u2022 Fabrication Bay Multi-Worker"
+  zone_id: production_floor
+  location: Mechanical Fabrication Bay 2
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134021_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_13
+  name: "CAM-13 \u2022 Welding & Hot Work Station"
+  zone_id: production_floor
+  location: Arc Welding Booth 3
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134122_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_14
+  name: "CAM-14 \u2022 Dispatch & Cargo Dock"
+  zone_id: loading_dock
+  location: Logistics Outbound Bay 2
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134149_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_15
+  name: "CAM-15 \u2022 Component Assembly Line"
+  zone_id: production_floor
+  location: Conveyor Station 5
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134204_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_16
+  name: "CAM-16 \u2022 Furnace Combustion Hazard Zone"
+  zone_id: hazard_zone
+  location: High-Temp Smelting Furnace
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134222_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_17
+  name: "CAM-17 \u2022 High-Bay Storage & Forklift Route"
+  zone_id: storage_area
+  location: Forklift Crossing Zone
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134251_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_output2_18
+  name: "CAM-18 \u2022 Facility Wide-Angle Overview"
+  zone_id: general_facility
+  location: Mezzanine Observation Deck
+  source: D:\Additional\Safesync\output2\annotated_videos\VID_20261009_134306_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_01
+  name: "CAM-19 \u2022 Yard Gate Entry Check"
+  zone_id: entry_gate
+  location: Exterior Site Gate A
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_131951_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_02
+  name: "CAM-20 \u2022 Logistics Staging Area"
+  zone_id: loading_dock
+  location: Cargo Staging Bay 3
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_133226_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_03
+  name: "CAM-21 \u2022 Electrical Sub-Panel Room"
+  zone_id: electrical_room
+  location: Secondary Substation East
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_133238_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 30
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_04
+  name: "CAM-22 \u2022 Assembly Compliance Station"
+  zone_id: production_floor
+  location: Electronics Assembly Bay 4
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_133245_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_05
+  name: "CAM-23 \u2022 Perimeter Safety Patrol"
+  zone_id: general_facility
+  location: Outdoor Perimeter Route B
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_133302_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 30
+  resolution: 1080x1920
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_06
+  name: "CAM-24 \u2022 Workshop Tool Station"
+  zone_id: production_floor
+  location: Mechanical Workshop Bay 5
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_134021_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 29
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: cam_new_07
+  name: "CAM-25 \u2022 Night-Shift Overview"
+  zone_id: general_facility
+  location: Facility Wide-Angle Night View
+  source: D:\Additional\New folder (2)\output\annotated_videos\VID_20261009_230104_annotated.mp4
+  source_type: file
+  enabled: false
+  fps_target: 60
+  resolution: 1920x1080
+  timeout_seconds: 5.0
+  speaker_enabled: true
+  reconnect_policy:
+    max_retries: 10
+    initial_delay_seconds: 0.5
+    max_delay_seconds: 5.0
+- id: camera_01
+  name: Camera 01 Test
+  zone_id: production_floor
+  location: Fabrication Bay A1
+  source: synthetic://cam1
+  source_type: synthetic
+  enabled: false
+- id: camera_03
+  name: Camera 03 Test
+  zone_id: electrical_room
+  location: Substation Switchgear
+  source: synthetic://cam3
+  source_type: synthetic
+  enabled: false
 zones:
-  - id: "production_floor"
-    name: "Production Floor"
-    description: "Main assembly and fabrication area"
-    # Optional polygon ROI in normalized [0..1] or pixel coordinates.
-    # If omitted, all coordinates within camera_01 map to this zone.
-
-  - id: "storage_area"
-    name: "Storage Area"
-    description: "Warehouse aisle and racked material bins"
-
-  - id: "electrical_room"
-    name: "Electrical Room"
-    description: "Substation and transformer enclosure"
-    # Example normalized polygon ROI for high-risk transformer zone
-    polygon_normalized:
-      - [0.1, 0.1]
-      - [0.9, 0.1]
-      - [0.9, 0.9]
-      - [0.1, 0.9]
-
-  - id: "loading_dock"
-    name: "Loading Dock"
-    description: "Logistics bay and exterior staging"
+- id: production_floor
+  name: Production Floor
+  description: Main manufacturing, fabrication, and assembly areas
+- id: storage_area
+  name: Warehouse Storage
+  description: High-bay storage racks, forklift routes, and inventory aisles
+- id: hazard_zone
+  name: Hazard & Combustion Zone
+  description: Thermal smelting, furnace operations, and exhaust shafts
+- id: entry_gate
+  name: Entry Turnstile & Access
+  description: Personnel access gates and PPE clearance checkpoint
+- id: loading_dock
+  name: Loading & Logistics Dock
+  description: Inbound receiving and outbound shipping cargo bays
+- id: electrical_room
+  name: Electrical Switchgear Room
+  description: High-voltage substations and transformer units
+  polygon_normalized:
+  - - 0.1
+    - 0.1
+  - - 0.9
+    - 0.1
+  - - 0.9
+    - 0.9
+  - - 0.1
+    - 0.9
+- id: general_facility
+  name: General Facility
+  description: Mezzanine corridors, observation walkways, and overview zones

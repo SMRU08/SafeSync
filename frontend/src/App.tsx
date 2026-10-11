@@ -24,9 +24,6 @@ import { WorkerRegistrationModal } from './components/WorkerRegistrationModal';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { NotificationDrawer } from './components/NotificationDrawer';
 import { SystemStatusBar } from './components/SystemStatusBar';
-import { DemoTopBanner, DemoScenarioId } from './components/DemoTopBanner';
-import { HackathonDemoModal } from './components/HackathonDemoModal';
-import { DEMO_SCENARIOS } from './utils/demoScenarios';
 import { useSafetyData } from './hooks/useSafetyData';
 import { useWebSocket } from './hooks/useWebSocket';
 import { Alert, Incident } from './types';
@@ -42,11 +39,6 @@ export const App: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [cameraSubTab, setCameraSubTab] = useState<'matrix' | 'entry_gate'>('matrix');
-
-  // Hackathon Demo Mode State (Phase 10)
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
-  const [demoScenario, setDemoScenario] = useState<DemoScenarioId>('safe_worker');
-  const [isDemoGuideOpen, setIsDemoGuideOpen] = useState<boolean>(false);
 
   // Theme Management (Default Dark Industrial Mode, with Light mode support & persistence)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -137,14 +129,8 @@ export const App: React.FC = () => {
     }
   };
 
-  // Effective scenario data in Demo Mode (Phase 10)
-  const currentScenario = isDemoMode ? DEMO_SCENARIOS[demoScenario] : null;
-  const effectiveAlerts = currentScenario ? currentScenario.alerts : alerts;
-  const effectiveHazards = currentScenario ? currentScenario.hazards : hazards;
-
-  const activeAlertsCount = isDemoMode && currentScenario
-    ? effectiveAlerts.filter((a) => a.status === 'ACTIVE').length
-    : (summary?.active_alerts ?? alerts.filter((a) => a.status === 'ACTIVE').length);
+  const activeAlertsCount =
+    summary?.active_alerts ?? alerts.filter((a) => a.status === 'ACTIVE').length;
 
   const handleOpenIncident = (incidentId: string) => {
     const found = incidents.find((inc) => inc.incident_id === incidentId);
@@ -185,24 +171,11 @@ export const App: React.FC = () => {
         theme={theme}
         onToggleTheme={toggleTheme}
         onNavigateHealth={() => handleTabChange('health')}
-        isDemoMode={isDemoMode}
-        onToggleDemoMode={() => setIsDemoMode((prev) => !prev)}
-        onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
       />
 
-      {/* ─── DEMO MODE TOP BANNER (Phase 10) ───────────────────────────────── */}
-      {isDemoMode && (
-        <DemoTopBanner
-          activeScenario={demoScenario}
-          onSelectScenario={(scId: DemoScenarioId) => setDemoScenario(scId)}
-          onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
-          onExitDemo={() => setIsDemoMode(false)}
-        />
-      )}
-
       {/* ─── GLOBAL BACKEND-OFFLINE BANNER (Honest Failover) ────────────────── */}
-      {status?.backend === 'offline' && !isDemoMode && (
-        <div className="w-full px-4 py-2 bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-b border-rose-500/40 text-xs font-semibold text-rose-200 flex items-center justify-between z-30 select-none shadow-md">
+      {status?.backend === 'offline' && (
+        <div className="w-full px-4 py-2 bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-b border-rose-500/40 text-xs font-semibold text-rose-200 flex items-center justify-between z-30 select-none shadow-md shrink-0">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 animate-pulse" />
             <span>
@@ -216,28 +189,22 @@ export const App: React.FC = () => {
             >
               RETRY
             </button>
-            <button
-              onClick={() => setIsDemoMode(true)}
-              className="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-black transition cursor-pointer shadow-sm"
-            >
-              EXPLORE IN DEMO MODE
-            </button>
           </div>
         </div>
       )}
 
       {/* ─── CRITICAL ALERT BANNER (Sticky, pulsing red) ─────────────────────── */}
       {(() => {
-        const fireHazard = effectiveHazards.find(
+        const fireHazard = hazards.find(
           (h) => h.hazard_type === 'fire' && (h.state === 'CONFIRMED' || h.state === 'ACTIVE')
         );
-        const smokeHazard = effectiveHazards.find(
+        const smokeHazard = hazards.find(
           (h) => h.hazard_type === 'smoke' && (h.state === 'CONFIRMED' || h.state === 'ACTIVE')
         );
-        const evaluatingHazard = effectiveHazards.find(
+        const evaluatingHazard = hazards.find(
           (h) => h.state === 'CANDIDATE' || h.state === 'DETECTING'
         );
-        const criticalAlert = effectiveAlerts.find(
+        const criticalAlert = alerts.find(
           (a) => a.status === 'ACTIVE' && (a.severity === 'CRITICAL' || a.severity === 'HIGH')
         );
         const bannerText = fireHazard
@@ -255,7 +222,7 @@ export const App: React.FC = () => {
 
         return (
           <div
-            className={`w-full px-4 py-2 flex items-center justify-between text-xs font-bold tracking-wide select-none z-30 transition-all ${
+            className={`w-full px-4 py-2 flex items-center justify-between text-xs font-bold tracking-wide select-none z-30 transition-all shrink-0 ${
               isFireOrSmoke
                 ? 'bg-rose-600 text-white animate-pulse shadow-lg shadow-rose-900/40'
                 : criticalAlert
@@ -309,7 +276,7 @@ export const App: React.FC = () => {
       )}
 
       {/* ─── Main Body: Left Sidebar + Active View Surface ──────────────────── */}
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative min-h-0 min-w-0">
         {/* Left Dark Navy Industrial Sidebar */}
         <Sidebar
           activeTab={activeTab}
@@ -318,17 +285,16 @@ export const App: React.FC = () => {
           activeAlertsCount={activeAlertsCount}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
-          onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
         />
 
         {/* Main Content Router Surface */}
-        <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#070b14]">
-          <div className="flex-1 flex flex-col overflow-hidden relative">
+        <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#070b14] min-h-0 min-w-0">
+          <div className="flex-1 flex flex-col overflow-hidden relative min-h-0 min-w-0">
             {activeTab === 'overview' && (
               <OverviewView
                 summary={summary}
-                alerts={effectiveAlerts}
-                hazards={effectiveHazards}
+                alerts={alerts}
+                hazards={hazards}
                 cameras={cameras}
                 onNavigate={handleTabChange}
                 onSelectAlert={(a) => setSelectedAlert(a)}
@@ -345,9 +311,6 @@ export const App: React.FC = () => {
                 cameras={cameras}
                 onRefresh={refreshAll}
                 onNavigateCameras={() => handleTabChange('cameras')}
-                isDemoMode={isDemoMode}
-                demoScenario={demoScenario}
-                onOpenDemoGuide={() => setIsDemoGuideOpen(true)}
               />
             )}
 
@@ -379,7 +342,7 @@ export const App: React.FC = () => {
 
             {activeTab === 'hazards' && (
               <HazardsView
-                hazards={effectiveHazards}
+                hazards={hazards}
                 hazardConfig={hazardConfig}
                 cameras={cameras}
                 onNavigate={handleTabChange}
@@ -391,7 +354,7 @@ export const App: React.FC = () => {
 
             {activeTab === 'alerts' && (
               <AlertsView
-                alerts={effectiveAlerts}
+                alerts={alerts}
                 incidents={incidents}
                 cameras={cameras}
                 summary={summary}
@@ -498,20 +461,6 @@ export const App: React.FC = () => {
           setIsEnrollModalOpen(false);
           refreshAll();
         }}
-      />
-
-      {/* ─── Hackathon Demo & Architecture Guide Modal (Phase 10) ──────────── */}
-      <HackathonDemoModal
-        isOpen={isDemoGuideOpen}
-        onClose={() => setIsDemoGuideOpen(false)}
-        onSelectDemoScenario={(scId: DemoScenarioId) => {
-          setIsDemoMode(true);
-          setDemoScenario(scId);
-        }}
-        onNavigateTab={(tab) => handleTabChange(tab as ActiveTab)}
-        activeScenario={demoScenario}
-        isDemoMode={isDemoMode}
-        onToggleDemoMode={(enable) => setIsDemoMode(enable)}
       />
     </div>
   );

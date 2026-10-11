@@ -89,6 +89,7 @@ class SafetyAssessment:
     active_hazards_count: int
     workers_count: int
     requires_audible_siren: bool
+    overall_safety_state: str = "NO_VERIFIED_DETECTION"
     events: List[NormalizedSafetyEvent] = field(default_factory=list)
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -453,6 +454,16 @@ class SafetyEngine:
             if ev.details.get("audible", False):
                 requires_audible = True
 
+        # 5. Enforce Section 14 Invariant: 0 workers is NEVER SAFE
+        if workers_count == 0:
+            overall_safety_state = "NO_VERIFIED_DETECTION"
+        elif active_violations_count > 0:
+            overall_safety_state = "VIOLATION"
+        elif compliance_response and any(str(getattr(w, "overall_status", "")).upper() in ("UNKNOWN", "OVERALLCOMPLIANCESTATE.UNKNOWN") for w in compliance_response.workers):
+            overall_safety_state = "UNKNOWN"
+        else:
+            overall_safety_state = "SAFE"
+
         return SafetyAssessment(
             camera_id=camera_id,
             zone_id=zone_id,
@@ -463,5 +474,6 @@ class SafetyEngine:
             active_hazards_count=active_hazards_count,
             workers_count=workers_count,
             requires_audible_siren=requires_audible,
+            overall_safety_state=overall_safety_state,
             events=events,
         )

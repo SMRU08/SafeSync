@@ -108,6 +108,7 @@ async def analyze_frame(
         image,
         confidence_threshold=confidence,
         annotate=annotate,
+        encode_b64=annotate,
     )
     return response
 

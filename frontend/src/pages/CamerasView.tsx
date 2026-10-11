@@ -27,6 +27,7 @@ import {
   Search,
   Eye,
   Settings,
+  Film,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { CameraLiveCard } from '../components/CameraLiveCard';
@@ -34,6 +35,7 @@ import { AddCameraModal } from '../components/AddCameraModal';
 import { EntryGateView } from '../components/EntryGateView';
 import { CameraCoverageSection, getCameraPurpose } from '../components/CameraCoverageSection';
 import { CameraDetailModal } from '../components/CameraDetailModal';
+import { RecordedVideoAnalysis } from '../components/RecordedVideoAnalysis';
 import {
   fetchCameras,
   deleteCamera,
@@ -49,7 +51,7 @@ interface CamerasViewProps {
   hazardConfig?: any;
   onRefreshCameras?: () => void;
   onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
-  initialSubTab?: 'matrix' | 'entry_gate' | 'coverage';
+  initialSubTab?: 'matrix' | 'entry_gate' | 'coverage' | 'recorded_p0';
   onSubTabChange?: (subTab: 'matrix' | 'entry_gate') => void;
 }
 
@@ -75,18 +77,19 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
   onSubTabChange,
 }) => {
   const [cameraList, setCameraList] = useState<CameraConfig[]>(initialCameras);
-  const [activeCategory, setActiveCategory] = useState<'matrix' | 'entry_gate' | 'coverage'>(
-    initialSubTab === 'entry_gate' ? 'entry_gate' : 'matrix'
+  const [activeCategory, setActiveCategory] = useState<'matrix' | 'entry_gate' | 'coverage' | 'recorded_p0'>(
+    initialSubTab === 'entry_gate' ? 'entry_gate' : initialSubTab === 'recorded_p0' ? 'recorded_p0' : 'matrix'
   );
 
   useEffect(() => {
     if (initialSubTab) {
       if (initialSubTab === 'entry_gate') setActiveCategory('entry_gate');
+      else if (initialSubTab === 'recorded_p0') setActiveCategory('recorded_p0');
       else if (initialSubTab === 'matrix') setActiveCategory('matrix');
     }
   }, [initialSubTab]);
 
-  const handleCategorySwitch = (cat: 'matrix' | 'entry_gate' | 'coverage') => {
+  const handleCategorySwitch = (cat: 'matrix' | 'entry_gate' | 'coverage' | 'recorded_p0') => {
     setActiveCategory(cat);
     if (cat === 'entry_gate') onSubTabChange?.('entry_gate');
     else onSubTabChange?.('matrix');
@@ -154,13 +157,24 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
     }
   }, [initialCameras]);
 
+  const checkCameraOnline = (c: CameraConfig): boolean => {
+    if (c.enabled === false) return false;
+    const st = String(c.status || '').toLowerCase();
+    const stState = String(c.state || '').toUpperCase();
+    return (
+      st === 'online' ||
+      st === 'active' ||
+      st === 'streaming' ||
+      stState === 'ONLINE' ||
+      stState === 'CONNECTED' ||
+      stState === 'STREAMING' ||
+      c.is_streaming === true
+    );
+  };
+
   // Operational Dashboard Metrics (Real values only)
   const totalCount = cameraList.length;
-  const onlineCount = cameraList.filter(
-    (c) =>
-      c.enabled !== false &&
-      (c.status === 'online' || c.status === 'ACTIVE' || c.status === 'streaming' || c.state === 'CONNECTED')
-  ).length;
+  const onlineCount = cameraList.filter(checkCameraOnline).length;
   const offlineCount = totalCount - onlineCount;
   const totalViolations = cameraList.reduce(
     (acc, c) => acc + (c.metrics?.active_violations ?? 0),
@@ -174,9 +188,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
   // Filtered cameras based on filter tab and search query
   const filteredCameras = useMemo(() => {
     return cameraList.filter((c) => {
-      const isOnline =
-        c.enabled !== false &&
-        (c.status === 'online' || c.status === 'ACTIVE' || c.status === 'streaming' || c.state === 'CONNECTED');
+      const isOnline = checkCameraOnline(c);
       const purpose = getCameraPurpose(c);
 
       // Filter Tab Check
@@ -273,6 +285,70 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
     );
   }
 
+  // If active category is Recorded Video Analysis (P0), render dedicated analysis suite
+  if (activeCategory === 'recorded_p0') {
+    return (
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 bg-[#07111F] text-[#E8F0F7] select-none">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#20344A]">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400">
+                <Film className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-black text-white tracking-tight">
+                    SURVEILLANCE CAMERAS
+                  </h1>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-sky-400 border border-slate-700 font-bold uppercase">
+                    Recorded Video Analysis (P0)
+                  </span>
+                </div>
+                <p className="text-xs text-[#8FA3B8] mt-0.5">
+                  Offline industrial safety compliance verification, PPE auditing, and hazard identification
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+            <div className="flex items-center p-1 bg-[#0D1B2A] rounded-xl border border-[#20344A]">
+              <button
+                onClick={() => handleCategorySwitch('matrix')}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-white"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>Surveillance Matrix</span>
+              </button>
+              <button
+                onClick={() => handleCategorySwitch('coverage')}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-white"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Coverage &amp; Visibility</span>
+              </button>
+              <button
+                onClick={() => handleCategorySwitch('entry_gate')}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-emerald-400"
+              >
+                <DoorOpen className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Entry Gate</span>
+              </button>
+              <button
+                onClick={() => handleCategorySwitch('recorded_p0')}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer bg-sky-600 text-white shadow-sm"
+              >
+                <Film className="w-3.5 h-3.5 text-sky-300" />
+                <span>Recorded Video (P0)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <RecordedVideoAnalysis />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-5 bg-[#07111F] text-[#E8F0F7] select-none">
       {/* ─── Top Dashboard Header & SOC Telemetry Bar ───────────────────── */}
@@ -298,7 +374,7 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
           </div>
         </div>
 
-        {/* View Mode Category Switcher (Matrix vs Coverage vs Entry Gate) */}
+        {/* View Mode Category Switcher (Matrix vs Coverage vs Entry Gate vs Recorded Video) */}
         <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
           <div className="flex items-center p-1 bg-[#0D1B2A] rounded-xl border border-[#20344A]">
             <button
@@ -329,6 +405,17 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
             >
               <DoorOpen className="w-3.5 h-3.5 text-emerald-400" />
               <span>Entry Gate</span>
+            </button>
+            <button
+              onClick={() => handleCategorySwitch('recorded_p0')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                (activeCategory as string) === 'recorded_p0'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Film className="w-3.5 h-3.5 text-sky-400" />
+              <span>Recorded Video (P0)</span>
             </button>
           </div>
 
@@ -502,23 +589,40 @@ export const CamerasView: React.FC<CamerasViewProps> = ({
               }
             />
           ) : viewMode === 'grid' ? (
-            /* Responsive 2-column (tablet) to 3-column (desktop) Matrix */
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filteredCameras.map((camera) => (
-                <CameraLiveCard
-                  key={camera.camera_id}
-                  camera={camera}
-                  onRefresh={handleReconnect}
-                  onDelete={handleDeleteCamera}
-                  onOpenLiveView={(cam) => setSelectedDetailCamera(cam)}
-                  onToggleSpeaker={handleToggleSpeaker}
-                  onToggleStartStop={handleToggleStartStop}
-                  onEdit={(cam) => {
-                    setEditingCamera(cam);
-                    setIsAddModalOpen(true);
-                  }}
-                />
-              ))}
+            <div className="space-y-8">
+              {/* ─── LIVE CAMERAS SECTION (Section 12) ───────────────────── */}
+              <div>
+                <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#20344A]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <h2 className="text-xs font-black text-white uppercase tracking-wider">
+                      LIVE CAMERAS ({filteredCameras.length})
+                    </h2>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Active Physical &amp; Network Ingestion Channels
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {filteredCameras.map((camera) => (
+                    <CameraLiveCard
+                      key={camera.camera_id}
+                      camera={camera}
+                      onRefresh={handleReconnect}
+                      onDelete={handleDeleteCamera}
+                      onOpenLiveView={(cam) => setSelectedDetailCamera(cam)}
+                      onOpenEntryGate={() => handleCategorySwitch('entry_gate')}
+                      onToggleSpeaker={handleToggleSpeaker}
+                      onToggleStartStop={handleToggleStartStop}
+                      onEdit={(cam) => {
+                        setEditingCamera(cam);
+                        setIsAddModalOpen(true);
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             /* Table Ledger Mode (Section 26) */

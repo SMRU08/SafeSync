@@ -86,13 +86,17 @@ export const CameraDetailModal: React.FC<CameraDetailModalProps> = ({
   const coverage = getCameraCoverageStatus(camera);
 
   const isEnabled = camera.enabled !== false;
+  const statusStr = String(camera.status || '').toLowerCase();
+  const stateStr = String(camera.state || '').toUpperCase();
   const isOnline =
     isEnabled &&
-    (camera.status === 'online' ||
-      camera.status === 'ACTIVE' ||
-      camera.status === 'streaming' ||
-      camera.state === 'CONNECTED' ||
-      camera.state === 'STREAMING');
+    (statusStr === 'online' ||
+      statusStr === 'active' ||
+      statusStr === 'streaming' ||
+      stateStr === 'ONLINE' ||
+      stateStr === 'CONNECTED' ||
+      stateStr === 'STREAMING' ||
+      camera.is_streaming === true);
   const isConnecting =
     isEnabled &&
     (camera.status === 'connecting' ||
@@ -350,7 +354,9 @@ export const CameraDetailModal: React.FC<CameraDetailModalProps> = ({
                 </div>
                 <div className="flex justify-between items-center py-1 border-b border-[#20344A]/50">
                   <span className="text-emerald-400 font-medium">Safe (Compliant):</span>
-                  <span className="font-mono font-bold text-emerald-400">{safeWorkersCount}</span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    {liveWorkers.length > 0 ? safeWorkersCount : '—'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center py-1 border-b border-[#20344A]/50">
                   <span className="text-[#F5B942] font-medium">Unknown / Occluded:</span>

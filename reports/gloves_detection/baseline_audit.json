@@ -1,0 +1,167 @@
+{
+  "audit_version": "1.0.0",
+  "timestamp": "2026-10-09T10:50:00Z",
+  "project_name": "SafeSync",
+  "project_type": "AI-Powered PPE Compliance and Industrial Safety Monitoring",
+  "task": "Gloves Detection Accuracy Improvement & Audit",
+  "production_system": {
+    "model_path": "models/detection/ppe_fire_smoke_v3/weights/best.pt",
+    "sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+    "architecture": "YOLOv8n",
+    "parameters": 3007013,
+    "gflops": 8.1,
+    "input_resolution": [384, 384],
+    "canonical_classes": {
+      "0": "person",
+      "1": "helmet",
+      "2": "safety_vest",
+      "3": "gloves",
+      "4": "safety_footwear",
+      "5": "fire",
+      "6": "smoke"
+    },
+    "inference_config": {
+      "config_file": "configs/detection.yaml",
+      "global_confidence_threshold": 0.20,
+      "nms_iou_threshold": 0.45,
+      "class_thresholds": {
+        "person": 0.22,
+        "helmet": 0.25,
+        "safety_vest": 0.25,
+        "gloves": 0.22,
+        "safety_footwear": 0.22,
+        "fire": 0.20,
+        "smoke": 0.20
+      }
+    },
+    "compliance_config": {
+      "config_file": "configs/compliance.yaml",
+      "tracker": "bytetrack",
+      "track_high_thresh": 0.20,
+      "track_low_thresh": 0.08,
+      "new_track_thresh": 0.22,
+      "glove_association_roi": {
+        "vertical_roi_top": 0.30,
+        "vertical_roi_bottom": 0.95,
+        "max_lateral_offset": 0.40,
+        "min_containment_ratio": 0.10
+      },
+      "temporal_validation": {
+        "confirmation_frames": 2,
+        "missing_detection_tolerance": 15,
+        "history_window_frames": 30,
+        "prune_lost_after_frames": 60
+      }
+    }
+  },
+  "baseline_metrics": {
+    "evaluation_split_val": {
+      "dataset": "data/processed/safesync/dataset.yaml (split=val)",
+      "total_images": 1262,
+      "total_instances": 3602,
+      "overall": {
+        "precision": 0.4816,
+        "recall": 0.4811,
+        "mAP50": 0.3465,
+        "mAP50_95": 0.1512
+      },
+      "per_class": {
+        "person": { "precision": 0.3731, "recall": 0.7305, "f1": 0.4939, "mAP50": 0.4461, "mAP50_95": 0.1972 },
+        "helmet": { "precision": 0.5344, "recall": 0.6755, "f1": 0.5967, "mAP50": 0.5399, "mAP50_95": 0.2400 },
+        "safety_vest": { "precision": 0.7253, "recall": 0.8004, "f1": 0.7610, "mAP50": 0.7303, "mAP50_95": 0.3568 },
+        "gloves": { "precision": 0.2632, "recall": 0.1831, "f1": 0.2159, "mAP50": 0.0851, "mAP50_95": 0.0279 },
+        "safety_footwear": { "precision": 0.3174, "recall": 0.5207, "f1": 0.3944, "mAP50": 0.2831, "mAP50_95": 0.1228 },
+        "fire": { "precision": 0.4828, "recall": 0.1935, "f1": 0.2763, "mAP50": 0.1399, "mAP50_95": 0.0496 },
+        "smoke": { "precision": 0.6753, "recall": 0.2640, "f1": 0.3796, "mAP50": 0.2009, "mAP50_95": 0.0638 }
+      }
+    },
+    "evaluation_split_test": {
+      "dataset": "data/processed/safesync/dataset.yaml (split=test)",
+      "total_images": 632,
+      "total_instances": 1942,
+      "overall": {
+        "precision": 0.4900,
+        "recall": 0.4867,
+        "mAP50": 0.3537,
+        "mAP50_95": 0.1538
+      },
+      "per_class": {
+        "person": { "precision": 0.3714, "recall": 0.7578, "f1": 0.4985, "mAP50": 0.4659, "mAP50_95": 0.2050 },
+        "helmet": { "precision": 0.5290, "recall": 0.7139, "f1": 0.6077, "mAP50": 0.5612, "mAP50_95": 0.2365 },
+        "safety_vest": { "precision": 0.7350, "recall": 0.7931, "f1": 0.7629, "mAP50": 0.7387, "mAP50_95": 0.3802 },
+        "gloves": { "precision": 0.3832, "recall": 0.2634, "f1": 0.3122, "mAP50": 0.1767, "mAP50_95": 0.0580 },
+        "safety_footwear": { "precision": 0.3175, "recall": 0.4534, "f1": 0.3735, "mAP50": 0.2421, "mAP50_95": 0.1044 },
+        "fire": { "precision": 0.5484, "recall": 0.2556, "f1": 0.3487, "mAP50": 0.1722, "mAP50_95": 0.0470 },
+        "smoke": { "precision": 0.5455, "recall": 0.1698, "f1": 0.2590, "mAP50": 0.1187, "mAP50_95": 0.0454 }
+      }
+    }
+  },
+  "root_cause_analysis": {
+    "primary_failure_mode": "Severe class under-representation and background penalty gradient",
+    "findings": [
+      {
+        "factor": "Dataset Imbalance",
+        "description": "In the training dataset (data/processed/safesync), gloves have only 1,521 instances compared to 3,476 safety vests and 2,819 helmets. Only 17.8% of images contain glove annotations.",
+        "impact": "HIGH"
+      },
+      {
+        "factor": "Unannotated Background Penalization",
+        "description": "Historical sub-datasets (e.g. hard_hat_workers with 7,035 images, construction_ppe with 1,124 images) contain workers with visible hands/gloves but zero glove labels. When trained jointly, these unannotated gloves acted as false negatives, actively training the model to suppress glove detections.",
+        "impact": "CRITICAL"
+      },
+      {
+        "factor": "Small-Object Resolution Limit",
+        "description": "Median relative area of gloves is 0.0104. At inference size 384x384, average gloves are only ~39x39 pixels, and distant CCTV hands drop below 14x14 pixels. Deep feature maps (P5 stride 32) lack sufficient spatial resolution for hands.",
+        "impact": "HIGH"
+      },
+      {
+        "factor": "Confidence Calibration",
+        "description": "Because glove detections have lower confidence (often 0.12-0.20), the 0.22 threshold discards over 30% of valid candidates before NMS.",
+        "impact": "MEDIUM"
+      },
+      {
+        "factor": "Color and Material Diversity",
+        "description": "Existing training examples heavily emphasize bright yellow/orange rubber gloves, performing poorly on leather, white cloth, blue nitrile, and dark industrial mechanics gloves.",
+        "impact": "HIGH"
+      }
+    ]
+  },
+  "raw_datasets_inventory": [
+    {
+      "name": "ultralytics_construction_ppe",
+      "path": "datasets/raw/ultralytics_construction_ppe",
+      "status": "AVAILABLE_LOCAL",
+      "images": 1416,
+      "glove_instances": 1461,
+      "bare_hand_instances": 556,
+      "license": "AGPL-3.0"
+    },
+    {
+      "name": "ppe_detection_compliance",
+      "path": "datasets/raw/ppe_detection_compliance",
+      "status": "AVAILABLE_LOCAL",
+      "images": 9663,
+      "glove_instances": 2477,
+      "bare_hand_instances": 2591,
+      "license": "CC BY 4.0"
+    },
+    {
+      "name": "safety_ppe_4",
+      "path": "datasets/raw/safety_ppe_4",
+      "status": "AVAILABLE_LOCAL",
+      "images": 5079,
+      "glove_instances": 1368,
+      "bare_hand_instances": 301,
+      "license": "Roboflow Universe"
+    },
+    {
+      "name": "bangga_ppe",
+      "path": "datasets/raw/bangga_ppe",
+      "status": "AVAILABLE_LOCAL",
+      "images": 19158,
+      "glove_instances": 11355,
+      "bare_hand_instances": 752,
+      "license": "Roboflow Universe"
+    }
+  ]
+}

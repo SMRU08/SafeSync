@@ -39,8 +39,9 @@ class TemporalComplianceTracker:
         cfg = config or {}
         temp_cfg = cfg.get("temporal", {})
 
-        self.confirmation_frames = temp_cfg.get("confirmation_frames", 3)
-        self.missing_detection_tolerance = temp_cfg.get("missing_detection_tolerance", 5)
+        self.confirmation_frames = temp_cfg.get("confirmation_frames", 2)
+        self.missed_grace_frames = temp_cfg.get("missed_grace_frames", 5)
+        self.missing_detection_tolerance = temp_cfg.get("missing_detection_tolerance", 10)
         self.history_window_frames = temp_cfg.get("history_window_frames", 30)
         self.prune_lost_after_frames = temp_cfg.get("prune_lost_after_frames", 60)
 
@@ -123,6 +124,8 @@ class TemporalComplianceTracker:
 
             hist = self._history[track_id][item_type]
 
+            prior_state = self._confirmed_state[track_id][item_type]
+
             if raw_match is not None:
                 # PPE detected and associated in this frame
                 hist.append(True)
@@ -130,10 +133,18 @@ class TemporalComplianceTracker:
                 self._consecutive_missed[track_id][item_type] = 0
 
                 c_seen = self._consecutive_seen[track_id][item_type]
-                if c_seen >= self.confirmation_frames:
+                pos_in_hist = sum(1 for x in hist if x is True)
+
+                # Stabilized transition:
+                # 1. If previously confirmed PRESENT, maintain PRESENT (prevent momentary drops)
+                # 2. If recent history shows strong evidence (pos_in_hist >= confirmation_frames), confirm PRESENT
+                # 3. If consecutive positive detections reach confirmation_frames, confirm PRESENT
+                # 4. Otherwise, continue gathering evidence in UNKNOWN state
+                if prior_state == PPEState.PRESENT:
+                    self._confirmed_state[track_id][item_type] = PPEState.PRESENT
+                elif c_seen >= self.confirmation_frames or pos_in_hist >= self.confirmation_frames:
                     self._confirmed_state[track_id][item_type] = PPEState.PRESENT
                 else:
-                    # Still gathering temporal confirmation evidence
                     self._confirmed_state[track_id][item_type] = PPEState.UNKNOWN
 
                 match_box = None
@@ -176,15 +187,14 @@ class TemporalComplianceTracker:
                         # New track, insufficient observations to declare absent
                         self._confirmed_state[track_id][item_type] = PPEState.UNKNOWN
                         details_str = f"Initializing observation ({frames_seen}/{self.confirmation_frames} frames)"
+                    elif prior_state == PPEState.PRESENT and c_missed <= self.missed_grace_frames:
+                        # Within brief grace period: tolerate momentary drop without flickering to UNKNOWN or ABSENT
+                        self._confirmed_state[track_id][item_type] = PPEState.PRESENT
+                        details_str = f"Tolerating momentary detection drop ({c_missed}/{self.missed_grace_frames} grace frames)"
                     else:
-                        # Within tolerance: maintain prior confirmed state or UNKNOWN
-                        prior = self._confirmed_state[track_id][item_type]
-                        if prior == PPEState.PRESENT:
-                            # Tolerating temporary detector flicker
-                            details_str = f"Temporary detection drop ({c_missed}/{self.missing_detection_tolerance} tolerance frames)"
-                        else:
-                            self._confirmed_state[track_id][item_type] = PPEState.UNKNOWN
-                            details_str = f"Absence candidate ({c_missed}/{self.missing_detection_tolerance} validation frames)"
+                        # Beyond grace period but within full missing tolerance: state is UNKNOWN / verifying
+                        self._confirmed_state[track_id][item_type] = PPEState.UNKNOWN
+                        details_str = f"Absence candidate ({c_missed}/{self.missing_detection_tolerance} validation frames)"
 
                 c_missed = self._consecutive_missed[track_id][item_type]
                 obs = PPEObservation(

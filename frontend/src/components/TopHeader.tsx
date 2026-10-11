@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, ChevronDown, RefreshCw, Sun, Moon, Award, Sparkles } from 'lucide-react';
+import { Search, Bell, ChevronDown, RefreshCw, Sun, Moon } from 'lucide-react';
 import { WebSocketStatus } from '../hooks/useWebSocket';
 
 export interface TopHeaderProps {
@@ -21,9 +21,6 @@ export interface TopHeaderProps {
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
   onNavigateHealth?: () => void;
-  isDemoMode?: boolean;
-  onToggleDemoMode?: () => void;
-  onOpenDemoGuide?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -39,9 +36,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   theme = 'dark',
   onToggleTheme,
   onNavigateHealth,
-  isDemoMode = false,
-  onToggleDemoMode,
-  onOpenDemoGuide,
 }) => {
   const [timeStr, setTimeStr] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -80,10 +74,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   const isWsConnecting = wsStatus === 'CONNECTING';
 
   return (
-    <header className="h-14 bg-[#0c1424]/95 backdrop-blur-md border-b border-slate-800/80 px-4 flex items-center justify-between sticky top-0 z-40 shadow-md select-none text-slate-100">
+    <header className="h-14 bg-[#0c1424]/95 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-4 flex items-center justify-between sticky top-0 z-40 shadow-md select-none text-slate-100 overflow-hidden">
       {/* Brand / Logo Area */}
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-2.5 cursor-pointer">
+      <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+        <div className="flex items-center gap-2.5 cursor-pointer shrink-0">
           <img
             src="/logo.png"
             alt="SafeSync Logo"
@@ -105,14 +99,14 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         {/* Global Search Trigger Input */}
         <div
           onClick={onOpenSearch}
-          className="relative w-64 md:w-72 hidden sm:flex items-center cursor-pointer group"
+          className="relative w-40 md:w-56 xl:w-64 hidden sm:flex items-center cursor-pointer group shrink-0"
         >
           <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-500 group-hover:text-sky-400 transition">
             <Search className="w-3.5 h-3.5" />
           </span>
           <div className="w-full bg-slate-900/80 border border-slate-800 group-hover:border-slate-700 text-xs text-slate-400 rounded-md pl-8 pr-12 py-1.5 transition flex items-center justify-between">
-            <span>Search telemetry, cameras...</span>
-            <kbd className="text-[10px] font-mono text-slate-500 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
+            <span className="truncate">Search telemetry, cameras...</span>
+            <kbd className="text-[10px] font-mono text-slate-500 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800 ml-1">
               Ctrl+K
             </kbd>
           </div>
@@ -120,16 +114,16 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
       </div>
 
       {/* Health Indicators & User Profile */}
-      <div className="flex items-center gap-3 lg:gap-4">
+      <div className="flex items-center gap-2 lg:gap-3 shrink-0">
         {/* Real Backend Telemetry Status Badges */}
         <div
           onClick={onNavigateHealth}
-          className="hidden lg:flex items-center gap-2 cursor-pointer hover:opacity-90 transition"
+          className="hidden xl:flex items-center gap-1.5 cursor-pointer hover:opacity-90 transition shrink-0"
           title="Click to view detailed system health"
         >
           {/* API Status */}
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-semibold transition ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-semibold transition shrink-0 ${
               isApiOnline
                 ? 'bg-slate-900/80 border-emerald-900/40 text-emerald-400'
                 : 'bg-slate-900/80 border-rose-900/40 text-rose-400'
@@ -147,7 +141,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
           {/* AI Engine */}
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-semibold transition ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-semibold transition shrink-0 ${
               isAiReady
                 ? 'bg-slate-900/80 border-emerald-900/40 text-emerald-400'
                 : 'bg-slate-900/80 border-amber-900/40 text-amber-400'
@@ -159,16 +153,13 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
               }`}
             />
             <span>
-              AI Engine{' '}
-              <span className="font-normal text-slate-400">
-                {isAiReady ? aiEngineStatus : 'Standby'}
-              </span>
+              AI <span className="font-normal text-slate-400">{isAiReady ? 'Ready' : 'Standby'}</span>
             </span>
           </div>
 
           {/* Database */}
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-semibold transition ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-semibold transition shrink-0 ${
               isDbConnected
                 ? 'bg-slate-900/80 border-emerald-900/40 text-emerald-400'
                 : 'bg-slate-900/80 border-rose-900/40 text-rose-400'
@@ -186,7 +177,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
           {/* WebSocket */}
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-semibold transition ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-md border text-[10px] font-semibold transition shrink-0 ${
               isWsConnected
                 ? 'bg-slate-900/80 border-sky-900/40 text-sky-400'
                 : isWsConnecting
@@ -233,34 +224,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           </button>
         )}
 
-        {/* Hackathon Guide & Architecture Trigger */}
-        {onOpenDemoGuide && (
-          <button
-            onClick={onOpenDemoGuide}
-            className="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/40 border border-sky-500/40 text-sky-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
-            title="Open Hackathon Demo Guide & System Architecture"
-          >
-            <Award className="w-3.5 h-3.5 text-sky-400" />
-            <span className="hidden sm:inline">Guide &amp; Arch</span>
-          </button>
-        )}
-
-        {/* Demo Mode Toggle */}
-        {onToggleDemoMode && (
-          <button
-            onClick={onToggleDemoMode}
-            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border ${
-              isDemoMode
-                ? 'bg-amber-500/25 text-amber-300 border-amber-500/50 shadow-sm'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
-            }`}
-            title={isDemoMode ? 'Demo Mode Active — Click to return to Live Mode' : 'Switch to Hackathon Pre-Recorded Demo Mode'}
-          >
-            <Sparkles className={`w-3.5 h-3.5 ${isDemoMode ? 'text-amber-400 animate-spin' : 'text-slate-500'}`} style={isDemoMode ? { animationDuration: '4s' } : undefined} />
-            <span className="hidden md:inline">{isDemoMode ? 'Demo Mode' : 'Live Mode'}</span>
-          </button>
-        )}
-
         <div className="h-4 w-px bg-slate-800 hidden sm:block" />
 
         {/* Right Tools: Notification Bell, Profile, Clock */}
@@ -282,21 +245,21 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           </div>
 
           {/* User Profile Pill */}
-          <div className="flex items-center gap-2 pl-1 cursor-pointer group">
+          <div className="flex items-center gap-2 pl-1 cursor-pointer group shrink-0">
             <div className="w-7 h-7 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center shadow-sm">
               SO
             </div>
-            <div className="text-left hidden sm:block">
+            <div className="text-left hidden xl:block">
               <div className="text-[11px] font-bold text-slate-200 leading-tight">Safety Officer</div>
               <div className="text-[9px] text-slate-400 font-medium">SOC Control Station</div>
             </div>
             <ChevronDown className="w-3 h-3 text-slate-500 group-hover:text-slate-300 transition" />
           </div>
 
-          <div className="h-4 w-px bg-slate-800 hidden md:block" />
+          <div className="h-4 w-px bg-slate-800 hidden 2xl:block shrink-0" />
 
           {/* Real-time Clock */}
-          <div className="text-right hidden sm:block">
+          <div className="text-right hidden 2xl:block shrink-0">
             <div className="text-[9px] text-slate-400 font-medium">{dateStr || 'Mon, 22 Sep 2026'}</div>
             <div className="text-xs font-bold text-white font-mono-nums">{timeStr || '18:32:17'}</div>
           </div>

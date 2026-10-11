@@ -9,6 +9,7 @@ import re
 import time
 import logging
 import threading
+import concurrent.futures
 from typing import Optional, Tuple, Any, Dict, List
 import numpy as np
 import cv2
@@ -134,6 +135,12 @@ class CameraWorker:
         self._ai_event = threading.Event()
         self._ai_busy = False
 
+        # Asynchronous DB/Evidence alert execution pool (offloads DB writes from AI loop)
+        self._alert_executor = concurrent.futures.ThreadPoolExecutor(
+            max_workers=2,
+            thread_name_prefix=f"AlertExec-{self.camera_id}"
+        )
+
         # Monotonic frame tracking
         self._frame_id = 0
 
@@ -195,6 +202,7 @@ class CameraWorker:
                 frame,
                 confidence_threshold=0.20,
                 annotate=True,
+                encode_b64=False,
                 zone_id=self.config.zone_id or "UNKNOWN",
             )
 
@@ -271,7 +279,7 @@ class CameraWorker:
                 self.metrics.active_workers = len(compliance_resp.workers)
                 self.metrics.active_violations = compliance_resp.summary.non_compliant_workers
 
-            # 4. Dispatch evaluated safety events to AlertEngine
+            # 4. Dispatch evaluated safety events to AlertEngine (asynchronous offload - zero DB latency on AI thread)
             events_to_dispatch = []
             if safety_assessment and safety_assessment.events:
                 events_to_dispatch = safety_assessment.events
@@ -283,26 +291,11 @@ class CameraWorker:
                 )
 
             if events_to_dispatch and self._alert_engine:
-                from app.database.session import SessionLocal
-                from app.services.evidence_manager import EvidenceManager
-                with SessionLocal() as db:
-                    for ev in events_to_dispatch:
-                        try:
-                            alert, incident, action = self._alert_engine.process_event(ev, db=db)
-                            if action in ("CREATED", "ESCALATED") and incident:
-                                try:
-                                    EvidenceManager.get_instance().capture_incident_evidence(
-                                        incident_id=incident.incident_id,
-                                        camera_id=self.camera_id,
-                                        frame=annotated_frame,
-                                        annotations=ev.details,
-                                        db=db,
-                                        evidence_type="SNAPSHOT",
-                                    )
-                                except Exception as ev_err:
-                                    logger.debug("Evidence capture error: %s", ev_err)
-                        except Exception as alert_err:
-                            logger.warning("Alert processing error: %s", alert_err)
+                snap = annotated_frame.copy() if any(getattr(ev, 'severity', '') in ('CRITICAL', 'HIGH') for ev in events_to_dispatch) else None
+                try:
+                    self._alert_executor.submit(self._dispatch_alerts_async, events_to_dispatch, snap)
+                except Exception as alert_submit_err:
+                    logger.debug("Alert executor submit notice for %s: %s", self.camera_id, alert_submit_err)
 
             # 5. Core AI Audio-Alert Engine (Fire/Smoke Critical Hazards & Worker PPE Alerts)
             try:
@@ -330,6 +323,34 @@ class CameraWorker:
 
         except Exception as e:
             logger.error("Error in AI frame processing for %s: %s", self.camera_id, e, exc_info=True)
+
+    def _dispatch_alerts_async(self, events: list, frame_snapshot: Optional[np.ndarray]):
+        """Asynchronously processes safety alerts and records evidence snapshots without stalling AI inference loop."""
+        if not self._alert_engine or not events:
+            return
+        try:
+            from app.database.session import SessionLocal
+            from app.services.evidence_manager import EvidenceManager
+            with SessionLocal() as db:
+                for ev in events:
+                    try:
+                        alert, incident, action = self._alert_engine.process_event(ev, db=db)
+                        if action in ("CREATED", "ESCALATED") and incident and frame_snapshot is not None:
+                            try:
+                                EvidenceManager.get_instance().capture_incident_evidence(
+                                    incident_id=incident.incident_id,
+                                    camera_id=self.camera_id,
+                                    frame=frame_snapshot,
+                                    annotations=ev.details,
+                                    db=db,
+                                    evidence_type="SNAPSHOT",
+                                )
+                            except Exception as ev_err:
+                                logger.debug("Evidence capture error: %s", ev_err)
+                    except Exception as alert_err:
+                        logger.warning("Alert processing error: %s", alert_err)
+        except Exception as e:
+            logger.debug("Async alert processing error in %s: %s", self.camera_id, e)
 
     def _dispatch_frame_to_ai(self, frame_id: int, frame_time: float, frame: np.ndarray):
         """Passes the newest frame to the AI worker thread via 1-slot latest-frame-wins buffer."""
@@ -445,6 +466,10 @@ class CameraWorker:
             with self._ai_lock:
                 self._ai_slot = None
                 self._ai_busy = False
+            try:
+                self._alert_executor.shutdown(wait=False)
+            except Exception:
+                pass
             logger.info("Stopped CameraWorker for %s", self.camera_id)
 
     def get_status(self) -> CameraStatus:
@@ -653,11 +678,30 @@ class CameraWorker:
             for h in self._latest_hazards:
                 try:
                     if hasattr(h, "model_dump"):
-                        hazards_out.append(h.model_dump())
+                        hd = h.model_dump()
                     elif isinstance(h, dict):
-                        hazards_out.append(dict(h))
+                        hd = dict(h)
                     else:
-                        hazards_out.append(vars(h))
+                        hd = vars(h).copy()
+
+                    if "bbox" in hd:
+                        hb = hd["bbox"]
+                        if isinstance(hb, dict):
+                            hd["bbox"] = [
+                                float(hb.get("x1", 0)),
+                                float(hb.get("y1", 0)),
+                                float(hb.get("x2", 0)),
+                                float(hb.get("y2", 0)),
+                            ]
+                        if isinstance(hd["bbox"], (list, tuple)) and len(hd["bbox"]) >= 4:
+                            hbx1, hby1, hbx2, hby2 = hd["bbox"][:4]
+                            hd["normalized_bbox"] = [
+                                round(float(hbx1) / max(1, fw), 4),
+                                round(float(hby1) / max(1, fh), 4),
+                                round(float(hbx2) / max(1, fw), 4),
+                                round(float(hby2) / max(1, fh), 4),
+                            ]
+                    hazards_out.append(hd)
                 except Exception:
                     pass
 
@@ -956,6 +1000,18 @@ class CameraWorker:
                     not isinstance(target_source if "target_source" in dir() else self.config.source, int)
                     and any(str(self.config.source).startswith(p) for p in ("http://", "https://", "rtsp://"))
                 )
+                _is_file_stream = (self.config.source_type == CameraSourceType.FILE)
+                if _is_file_stream and "_file_total_frames" not in locals():
+                    try:
+                        _file_total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                    except Exception:
+                        _file_total_frames = 0
+
+                if _is_file_stream and _file_total_frames > 1:
+                    _curr_pos = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                    if _curr_pos >= _file_total_frames - 1:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
                 t_frame_start = time.time()
 
                 if _is_network_stream:
@@ -963,7 +1019,7 @@ class CameraWorker:
                     # then retrieve the last grabbed frame for decode + inference.
                     _grabbed = False
                     _skipped = 0
-                    _MAX_DRAIN = 8  # Never drain more than 8 frames per iteration to stay bounded
+                    _MAX_DRAIN = 25  # Drain backlog rapidly up to 25 frames for zero IP latency
                     while _skipped < _MAX_DRAIN:
                         _t_grab = time.perf_counter()
                         _ok = cap.grab()
@@ -972,8 +1028,8 @@ class CameraWorker:
                         _grabbed = True
                         _elapsed_grab = (time.perf_counter() - _t_grab) * 1000.0
                         _skipped += 1
-                        # If grab took > 40ms, this was a blocking live frame — stop draining
-                        if _elapsed_grab > 40.0:
+                        # If grab took > 25ms, this is a fresh live frame from socket — stop draining
+                        if _elapsed_grab > 25.0:
                             break
                     if _grabbed:
                         ret, frame = cap.retrieve()
@@ -982,25 +1038,31 @@ class CameraWorker:
                     else:
                         ret, frame = False, None
                 else:
+                    _skipped = 0
                     ret, frame = cap.read()
 
                 if not ret or frame is None:
-                    with self._lock:
-                        self.metrics.dropped_frames += 1
-                        self.metrics.last_error = "Frame read failed or stream closed"
-                        self.state = CameraState.DEGRADED
-                    try:
-                        from app.services.metrics import MetricsCollector
-                        MetricsCollector.get_instance().increment_counter(
-                            "safesync_pipeline_dropped_frames_total",
-                            labels={"camera_id": self.camera_id},
-                        )
-                    except Exception:
-                        pass
-                    logger.warning("Camera %s lost frame. Resetting capture...", self.camera_id)
-                    cap.release()
-                    cap = None
-                    continue
+                    if _is_file_stream:
+                        # Seamlessly loop recorded video file back to frame 0
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                        ret, frame = cap.read()
+                    if not ret or frame is None:
+                        with self._lock:
+                            self.metrics.dropped_frames += 1
+                            self.metrics.last_error = "Frame read failed or stream closed"
+                            self.state = CameraState.DEGRADED
+                        try:
+                            from app.services.metrics import MetricsCollector
+                            MetricsCollector.get_instance().increment_counter(
+                                "safesync_pipeline_dropped_frames_total",
+                                labels={"camera_id": self.camera_id},
+                            )
+                        except Exception:
+                            pass
+                        logger.warning("Camera %s lost frame. Resetting capture...", self.camera_id)
+                        cap.release()
+                        cap = None
+                        continue
 
                 now = time.time()
 
@@ -1091,11 +1153,13 @@ class CameraWorker:
                 self._update_fps()
 
                 # Rate control: for hardware webcam cap.read() blocks naturally at hardware FPS (~30 FPS).
-                # Only sleep if elapsed time is less than target frame interval.
-                elapsed = time.time() - t_frame_start
-                sleep_time = max(0.0005, frame_delay - elapsed)
-                if sleep_time > 0.001:
-                    time.sleep(sleep_time)
+                # For network cameras: only sleep if we didn't have to skip buffered frames.
+                # If buffered frames existed (_skipped > 1), skip sleep to drain remaining socket backlog immediately.
+                if not (_is_network_stream and _skipped > 1):
+                    elapsed = time.time() - t_frame_start
+                    sleep_time = max(0.0005, frame_delay - elapsed)
+                    if sleep_time > 0.001:
+                        time.sleep(sleep_time)
 
         except Exception as e:
             logger.error("Unhandled exception in CameraWorker %s: %s", self.camera_id, e, exc_info=True)

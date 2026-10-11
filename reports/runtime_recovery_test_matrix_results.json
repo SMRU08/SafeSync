@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-10-08T11:42:00Z",
+  "tests": {
+    "TEST_A_backend_startup": {
+      "status": "PASS",
+      "latency_ms": 19.83,
+      "liveness": "alive",
+      "ready": "ready"
+    },
+    "TEST_B_database_initialization": {
+      "status": "PASS",
+      "journal_mode": "wal",
+      "tables_count": 14,
+      "can_query": true
+    },
+    "TEST_C_v3_model_loading": {
+      "status": "PASS",
+      "sha256": "9b414f3018d54ae55db150629792a4678d58afc7074b919d9bfcf4f9c95e6efe",
+      "classes_count": 7,
+      "probe_latency_ms": 273.5,
+      "device": "cpu"
+    },
+    "TEST_D_single_camera": {
+      "status": "PASS",
+      "state": "CONNECTED",
+      "fps": 0.3,
+      "frame_count": 10,
+      "snapshot_size_bytes": 34639
+    },
+    "TEST_E_single_camera_detection": {
+      "status": "PASS",
+      "workers_detected": 0,
+      "latencies": {
+        "detection_ms": 702.07,
+        "tracking_ms": 0.02,
+        "association_ms": 0.0,
+        "temporal_ms": 0.0,
+        "total_ms": 704.97
+      },
+      "annotated_frame_delivered": true
+    },
+    "TEST_F_websocket": {
+      "status": "PASS",
+      "handshake_type": "connected",
+      "active_connections": 1
+    },
+    "TEST_G_frontend_events": {
+      "status": "PASS",
+      "active_websocket_connections": 1
+    },
+    "TEST_H_sustained_stability": {
+      "status": "PASS",
+      "frames_captured_in_window": 226,
+      "avg_fps": 14.9,
+      "p50_latency_ms": 4.65,
+      "p95_latency_ms": 8.09,
+      "avg_cpu_percent": 98.4,
+      "avg_ram_mb": 13442.0,
+      "dropped_frames": 0
+    },
+    "TEST_I_disconnect_reconnect": {
+      "status": "PASS",
+      "stopped_state": "DISCONNECTED",
+      "reconnected_state": "CONNECTED",
+      "fps_after_reconnect": 14.8
+    },
+    "TEST_J_backend_restart": {
+      "status": "PASS",
+      "cluster_state": "healthy",
+      "model_loaded": true
+    },
+    "TEST_K_two_camera": {
+      "status": "PASS",
+      "cam1_fps": 14.9,
+      "cam3_fps": 20.4,
+      "cam1_state": "CONNECTED",
+      "cam3_state": "CONNECTED"
+    },
+    "TEST_L_four_camera_scaling": {
+      "status": "PASS",
+      "active_concurrent_streams": 4,
+      "recommendation": "Single camera primary demo recommended on CPU runtime for optimal latency headroom"
+    }
+  },
+  "metrics": {}
+}

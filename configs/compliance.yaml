@@ -5,7 +5,7 @@ tracking:
   tracker: "bytetrack"
   track_high_thresh: 0.20      # Detection confidence threshold for first-stage ByteTrack matching
   track_low_thresh: 0.08       # Detection confidence threshold for second-stage matching (low-conf recovery)
-  new_track_thresh: 0.25       # Confidence required to initialize a new track ID
+  new_track_thresh: 0.22       # Confidence required to initialize a new track ID (aligned with person threshold 0.22)
   track_buffer: 30             # Number of frames to keep a lost track in memory
   match_thresh: 0.70           # IoU threshold for track matching
   min_box_area: 250            # Minimum pixel area for a valid person bounding box (allows portrait/upper body)
@@ -36,7 +36,8 @@ association:
 
 temporal:
   confirmation_frames: 2         # Frames required to confirm PRESENT
-  missing_detection_tolerance: 15 # Tolerated missed detections before transitioning to ABSENT (~0.5s at 30 FPS to eliminate flicker violations)
+  missed_grace_frames: 5         # Brief drops tolerated before dropping from PRESENT to UNKNOWN
+  missing_detection_tolerance: 15 # Tolerated missed detections before transitioning to ABSENT (~0.50s at 30 FPS)
   history_window_frames: 30      # Sliding history window per active worker track
   prune_lost_after_frames: 60    # Purge worker history after 60 frames of inactivity
 

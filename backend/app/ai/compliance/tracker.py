@@ -416,7 +416,7 @@ class ByteTrack:
         for det, score in unmatched_dets_final:
             if score >= self.new_track_thresh:
                 new_track = KalmanBoxTracker(det, score, confirmation_frames=self.confirmation_frames)
-                if new_track.is_activated or score >= 0.50 or self.confirmation_frames <= 1:
+                if new_track.is_activated or score >= self.new_track_thresh or self.confirmation_frames <= 1:
                     new_track.is_activated = True
                     new_track.state = TrackState.Tracked
                     activated_stracks.append(new_track)

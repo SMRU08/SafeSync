@@ -54,6 +54,7 @@ class Detector:
             log.debug("Registry threshold lookup skipped: %s", e)
 
         self._person_model = None
+        self._glove_model = None
 
     def _get_person_model(self):
         """Loads lightweight base detector for person recall when specialized model misses portrait/webcam silhouettes."""
@@ -68,6 +69,19 @@ class Detector:
             except Exception as e:
                 log.debug("Base person detector unavailable: %s", e)
         return self._person_model
+
+    def _get_glove_model(self):
+        """Loads dedicated high-precision glove detector to boost glove recall across all colors and varieties."""
+        if self._glove_model is None:
+            try:
+                from ultralytics import YOLO
+                root_proj = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+                w_path = os.path.join(root_proj, "models", "detection", "safesync_glove_detector", "weights", "best.pt")
+                if os.path.isfile(w_path):
+                    self._glove_model = YOLO(w_path)
+            except Exception as e:
+                log.debug("Dedicated glove detector unavailable: %s", e)
+        return self._glove_model
 
     @staticmethod
     def _calc_iou(b1: List[float], b2: List[float]) -> float:
@@ -314,13 +328,80 @@ class Detector:
                 except Exception as p_err:
                     log.debug("Multi-person recall detection error: %s", p_err)
 
-        # Log raw model detections (Step 1 raw output trace)
+        # 4c. Ensure glove recall across all industrial glove varieties and colors:
+        # Merges specialized high-precision glove detector detections via IoU NMS deduplication
+        if self.model_type == "ppe" and (filter_set is None or "gloves" in filter_set):
+            g_model = self._get_glove_model()
+            if g_model is not None:
+                try:
+                    glove_min = self.class_conf_thresholds.get("gloves", 0.22)
+                    glove_thresh = glove_min if (conf is None or conf == self.default_conf) else max(conf_thresh, glove_min)
+                    g_results = g_model.predict(
+                        source=frame,
+                        conf=glove_thresh,
+                        iou=iou_thresh,
+                        imgsz=inference_size,
+                        device=device,
+                        verbose=False,
+                    )
+                    if g_results and len(g_results) > 0 and g_results[0].boxes is not None:
+                        for box in g_results[0].boxes:
+                            score = float(box.conf[0].item())
+                            coords = box.xyxy[0].tolist()
+                            clamped_bbox = self._validate_and_clamp_bbox(coords, w, h, "gloves")
+                            if clamped_bbox is None:
+                                continue
+
+                            # Check overlap with already detected gloves (IoU NMS merge)
+                            g_box_arr = [clamped_bbox.x1, clamped_bbox.y1, clamped_bbox.x2, clamped_bbox.y2]
+                            matched_idx = -1
+                            for idx, existing_det in enumerate(detections):
+                                if existing_det.class_name.lower() == "gloves":
+                                    eb = existing_det.bbox
+                                    e_arr = [eb.x1, eb.y1, eb.x2, eb.y2]
+                                    if self._calc_iou(g_box_arr, e_arr) >= 0.40:
+                                        matched_idx = idx
+                                        break
+
+                            if matched_idx >= 0:
+                                if score > detections[matched_idx].confidence:
+                                    detections[matched_idx].confidence = round(score, 4)
+                                    detections[matched_idx].bbox = clamped_bbox
+                            else:
+                                det = DetectionObject(
+                                    class_id=3,
+                                    class_name="gloves",
+                                    confidence=round(score, 4),
+                                    bbox=clamped_bbox,
+                                )
+                                detections.append(det)
+                                class_counts["gloves"] = class_counts.get("gloves", 0) + 1
+                                raw_detections_list.append({
+                                    "class_id": 3,
+                                    "class_name": "gloves",
+                                    "confidence": round(score, 4),
+                                    "bbox": coords,
+                                })
+                except Exception as g_err:
+                    log.debug("Dedicated glove recall detection error: %s", g_err)
+
+        # Log raw model detections (rate-limited when DETECTION_DEBUG=true, otherwise log.debug)
         if raw_detections_list:
-            log.info(
-                "[RAW YOLO] %d candidates (conf_min=%.2f): %s",
-                len(raw_detections_list), pred_conf,
-                ", ".join(f"{r['class_name']}:{r['confidence']:.2f}" for r in raw_detections_list)
-            )
+            summary_str = ", ".join(f"{r['class_name']}:{r['confidence']:.2f}" for r in raw_detections_list)
+            is_debug_mode = os.getenv("DETECTION_DEBUG", "").lower() in ("true", "1", "yes")
+            if is_debug_mode:
+                now = time.time()
+                if now - getattr(self, "_last_diag_log_time", 0.0) >= 1.0:
+                    self._last_diag_log_time = now
+                    log.info(
+                        "[RAW YOLO DIAGNOSTIC] %d candidates (conf_min=%.2f): %s",
+                        len(raw_detections_list), pred_conf, summary_str
+                    )
+            else:
+                log.debug(
+                    "[RAW YOLO] %d candidates (conf_min=%.2f): %s",
+                    len(raw_detections_list), pred_conf, summary_str
+                )
 
         # 5. Build response
         response = ImageDetectionResponse(

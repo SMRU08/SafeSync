@@ -61,8 +61,8 @@ export function useSafetyData() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
-  const refreshAll = useCallback(async () => {
-    setIsLoading(true);
+  const refreshAll = useCallback(async (isManual: boolean = false) => {
+    if (isManual) setIsLoading(true);
     const nowStr = new Date().toLocaleTimeString();
 
     // 1. Health check
@@ -148,68 +148,51 @@ export function useSafetyData() {
       setHazards([]);
     }
 
-    // 6. Hazard & Camera Manager
+    // 6. Hazard Configuration
     try {
       const hConfig = await fetchHazardConfig();
       setHazardConfig(hConfig);
-
-      // Fetch real multi-camera statuses from /api/cameras
-      try {
-        const realCameras = await fetchCameras();
-        if (Array.isArray(realCameras) && realCameras.length > 0) {
-          const mappedCameras: CameraConfig[] = realCameras.map((c: any) => ({
-            camera_id: c.camera_id,
-            name: c.name || `Camera ${c.camera_id}`,
-            zone_id: c.zone_id,
-            status:
-              c.state === 'STREAMING' || c.state === 'CONNECTED' || c.is_streaming
-                ? 'ACTIVE'
-                : c.state === 'DISABLED'
-                ? 'STANDBY'
-                : c.state === 'DEGRADED'
-                ? 'DEGRADED'
-                : 'OFFLINE',
-            state: c.state,
-            is_streaming: c.is_streaming ?? (c.state === 'STREAMING'),
-            last_frame_age_ms: c.last_frame_age_ms,
-            frame_id: c.frame_id,
-            last_frame_timestamp: c.last_frame_timestamp,
-            source_type: c.source_type,
-            enabled: c.enabled,
-            resolution: '1280x720',
-            fps: c.metrics?.fps || 0,
-            safe_source: c.safe_source,
-            metrics: c.metrics,
-          }));
-          setCameras(mappedCameras);
-        } else if (hConfig && hConfig.cameras) {
-          const fallbackCameras: CameraConfig[] = hConfig.cameras.map((c: any) => ({
-            camera_id: c.camera_id,
-            name: c.name || `Camera ${c.camera_id}`,
-            zone_id: c.zone_id,
-            status: 'ACTIVE',
-            resolution: '1280x720',
-            fps: 30,
-            rtsp_url: c.rtsp_url,
-          }));
-          setCameras(fallbackCameras);
-        }
-      } catch {
-        if (hConfig && hConfig.cameras) {
-          const fallbackCameras: CameraConfig[] = hConfig.cameras.map((c: any) => ({
-            camera_id: c.camera_id,
-            name: c.name || `Camera ${c.camera_id}`,
-            zone_id: c.zone_id,
-            status: 'ACTIVE',
-            resolution: '1280x720',
-            fps: 30,
-            rtsp_url: c.rtsp_url,
-          }));
-          setCameras(fallbackCameras);
-        }
-      }
     } catch {
       setHazardConfig(null);
+    }
+
+    // 7. Production Multi-Camera Manager
+    try {
+      const realCameras = await fetchCameras();
+      if (Array.isArray(realCameras) && realCameras.length > 0) {
+        const mappedCameras: CameraConfig[] = realCameras.map((c: any) => ({
+          camera_id: c.camera_id,
+          name: c.name || `Camera ${c.camera_id}`,
+          zone_id: c.zone_id,
+          status:
+            c.state === 'STREAMING' ||
+            c.state === 'ONLINE' ||
+            c.state === 'CONNECTED' ||
+            c.status === 'online' ||
+            c.status === 'active' ||
+            c.is_streaming
+              ? 'ACTIVE'
+              : c.state === 'DISABLED'
+              ? 'STANDBY'
+              : c.state === 'DEGRADED'
+              ? 'DEGRADED'
+              : 'OFFLINE',
+          state: c.state,
+          is_streaming: c.is_streaming ?? (c.state === 'STREAMING'),
+          last_frame_age_ms: c.last_frame_age_ms,
+          frame_id: c.frame_id,
+          last_frame_timestamp: c.last_frame_timestamp,
+          source_type: c.source_type,
+          enabled: c.enabled,
+          resolution: c.resolution || '1280x720',
+          fps: c.metrics?.fps || (typeof c.fps === 'number' ? c.fps : 0),
+          safe_source: c.safe_source,
+          metrics: c.metrics,
+        }));
+        setCameras(mappedCameras);
+      }
+    } catch {
+      // tolerate camera fetch error
     }
 
     // 7. Compliance Config
@@ -232,8 +215,8 @@ export function useSafetyData() {
   }, []);
 
   useEffect(() => {
-    refreshAll();
-    const intervalId = window.setInterval(refreshAll, 10000);
+    refreshAll(false);
+    const intervalId = window.setInterval(() => refreshAll(false), 10000);
     return () => clearInterval(intervalId);
   }, [refreshAll]);
 

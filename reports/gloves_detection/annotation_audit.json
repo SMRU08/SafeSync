@@ -1,0 +1,127 @@
+{
+  "audit_version": "1.0.0",
+  "timestamp": "2026-10-09T10:55:00Z",
+  "summary": "Annotation audit evaluating glove coordinates, scale, and negative class co-occurrence",
+  "datasets": {
+    "production_safesync_train": {
+      "total_files": 4419,
+      "files_with_gloves": 788,
+      "files_without_gloves": 3631,
+      "files_with_single_glove": 154,
+      "files_with_pair_gloves": 589,
+      "files_with_multi_gloves": 45,
+      "files_with_bare_hands": 0,
+      "total_glove_instances": 1521,
+      "total_bare_hand_instances": 0,
+      "scale_distribution": {
+        "small_area_under_0_0025": 111,
+        "medium_area_0_0025_to_0_0225": 938,
+        "large_area_above_0_0225": 472
+      },
+      "malformed_lines": 0,
+      "out_of_bounds_boxes": 0,
+      "invalid_coords": 0,
+      "notes": "Current baseline training dataset (7-class canonical: 3=gloves)"
+    },
+    "production_safesync_val": {
+      "total_files": 1262,
+      "files_with_gloves": 228,
+      "files_without_gloves": 1034,
+      "files_with_single_glove": 44,
+      "files_with_pair_gloves": 171,
+      "files_with_multi_gloves": 13,
+      "files_with_bare_hands": 0,
+      "total_glove_instances": 437,
+      "total_bare_hand_instances": 0,
+      "scale_distribution": {
+        "small_area_under_0_0025": 30,
+        "medium_area_0_0025_to_0_0225": 276,
+        "large_area_above_0_0225": 131
+      },
+      "malformed_lines": 0,
+      "out_of_bounds_boxes": 0,
+      "invalid_coords": 0,
+      "notes": "Frozen evaluation validation split"
+    },
+    "production_safesync_test": {
+      "total_files": 632,
+      "files_with_gloves": 120,
+      "files_without_gloves": 512,
+      "files_with_single_glove": 16,
+      "files_with_pair_gloves": 94,
+      "files_with_multi_gloves": 10,
+      "files_with_bare_hands": 0,
+      "total_glove_instances": 243,
+      "total_bare_hand_instances": 0,
+      "scale_distribution": {
+        "small_area_under_0_0025": 10,
+        "medium_area_0_0025_to_0_0225": 143,
+        "large_area_above_0_0225": 90
+      },
+      "malformed_lines": 0,
+      "out_of_bounds_boxes": 0,
+      "invalid_coords": 0,
+      "notes": "Frozen evaluation test split"
+    },
+    "ultralytics_construction_ppe": {
+      "total_files": 1426,
+      "files_with_gloves": 714,
+      "files_without_gloves": 712,
+      "files_with_single_glove": 81,
+      "files_with_pair_gloves": 580,
+      "files_with_multi_gloves": 53,
+      "files_with_bare_hands": 236,
+      "total_glove_instances": 1461,
+      "total_bare_hand_instances": 556,
+      "scale_distribution": {
+        "small_area_under_0_0025": 109,
+        "medium_area_0_0025_to_0_0225": 1293,
+        "large_area_above_0_0225": 59
+      },
+      "malformed_lines": 0,
+      "out_of_bounds_boxes": 0,
+      "invalid_coords": 0,
+      "notes": "Ultralytics construction PPE (1=gloves, 9=no_gloves)"
+    },
+    "ppe_detection_compliance": {
+      "total_files": 9665,
+      "files_with_gloves": 1394,
+      "files_without_gloves": 8271,
+      "files_with_single_glove": 381,
+      "files_with_pair_gloves": 894,
+      "files_with_multi_gloves": 119,
+      "files_with_bare_hands": 1433,
+      "total_glove_instances": 2634,
+      "total_bare_hand_instances": 2711,
+      "scale_distribution": {
+        "small_area_under_0_0025": 122,
+        "medium_area_0_0025_to_0_0225": 1299,
+        "large_area_above_0_0225": 1213
+      },
+      "malformed_lines": 23,
+      "out_of_bounds_boxes": 47,
+      "invalid_coords": 0,
+      "notes": "Roboflow PPE Detection & Compliance (1=Gloves, 6=NO-Gloves)"
+    },
+    "safety_ppe_4": {
+      "total_files": 5081,
+      "files_with_gloves": 818,
+      "files_without_gloves": 4263,
+      "files_with_single_glove": 171,
+      "files_with_pair_gloves": 626,
+      "files_with_multi_gloves": 21,
+      "files_with_bare_hands": 176,
+      "total_glove_instances": 1512,
+      "total_bare_hand_instances": 329,
+      "scale_distribution": {
+        "small_area_under_0_0025": 100,
+        "medium_area_0_0025_to_0_0225": 1133,
+        "large_area_above_0_0225": 279
+      },
+      "malformed_lines": 23,
+      "out_of_bounds_boxes": 13,
+      "invalid_coords": 0,
+      "notes": "Roboflow Safety PPE 4 (1=gloves, 5=no-gloves)"
+    }
+  }
+}

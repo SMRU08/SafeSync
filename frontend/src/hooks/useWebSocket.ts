@@ -97,6 +97,12 @@ export function useWebSocket(onEvent?: (message: WebSocketMessage) => void): Use
       };
     } catch {
       setStatus('DISCONNECTED');
+      if (!reconnectTimeoutRef.current) {
+        reconnectTimeoutRef.current = window.setTimeout(() => {
+          reconnectTimeoutRef.current = null;
+          connect();
+        }, 3000);
+      }
     }
   }, []);
 

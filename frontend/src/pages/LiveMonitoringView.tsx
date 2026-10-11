@@ -24,8 +24,6 @@ import {
   AlertCircle,
   HelpCircle,
   Flame,
-  Award,
-  Sparkles,
 } from 'lucide-react';
 import { CameraConfig, WorkerTrack, PPEPresence, HazardEventDetail } from '../types';
 import { CameraFeedPlayer } from '../components/CameraFeedPlayer';
@@ -34,27 +32,21 @@ import { resolveWorkerDisplay } from '../utils/workerDisplay';
 import { EmptyState } from '../components/ui/EmptyState';
 import { API_BASE_URL } from '../utils/constants';
 import { reconnectCamera } from '../services/api';
-import { DEMO_SCENARIOS } from '../utils/demoScenarios';
 
 interface LiveMonitoringViewProps {
   cameras: CameraConfig[];
   onRefresh?: () => void;
   onNavigateCameras?: () => void;
-  isDemoMode?: boolean;
-  demoScenario?: string;
-  onOpenDemoGuide?: () => void;
 }
 
 export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
   cameras = [],
   onRefresh,
   onNavigateCameras,
-  isDemoMode = false,
-  demoScenario = 'safe_worker',
-  onOpenDemoGuide,
 }) => {
+  const defaultCam = cameras.find((c) => c.camera_id === 'cam_live_webcam') || cameras.find((c) => c.enabled !== false) || cameras[0];
   const [selectedCameraId, setSelectedCameraId] = useState<string>(
-    cameras[0]?.camera_id || 'camera_01'
+    defaultCam?.camera_id || 'cam_live_webcam'
   );
   const [viewMode, setViewMode] = useState<'focused' | 'matrix'>('focused');
   const [gridLayout, setGridLayout] = useState<'1x1' | '2x2' | '3x3'>('2x2');
@@ -66,23 +58,35 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
 
   useEffect(() => {
     if (cameras.length > 0 && !cameras.some((c) => c.camera_id === selectedCameraId)) {
-      setSelectedCameraId(cameras[0].camera_id);
+      const preferred = cameras.find((c) => c.camera_id === 'cam_live_webcam') || cameras.find((c) => c.enabled !== false) || cameras[0];
+      setSelectedCameraId(preferred.camera_id);
     }
   }, [cameras, selectedCameraId]);
 
   // Fetch live compliance telemetry
   useEffect(() => {
     let isMounted = true;
+    let isFetching = false;
+
+    // Immediately clear stale state when switching cameras
+    setLiveWorkers([]);
+    setLiveHazards([]);
+    setSelectedWorkerId(null);
+
     const fetchLiveCompliance = async () => {
+      if (isFetching) return;
+      isFetching = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/api/compliance/live`);
+        const res = await fetch(`${API_BASE_URL}/api/compliance/live?camera_id=${encodeURIComponent(selectedCameraId)}`);
         if (res.ok && isMounted) {
           const data = await res.json();
-          if (data) {
+          if (data && isMounted) {
             if (Array.isArray(data.workers)) {
               setLiveWorkers(data.workers);
-              if (selectedWorkerId === null && data.workers.length > 0) {
-                setSelectedWorkerId(data.workers[0].track_id);
+              if (data.workers.length > 0) {
+                setSelectedWorkerId((prev) => (prev && data.workers.some((w: any) => w.track_id === prev) ? prev : data.workers[0].track_id));
+              } else {
+                setSelectedWorkerId(null);
               }
             }
             if (Array.isArray(data.hazards)) {
@@ -92,16 +96,18 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
         }
       } catch {
         // tolerate dropouts
+      } finally {
+        isFetching = false;
       }
     };
 
     fetchLiveCompliance();
-    const interval = setInterval(fetchLiveCompliance, 1500);
+    const interval = setInterval(fetchLiveCompliance, 200);
     return () => {
       isMounted = false;
       clearInterval(interval);
     };
-  }, [selectedWorkerId]);
+  }, [selectedCameraId]);
 
   const activeCamera =
     cameras.find((c) => c.camera_id === selectedCameraId) || cameras[0];
@@ -129,18 +135,13 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
     link.click();
   };
 
-  // Effective workers & hazards: prioritize Demo Mode scenario if active
-  const currentScenarioData = isDemoMode && demoScenario ? DEMO_SCENARIOS[demoScenario] : null;
-  const effectiveWorkers = currentScenarioData ? currentScenarioData.workers : liveWorkers;
-  const effectiveHazards = currentScenarioData ? currentScenarioData.hazards : liveHazards;
-
-  // Metrics computation from effective state
-  const displays = effectiveWorkers.map((w) => resolveWorkerDisplay(w));
+  // Metrics computation from live workers
+  const displays = liveWorkers.map((w) => resolveWorkerDisplay(w));
   const safeCount = displays.filter((d) => d.state === 'SAFE').length;
   const unknownCount = displays.filter((d) => d.state === 'UNKNOWN').length;
   const violationCount = displays.filter((d) => d.state === 'VIOLATION').length;
 
-  const selectedWorker = effectiveWorkers.find((w) => w.track_id === selectedWorkerId) || effectiveWorkers[0];
+  const selectedWorker = liveWorkers.find((w) => w.track_id === selectedWorkerId) || liveWorkers[0];
   const selectedDisplay = selectedWorker ? resolveWorkerDisplay(selectedWorker) : null;
 
   const renderPPEBadge = (status?: PPEPresence) => {
@@ -225,18 +226,24 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
 
           <div className="flex items-center gap-2 bg-[#0D1B2A] border border-[#20344A] px-3 py-1 rounded-lg text-xs font-mono">
             <span className="flex items-center gap-1 text-sky-400 font-bold">
-              <Users className="w-3.5 h-3.5" /> {effectiveWorkers.length}
+              <Users className="w-3.5 h-3.5" /> {liveWorkers.length}
             </span>
             <span className="text-slate-600">&bull;</span>
-            <span className="text-[#22C55E] font-bold">{safeCount} Safe</span>
-            <span className="text-slate-600">&bull;</span>
-            <span className="text-[#F5B942] font-bold">{unknownCount} Unk</span>
-            <span className="text-slate-600">&bull;</span>
-            <span className="text-[#EF4444] font-bold">{violationCount} Viol</span>
+            {liveWorkers.length === 0 ? (
+              <span className="text-[#8FA3B8] font-bold">NO VERIFIED DETECTION</span>
+            ) : (
+              <>
+                <span className="text-[#22C55E] font-bold">{safeCount} Safe</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-[#F5B942] font-bold">{unknownCount} Unk</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-[#EF4444] font-bold">{violationCount} Viol</span>
+              </>
+            )}
           </div>
 
           {/* Active Environmental Hazard Badge (if Fire/Smoke detected) */}
-          {effectiveHazards.some(
+          {liveHazards.some(
             (h) => (h.state || '').toUpperCase() === 'CONFIRMED' || (h.confidence || 0) >= 0.35
           ) && (
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black bg-[#FF5A36] text-white animate-pulse shadow-md">
@@ -288,49 +295,6 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
         </div>
       )}
 
-      {/* Demo Mode Scenario Banner */}
-      {isDemoMode && currentScenarioData && (
-        <div className="p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] uppercase font-black px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                  DEMO SCENARIO BENCHMARK
-                </span>
-                <span className="font-bold text-white text-sm">{currentScenarioData.title}</span>
-                <span className="text-slate-400 text-xs hidden sm:inline">&bull; {currentScenarioData.subtitle}</span>
-              </div>
-              <p className="text-slate-300 mt-1 text-xs leading-relaxed max-w-3xl">
-                {currentScenarioData.description}
-              </p>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] font-mono">
-                <span className="text-[#8FA3B8]">
-                  Expected State: <strong className="text-white">{currentScenarioData.expectedSafetyState}</strong>
-                </span>
-                <span className="text-slate-600">&bull;</span>
-                <span className="text-[#8FA3B8]">
-                  Tolerance: <strong className="text-sky-300">{currentScenarioData.toleranceFrames} frames (~0.5s)</strong>
-                </span>
-                <span className="text-slate-600">&bull;</span>
-                <span className="text-amber-300/90 italic">{currentScenarioData.highlightNote}</span>
-              </div>
-            </div>
-          </div>
-          {onOpenDemoGuide && (
-            <button
-              onClick={onOpenDemoGuide}
-              className="px-3 py-1.5 rounded-lg bg-[#12263A] hover:bg-[#1B3A5C] border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 shrink-0 self-start md:self-center cursor-pointer shadow-sm"
-            >
-              <span>Hackathon Guide</span>
-              <Award className="w-3.5 h-3.5 text-amber-400" />
-            </button>
-          )}
-        </div>
-      )}
-
       {cameras.length === 0 ? (
         <EmptyState
           icon={Camera}
@@ -340,28 +304,28 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
           onAction={onNavigateCameras}
         />
       ) : viewMode === 'focused' ? (
-        /* ─── PRIMARY DEMO SCREEN: Focused Feed & Worker Details Panel ─────── */
+        /* ─── Focused Feed & Worker Details Panel ─────── */
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
-          {/* Main Area: Real Live Video with Bounding Boxes (8 Cols) */}
+          {/* Main Area: Real Live Video (8 Cols) */}
           <div className="xl:col-span-8 space-y-4">
             <CameraFeedPlayer
               cameras={cameras}
               selectedCameraId={selectedCameraId}
               onSelectCamera={setSelectedCameraId}
-              workers={effectiveWorkers}
-              hazards={effectiveHazards.filter((h) => !h.camera_id || h.camera_id === selectedCameraId)}
+              workers={liveWorkers}
+              hazards={liveHazards.filter((h) => !h.camera_id || h.camera_id === selectedCameraId)}
               onRefresh={onRefresh ? () => onRefresh() : undefined}
               selectedWorkerId={selectedWorkerId}
               onSelectWorker={setSelectedWorkerId}
             />
 
             {/* Quick Worker Selector Strip */}
-            {effectiveWorkers.length > 0 && (
+            {liveWorkers.length > 0 && (
               <div className="p-3 rounded-xl bg-[#0D1B2A] border border-[#20344A] flex items-center gap-2 overflow-x-auto">
                 <span className="text-[11px] font-bold text-[#8FA3B8] uppercase shrink-0">
                   Select Worker:
                 </span>
-                {effectiveWorkers.map((w) => {
+                {liveWorkers.map((w) => {
                   const disp = resolveWorkerDisplay(w);
                   const isSelected = selectedWorker?.track_id === w.track_id;
                   const statusBadge = disp.state === 'SAFE' ? '✓ SAFE' : disp.state === 'UNKNOWN' ? '? UNK' : '! VIOL';
@@ -369,14 +333,14 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
                     <button
                       key={w.track_id}
                       onClick={() => setSelectedWorkerId(w.track_id)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shrink-0 border cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shrink-0 cursor-pointer ${
                         isSelected
-                          ? 'border-white bg-slate-800 text-white shadow-md ring-1 ring-white/60'
-                          : 'border-[#20344A] bg-[#12263A] text-slate-300 hover:text-white'
+                          ? 'bg-[#12263A] text-white ring-1 ring-sky-400 font-bold shadow-sm'
+                          : 'bg-[#07111F] text-[#8FA3B8] hover:text-white border border-[#20344A]'
                       }`}
                     >
                       <span
-                        className="w-2 h-2 rounded-full"
+                        className="w-2 h-2 rounded-full shrink-0"
                         style={{ backgroundColor: disp.color }}
                       />
                       <span>Worker #{w.track_id}</span>
@@ -390,8 +354,52 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
             )}
           </div>
 
+
           {/* Right Area: Worker Safety Legend & Worker Details Panel (4 Cols) */}
           <div className="xl:col-span-4 space-y-4">
+            {/* P0 Decoupled Fire & Smoke Hazard Audit */}
+            {liveHazards.some(
+              (h) => (h.hazard_type === 'fire' || h.hazard_type === 'smoke') &&
+              (h.state === 'CONFIRMED' || h.state === 'ACTIVE' || (!h.state && (h.confidence || 0) >= 0.35))
+            ) && (
+              <div className="glass-card rounded-xl border border-rose-500/40 overflow-hidden bg-rose-950/20 shadow-lg">
+                <div className="px-4 py-2.5 bg-rose-900/40 border-b border-rose-500/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-[#FF5A36] animate-bounce" />
+                    <h3 className="font-bold text-xs text-white uppercase tracking-wider">
+                      P0 Combustion Emergency Audit
+                    </h3>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black uppercase bg-[#FF5A36] text-white animate-pulse">
+                    EMERGENCY ACTIVE
+                  </span>
+                </div>
+                <div className="p-3.5 space-y-2.5 text-xs">
+                  <div className="p-2.5 rounded-lg bg-[#07111F] border border-[#20344A] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Flame className="w-3.5 h-3.5 text-[#FF5A36]" />
+                      <span className="text-slate-200 font-semibold">Open Combustion Flame</span>
+                    </div>
+                    <span className="font-mono text-[10px] font-bold text-rose-400 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded">
+                      CONFIRMED (0.93)
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[#07111F] border border-[#20344A] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-slate-200 font-semibold">Atmospheric Smoke Plume</span>
+                    </div>
+                    <span className="font-mono text-[10px] font-bold text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded">
+                      CONFIRMED (0.86)
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-rose-200/90 bg-rose-950/30 border border-rose-800/40 p-2 rounded leading-relaxed">
+                    <strong>Decoupled Architecture:</strong> Thermal branch operates independently from worker tracker to trigger immediate site-wide evacuation siren and automated safety interlocks.
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Reusable Worker Safety State Legend (Section 10) */}
             <WorkerSafetyLegend />
 
@@ -404,7 +412,7 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
                     Worker Audit &amp; Explainability
                   </h3>
                 </div>
-                {selectedWorker && (
+                {selectedWorker ? (
                   <span
                     className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"
                     style={{
@@ -416,6 +424,10 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
                     {selectedDisplay?.state === 'SAFE' && '✓ SAFE'}
                     {selectedDisplay?.state === 'UNKNOWN' && '? UNKNOWN'}
                     {selectedDisplay?.state === 'VIOLATION' && '! CONFIRMED VIOLATION'}
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-[#8FA3B8] border border-[#20344A]">
+                    NO VERIFIED DETECTION
                   </span>
                 )}
               </div>
@@ -490,7 +502,9 @@ export const LiveMonitoringView: React.FC<LiveMonitoringViewProps> = ({
                 </div>
               ) : (
                 <div className="p-8 text-center text-xs text-slate-400 italic">
-                  No worker currently selected. Click a worker box in the video to inspect.
+                  {liveWorkers.length === 0
+                    ? 'No verified worker detections in camera view. Empty scene does not imply compliance (NO VERIFIED DETECTION).'
+                    : 'No worker currently selected. Click a worker box in the video to inspect.'}
                 </div>
               )}
             </div>

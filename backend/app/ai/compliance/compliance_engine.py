@@ -153,13 +153,13 @@ class WorkerComplianceEngine:
         # Initialize ByteTrack
         track_cfg = self.config.get("tracking", {})
         self.tracker = ByteTrack(
-            track_high_thresh=track_cfg.get("track_high_thresh", 0.25),
-            track_low_thresh=track_cfg.get("track_low_thresh", 0.10),
-            new_track_thresh=track_cfg.get("new_track_thresh", 0.35),
+            track_high_thresh=track_cfg.get("track_high_thresh", 0.20),
+            track_low_thresh=track_cfg.get("track_low_thresh", 0.08),
+            new_track_thresh=track_cfg.get("new_track_thresh", 0.22),
             track_buffer=track_cfg.get("track_buffer", 30),
             match_thresh=track_cfg.get("match_thresh", 0.70),
             confirmation_frames=track_cfg.get("confirmation_frames", 2),
-            lost_tolerance_frames=track_cfg.get("lost_tolerance_frames", 15),
+            lost_tolerance_frames=track_cfg.get("lost_tolerance_frames", 20),
         )
 
         # Initialize spatial associator
@@ -186,6 +186,7 @@ class WorkerComplianceEngine:
         annotate: bool = True,
         zone_id: str = "UNKNOWN",
         imgsz: Optional[int] = None,
+        encode_b64: bool = False,
     ) -> Tuple[ComplianceAnalysisResponse, np.ndarray, Dict[str, float]]:
         """
         Processes a single video or camera frame.
@@ -231,7 +232,7 @@ class WorkerComplianceEngine:
         ppe_dets = []
         hazards = []
 
-        min_area = self.config.get("tracking", {}).get("min_box_area", 400)
+        min_area = self.config.get("tracking", {}).get("min_box_area", 250)
         for obj in detections_to_process:
             cname = obj.class_name.lower()
             b = [obj.bbox.x1, obj.bbox.y1, obj.bbox.x2, obj.bbox.y2]
@@ -320,7 +321,8 @@ class WorkerComplianceEngine:
             annotated_frame = self.visualizer.draw_frame(
                 frame, worker_tracks, unassociated_ppe, hazards, is_entry_gate=is_entry_gate
             )
-            b64_img = encode_image_base64(annotated_frame)
+            if encode_b64:
+                b64_img = encode_image_base64(annotated_frame)
 
         total_ms = (time.perf_counter() - t_start) * 1000.0
         latencies = {

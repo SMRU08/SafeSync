@@ -1,3 +1,21 @@
+import os
+import sys
+
+# Ensure backend directory is in sys.path for app module imports regardless of cwd
+_backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
+# Suppress non-fatal C++ FFmpeg EOF packet warnings in OpenCV when reading multi-stream files
+if "OPENCV_FFMPEG_READ_ATTEMPTS" not in os.environ:
+    os.environ["OPENCV_FFMPEG_READ_ATTEMPTS"] = "8192"
+
+try:
+    import cv2.utils.logging as _cv2_logging
+    _cv2_logging.setLogLevel(_cv2_logging.LOG_LEVEL_ERROR)
+except Exception:
+    pass
+
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status
@@ -103,6 +121,7 @@ from app.api.evidence import router as evidence_router
 from app.api.monitoring import router as monitoring_router
 from app.api.workers import router as workers_router
 from app.api.analytics import router as analytics_router
+from app.api.p0_analysis import router as p0_analysis_router
 from app.config import setup_production_logging
 
 setup_production_logging()
@@ -118,6 +137,7 @@ app.include_router(evidence_router)
 app.include_router(monitoring_router)
 app.include_router(workers_router)
 app.include_router(analytics_router)
+app.include_router(p0_analysis_router)
 
 
 import os

@@ -14,7 +14,7 @@
  *   - Zero fake telemetry
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Maximize2,
   Minimize2,
@@ -31,6 +31,7 @@ import {
   CheckCircle2,
   Eye,
   Settings,
+  DoorOpen,
 } from 'lucide-react';
 import { CameraConfig } from '../types';
 import { API_BASE_URL } from '../utils/constants';
@@ -41,6 +42,7 @@ interface CameraLiveCardProps {
   onRefresh?: (cameraId: string) => void;
   onDelete?: (cameraId: string) => void;
   onOpenLiveView?: (camera: CameraConfig) => void;
+  onOpenEntryGate?: (camera: CameraConfig) => void;
   onAnalyzeLive?: (camera: CameraConfig) => void;
   onUploadAnalyze?: (camera: CameraConfig, file: File) => void;
   onToggleSpeaker?: (cameraId: string, enabled: boolean) => void;
@@ -53,6 +55,7 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
   onRefresh,
   onDelete,
   onOpenLiveView,
+  onOpenEntryGate,
   onAnalyzeLive: _onAnalyzeLive,
   onUploadAnalyze,
   onToggleSpeaker,
@@ -62,20 +65,40 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [streamKey, setStreamKey] = useState(Date.now());
   const [hasStreamError, setHasStreamError] = useState(false);
+  const [useSnapshot, setUseSnapshot] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    setHasStreamError(false);
+    setUseSnapshot(false);
+    setStreamKey(Date.now());
+  }, [camera.camera_id]);
+
+  useEffect(() => {
+    if (hasStreamError) {
+      const timer = setTimeout(() => {
+        setHasStreamError(false);
+        setUseSnapshot(false);
+        setStreamKey(Date.now());
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasStreamError]);
+
   const isEnabled = camera.enabled !== false;
-  const isLive =
-    isEnabled &&
-    (camera.status === 'online' ||
-      camera.status === 'streaming' ||
-      camera.status === 'ACTIVE' ||
-      camera.state === 'CONNECTED' ||
-      camera.state === 'STREAMING' ||
-      camera.is_streaming === true) &&
-    !hasStreamError;
+  const statusStr = String(camera.status || '').toLowerCase();
+  const stateStr = String(camera.state || '').toUpperCase();
+  const isOnlineState =
+    statusStr === 'online' ||
+    statusStr === 'streaming' ||
+    statusStr === 'active' ||
+    stateStr === 'ONLINE' ||
+    stateStr === 'CONNECTED' ||
+    stateStr === 'STREAMING' ||
+    camera.is_streaming === true;
+  const isLive = isEnabled && isOnlineState && !hasStreamError;
 
   const isConnecting =
     isEnabled &&
@@ -101,6 +124,7 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
   const handleRetry = () => {
     setIsRetrying(true);
     setHasStreamError(false);
+    setUseSnapshot(false);
     setStreamKey(Date.now());
     onRefresh?.(camera.camera_id);
     setTimeout(() => setIsRetrying(false), 1000);
@@ -114,7 +138,9 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
     e.target.value = '';
   };
 
-  const streamSrc = `${API_BASE_URL}/api/cameras/${camera.camera_id}/stream?t=${streamKey}`;
+  const streamSrc = useSnapshot
+    ? `${API_BASE_URL}/api/cameras/${camera.camera_id}/snapshot?t=${streamKey}`
+    : `${API_BASE_URL}/api/cameras/${camera.camera_id}/stream?t=${streamKey}`;
   const purpose = getCameraPurpose(camera);
 
   // Status label and color token (Section 5)
@@ -246,7 +272,14 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
             key={streamKey}
             src={streamSrc}
             alt={camera.name}
-            onError={() => setHasStreamError(true)}
+            onError={() => {
+              if (!useSnapshot) {
+                setUseSnapshot(true);
+                setStreamKey(Date.now());
+              } else {
+                setHasStreamError(true);
+              }
+            }}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -347,7 +380,7 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
 
       {/* ─── Card Action Footer with [ OPEN LIVE VIEW ] ─────────────── */}
       <div className="px-3.5 py-2 bg-[#12263A] border-t border-[#20344A] flex items-center justify-between gap-2 mt-auto">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {onOpenLiveView && (
             <button
               onClick={() => onOpenLiveView(camera)}
@@ -358,6 +391,22 @@ export const CameraLiveCard: React.FC<CameraLiveCardProps> = ({
               <span>OPEN LIVE VIEW</span>
             </button>
           )}
+
+          {onOpenEntryGate &&
+            (purpose === 'ENTRY GATE' ||
+              camera.camera_id === 'camera_01' ||
+              camera.camera_id === 'camera_1' ||
+              camera.zone_id === 'entry_gate' ||
+              (camera.name && camera.name.toLowerCase().includes('gate'))) && (
+              <button
+                onClick={() => onOpenEntryGate(camera)}
+                className="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                title="Open Turnstile Entry Gate Access Workflow"
+              >
+                <DoorOpen className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Entry Gate View</span>
+              </button>
+            )}
 
           {onToggleSpeaker && (
             <button
